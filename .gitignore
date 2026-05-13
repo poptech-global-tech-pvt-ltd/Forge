@@ -36,8 +36,23 @@ build/
 .vscode/
 
 ### Mac OS ###
-.DS_Store*.apk
+.DS_Store
+
+### Secrets ###
+src/test/resources/*.properties
+src/test/resources/local.properties
+src/test/resources/prod.properties
+src/test/resources/qa.properties
 
 ### Local overrides (machine-specific, never commit) ###
 local.cloud.properties
 src/test/resources/local.cloud.properties
+
+### Forge ###
+*.apk
+*.ipa
+reports/
+graphify-out/
+missing_test_tags.txt
+testsigma-ai.yaml
+.m2/

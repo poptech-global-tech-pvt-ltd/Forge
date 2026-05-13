@@ -1,0 +1,51 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<!--
+  API automation suite — mirrors roast-master's intg/sanity modes.
+  Run: java -DMODE=api -DENV=qa -jar forge.jar
+  Or:  mvn test -Dsurefire.suiteXmlFiles=src/test/resources/testNg/testng-api.xml -DENV=qa
+-->
+<suite name="Forge API Suite" parallel="tests" thread-count="2">
+
+    <listeners>
+        <listener class-name="com.popclub.listener.TestListener"/>
+    </listeners>
+
+    <parameter name="runTitle" value="API Integration Tests"/>
+    <parameter name="projectId" value="d8f4a221-bc6d-47d8-9448-0834f5d012ec"/>
+    <parameter name="tag" value="api"/>
+
+    <test name="API - Auth">
+        <groups>
+            <run>
+                <include name="auth"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.popclub.runner.TestRunnerTest"/>
+        </classes>
+    </test>
+
+    <test name="API - Payments">
+        <groups>
+            <run>
+                <include name="payments"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.popclub.runner.TestRunnerTest"/>
+        </classes>
+    </test>
+
+    <test name="API - UPI">
+        <groups>
+            <run>
+                <include name="upi"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.popclub.runner.TestRunnerTest"/>
+        </classes>
+    </test>
+
+</suite>
