@@ -1,0 +1,50 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<!--
+  Web automation suite — Playwright + POM
+  Run full suite  : mvn test -Dsurefire.suiteXmlFiles=src/test/resources/testNg/testng-web.xml
+  Run smoke only  : mvn test -Dsurefire.suiteXmlFiles=src/test/resources/testNg/testng-web.xml -Dgroups=smoke
+  Run e2e only    : mvn test -Dsurefire.suiteXmlFiles=src/test/resources/testNg/testng-web.xml -Dgroups=e2e
+-->
+<suite name="Forge Web Suite" parallel="tests" thread-count="3">
+
+    <listeners>
+        <!-- Existing TestSigma / run-tracking listener -->
+        <listener class-name="com.popclub.listener.TestListener"/>
+    </listeners>
+
+    <parameter name="runTitle"   value="Web Automation Tests"/>
+    <parameter name="projectId"  value="d8f4a221-bc6d-47d8-9448-0834f5d012ec"/>
+    <parameter name="tag"        value="web"/>
+
+<!--    &lt;!&ndash; ── Smoke + regression tests on individual pages ─────────────────── &ndash;&gt;-->
+<!--    <test name="OTP Page Tests">-->
+<!--        <groups>-->
+<!--            <run><include name="smoke"/></run>-->
+<!--        </groups>-->
+<!--        <classes>-->
+<!--            <class name="com.popclub.web.tests.OtpPageTest"/>-->
+<!--        </classes>-->
+<!--    </test>-->
+
+<!--    &lt;!&ndash; ── Legacy eligibility flow tests ────────────────────────────────── &ndash;&gt;-->
+<!--    <test name="Eligibility Flow Tests">-->
+<!--        <classes>-->
+<!--            <class name="com.popclub.web.tests.EligibilityFlowTest"/>-->
+<!--        </classes>-->
+<!--    </test>-->
+
+    <!-- ── Full application flow — smoke + e2e ───────────────────────────── -->
+    <test name="Full Application Flow Tests">
+        <classes>
+            <class name="com.popclub.web.tests.FullApplicationFlowTest"/>
+        </classes>
+    </test>
+
+<!--    <test name="Error Page Tests">-->
+<!--        <classes>-->
+<!--            <class name="com.popclub.web.tests.ErrorPageTest"/>-->
+<!--        </classes>-->
+<!--    </test>-->
+
+</suite>

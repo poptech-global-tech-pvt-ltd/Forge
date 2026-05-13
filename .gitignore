@@ -37,3 +37,17 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### Secrets ###
+src/test/resources/local.properties
+src/test/resources/prod.properties
+src/test/resources/qa.properties
+
+### Forge ###
+*.apk
+*.ipa
+reports/
+graphify-out/
+missing_test_tags.txt
+testsigma-ai.yaml
+.m2/
