@@ -1,6 +1,7 @@
 package com.popclub.mobile.driver;
 
 import com.popclub.core.TestContext;
+import com.popclub.mobile.cloud.CloudConfig;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.options.UiAutomator2Options;
@@ -12,55 +13,58 @@ import java.time.Duration;
 
 public class AppiumDriverManager {
 
-    private static ThreadLocal<AppiumDriver> driver = new ThreadLocal<>();
-    public static ThreadLocal<DeviceInfo> deviceInfo = new ThreadLocal<>();
+    private static ThreadLocal<AppiumDriver> driver     = new ThreadLocal<>();
+    public  static ThreadLocal<DeviceInfo>   deviceInfo = new ThreadLocal<>();
 
     public static AppiumDriver getDriver() {
-
         if (driver.get() == null) {
             driver.set(createDriver());
         }
-
         return driver.get();
     }
 
     private static AppiumDriver createDriver() {
-
+        DeviceInfo device = null;
         try {
-
-            // Get device + port
-            DeviceInfo device = DeviceManager.getDevice();
-
+            // 1. Obtain a device (local ADB pool  OR  STF cloud reservation)
+            device = DeviceManager.getDevice();
             String udid = device.udid;
-            int port = device.port;
+            int    port = device.port;
 
             System.out.println(
                     "Thread: " + Thread.currentThread().getId() +
-                            " | Device: " + udid +
-                            " | Port: " + port
+                    " | Device: " + udid +
+                    " | Port: "   + port +
+                    " | Mode: "   + (CloudConfig.isCloudEnabled() ? "CLOUD" : "LOCAL")
             );
 
-            //  Start Appium server
+            // 2. Start a local Appium server that will drive the device.
+            //    Works for both modes:
+            //      • Local  → device was already connected via USB/emulator
+            //      • Cloud  → device was just ADB-connected over TCP by DeviceManager
             AppiumServerManager.startServer(udid, port);
 
+            // 3. Build capabilities
             UiAutomator2Options options = new UiAutomator2Options();
-
-            options.setPlatformName("Android");
+            options.setPlatformName(device.platformName != null ? device.platformName : "Android");
             options.setDeviceName(udid);
             options.setUdid(udid);
             options.setAutomationName("UiAutomator2");
+            if (device.platformVersion != null && !device.platformVersion.isEmpty()) {
+                options.setPlatformVersion(device.platformVersion);
+            }
             options.setAutoGrantPermissions(true);
-
             options.setApp(System.getProperty("user.dir") +
                     "/src/main/resources/pop-debug.apk");
-
-            //  Reset behavior
-            options.setNoReset(false);
+            // Explicitly set package + main activity so Appium resolves the
+            // correct entry point when the APK declares multiple launcher activities.
+            options.setAppPackage("com.popclub.android");
+            options.setAppActivity("com.popclub.android.LauncherClassic");
+            options.setNoReset(TestContext.isNoReset());
+            options.setNewCommandTimeout(Duration.ofSeconds(300));
             TestContext.setFreshLaunch(true);
 
-            options.setNewCommandTimeout(Duration.ofSeconds(300));
-
-            // Unique host port for UiAutomator2 (avoids stale-session collisions on fixed 8200+port)
+            // Unique UiAutomator2 system port to avoid stale-session collisions
             int systemPort;
             try (ServerSocket socket = new ServerSocket(0)) {
                 systemPort = socket.getLocalPort();
@@ -69,34 +73,38 @@ public class AppiumDriverManager {
             }
             options.setSystemPort(systemPort);
 
+            // 4. Connect to the local Appium server
             AppiumDriver driverInstance = new AndroidDriver(
-                    new URL("http://127.0.0.1:" + port ),
+                    new URL("http://127.0.0.1:" + port),
                     options
             );
 
-            // store device info
             deviceInfo.set(device);
-
             return driverInstance;
 
         } catch (Exception e) {
+            // Release the device if it was allocated but session creation failed
+            if (device != null) {
+                try { AppiumServerManager.stopServer(device.udid); } catch (Exception ignored) {}
+                DeviceManager.release(device.udid);
+            }
             e.printStackTrace();
-            throw
-
-                    new RuntimeException("Driver creation failed", e);
+            throw new RuntimeException("Driver creation failed", e);
         }
     }
 
     public static void quitDriver() {
-
         if (driver.get() != null) {
-
-            driver.get().quit();
+            try {
+                driver.get().quit();
+            } catch (Exception ignored) {}
 
             DeviceInfo device = deviceInfo.get();
-
             if (device != null) {
+                // Stop local Appium server for this device
                 AppiumServerManager.stopServer(device.udid);
+                // Release device (local pool or STF reservation)
+                DeviceManager.release(device.udid);
             }
 
             driver.remove();
@@ -108,4 +116,3 @@ public class AppiumDriverManager {
         return deviceInfo.get();
     }
 }
-

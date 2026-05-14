@@ -23,6 +23,7 @@ public class TestContext {
             ThreadLocal.withInitial(HashSet::new);
 
     private static ThreadLocal<String> executionMode = new ThreadLocal<>();
+    private static ThreadLocal<Boolean> noReset = ThreadLocal.withInitial(() -> false);
     private static ThreadLocal<File> videoFile = new ThreadLocal<>();
     private static ThreadLocal<String> currentTestCase = new ThreadLocal<>();
 
@@ -48,6 +49,14 @@ public class TestContext {
 
     public static String getExecutionMode() {
         return executionMode.get();
+    }
+
+    public static void setNoReset(boolean value) {
+        noReset.set(value);
+    }
+
+    public static boolean isNoReset() {
+        return noReset.get();
     }
 
     public static void markFailed(String testCaseId) {

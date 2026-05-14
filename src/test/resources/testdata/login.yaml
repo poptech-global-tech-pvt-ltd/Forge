@@ -1,11 +1,14 @@
 testName: Login Test
 platform: android
+noReset: false
 
 testCaseIds:
   - PO-6184
 
 features:
   - login
+  - shop
+  - home
 
 tags:
   - smoke
@@ -20,7 +23,6 @@ steps:
     element: login_input_phone
     value: 1234561122
 
-
   - action: tap
     element: login_button
 
@@ -28,5 +30,40 @@ steps:
     element: otp_input
     value: 560102
 
+  - action: tap
+    element: skip_tour
+
+  - action: waitFor
+    element: home_tab
+
   - action: verifyElement
     element: home_tab
+
+  - action: tap
+    element: shop_tab
+
+
+
+  - action: waitFor
+    element: shop_search_icon
+
+  - action: tap
+    element: shop_search_icon
+
+  - action: scanTags
+
+  - action: enterText
+    element: search_input
+    value: Aloe face wash
+
+  - action: scanTags
+
+
+  - action: tap
+    element: search_input
+
+
+  - action: scanTags
+
+
+

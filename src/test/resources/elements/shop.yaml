@@ -1,30 +1,30 @@
-home_profile_icon:
+shop_search_icon:
   android:
     - type: accessibilityId
-      value: Profile
+      value: search
 
-shop_tab:
+wishlist_icon:
   android:
     - type: accessibilityId
-      value: Shop
+      value: wishlsit
 
-card_tab:
+cart_icon:
   android:
     - type: accessibilityId
-      value: Card
+      value: cart
 
-scan_qr_code:
+
+banner_image:
   android:
     - type: accessibilityId
-      value: Scan QR Code
+      value: home_editor_pick_item_0
 
-home_tab:
+search_input:
   android:
     - type: accessibilityId
-      value: Home
+      value: Search
 
-skip_tour:
+search_key:
   android:
     - type: accessibilityId
-      value: Close
-
+      value: enter

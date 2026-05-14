@@ -18,7 +18,7 @@ public class WaitUtil {
             try {
                 AppiumBy by = (AppiumBy) (AppiumBy) LocatorUtil.getLocator(locator);
 
-                WebElement element = new WebDriverWait(driver, Duration.ofSeconds(5))
+                WebElement element = new WebDriverWait(driver, Duration.ofSeconds(20))
                         .until(ExpectedConditions.visibilityOfElementLocated(by));
 
                 System.out.println("Found using: " + locator.type);

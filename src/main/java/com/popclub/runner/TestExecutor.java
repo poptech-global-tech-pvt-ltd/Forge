@@ -21,6 +21,7 @@ public class TestExecutor {
 
         // Platform
         TestContext.setPlatform(testCase.platform);
+        TestContext.setNoReset(testCase.noReset);
 
         System.out.println("Starting Test: " + testCase.testName);
 

@@ -15,7 +15,7 @@ retry: 2   #  retry at test level
 steps:
   - action: launchApp
 
-
+  - action: scanTags
 
   - action: enterText
     element: login_input_phone

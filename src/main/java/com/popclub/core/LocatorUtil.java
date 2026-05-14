@@ -19,7 +19,12 @@ public class LocatorUtil {
                 return By.xpath(locator.value);
 
             case "text":
-                return By.xpath("//*[contains(@text,'" + locator.value + "')]");
+                return By.xpath("//*[contains(@text,'" + locator.value
+                        + "') or contains(@content-desc,'" + locator.value + "')]");
+
+            case "uiautomator":
+                return AppiumBy.androidUIAutomator(
+                        "new UiSelector().textContains(\"" + locator.value + "\")");
 
             default:
                 throw new RuntimeException("Unknown locator type: " + locator.type);

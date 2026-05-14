@@ -17,6 +17,8 @@ public class TestCase {
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
     public List<String> testCaseIds;
 
+    public boolean noReset = false;
+
     public String mapping = "TEST";
 
 

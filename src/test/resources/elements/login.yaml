@@ -1,19 +1,26 @@
 login_input_phone:
   android:
     - type: accessibilityId
-      value: login_input_phone
+      value: login_phone_input
 
 login_button:
   android:
     - type: accessibilityId
-      value: login_button_get_otp
+      value: login_continue_button
+
 
 otp_input:
   android:
     - type: accessibilityId
-      value: login_input_otp
+      value: login_otp_input
 
 home_tab:
   android:
     - type: accessibilityId
-      value: navigation_tab_home
+      value: Home
+
+skip_tour:
+  android:
+    - type: accessibilityId
+      value: Close
+
