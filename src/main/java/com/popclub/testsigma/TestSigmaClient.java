@@ -96,6 +96,13 @@ public class TestSigmaClient {
         List<Map<String, Object>> list =
                 response.jsonPath().getList("data.test_cases");
 
+        if (list == null) {
+            System.err.println("[TestSigma] API returned null for data.test_cases. " +
+                    "Status: " + response.getStatusCode() +
+                    " | Body: " + response.asPrettyString());
+            throw new RuntimeException("TestCase not found (null response): " + humanId);
+        }
+
         for (Map<String, Object> tc : list) {
 
             String human = (String) tc.get("human_id");

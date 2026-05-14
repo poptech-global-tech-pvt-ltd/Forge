@@ -60,9 +60,10 @@ public class TagFinder {
         options.setUdid(udid);
         options.setAutomationName("UiAutomator2");
         options.setApp(System.getProperty("user.dir") + "/src/main/resources/pop-debug.apk");
+        options.setAppPackage("com.popclub.android");
+        options.setAppActivity("com.popclub.android.LauncherClassic");
         options.setAutoGrantPermissions(true);
         options.setNoReset(false);
-        options.setCapability("appium:dontStopAppOnReset", true); // avoids -S flag in am start-activity (multiple launcher activities bug)
         options.setNewCommandTimeout(Duration.ofSeconds(300));
 
         int systemPort;
