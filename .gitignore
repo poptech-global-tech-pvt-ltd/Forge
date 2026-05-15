@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
@@ -49,3 +50,8 @@ graphify-out/
 missing_test_tags.txt
 testsigma-ai.yaml
 .m2/
+=======
+.idea/
+target/
+
+>>>>>>> API-AUTOMATION
