@@ -36,9 +36,12 @@ public class STFClient {
     public STFClient(String baseUrl, String token) {
         this.baseUrl = baseUrl.replaceAll("/$", ""); // strip trailing slash
         this.token   = token;
+        // Disable Java 11+ HttpClient hostname verification for self-signed / IP-only certs
+        System.setProperty("jdk.internal.httpclient.disableHostnameVerification", "true");
+
         this.http    = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(30))
-                .sslContext(trustAllSslContext())   // accept self-signed certs on internal farms
+                .sslContext(trustAllSslContext())
                 .build();
     }
 
@@ -95,6 +98,7 @@ public class STFClient {
             return serials;
 
         } catch (Exception e) {
+            System.err.println("[STF] Failed to list devices — cause: " + e.getClass().getName() + ": " + e.getMessage());
             throw new RuntimeException("[STF] Failed to list devices", e);
         }
     }

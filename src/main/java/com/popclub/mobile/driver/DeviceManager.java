@@ -100,13 +100,13 @@ public class DeviceManager {
             }
         }
 
-        // 2. Reserve it (best-effort — some STF builds have a buggy reservation API
-        //    but still allow remote-connect, so we warn and continue on failure)
+        // 2. Release any stale reservation first, then reserve fresh
+        stf.releaseDevice(serial); // no-op if not owned; clears stale holds from crashed runs
         try {
             stf.reserveDevice(serial, CloudConfig.getStfDeviceTimeout());
         } catch (Exception e) {
-            System.out.println("[STF] Warning: reservation API failed (" + e.getMessage()
-                    + ") — attempting remote connect anyway");
+            throw new RuntimeException("[STF] Failed to reserve device " + serial
+                    + ": " + e.getMessage(), e);
         }
         busyDevices.add(serial);
 
