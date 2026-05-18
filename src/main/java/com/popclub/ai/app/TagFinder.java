@@ -61,7 +61,7 @@ public class TagFinder {
         options.setAutomationName("UiAutomator2");
         options.setApp(System.getProperty("user.dir") + "/src/main/resources/pop-debug.apk");
         options.setAppPackage("com.popclub.android");
-        options.setAppActivity("com.popclub.android.LauncherClassic");
+        options.setAppActivity("com.popclub.android.LauncherFresh");
         options.setAutoGrantPermissions(true);
         options.setNoReset(false);
         options.setNewCommandTimeout(Duration.ofSeconds(300));

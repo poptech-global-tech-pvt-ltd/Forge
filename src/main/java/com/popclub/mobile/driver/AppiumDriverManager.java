@@ -59,7 +59,7 @@ public class AppiumDriverManager {
             // Explicitly set package + main activity so Appium resolves the
             // correct entry point when the APK declares multiple launcher activities.
             options.setAppPackage("com.popclub.android");
-            options.setAppActivity("com.popclub.android.LauncherClassic");
+            options.setAppActivity("com.popclub.android.LauncherFresh");
             options.setNoReset(TestContext.isNoReset());
             options.setNewCommandTimeout(Duration.ofSeconds(300));
             TestContext.setFreshLaunch(true);
