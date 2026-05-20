@@ -97,6 +97,10 @@ public class STFClient {
             System.out.println("[STF] Available devices: " + serials);
             return serials;
 
+        } catch (java.net.http.HttpConnectTimeoutException e) {
+            System.err.println("[STF] Cannot reach device farm at " + baseUrl
+                    + " — is pop-device-farm running? (./start.sh)");
+            throw new RuntimeException("[STF] Device farm unreachable: " + baseUrl, e);
         } catch (Exception e) {
             System.err.println("[STF] Failed to list devices — cause: " + e.getClass().getName() + ": " + e.getMessage());
             throw new RuntimeException("[STF] Failed to list devices", e);
