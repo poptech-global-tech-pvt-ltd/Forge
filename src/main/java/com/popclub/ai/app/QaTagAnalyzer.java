@@ -40,6 +40,12 @@ public class QaTagAnalyzer {
         "Open navigation drawer", "Navigate up"
     ));
 
+    // Elements that appear on every screen (bottom nav, toolbar) → use common_ prefix
+    private static final Set<String> GLOBAL_LABELS = new HashSet<>(Arrays.asList(
+        "Profile", "Shop", "Card", "Home", "Rewards", "Feed",
+        "profile", "shop", "card", "home", "rewards", "feed"
+    ));
+
     // Android widget classes that are always interactive
     private static final Set<String> INTERACTIVE_CLASSES = new HashSet<>(Arrays.asList(
         "android.widget.Button",
@@ -217,6 +223,13 @@ public class QaTagAnalyzer {
      */
     private static String suggestBadTag(String screenName, String tag,
                                         String text, String className) {
+        // Global elements (bottom nav, toolbar) → always use common_ prefix
+        if (GLOBAL_LABELS.contains(tag) || GLOBAL_LABELS.contains(text)) {
+            String snake = textToSnake(tag.isBlank() ? text : tag);
+            String base  = dedup("common_" + snake);
+            return "const val " + base.toUpperCase() + " = \"" + base + "\"";
+        }
+
         String prefix = screenPrefix(screenName);
 
         // Already snake_case — just prepend screen prefix
