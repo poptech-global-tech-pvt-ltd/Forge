@@ -1,18 +1,15 @@
 #!/bin/bash
-# Run TagFinder standalone — no TestNG, no YAML needed.
-# Usage: ./run-tag-finder.sh
+# Run TagFinder standalone — ADB only, no Appium needed.
+# Usage:
+#   ./run-tag-finder.sh                     ← auto-detect device
+#   ./run-tag-finder.sh 10BDCM0YJZ00043     ← specific device
 
 set -e
+cd "$(dirname "$0")"
 
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-cd "$SCRIPT_DIR"
-
-# Compile (test-compile also copies src/test/resources → target/test-classes)
-mvn test-compile -q
-
-# Build classpath (uses cached local jars — no network)
-mvn dependency:build-classpath -Dmdep.outputFile=.classpath -q
+# Copy test resources (properties files) to target
+mkdir -p target/test-classes
+cp -r src/test/resources/* target/test-classes/ 2>/dev/null || true
 
 CP="target/classes:target/test-classes:$(cat .classpath)"
-
 java -cp "$CP" com.popclub.ai.app.TagFinder "$@"

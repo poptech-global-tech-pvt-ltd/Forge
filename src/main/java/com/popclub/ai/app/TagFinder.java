@@ -1,68 +1,62 @@
 package com.popclub.ai.app;
 
-import com.popclub.mobile.driver.AppiumServerManager;
-import com.popclub.mobile.driver.DeviceManager;
-import com.popclub.mobile.driver.DeviceInfo;
 import com.popclub.parser.XmlElementParser;
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.android.options.UiAutomator2Options;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.ServerSocket;
-import java.net.URL;
-import java.time.Duration;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Standalone QA tag scanner.
+ * Standalone QA tag scanner — uses ADB only, no Appium needed.
  *
- * Starts Appium server, launches the app fresh, then lets you navigate
- * screen by screen and scan test tags on demand.
- *
- * Usage:  ./run-tag-finder.sh
+ * Usage:
+ *   ./run-tag-finder.sh                     ← auto-detect device
+ *   ./run-tag-finder.sh 10BDCM0YJZ00043     ← specific device
  */
 public class TagFinder {
 
-    private static final String REPORTS_DIR  = "reports";
+    private static final String REPORTS_DIR = "reports";
     private static final String APP_PACKAGE  = "com.popclub.android";
     private static final String APP_ACTIVITY = "com.popclub.android.LauncherFresh";
 
     public static void main(String[] args) throws Exception {
 
-        // Optional: pass device UDID as first argument
-        //   ./run-tag-finder.sh emulator-5554
-        //   ./run-tag-finder.sh R5CTA1XXXXX
-        if (args.length > 0 && !args[0].isBlank()) {
-            System.setProperty("stf.device.serial", args[0].trim());
-            System.out.println("Using device: " + args[0].trim());
-        }
+        System.out.println("[1] Detecting device...");
+        String udid = args.length > 0 ? args[0].trim() : detectDevice();
+        System.out.println("[2] Device: " + udid);
 
-        AndroidDriver driver = createDriver();
-        System.out.println("App launched. Navigate on the device.");
-        System.out.println("Press ENTER to scan current screen.");
-        System.out.println("Type a screen name before ENTER to label it, or just ENTER to auto-detect.");
-        System.out.println("Type 'exit' to stop and write summary.\n");
+        System.out.println("[3] Launching app...");
+        launchApp(udid);
+        System.out.println("[4] App launched.");
+
+        System.out.println("\nNavigate on the device, then press ENTER to scan.");
+        System.out.println("Type a screen name before ENTER to label it.");
+        System.out.println("Type 'exit' to stop.\n");
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         List<QaTagAnalyzer.ScreenReport> allReports = new ArrayList<>();
 
         while (true) {
-            System.out.print("Screen name (or ENTER): ");
+            System.out.print("Screen name (or ENTER to detect): ");
             String input = reader.readLine();
             if ("exit".equalsIgnoreCase(input != null ? input.trim() : "")) break;
 
             String screenName = (input != null && !input.isBlank())
                     ? input.trim()
-                    : resolveActivity(driver);
+                    : resolveActivity(udid);
 
             System.out.println("Scanning: " + screenName + " ...");
-            Thread.sleep(800); // let UI settle
 
-            String xml = driver.getPageSource();
+            String xml = getPageSource(udid);
+            if (xml == null || xml.isBlank()) {
+                System.out.println("  Could not get screen XML — is the app open on the device?");
+                continue;
+            }
+
             List<Map<String, String>> elements = XmlElementParser.parse(xml);
             QaTagAnalyzer.ScreenReport report = QaTagAnalyzer.analyse(elements, screenName);
             QaTagAnalyzer.printReport(report);
@@ -72,47 +66,107 @@ public class TagFinder {
 
         if (!allReports.isEmpty()) {
             QaTagAnalyzer.writeSummary(allReports, REPORTS_DIR);
-            System.out.println("\nSummary → " + REPORTS_DIR + "/qa-app-scan/summary.yaml");
+            System.out.println("Summary → " + REPORTS_DIR + "/qa-app-scan/summary.yaml");
         }
 
-        driver.quit();
         System.out.println("Done.");
     }
 
-    private static AndroidDriver createDriver() throws Exception {
-        DeviceInfo device = DeviceManager.getDevice();
-        String udid = device.udid;
-        int port    = device.port;
+    // ── App launch ────────────────────────────────────────────────────────────
 
-        System.out.println("Device: " + udid + " | Port: " + port);
-        AppiumServerManager.startServer(udid, port);
-
-        int systemPort;
-        try (ServerSocket s = new ServerSocket(0)) { systemPort = s.getLocalPort(); }
-        catch (IOException e) { systemPort = 8200 + port; }
-
-        UiAutomator2Options options = new UiAutomator2Options()
-                .setPlatformName("Android")
-                .setDeviceName(udid)
-                .setUdid(udid)
-                .setAutomationName("UiAutomator2")
-                .setAppPackage(APP_PACKAGE)
-                .setAppActivity(APP_ACTIVITY)
-                .setAutoGrantPermissions(true)
-                .setNoReset(false)
-                .setNewCommandTimeout(Duration.ofSeconds(300))
-                .setSystemPort(systemPort);
-
-        return new AndroidDriver(new URL("http://127.0.0.1:" + port), options);
+    private static void launchApp(String udid) throws Exception {
+        System.out.println("[3a] Waking screen...");
+        adb(udid, "shell", "input", "keyevent", "224");
+        System.out.println("[3b] Force stopping app...");
+        Thread.sleep(500);
+        adb(udid, "shell", "am", "force-stop", APP_PACKAGE);
+        System.out.println("[3c] Starting app...");
+        Thread.sleep(1000);
+        adb(udid, "shell", "am", "start", "-n", APP_PACKAGE + "/" + APP_ACTIVITY);
+        System.out.println("[3d] Waiting 4s for app to load...");
+        Thread.sleep(4000);
     }
 
-    private static String resolveActivity(AndroidDriver driver) {
-        try {
-            String activity = driver.currentActivity();
-            String[] parts  = activity.split("\\.");
-            return parts[parts.length - 1];
-        } catch (Exception ignored) {
-            return "unknown_screen";
+    // ── Page source via uiautomator dump ─────────────────────────────────────
+
+    private static String getPageSource(String udid) throws Exception {
+        Thread.sleep(800);
+        // Wake screen first to ensure UI is ready
+        adb(udid, "shell", "input", "keyevent", "224");
+        Thread.sleep(500);
+
+        adb(udid, "shell", "uiautomator", "dump", "/sdcard/wd.xml");
+        Path tmp = Files.createTempFile("wd_", ".xml");
+        adb(udid, "pull", "/sdcard/wd.xml", tmp.toAbsolutePath().toString());
+        String xml = Files.readString(tmp);
+        Files.deleteIfExists(tmp);
+
+        int start = xml.indexOf("<hierarchy");
+        int end   = xml.lastIndexOf("</hierarchy>");
+        if (start >= 0 && end >= 0) {
+            return xml.substring(start, end + "</hierarchy>".length());
         }
+        return null;
+    }
+
+    // ── Activity detection ────────────────────────────────────────────────────
+
+    private static String resolveActivity(String udid) {
+        try {
+            ProcessBuilder pb = new ProcessBuilder(
+                    "adb", "-s", udid, "shell", "dumpsys", "window", "windows");
+            pb.redirectErrorStream(true);
+            Process p = pb.start();
+            try (BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+                String line;
+                while ((line = r.readLine()) != null) {
+                    if (line.contains("mCurrentFocus") || line.contains("mFocusedApp")) {
+                        int slash = line.lastIndexOf('/');
+                        int brace = line.lastIndexOf('}');
+                        if (slash >= 0 && brace > slash) {
+                            String activity = line.substring(slash + 1, brace).trim();
+                            String[] parts = activity.split("\\.");
+                            return parts[parts.length - 1];
+                        }
+                    }
+                }
+            }
+            p.waitFor();
+        } catch (Exception ignored) {}
+        return "unknown_screen";
+    }
+
+    // ── ADB device detection ──────────────────────────────────────────────────
+
+    private static String detectDevice() throws Exception {
+        ProcessBuilder pb = new ProcessBuilder("adb", "devices");
+        pb.redirectErrorStream(true);
+        Process p = pb.start();
+        List<String> udids = new ArrayList<>();
+        try (BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+            String line;
+            while ((line = r.readLine()) != null) {
+                if (line.endsWith("\tdevice")) udids.add(line.split("\t")[0].trim());
+            }
+        }
+        p.waitFor();
+        if (udids.isEmpty()) throw new RuntimeException("No ADB device connected.");
+        if (udids.size() > 1) System.out.println("Multiple devices found, using: " + udids.get(0));
+        return udids.get(0);
+    }
+
+    // ── ADB helper ────────────────────────────────────────────────────────────
+
+    private static void adb(String udid, String... cmd) throws Exception {
+        List<String> full = new ArrayList<>();
+        full.add("adb"); full.add("-s"); full.add(udid);
+        for (String c : cmd) full.add(c);
+        ProcessBuilder pb = new ProcessBuilder(full);
+        pb.redirectErrorStream(true);
+        Process p = pb.start();
+        try (BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+            while (r.readLine() != null) {}
+        }
+        p.waitFor();
     }
 }

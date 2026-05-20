@@ -30,7 +30,8 @@ public class QaTagAnalyzer {
         "rupay_", "toolbar_", "common_", "app_update_", "faq_", "help_support_",
         "address_", "wishlist_", "mandate_", "check_balance_", "request_money_",
         "add_faves_", "bank_transfer_", "link_bank_", "split_", "activate_lite_",
-        "biometric_", "refer_", "no_cashback_"
+        "biometric_", "refer_", "no_cashback_", "clp_", "search_", "onboarding_",
+        "kyc_", "notification_", "settings_", "voucher_", "offer_", "banner_"
     );
 
     // Tags that are purely accessibility labels — not test tags, skip them
@@ -142,7 +143,7 @@ public class QaTagAnalyzer {
 
             String problem = checkConvention(tag);
             if (problem != null) {
-                String suggested = suggestTag(screenName, text, className, 0, false);
+                String suggested = suggestBadTag(screenName, tag, text, className);
                 report.badNaming.add(new BadNamingResult(tag, text, className, bounds, problem, suggested));
             } else {
                 report.good.add(new TagResult(tag, text, className, bounds));
@@ -209,6 +210,32 @@ public class QaTagAnalyzer {
         return "const val " + base.toUpperCase() + " = \"" + base + "\"";
     }
 
+    /**
+     * Suggest a fix for a badly named tag.
+     * - If tag is already snake_case but missing screen prefix → prepend screen prefix
+     * - If tag is PascalCase/Title Case → convert to snake_case and prepend screen prefix
+     */
+    private static String suggestBadTag(String screenName, String tag,
+                                        String text, String className) {
+        String prefix = screenPrefix(screenName);
+
+        // Already snake_case — just prepend screen prefix
+        if (tag.matches("[a-z][a-z0-9_]+")) {
+            String base = dedup(prefix + "_" + tag);
+            return "const val " + base.toUpperCase() + " = \"" + base + "\"";
+        }
+
+        // PascalCase / Title Case / spaces — convert to snake_case with screen prefix
+        String snake = textToSnake(tag);
+        if (!snake.isBlank()) {
+            String base = dedup(prefix + "_" + snake);
+            return "const val " + base.toUpperCase() + " = \"" + base + "\"";
+        }
+
+        // Fallback
+        return suggestTag(screenName, text, className, 0, false);
+    }
+
     private static String resolveLabel(String text, String className) {
         if (text != null && !text.isBlank() && text.length() < 40)
             return textToSnake(text);
@@ -239,7 +266,9 @@ public class QaTagAnalyzer {
     }
 
     private static String textToSnake(String text) {
-        String clean = text.replaceAll("[^a-zA-Z0-9\\s]", "").trim();
+        // Insert underscore before uppercase letters (PascalCase → pascal_case)
+        String spaced = text.replaceAll("([a-z])([A-Z])", "$1 $2");
+        String clean  = spaced.replaceAll("[^a-zA-Z0-9\\s]", "").trim();
         return clean.replaceAll("\\s+", "_").toLowerCase();
     }
 

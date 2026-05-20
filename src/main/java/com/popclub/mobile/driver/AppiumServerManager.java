@@ -46,13 +46,27 @@ public class AppiumServerManager {
 
         AppiumDriverLocalService service = builder.build();
 
+        System.out.println("Starting Appium server on port " + port + " ...");
         service.start();
 
+        int waited = 0;
         while (!service.isRunning()) {
             try { Thread.sleep(500); } catch (Exception ignored) {}
+            waited += 500;
+            if (waited % 3000 == 0) {
+                System.out.println("  Still waiting for Appium... (" + (waited / 1000) + "s)");
+            }
+            if (waited >= 30000) {
+                throw new RuntimeException(
+                    "Appium server did not start within 30s on port " + port +
+                    ". Check that node and appium paths in local.cloud.properties are correct.\n" +
+                    "  appium.node.path = " + CloudConfig.getNodePath() + "\n" +
+                    "  appium.js.path   = " + CloudConfig.getAppiumJsPath()
+                );
+            }
         }
 
-        System.out.println("🚀 Started Appium server → " + udid + " | port: " + port);
+        System.out.println("Appium server started → " + udid + " | port: " + port);
         services.put(udid, service);
         return service;
     }
