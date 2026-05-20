@@ -36,6 +36,10 @@ public class XmlElementParser {
             attrs.put("resourceId",      element.getAttribute("resource-id"));
             attrs.put("text",            element.getAttribute("text"));
             attrs.put("class",           element.getAttribute("class"));
+            attrs.put("clickable",       element.getAttribute("clickable"));
+            attrs.put("focusable",       element.getAttribute("focusable"));
+            attrs.put("enabled",         element.getAttribute("enabled"));
+            attrs.put("bounds",          element.getAttribute("bounds"));
 
             results.add(attrs);
         }

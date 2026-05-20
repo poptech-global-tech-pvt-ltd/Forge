@@ -1,0 +1,1962 @@
+# Missing QA Test Tags
+# Generated: 2026-05-20 11:33:14
+#
+# These interactive elements in Popdroid lack .qaTestTag().
+# Copy the 'suggested' declaration into TestTags.kt, then run `claude /qa-tags` to inject the modifier.
+# Adjust the name if the suggestion doesn't capture the semantic meaning clearly.
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : AccountItem
+File   : feature/upi/src/main/java/com/pop/feature/upi/ui/shoppayments/components/AccountItem.kt
+
+  Composable: AccountItem
+    Line  166  [radio     ]  PopRadioButton(
+             💡 const val ACCOUNT_ITEM_RADIO = "account_item_radio"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : AdditionalDetailsScreen
+File   : feature/credit_card/src/main/java/com/pop/credit_card/ui/compose/steps/AdditionalDetailsScreen.kt
+
+  Composable: AdditionalDetailsScreen > AdditionalDetailsContent > UserDetailsErrorBottomSheet > AdditionalDetailsCard > ChipRow > SelectionChip > RelationSelector > ClickableTextWithDottedUnderline > TncCheckboxRowWithBottomSheet
+    Line 1469  [row       ]  .clickable(enabled = !isReadOnly) {
+             💡 const val ADDITIONAL_DETAILS_TNC_CHECKBOX_ROW_WITH_BOTTOM_SHEET_ROW = "additional_details_tnc_checkbox_row_with_bottom_sheet_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : AddressSelectionBottomSheet
+File   : feature/ecom/src/main/java/com/pop/ecom/address/AddressSelectionBottomSheet.kt
+
+  Composable: AddressSelectionBottomSheet > LocationPermissionCard > AddressItem
+    Line  411  [row       ]  .clickable(onClick = onClick)
+             💡 const val ADDRESS_SELECTION_ADDRESS_ITEM_ROW = "address_selection_address_item_row"
+    Line  417  [row       ]  .clickable(onClick = onClick)
+             💡 fun addressSelectionAddressItemRowItem(index: Int) = "address_selection_address_item_row_item_$index"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : AppIconChangeBottomSheet
+File   : core/src/main/java/com/popclub/core/appicon/ui/AppIconChangeBottomSheet.kt
+
+  Composable: AppIconChangeBottomSheet
+    Line  173  [button    ]  PopButtonV2(
+             💡 const val APP_ICON_CHANGE_BOTTOM_SHEET_BUTTON = "app_icon_change_bottom_sheet_button"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : BankTransferSelectionBottomSheet
+File   : feature/upi/src/main/java/com/pop/feature/upi/ui/components/BankTransferSelectionBottomSheet.kt
+
+  Composable: BankTransferSelectionBottomSheet > SectionHeader
+    Line  297  [row       ]  modifier = Modifier.clickable(onClick = onAddClick)
+             💡 const val BANK_TRANSFER_SELECTION_SECTION_HEADER_ROW = "bank_transfer_selection_section_header_row"
+
+  Composable: BankTransferSelectionBottomSheet > SectionHeader > AccountListItem
+    Line  367  [radio     ]  RadioButton(
+             💡 const val BANK_TRANSFER_SELECTION_ACCOUNT_LIST_ITEM_RADIO = "bank_transfer_selection_account_list_item_radio"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : BillPayPaymentProcessingFragment
+File   : feature/billpay/src/main/java/com/pop/billpay/presentation/ui/fragment/BillPayPaymentProcessingFragment.kt
+
+  Composable: PaymentProcessingScreen
+    Line 1242  [button    ]  PopButtonV2(
+             💡 const val BILL_PAY_PAYMENT_PROCESSING_PAYMENT_PROCESSING_SCREEN_BUTTON = "bill_pay_payment_processing_payment_processing_screen_button"
+    Line 1267  [button    ]  PopButtonV2(
+             💡 fun billPayPaymentProcessingPaymentProcessingScreenButtonItem(index: Int) = "bill_pay_payment_processing_payment_processing_screen_button_item_$index"
+
+  Composable: PaymentProcessingScreen > ErrorBottomSheetContent
+    Line 1547  [button    ]  PopButtonV2(
+             💡 const val BILL_PAY_PAYMENT_PROCESSING_ERROR_BOTTOM_SHEET_CONTENT_BUTTON = "bill_pay_payment_processing_error_bottom_sheet_content_button"
+    Line 1558  [button    ]  PopButtonV2(
+             💡 fun billPayPaymentProcessingErrorBottomSheetContentButtonItem(index: Int) = "bill_pay_payment_processing_error_bottom_sheet_content_button_item_$index"
+    Line 1571  [button    ]  PopButtonV2(
+             💡 fun billPayPaymentProcessingErrorBottomSheetContentButtonItem(index: Int) = "bill_pay_payment_processing_error_bottom_sheet_content_button_item_$index"
+    Line 1583  [button    ]  PopButtonV2(
+             💡 fun billPayPaymentProcessingErrorBottomSheetContentButtonItem(index: Int) = "bill_pay_payment_processing_error_bottom_sheet_content_button_item_$index"
+    Line 1595  [button    ]  PopButtonV2(
+             💡 fun billPayPaymentProcessingErrorBottomSheetContentButtonItem(index: Int) = "bill_pay_payment_processing_error_bottom_sheet_content_button_item_$index"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : BillPayRechargePlanPageFragmentV2
+File   : feature/billpay/src/main/java/com/pop/billpay/presentation/ui/fragment/BillPayRechargePlanPageFragmentV2.kt
+
+  Composable: RechargePlanScreen > RechargePlanContent > UserInfoSection > SearchBarSection > PlanTypeTabsSection > PlanItemCard
+    Line 1347  [row       ]  .clickable { onSeeDetailsClick() }
+             💡 const val BILL_PAY_RECHARGE_PLAN_PAGE_FRAGMENT_V2_PLAN_ITEM_CARD_ROW = "bill_pay_recharge_plan_page_fragment_v2_plan_item_card_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : BillPayTssTransactionTable
+File   : feature/upi/src/main/java/com/pop/feature/upi/ui/tss/components/billpay/BillPayTssTransactionTable.kt
+
+  Composable: BillPayTssTransactionTable
+    Line  134  [row       ]  .popClickable(
+             💡 const val BILL_PAY_TSS_TRANSACTION_TABLE_ROW = "bill_pay_tss_transaction_table_row"
+
+  Composable: BillPayTssTransactionTable > ProcessingStateContent > SuccessStateContent > FailureStateContent > TimelineIndicator > TimelineContentItem > TimelineStepItem > TimelineSection > TimelineSectionWithHeader
+    Line 1229  [row       ]  .popClickable(
+             💡 const val BILL_PAY_TSS_TRANSACTION_TABLE_TIMELINE_SECTION_WITH_HEADER_ROW = "bill_pay_tss_transaction_table_timeline_section_with_header_row"
+
+  Composable: BillPayTssTransactionTable > ProcessingStateContent > SuccessStateContent > FailureStateContent > TimelineIndicator > TimelineContentItem > TimelineStepItem > TimelineSection > TimelineSectionWithHeader > TimelineIcon > RemarksSection > TransactionDetailRowItem
+    Line 1470  [row       ]  .popClickable(
+             💡 const val BILL_PAY_TSS_TRANSACTION_TABLE_TRANSACTION_DETAIL_ROW_ITEM_ROW = "bill_pay_tss_transaction_table_transaction_detail_row_item_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : BiometricFallbackDialogFragment
+File   : pop/src/main/java/com/popclub/android/biometric/BiometricFallbackDialogFragment.kt
+
+  Composable: BiometricFallbackScreen
+    Line  171  [button    ]  PopButtonV2(
+             💡 const val BIOMETRIC_FALLBACK_DIALOG_BIOMETRIC_FALLBACK_SCREEN_BUTTON = "biometric_fallback_dialog_biometric_fallback_screen_button"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : ButtonDemoScreen
+File   : ui_components/src/main/java/com/pop/components/screens/ButtonDemoScreen.kt
+
+  Composable: ButtonDemoScreen
+    Line   35  [button    ]  PopButton(
+             💡 const val BUTTON_DEMO_SCREEN_BUTTON = "button_demo_screen_button"
+    Line   43  [button    ]  PopButton(
+             💡 fun buttonDemoScreenButtonItem(index: Int) = "button_demo_screen_button_item_$index"
+    Line   51  [button    ]  PopButton(
+             💡 fun buttonDemoScreenButtonItem(index: Int) = "button_demo_screen_button_item_$index"
+    Line   59  [button    ]  PopButton(
+             💡 fun buttonDemoScreenButtonItem(index: Int) = "button_demo_screen_button_item_$index"
+    Line   67  [button    ]  PopButton(
+             💡 fun buttonDemoScreenButtonItem(index: Int) = "button_demo_screen_button_item_$index"
+    Line   78  [button    ]  PopButton(
+             💡 fun buttonDemoScreenButtonItem(index: Int) = "button_demo_screen_button_item_$index"
+    Line   86  [button    ]  PopButton(
+             💡 fun buttonDemoScreenButtonItem(index: Int) = "button_demo_screen_button_item_$index"
+    Line   94  [button    ]  PopButton(
+             💡 fun buttonDemoScreenButtonItem(index: Int) = "button_demo_screen_button_item_$index"
+    Line  102  [button    ]  PopButton(
+             💡 fun buttonDemoScreenButtonItem(index: Int) = "button_demo_screen_button_item_$index"
+    Line  110  [button    ]  PopButton(
+             💡 fun buttonDemoScreenButtonItem(index: Int) = "button_demo_screen_button_item_$index"
+    Line  121  [button    ]  PopButton(
+             💡 fun buttonDemoScreenButtonItem(index: Int) = "button_demo_screen_button_item_$index"
+    Line  129  [button    ]  PopButton(
+             💡 fun buttonDemoScreenButtonItem(index: Int) = "button_demo_screen_button_item_$index"
+    Line  137  [button    ]  PopButton(
+             💡 fun buttonDemoScreenButtonItem(index: Int) = "button_demo_screen_button_item_$index"
+    Line  145  [button    ]  PopButton(
+             💡 fun buttonDemoScreenButtonItem(index: Int) = "button_demo_screen_button_item_$index"
+    Line  153  [button    ]  PopButton(
+             💡 fun buttonDemoScreenButtonItem(index: Int) = "button_demo_screen_button_item_$index"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : CCErrorFragment
+File   : feature/credit_card/src/main/java/com/pop/credit_card/fragments/CCErrorFragment.kt
+
+  Composable: CcErrorScreen
+    Line  183  [button    ]  PopButtonV2(
+             💡 const val CC_ERROR_SCREEN_BUTTON = "cc_error_screen_button"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : CCHybridJourneyScreen
+File   : feature/home/src/main/java/com/pop/feature/credit_card/CCHybridJourneyScreen.kt
+
+  Composable: CCHybridJourneyScreen > TimerSection > TimerBadge > BottomActionStack
+    Line  548  [button    ]  PopButtonV2(
+             💡 const val CC_HYBRID_JOURNEY_BOTTOM_ACTION_STACK_BUTTON = "cc_hybrid_journey_bottom_action_stack_button"
+
+  Composable: CCHybridJourneyScreen > TimerSection > TimerBadge > BottomActionStack > InfoBadge > BackPressBottomSheet
+    Line  709  [button    ]  PopButtonV2(
+             💡 const val CC_HYBRID_JOURNEY_BACK_PRESS_BOTTOM_SHEET_BUTTON = "cc_hybrid_journey_back_press_bottom_sheet_button"
+    Line  717  [button    ]  PopButtonV2(
+             💡 fun ccHybridJourneyBackPressBottomSheetButtonItem(index: Int) = "cc_hybrid_journey_back_press_bottom_sheet_button_item_$index"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : CLPFragment
+File   : feature/home/src/main/java/com/pop/feature/clp/CLPFragment.kt
+
+  Composable: getMerchantImageForCategory > CLPWithTopBarContent > AllBillsErrorBottomSheetContent
+    Line 2767  [button    ]  PopButtonV2(
+             💡 const val CLP_ALL_BILLS_ERROR_BOTTOM_SHEET_CONTENT_BUTTON = "clp_all_bills_error_bottom_sheet_content_button"
+    Line 2778  [button    ]  PopButtonV2(
+             💡 fun clpAllBillsErrorBottomSheetContentButtonItem(index: Int) = "clp_all_bills_error_bottom_sheet_content_button_item_$index"
+    Line 2791  [button    ]  PopButtonV2(
+             💡 fun clpAllBillsErrorBottomSheetContentButtonItem(index: Int) = "clp_all_bills_error_bottom_sheet_content_button_item_$index"
+    Line 2803  [button    ]  PopButtonV2(
+             💡 fun clpAllBillsErrorBottomSheetContentButtonItem(index: Int) = "clp_all_bills_error_bottom_sheet_content_button_item_$index"
+    Line 2821  [button    ]  PopButtonV2(
+             💡 fun clpAllBillsErrorBottomSheetContentButtonItem(index: Int) = "clp_all_bills_error_bottom_sheet_content_button_item_$index"
+    Line 2832  [button    ]  PopButtonV2(
+             💡 fun clpAllBillsErrorBottomSheetContentButtonItem(index: Int) = "clp_all_bills_error_bottom_sheet_content_button_item_$index"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : CLPScreen
+File   : feature/home/src/main/java/com/pop/feature/clp/compose/CLPScreen.kt
+
+  Composable: CLPScreen > CLPWithTopBar > CLPContentStandard > CLPContentList > rememberBottomBarScrollModifier > ShimmerLoadingState > EmptyState > AllBillsErrorBottomSheetContent
+    Line 1051  [button    ]  PopButtonV2(
+             💡 const val CLP_ALL_BILLS_ERROR_BOTTOM_SHEET_CONTENT_BUTTON = "clp_all_bills_error_bottom_sheet_content_button"
+    Line 1071  [button    ]  PopButtonV2(
+             💡 fun clpAllBillsErrorBottomSheetContentButtonItem(index: Int) = "clp_all_bills_error_bottom_sheet_content_button_item_$index"
+    Line 1079  [button    ]  PopButtonV2(
+             💡 fun clpAllBillsErrorBottomSheetContentButtonItem(index: Int) = "clp_all_bills_error_bottom_sheet_content_button_item_$index"
+    Line 1094  [button    ]  PopButtonV2(
+             💡 fun clpAllBillsErrorBottomSheetContentButtonItem(index: Int) = "clp_all_bills_error_bottom_sheet_content_button_item_$index"
+    Line 1102  [button    ]  PopButtonV2(
+             💡 fun clpAllBillsErrorBottomSheetContentButtonItem(index: Int) = "clp_all_bills_error_bottom_sheet_content_button_item_$index"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : CachedTransactionHistory
+File   : feature/upi/src/main/java/com/pop/feature/upi/ui/txnhistory/CachedTransactionHistory.kt
+
+  Composable: CachedTransactionHistory
+    Line  422  [row       ]  modifier = Modifier.clickable {
+             💡 const val CACHED_TRANSACTION_HISTORY_ROW = "cached_transaction_history_row"
+    Line  516  [input     ]  PopInputFieldV2(
+             💡 const val CACHED_TRANSACTION_HISTORY_INPUT = "cached_transaction_history_input"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : CartFragment
+File   : feature/ecom/src/main/java/com/pop/ecom/cart/CartFragment.kt
+
+  Composable: CartScreen
+    Line  915  [row       ]  .clickable(
+             💡 const val CART_SCREEN_ROW = "cart_screen_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : CartValidationDebugMenu
+File   : feature/ecom/src/main/java/com/pop/ecom/cart/CartValidationDebugMenu.kt
+
+  Composable: CartValidationDebugMenu
+    Line   61  [row       ]  .clickable { showDebugMenu = true }
+             💡 const val CART_VALIDATION_DEBUG_MENU_ROW = "cart_validation_debug_menu_row"
+
+  Composable: CartValidationDebugMenu > CartValidationDebugBottomSheet > DebugMenuItem
+    Line  179  [row       ]  .clickable(onClick = onClick)
+             💡 const val CART_VALIDATION_DEBUG_MENU_DEBUG_MENU_ITEM_ROW = "cart_validation_debug_menu_debug_menu_item_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : CartValidationErrorBottomSheet
+File   : feature/ecom/src/main/java/com/pop/ecom/cart/CartValidationErrorBottomSheet.kt
+
+  Composable: CartValidationErrorBottomSheet
+    Line  147  [button    ]  PopButtonV2(
+             💡 const val CART_VALIDATION_ERROR_BOTTOM_SHEET_BUTTON = "cart_validation_error_bottom_sheet_button"
+    Line  155  [button    ]  PopButtonV2(
+             💡 fun cartValidationErrorBottomSheetButtonItem(index: Int) = "cart_validation_error_bottom_sheet_button_item_$index"
+    Line  170  [button    ]  PopButtonV2(
+             💡 fun cartValidationErrorBottomSheetButtonItem(index: Int) = "cart_validation_error_bottom_sheet_button_item_$index"
+    Line  178  [button    ]  PopButtonV2(
+             💡 fun cartValidationErrorBottomSheetButtonItem(index: Int) = "cart_validation_error_bottom_sheet_button_item_$index"
+    Line  189  [button    ]  PopButtonV2(
+             💡 fun cartValidationErrorBottomSheetButtonItem(index: Int) = "cart_validation_error_bottom_sheet_button_item_$index"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : Cashback
+File   : feature/upi/src/main/java/com/pop/feature/upi/ui/amountscreen/Cashback.kt
+
+  Composable: Cashback
+    Line   67  [row       ]  //                    .clickable {
+             💡 const val CASHBACK_ROW = "cashback_row"
+    Line  129  [checkbox  ]  PopCheckbox(
+             💡 const val CASHBACK_CHECKBOX = "cashback_checkbox"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : CashbackLedgerScreenV2
+File   : pop/src/main/java/com/popclub/android/cashback/CashbackLedgerScreenV2.kt
+
+  Composable: CashbackLedgerScreenV2 > ClaimCashbackBottomSheetV2 > AlmostThereBottomSheetV2 > AlmostClaimableBottomSheetV2 > WaysToEarnSectionV2 > TransactionItemV2 > CashbackZoneImageV2
+    Line 1237  [row       ]  .popClickable(enabled = true) {
+             💡 const val CASHBACK_LEDGER_SCREEN_V2_CASHBACK_ZONE_IMAGE_V2_ROW = "cashback_ledger_screen_v2_cashback_zone_image_v2_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : CategoryProductCarousal
+File   : feature/home/src/main/java/com/pop/feature/clp/compose/widgets/CategoryProductCarousal.kt
+
+  Composable: CategoryProductCarousal
+    Line  141  [row       ]  .clickable {
+             💡 const val CATEGORY_PRODUCT_CAROUSAL_ROW = "category_product_carousal_row"
+
+  Composable: CategoryProductCarousal > EditorPickCategoryItem
+    Line  289  [row       ]  .clickable { onClick() },
+             💡 const val CATEGORY_PRODUCT_CAROUSAL_EDITOR_PICK_CATEGORY_ITEM_ROW = "category_product_carousal_editor_pick_category_item_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : CategoryProductCarouselWidget
+File   : feature/home/src/main/java/com/pop/feature/clp/compose/widgets/CategoryProductCarouselWidget.kt
+
+  Composable: CategoryProductCarouselWidget
+    Line  168  [row       ]  .clickable {
+             💡 const val CATEGORY_PRODUCT_CAROUSEL_WIDGET_ROW = "category_product_carousel_widget_row"
+
+  Composable: CategoryProductCarouselWidget > CategoryCard
+    Line  236  [row       ]  .clickable {
+             💡 const val CATEGORY_PRODUCT_CAROUSEL_WIDGET_CATEGORY_CARD_ROW = "category_product_carousel_widget_category_card_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : CheckboxDemoScreen
+File   : ui_components/src/main/java/com/pop/components/screens/CheckboxDemoScreen.kt
+
+  Composable: CheckboxDemoScreen
+    Line   61  [checkbox  ]  PopCheckbox(
+             💡 const val CHECKBOX_DEMO_SCREEN_CHECKBOX = "checkbox_demo_screen_checkbox"
+    Line   70  [checkbox  ]  PopCheckbox(
+             💡 fun checkboxDemoScreenCheckboxItem(index: Int) = "checkbox_demo_screen_checkbox_item_$index"
+    Line   79  [checkbox  ]  PopCheckbox(
+             💡 fun checkboxDemoScreenCheckboxItem(index: Int) = "checkbox_demo_screen_checkbox_item_$index"
+    Line   88  [checkbox  ]  PopCheckbox(
+             💡 fun checkboxDemoScreenCheckboxItem(index: Int) = "checkbox_demo_screen_checkbox_item_$index"
+    Line   98  [checkbox  ]  PopCheckbox(
+             💡 fun checkboxDemoScreenCheckboxItem(index: Int) = "checkbox_demo_screen_checkbox_item_$index"
+    Line  123  [checkbox  ]  PopCheckbox(
+             💡 fun checkboxDemoScreenCheckboxItem(index: Int) = "checkbox_demo_screen_checkbox_item_$index"
+    Line  133  [checkbox  ]  PopCheckbox(
+             💡 fun checkboxDemoScreenCheckboxItem(index: Int) = "checkbox_demo_screen_checkbox_item_$index"
+    Line  143  [checkbox  ]  PopCheckbox(
+             💡 fun checkboxDemoScreenCheckboxItem(index: Int) = "checkbox_demo_screen_checkbox_item_$index"
+    Line  153  [checkbox  ]  PopCheckbox(
+             💡 fun checkboxDemoScreenCheckboxItem(index: Int) = "checkbox_demo_screen_checkbox_item_$index"
+    Line  164  [checkbox  ]  PopCheckbox(
+             💡 fun checkboxDemoScreenCheckboxItem(index: Int) = "checkbox_demo_screen_checkbox_item_$index"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : CoachMarkDialog
+File   : ui_components/src/main/java/com/pop/components/coachmarks/compose/CoachMarkDialog.kt
+
+  Composable: CoachMarkDialog
+    Line  208  [button    ]  TextButton(
+             💡 const val COACH_MARK_DIALOG_BUTTON = "coach_mark_dialog_button"
+    Line  226  [button    ]  PopButtonV2(
+             💡 fun coachMarkDialogButtonItem(index: Int) = "coach_mark_dialog_button_item_$index"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : CreditCardSdkMiddleWareActivity
+File   : feature/cc_sdk/src/main/java/com/ccsdk/presentation/ui/activity/CreditCardSdkMiddleWareActivity.kt
+
+  Composable: SDKErrorBottomSheetContent
+    Line  685  [button    ]  PopButtonV2(
+             💡 const val CREDIT_CARD_SDK_MIDDLE_WARE_ACTIVITY_SDK_ERROR_BOTTOM_SHEET_CONTENT_BUTTON = "credit_card_sdk_middle_ware_activity_sdk_error_bottom_sheet_content_button"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : CustomModifiers
+File   : core/src/main/java/com/popclub/core/base/CustomModifiers.kt
+
+  Composable: 
+    Line  133  [row       ]  fun Modifier.popClickable(enabled:Boolean = true, debounceIntervalMs: Long = 2000L, onClick: () -> U
+             💡 const val CUSTOM_MODIFIERS_ROW = "custom_modifiers_row"
+    Line  139  [row       ]  this.clickable(enabled = enabled, onClick = clickable, indication = rememberRipple(bounded = true),
+             💡 fun customModifiersRowItem(index: Int) = "custom_modifiers_row_item_$index"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : CustomNumberKeyboard
+File   : feature/upi/src/main/java/com/pop/feature/upi/ui/amountscreen/CustomNumberKeyboard.kt
+
+  Composable: CustomNumberKeyboard > KeyboardKey
+    Line  141  [row       ]  .clickable(
+             💡 const val CUSTOM_NUMBER_KEYBOARD_KEY_ROW = "custom_number_keyboard_key_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : DottedUnderlineText
+File   : ui_components/src/main/java/com/pop/components/compose_components/DottedUnderlineText.kt
+
+  Composable: DottedUnderlineText
+    Line   93  [row       ]  Modifier.clickable(onClick = onClick)
+             💡 const val DOTTED_UNDERLINE_TEXT_ROW = "dotted_underline_text_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : DropDown
+File   : feature/upi/src/main/java/com/pop/feature/upi/ui/components/DropDown.kt
+
+  Composable: DropDown
+    Line   51  [row       ]  modifier = Modifier.popClickable {
+             💡 const val DROP_DOWN_ROW = "drop_down_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : EmptyState
+File   : ui_components/src/main/java/com/pop/components/EmptyState.kt
+
+  Composable: EmptyState
+    Line   67  [button    ]  PopButtonV2(
+             💡 const val EMPTY_STATE_BUTTON = "empty_state_button"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : EmptyStateComponent
+File   : ui_components/src/main/java/com/pop/components/ds_components/EmptyStateComponent.kt
+
+  Composable: EmptyStateComponent
+    Line   97  [button    ]  PopButtonV2(
+             💡 const val EMPTY_STATE_COMPONENT_BUTTON = "empty_state_component_button"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : EnterAmountScreen
+File   : feature/upi/src/main/java/com/pop/feature/upi/ui/amountscreen/EnterAmountScreen.kt
+
+  Composable: EnterAmountScreen
+    Line 1907  [row       ]  //                                        .clickable {
+             💡 const val ENTER_AMOUNT_SCREEN_ROW = "enter_amount_screen_row"
+
+  Composable: EnterAmountScreen > keyboardAsState > BanksView
+    Line 2702  [row       ]  .clickable(
+             💡 const val ENTER_AMOUNT_BANKS_VIEW_ROW = "enter_amount_banks_view_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : EnterAmountScreenV2Steps
+File   : feature/upi/src/main/java/com/pop/feature/upi/ui/amountscreen/EnterAmountScreenV2Steps.kt
+
+  Composable: EnterAmountScreenV2Steps
+    Line 3498  [button    ]  PopButtonV2(
+             💡 const val ENTER_AMOUNT_SCREEN_V2_STEPS_BUTTON = "enter_amount_screen_v2_steps_button"
+    Line 3518  [button    ]  PopButtonV2(
+             💡 fun enterAmountScreenV2StepsButtonItem(index: Int) = "enter_amount_screen_v2_steps_button_item_$index"
+
+  Composable: EnterAmountScreenV2Steps > EnterAmountScreenV2StepsUI
+    Line 3922  [button    ]  PopButtonV2(
+             💡 const val ENTER_AMOUNT_SCREEN_V2_STEPS_UI_BUTTON = "enter_amount_screen_v2_steps_ui_button"
+
+  Composable: EnterAmountScreenV2Steps > EnterAmountScreenV2StepsUI > PaymentMethodRow
+    Line 4206  [row       ]  .clickable(onClick = onBankTransferSheetClick),
+             💡 const val ENTER_AMOUNT_SCREEN_V2_STEPS_PAYMENT_METHOD_ROW = "enter_amount_screen_v2_steps_payment_method_row"
+    Line 4270  [row       ]  .clickable(onClick = onBankTransferSheetClick),
+             💡 fun enterAmountScreenV2StepsPaymentMethodRowItem(index: Int) = "enter_amount_screen_v2_steps_payment_method_row_item_$index"
+    Line 4343  [row       ]  .clickable(
+             💡 fun enterAmountScreenV2StepsPaymentMethodRowItem(index: Int) = "enter_amount_screen_v2_steps_payment_method_row_item_$index"
+    Line 4443  [row       ]  .clickable(
+             💡 fun enterAmountScreenV2StepsPaymentMethodRowItem(index: Int) = "enter_amount_screen_v2_steps_payment_method_row_item_$index"
+
+  Composable: EnterAmountScreenV2Steps > EnterAmountScreenV2StepsUI > PaymentMethodRow > BottomSectionLocal
+    Line 4572  [button    ]  PopButtonV2(
+             💡 const val ENTER_AMOUNT_SCREEN_V2_STEPS_BOTTOM_SECTION_LOCAL_BUTTON = "enter_amount_screen_v2_steps_bottom_section_local_button"
+    Line 4654  [button    ]  PopButtonV2(
+             💡 fun enterAmountScreenV2StepsBottomSectionLocalButtonItem(index: Int) = "enter_amount_screen_v2_steps_bottom_section_local_button_item_$index"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : FaqEmailOptionsBottomSheet
+File   : pop/src/main/java/com/popclub/android/cx/FaqEmailOptionsBottomSheet.kt
+
+  Composable: FaqEmailOptionsBottomSheetWrapper > FaqEmailOptionsBottomSheetContent
+    Line  109  [row       ]  modifier = Modifier.popClickable(onClick = onDismiss)
+             💡 const val FAQ_EMAIL_OPTIONS_BOTTOM_SHEET_CONTENT_ROW = "faq_email_options_bottom_sheet_content_row"
+    Line  126  [row       ]  .popClickable { selectedOption = option },
+             💡 fun faqEmailOptionsBottomSheetContentRowItem(index: Int) = "faq_email_options_bottom_sheet_content_row_item_$index"
+    Line  130  [radio     ]  RadioButton(
+             💡 const val FAQ_EMAIL_OPTIONS_BOTTOM_SHEET_CONTENT_RADIO = "faq_email_options_bottom_sheet_content_radio"
+    Line  155  [button    ]  PopButton(
+             💡 const val FAQ_EMAIL_OPTIONS_BOTTOM_SHEET_CONTENT_BUTTON = "faq_email_options_bottom_sheet_content_button"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : FaqSubCategoryDetailsFragment
+File   : pop/src/main/java/com/popclub/android/cx/FaqSubCategoryDetailsFragment.kt
+
+  Composable: FaqCategoryDetailsCard
+    Line  381  [button    ]  PopButton(
+             💡 const val FAQ_SUB_CATEGORY_DETAILS_FAQ_CATEGORY_DETAILS_CARD_BUTTON = "faq_sub_category_details_faq_category_details_card_button"
+
+  Composable: FaqCategoryDetailsCard > ContactYesBankBottomSheet
+    Line  440  [row       ]  modifier = Modifier.popClickable(onClick = onDismiss)
+             💡 const val FAQ_SUB_CATEGORY_DETAILS_CONTACT_YES_BANK_BOTTOM_SHEET_ROW = "faq_sub_category_details_contact_yes_bank_bottom_sheet_row"
+    Line  451  [button    ]  PopButton(
+             💡 const val FAQ_SUB_CATEGORY_DETAILS_CONTACT_YES_BANK_BOTTOM_SHEET_BUTTON = "faq_sub_category_details_contact_yes_bank_bottom_sheet_button"
+
+  Composable: FaqCategoryDetailsCard > ContactYesBankBottomSheet > ContactRow
+    Line  473  [row       ]  .popClickable {
+             💡 const val FAQ_SUB_CATEGORY_DETAILS_CONTACT_ROW = "faq_sub_category_details_contact_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : FlashCheckbox
+File   : ui_components/src/main/java/com/pop/components/compose_components/FlashCheckbox.kt
+
+  Composable: 
+    Line   46  [row       ]  //            .clickable(enabled = enabled) { onCheckedChange(!checked) }
+             💡 const val FLASH_CHECKBOX_ROW = "flash_checkbox_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : InputFieldDemoScreen
+File   : ui_components/src/main/java/com/pop/components/screens/InputFieldDemoScreen.kt
+
+  Composable: InputFieldDemoScreen
+    Line   84  [input     ]  PopInputField(
+             💡 const val INPUT_FIELD_DEMO_SCREEN_INPUT = "input_field_demo_screen_input"
+    Line   93  [input     ]  PopInputField(
+             💡 fun inputFieldDemoScreenInputItem(index: Int) = "input_field_demo_screen_input_item_$index"
+    Line  103  [input     ]  PopInputField(
+             💡 fun inputFieldDemoScreenInputItem(index: Int) = "input_field_demo_screen_input_item_$index"
+    Line  115  [input     ]  PopInputField(
+             💡 fun inputFieldDemoScreenInputItem(index: Int) = "input_field_demo_screen_input_item_$index"
+    Line  138  [input     ]  PopPrefixInputField(
+             💡 fun inputFieldDemoScreenInputItem(index: Int) = "input_field_demo_screen_input_item_$index"
+    Line  144  [input     ]  PopPrefixInputField(
+             💡 fun inputFieldDemoScreenInputItem(index: Int) = "input_field_demo_screen_input_item_$index"
+    Line  152  [input     ]  PopPrefixInputField(
+             💡 fun inputFieldDemoScreenInputItem(index: Int) = "input_field_demo_screen_input_item_$index"
+    Line  171  [input     ]  PopLabeledInputField(
+             💡 fun inputFieldDemoScreenInputItem(index: Int) = "input_field_demo_screen_input_item_$index"
+    Line  180  [input     ]  PopLabeledInputField(
+             💡 fun inputFieldDemoScreenInputItem(index: Int) = "input_field_demo_screen_input_item_$index"
+    Line  189  [input     ]  PopLabeledInputField(
+             💡 fun inputFieldDemoScreenInputItem(index: Int) = "input_field_demo_screen_input_item_$index"
+    Line  198  [input     ]  PopLabeledInputField(
+             💡 fun inputFieldDemoScreenInputItem(index: Int) = "input_field_demo_screen_input_item_$index"
+    Line  209  [input     ]  PopLabeledInputField(
+             💡 fun inputFieldDemoScreenInputItem(index: Int) = "input_field_demo_screen_input_item_$index"
+    Line  239  [radio     ]  PopRadioButton(
+             💡 const val INPUT_FIELD_DEMO_SCREEN_RADIO = "input_field_demo_screen_radio"
+    Line  247  [radio     ]  PopRadioButton(
+             💡 fun inputFieldDemoScreenRadioItem(index: Int) = "input_field_demo_screen_radio_item_$index"
+    Line  257  [checkbox  ]  PopCheckbox(
+             💡 const val INPUT_FIELD_DEMO_SCREEN_CHECKBOX = "input_field_demo_screen_checkbox"
+    Line  265  [checkbox  ]  PopCheckbox(
+             💡 fun inputFieldDemoScreenCheckboxItem(index: Int) = "input_field_demo_screen_checkbox_item_$index"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : IntegrityBottomSheet
+File   : core/src/main/java/com/popclub/core/integrity/IntegrityBottomSheet.kt
+
+  Composable: IntegrityFailureBottomSheet
+    Line   89  [button    ]  PopButtonV2(
+             💡 const val INTEGRITY_FAILURE_BOTTOM_SHEET_BUTTON = "integrity_failure_bottom_sheet_button"
+
+  Composable: IntegrityFailureBottomSheet > IntegrityTechnicalErrorBottomSheet
+    Line  160  [button    ]  PopButtonV2(
+             💡 const val INTEGRITY_TECHNICAL_ERROR_BOTTOM_SHEET_BUTTON = "integrity_technical_error_bottom_sheet_button"
+
+  Composable: IntegrityFailureBottomSheet > IntegrityTechnicalErrorBottomSheet > IntegrityActionBlockedBottomSheet
+    Line  232  [button    ]  PopButtonV2(
+             💡 const val INTEGRITY_ACTION_BLOCKED_BOTTOM_SHEET_BUTTON = "integrity_action_blocked_bottom_sheet_button"
+    Line  244  [button    ]  PopButtonV2(
+             💡 fun integrityActionBlockedBottomSheetButtonItem(index: Int) = "integrity_action_blocked_bottom_sheet_button_item_$index"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : KotExtensions
+File   : core/src/main/java/com/popclub/core/base/KotExtensions.kt
+
+  Composable: 
+    Line  286  [row       ]  this.clickable(
+             💡 const val KOT_EXTENSIONS_ROW = "kot_extensions_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : LandscapeCarouselWidget
+File   : feature/home/src/main/java/com/pop/feature/clp/compose/widgets/LandscapeCarouselWidget.kt
+
+  Composable: LandscapeCarouselWidget
+    Line  214  [row       ]  .clickable {
+             💡 const val LANDSCAPE_CAROUSEL_WIDGET_ROW = "landscape_carousel_widget_row"
+    Line  291  [row       ]  .clickable {
+             💡 fun landscapeCarouselWidgetRowItem(index: Int) = "landscape_carousel_widget_row_item_$index"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : LandscapeSliderWidget
+File   : feature/home/src/main/java/com/pop/feature/clp/compose/widgets/LandscapeSliderWidget.kt
+
+  Composable: LandscapeSliderWidget
+    Line  220  [row       ]  .clickable {
+             💡 const val LANDSCAPE_SLIDER_WIDGET_ROW = "landscape_slider_widget_row"
+    Line  306  [row       ]  .clickable(enabled = image.imageCTA != null) {
+             💡 fun landscapeSliderWidgetRowItem(index: Int) = "landscape_slider_widget_row_item_$index"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : LerpIconsToTopRight
+File   : feature/upi/src/main/java/com/pop/feature/upi/ui/home/components/LerpIconsToTopRight.kt
+
+  Composable: LerpIconsToTopRight
+    Line  100  [row       ]  .clickable(
+             💡 const val LERP_ICONS_TO_TOP_RIGHT_ROW = "lerp_icons_to_top_right_row"
+    Line  117  [row       ]  .clickable(
+             💡 fun lerpIconsToTopRightRowItem(index: Int) = "lerp_icons_to_top_right_row_item_$index"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : LinkedBankAccountsScreen
+File   : feature/upi/src/main/java/com/pop/feature/upi/ui/screens/LinkedBankAccountsScreen.kt
+
+  Composable: LinkedBankAccountsScreen > BankListItem > UpiIdBlock
+    Line  872  [row       ]  if (hasMultipleUpiIds) Modifier.clickable(
+             💡 const val LINKED_BANK_ACCOUNTS_UPI_ID_BLOCK_ROW = "linked_bank_accounts_upi_id_block_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : LoadingRevealAndResizeAnimation
+File   : feature/upi/src/main/java/com/pop/feature/upi/ui/processing/LoadingRevealAndResizeAnimation.kt
+
+  Composable: LoadingRevealAndResizeAnimation
+    Line  526  [row       ]  .popClickable(
+             💡 const val LOADING_REVEAL_AND_RESIZE_ANIMATION_ROW = "loading_reveal_and_resize_animation_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : LocationSearchScreen
+File   : feature/credit_card/src/main/java/com/pop/credit_card/ui/compose/steps/location/LocationSearchScreen.kt
+
+  Composable: LocationSearchScreen > LocationSearchContent
+    Line  785  [input     ]  PopInputFieldV2(
+             💡 const val LOCATION_SEARCH_CONTENT_INPUT = "location_search_content_input"
+    Line  891  [button    ]  PopButtonV2(
+             💡 const val LOCATION_SEARCH_CONTENT_BUTTON = "location_search_content_button"
+    Line  958  [button    ]  TextButton(onClick = { onEvent(LocationSearchEvent.OpenLocationSettings) }) {
+             💡 fun locationSearchContentButtonItem(index: Int) = "location_search_content_button_item_$index"
+    Line  967  [button    ]  TextButton(onClick = { onEvent(LocationSearchEvent.DismissLocationServicesDialog) }) {
+             💡 fun locationSearchContentButtonItem(index: Int) = "location_search_content_button_item_$index"
+
+  Composable: LocationSearchScreen > LocationSearchContent > MapViewComposable > SearchResultsList
+    Line 1058  [row       ]  .clickable {
+             💡 const val LOCATION_SEARCH_RESULTS_LIST_ROW = "location_search_results_list_row"
+
+  Composable: LocationSearchScreen > LocationSearchContent > MapViewComposable > SearchResultsList > UseCurrentLocationButton
+    Line 1107  [button    ]  PopButtonV2(
+             💡 const val LOCATION_SEARCH_USE_CURRENT_LOCATION_BUTTON = "location_search_use_current_location_button"
+
+  Composable: LocationSearchScreen > LocationSearchContent > MapViewComposable > SearchResultsList > UseCurrentLocationButton > AddressFormBottomSheet
+    Line 1219  [row       ]  .clickable(onClick = onDismiss),
+             💡 const val LOCATION_SEARCH_ADDRESS_FORM_BOTTOM_SHEET_ROW = "location_search_address_form_bottom_sheet_row"
+    Line 1229  [input     ]  PopInputFieldV2(
+             💡 const val LOCATION_SEARCH_ADDRESS_FORM_BOTTOM_SHEET_INPUT = "location_search_address_form_bottom_sheet_input"
+    Line 1245  [input     ]  PopInputFieldV2(
+             💡 fun locationSearchAddressFormBottomSheetInputItem(index: Int) = "location_search_address_form_bottom_sheet_input_item_$index"
+    Line 1260  [input     ]  PopInputFieldV2(
+             💡 fun locationSearchAddressFormBottomSheetInputItem(index: Int) = "location_search_address_form_bottom_sheet_input_item_$index"
+    Line 1294  [row       ]  .clickable(enabled = isCityClickable, onClick = onSelectCityClick)
+             💡 fun locationSearchAddressFormBottomSheetRowItem(index: Int) = "location_search_address_form_bottom_sheet_row_item_$index"
+    Line 1296  [input     ]  PopInputFieldV2(
+             💡 fun locationSearchAddressFormBottomSheetInputItem(index: Int) = "location_search_address_form_bottom_sheet_input_item_$index"
+    Line 1320  [row       ]  .clickable(onClick = onSelectCityClick)
+             💡 fun locationSearchAddressFormBottomSheetRowItem(index: Int) = "location_search_address_form_bottom_sheet_row_item_$index"
+    Line 1358  [button    ]  PopButtonV2(
+             💡 const val LOCATION_SEARCH_ADDRESS_FORM_BOTTOM_SHEET_BUTTON = "location_search_address_form_bottom_sheet_button"
+
+  Composable: LocationSearchScreen > LocationSearchContent > MapViewComposable > SearchResultsList > UseCurrentLocationButton > AddressFormBottomSheet > CitySelectionBottomSheet
+    Line 1413  [row       ]  .clickable { onCitySelected(city) }
+             💡 const val LOCATION_SEARCH_CITY_SELECTION_BOTTOM_SHEET_ROW = "location_search_city_selection_bottom_sheet_row"
+    Line 1423  [radio     ]  PopRadio(
+             💡 const val LOCATION_SEARCH_CITY_SELECTION_BOTTOM_SHEET_RADIO = "location_search_city_selection_bottom_sheet_radio"
+    Line 1438  [button    ]  PopButtonV2(
+             💡 const val LOCATION_SEARCH_CITY_SELECTION_BOTTOM_SHEET_BUTTON = "location_search_city_selection_bottom_sheet_button"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : MediaUpload
+File   : feature/ecom/src/main/java/com/pop/ecom/presentation/ui/orders/returns/composables/MediaUpload.kt
+
+  Composable: UploadProofMediaStep
+    Line  181  [button    ]  PopButton(
+             💡 const val MEDIA_UPLOAD_PROOF_MEDIA_STEP_BUTTON = "media_upload_proof_media_step_button"
+
+  Composable: UploadProofMediaStep > UploadMediaSection > UploadCard
+    Line  527  [row       ]  .clickable(
+             💡 const val MEDIA_UPLOAD_CARD_ROW = "media_upload_card_row"
+    Line  567  [row       ]  .clickable(
+             💡 fun mediaUploadCardRowItem(index: Int) = "media_upload_card_row_item_$index"
+
+  Composable: UploadProofMediaStep > UploadMediaSection > UploadCard > UploadVideo
+    Line  627  [row       ]  .clickable(
+             💡 const val MEDIA_UPLOAD_VIDEO_ROW = "media_upload_video_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : MyTicketsFragment
+File   : pop/src/main/java/com/popclub/android/cx/MyTicketsFragment.kt
+
+  Composable: MyTicketsScreen > TicketHelpBottomSheet
+    Line  505  [row       ]  modifier = Modifier.popClickable {
+             💡 const val MY_TICKETS_TICKET_HELP_BOTTOM_SHEET_ROW = "my_tickets_ticket_help_bottom_sheet_row"
+    Line  532  [button    ]  PopButtonV2(
+             💡 const val MY_TICKETS_TICKET_HELP_BOTTOM_SHEET_BUTTON = "my_tickets_ticket_help_bottom_sheet_button"
+
+  Composable: MyTicketsScreen > TicketHelpBottomSheet > TicketAccordion
+    Line  606  [row       ]  modifier = Modifier.popClickable {
+             💡 const val MY_TICKETS_TICKET_ACCORDION_ROW = "my_tickets_ticket_accordion_row"
+    Line  658  [button    ]  PopButtonV2(
+             💡 const val MY_TICKETS_TICKET_ACCORDION_BUTTON = "my_tickets_ticket_accordion_button"
+
+  Composable: MyTicketsScreen > TicketHelpBottomSheet > TicketAccordion > TicketsEmptyState > TicketsSearchBar
+    Line  708  [input     ]  BasicTextField(
+             💡 const val MY_TICKETS_SEARCH_BAR_INPUT = "my_tickets_search_bar_input"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : NoCashbackCard
+File   : pop/src/main/java/com/popclub/android/profile/NoCashbackCard.kt
+
+  Composable: NoCashbackCard
+    Line   38  [row       ]  .popClickable(true){
+             💡 const val NO_CASHBACK_CARD_ROW = "no_cashback_card_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : OSSStatesUI
+File   : feature/ecom/src/main/java/com/pop/ecom/cart/payment/OSSStatesUI.kt
+
+  Composable: OSSStatesScreen
+    Line  230  [button    ]  PopButtonV2(
+             💡 const val OSS_STATES_UI_OSS_STATES_SCREEN_BUTTON = "oss_states_ui_oss_states_screen_button"
+
+  Composable: OSSStatesScreen > OSSHeaderSection > OSSStatusBackgroundAnimation > OSSOrderDetailsCard > OSSOrderItemCard
+    Line  545  [row       ]  .clickable { onItemClick(item.id) },
+             💡 const val OSS_STATES_UI_OSS_ORDER_ITEM_CARD_ROW = "oss_states_ui_oss_order_item_card_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : OrderItem
+File   : feature/ecom/src/main/java/com/pop/ecom/presentation/ui/orders/list/components/OrderItem.kt
+
+  Composable: OrderItem
+    Line   76  [row       ]  .clickable(
+             💡 const val ORDER_ITEM_ROW = "order_item_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PanDetailsScreen
+File   : feature/credit_card/src/main/java/com/pop/credit_card/ui/compose/steps/PanDetailsScreen.kt
+
+  Composable: PanDetailsScreen > PanDetailsContent > ClickableTextWithDottedUnderline > TncCheckboxRowWithBottomSheet
+    Line  899  [row       ]  .clickable(enabled = !isReadOnly) {
+             💡 const val PAN_DETAILS_TNC_CHECKBOX_ROW_WITH_BOTTOM_SHEET_ROW = "pan_details_tnc_checkbox_row_with_bottom_sheet_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PaymentProcessingScreen
+File   : feature/upi/src/main/java/com/pop/feature/upi/ui/fragments/PaymentProcessingScreen.kt
+
+  Composable: PaymentProcessingScreen > BottomFragment > LoadingContent > UserInfoSection > LoadingAnimation > AmountDisplay > ProcessingMessage > SuccessOverlay > GrayBackground > CircularRevealContent > SuccessContent > SuccessAnimation > AnimatedAmountText > PaymentSuccessDetails
+    Line  712  [row       ]  modifier=Modifier.size(32.dp).clickable(
+             💡 const val PAYMENT_PROCESSING_PAYMENT_SUCCESS_DETAILS_ROW = "payment_processing_payment_success_details_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PaymentRequestCard
+File   : feature/upi/src/main/java/com/pop/feature/upi/ui/pendingRequests/PaymentRequestCard.kt
+
+  Composable: PaymentRequestCard
+    Line   83  [row       ]  modifier = Modifier.align(Alignment.TopEnd).padding(8.dp).size(16.dp).clickable{
+             💡 const val PAYMENT_REQUEST_CARD_ROW = "payment_request_card_row"
+    Line  183  [button    ]  PopButtonV2(
+             💡 const val PAYMENT_REQUEST_CARD_BUTTON = "payment_request_card_button"
+    Line  192  [button    ]  PopButtonV2(
+             💡 fun paymentRequestCardButtonItem(index: Int) = "payment_request_card_button_item_$index"
+    Line  208  [button    ]  PopButtonV2(
+             💡 fun paymentRequestCardButtonItem(index: Int) = "payment_request_card_button_item_$index"
+    Line  235  [row       ]  .clickable {
+             💡 fun paymentRequestCardRowItem(index: Int) = "payment_request_card_row_item_$index"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PermissionsFlowSheet
+File   : ui_components/src/main/java/com/pop/components/permissions/PermissionsFlowSheet.kt
+
+  Composable: PermissionFlowBottomSheet
+    Line  233  [button    ]  PopButtonV2(
+             💡 const val PERMISSIONS_FLOW_SHEET_PERMISSION_FLOW_BOTTOM_SHEET_BUTTON = "permissions_flow_sheet_permission_flow_bottom_sheet_button"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopAccordion
+File   : ui_components/src/main/java/com/pop/components/ds_components/PopAccordion.kt
+
+  Composable: PopAccordion
+    Line  227  [row       ]  .clickable(onClick = safeOnClick)
+             💡 const val POP_ACCORDION_ROW = "pop_accordion_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopAppBar
+File   : ui_components/src/main/java/com/pop/components/ds_components/PopAppBar.kt
+
+  Composable: AppBarSlotVisibility > PopAppBar > NavigationIcon
+    Line  157  [row       ]  .clickable(
+             💡 const val POP_APP_BAR_NAVIGATION_ICON_ROW = "pop_app_bar_navigation_icon_row"
+
+  Composable: AppBarSlotVisibility > PopAppBar > NavigationIcon > AnimatedIconSlot > SlotIcon
+    Line  214  [row       ]  .clickable(
+             💡 const val POP_APP_BAR_SLOT_ICON_ROW = "pop_app_bar_slot_icon_row"
+
+  Composable: AppBarSlotVisibility > PopAppBar > NavigationIcon > AnimatedIconSlot > SlotIcon > ActionIconButton
+    Line  243  [row       ]  .clickable(onClick = onClick),
+             💡 const val POP_APP_BAR_ACTION_ICON_BUTTON_ROW = "pop_app_bar_action_icon_button_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopAppBarManager
+File   : ui_components/src/main/java/com/pop/components/ds_components/PopAppBarManager.kt
+
+  Composable: getRightSlot > getLeftSlot > GlobalPopAppBar
+    Line  366  [row       ]  .clickable(
+             💡 const val POP_APP_BAR_MANAGER_GLOBAL_POP_APP_BAR_ROW = "pop_app_bar_manager_global_pop_app_bar_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopAutopayTssScreen
+File   : feature/upi/src/main/java/com/pop/feature/upi/ui/tss/PopAutopayTssScreen.kt
+
+  Composable: PopAutopayTssScreen
+    Line   98  [button    ]  PopButtonV2(
+             💡 const val POP_AUTOPAY_TSS_SCREEN_BUTTON = "pop_autopay_tss_screen_button"
+    Line  107  [button    ]  PopButtonV2(
+             💡 fun popAutopayTssScreenButtonItem(index: Int) = "pop_autopay_tss_screen_button_item_$index"
+    Line  118  [button    ]  PopButtonV2(
+             💡 fun popAutopayTssScreenButtonItem(index: Int) = "pop_autopay_tss_screen_button_item_$index"
+    Line  127  [button    ]  PopButtonV2(
+             💡 fun popAutopayTssScreenButtonItem(index: Int) = "pop_autopay_tss_screen_button_item_$index"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopBottomBar
+File   : ui_components/src/main/java/com/pop/components/ds_components/PopBottomBar.kt
+
+  Composable: colors > PopBottomBar > BottomBarItem
+    Line  539  [row       ]  .clickable(enabled = enabled, onClick = onClick)
+             💡 const val POP_BOTTOM_BAR_BOTTOM_BAR_ITEM_ROW = "pop_bottom_bar_bottom_bar_item_row"
+
+  Composable: colors > PopBottomBar > BottomBarItem > EndStickyItemButton
+    Line  600  [row       ]  .clickable(onClick = onClick),
+             💡 const val POP_BOTTOM_BAR_END_STICKY_ITEM_BUTTON_ROW = "pop_bottom_bar_end_sticky_item_button_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopBottomBarTestActivity
+File   : pop/src/main/java/com/popclub/android/PopBottomBarTestActivity.kt
+
+  Composable: PopBottomBarTestScreen
+    Line  208  [row       ]  .clickable {
+             💡 const val POP_BOTTOM_BAR_TEST_ACTIVITY_POP_BOTTOM_BAR_TEST_SCREEN_ROW = "pop_bottom_bar_test_activity_pop_bottom_bar_test_screen_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopBottomSheet
+File   : ui_components/src/main/java/com/pop/components/ds_components/PopBottomSheet.kt
+
+  Composable: PopBottomSheet > PopBottomSheet > PopBottomSheetInternal
+    Line  671  [row       ]  .clickable(
+             💡 const val POP_BOTTOM_SHEET_INTERNAL_ROW = "pop_bottom_sheet_internal_row"
+    Line  681  [row       ]  .clickable(enabled = false) {}  // Absorb touches so they don't reach the dismiss tap target
+             💡 fun popBottomSheetInternalRowItem(index: Int) = "pop_bottom_sheet_internal_row_item_$index"
+    Line  711  [row       ]  .clickable(
+             💡 fun popBottomSheetInternalRowItem(index: Int) = "pop_bottom_sheet_internal_row_item_$index"
+    Line  723  [row       ]  .clickable { handleCloseButtonClick() },
+             💡 fun popBottomSheetInternalRowItem(index: Int) = "pop_bottom_sheet_internal_row_item_$index"
+    Line  736  [row       ]  .clickable(
+             💡 fun popBottomSheetInternalRowItem(index: Int) = "pop_bottom_sheet_internal_row_item_$index"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopButton
+File   : ui_components/src/main/java/com/pop/components/compose_components/PopButton.kt
+
+  Composable: PopButton
+    Line  140  [button    ]  Button(
+             💡 const val POP_BUTTON = "pop_button"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopButtonV2
+File   : ui_components/src/main/java/com/pop/components/ds_components/PopButtonV2.kt
+
+  Composable: PopButtonV2
+    Line  198  [row       ]  Modifier.clickable(enabled = true, onClick = { safeOnDisabledClick?.invoke() })
+             💡 const val POP_BUTTON_V2_ROW = "pop_button_v2_row"
+    Line  308  [button    ]  TextButton(
+             💡 const val POP_BUTTON_V2_BUTTON = "pop_button_v2_button"
+    Line  338  [button    ]  Button(
+             💡 fun popButtonV2ButtonItem(index: Int) = "pop_button_v2_button_item_$index"
+
+  Composable: PopButtonV2 > ButtonContent > getButtonConfig > getBaseButtonConfig > PopIconButtonV2
+    Line  757  [row       ]  Modifier.clickable(enabled = true, onClick = { safeOnDisabledClick?.invoke() })
+             💡 const val POP_BUTTON_V2_POP_ICON_BUTTON_V2_ROW = "pop_button_v2_pop_icon_button_v2_row"
+    Line  817  [button    ]  Button(
+             💡 const val POP_BUTTON_V2_POP_ICON_BUTTON_V2_BUTTON = "pop_button_v2_pop_icon_button_v2_button"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopCarousel
+File   : ui_components/src/main/java/com/pop/components/ds_components/PopCarousel.kt
+
+  Composable: PopCarouselItem
+    Line   90  [row       ]  Modifier.clickable(onClick = onClick)
+             💡 const val POP_CAROUSEL_ITEM_ROW = "pop_carousel_item_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopCheckBoxV2
+File   : ui_components/src/main/java/com/pop/components/ds_components/PopCheckBoxV2.kt
+
+  Composable: PopCheckBoxV2
+    Line   88  [row       ]  modifier = modifier.then(if (canToggle) Modifier.clickable { handleToggleClick() } else Modifier)
+             💡 const val POP_CHECK_BOX_V2_ROW = "pop_check_box_v2_row"
+
+  Composable: PopCheckBoxV2 > PopCheckBoxV2Content > PopCheckBoxWithTextV2
+    Line  308  [row       ]  .then(if (canToggle) Modifier.clickable { handleToggleClick() } else Modifier),
+             💡 const val POP_CHECK_BOX_V2_POP_CHECK_BOX_WITH_TEXT_V2_ROW = "pop_check_box_v2_pop_check_box_with_text_v2_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopChip
+File   : ui_components/src/main/java/com/pop/components/ds_components/PopChip.kt
+
+  Composable: PopChip
+    Line  201  [row       ]  Modifier.clickable(onClick = handleClick)
+             💡 const val POP_CHIP_ROW = "pop_chip_row"
+    Line  258  [row       ]  .clickable(onClick = config.onCloseClick)
+             💡 fun popChipRowItem(index: Int) = "pop_chip_row_item_$index"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopCoinsScreen
+File   : feature/ecom/src/main/java/com/pop/ecom/presentation/ui/popcoins/PopCoinsScreen.kt
+
+  Composable: PopCoinsScreen > PopCoinsContainer > PopCoinBalanceCard > TransactionTabWithFilter
+    Line  316  [button    ]  Button(
+             💡 const val POP_COINS_TRANSACTION_TAB_WITH_FILTER_BUTTON = "pop_coins_transaction_tab_with_filter_button"
+
+  Composable: PopCoinsScreen > PopCoinsContainer > PopCoinBalanceCard > TransactionTabWithFilter > PopCoinTransactions > PopCoinsTypeSelectionBottomSheet
+    Line  523  [icon_button]  IconButton(
+             💡 const val POP_COINS_TYPE_SELECTION_BOTTOM_SHEET_ICON_BUTTON = "pop_coins_type_selection_bottom_sheet_icon_button"
+    Line  535  [radio     ]  PopRadioButton(
+             💡 const val POP_COINS_TYPE_SELECTION_BOTTOM_SHEET_RADIO = "pop_coins_type_selection_bottom_sheet_radio"
+    Line  552  [button    ]  PopButton(
+             💡 const val POP_COINS_TYPE_SELECTION_BOTTOM_SHEET_BUTTON = "pop_coins_type_selection_bottom_sheet_button"
+    Line  563  [button    ]  PopButton(
+             💡 fun popCoinsTypeSelectionBottomSheetButtonItem(index: Int) = "pop_coins_type_selection_bottom_sheet_button_item_$index"
+
+  Composable: PopCoinsScreen > PopCoinsContainer > PopCoinBalanceCard > TransactionTabWithFilter > PopCoinTransactions > PopCoinsTypeSelectionBottomSheet > PopCoinTransactionCard
+    Line  701  [row       ]  .clickable(
+             💡 const val POP_COINS_POP_COIN_TRANSACTION_CARD_ROW = "pop_coins_pop_coin_transaction_card_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopEnterAmountHeader
+File   : ui_components/src/main/java/com/pop/components/compose_components/PopEnterAmountHeader.kt
+
+  Composable: PopEnterAmountHeader
+    Line  253  [row       ]  .clickable(
+             💡 const val POP_ENTER_AMOUNT_HEADER_ROW = "pop_enter_amount_header_row"
+
+  Composable: PopEnterAmountHeader > HeaderInfoSection
+    Line  528  [row       ]  .clickable(
+             💡 const val POP_ENTER_AMOUNT_HEADER_INFO_SECTION_ROW = "pop_enter_amount_header_info_section_row"
+    Line  540  [input     ]  PopInputFieldV2(
+             💡 const val POP_ENTER_AMOUNT_HEADER_INFO_SECTION_INPUT = "pop_enter_amount_header_info_section_input"
+    Line  576  [row       ]  .clickable(
+             💡 fun popEnterAmountHeaderInfoSectionRowItem(index: Int) = "pop_enter_amount_header_info_section_row_item_$index"
+    Line  596  [row       ]  .clickable(
+             💡 fun popEnterAmountHeaderInfoSectionRowItem(index: Int) = "pop_enter_amount_header_info_section_row_item_$index"
+    Line  755  [input     ]  PopInputFieldV2(
+             💡 fun popEnterAmountHeaderInfoSectionInputItem(index: Int) = "pop_enter_amount_header_info_section_input_item_$index"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopHeroCarousel
+File   : feature/home/src/main/java/com/pop/feature/clp/compose/widgets/PopHeroCarousel.kt
+
+  Composable: PopHeroCarousel > HeroCarouselImage
+    Line  135  [row       ]  Modifier.clickable(
+             💡 const val POP_HERO_CAROUSEL_HERO_CAROUSEL_IMAGE_ROW = "pop_hero_carousel_hero_carousel_image_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopHeroCarouselTestActivity
+File   : pop/src/main/java/com/popclub/android/PopHeroCarouselTestActivity.kt
+
+  Composable: PopHeroCarouselTestScreen
+    Line  356  [button    ]  PopButtonV2(
+             💡 const val POP_HERO_CAROUSEL_TEST_ACTIVITY_POP_HERO_CAROUSEL_TEST_SCREEN_BUTTON = "pop_hero_carousel_test_activity_pop_hero_carousel_test_screen_button"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopInputFieldHelpers
+File   : ui_components/src/main/java/com/pop/components/ds_components/PopInputFieldHelpers.kt
+
+  Composable: StatusMessage > StatusMessageRow
+    Line  164  [row       ]  .clickable {
+             💡 const val POP_INPUT_FIELD_HELPERS_STATUS_MESSAGE_ROW = "pop_input_field_helpers_status_message_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopInputFieldPreviews
+File   : ui_components/src/main/java/com/pop/components/compose_components/preview/PopInputFieldPreviews.kt
+
+  Composable: PreviewPopInputFieldAllStates
+    Line   52  [input     ]  PopInputFieldV2(
+             💡 const val POP_INPUT_FIELD_PREVIEWS_PREVIEW_POP_INPUT_FIELD_ALL_STATES_INPUT = "pop_input_field_previews_preview_pop_input_field_all_states_input"
+    Line   62  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_all_states_input_item_$index"
+    Line   72  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_all_states_input_item_$index"
+    Line   82  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_all_states_input_item_$index"
+    Line   93  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_all_states_input_item_$index"
+    Line  105  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_all_states_input_item_$index"
+    Line  118  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_all_states_input_item_$index"
+    Line  130  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_all_states_input_item_$index"
+    Line  142  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_all_states_input_item_$index"
+    Line  152  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_all_states_input_item_$index"
+
+  Composable: PreviewPopInputFieldAllStates > PreviewPopInputFieldError
+    Line  181  [input     ]  PopInputFieldV2(
+             💡 const val POP_INPUT_FIELD_PREVIEWS_PREVIEW_POP_INPUT_FIELD_ERROR_INPUT = "pop_input_field_previews_preview_pop_input_field_error_input"
+
+  Composable: PreviewPopInputFieldAllStates > PreviewPopInputFieldError > PreviewPopInputFieldSuccess
+    Line  211  [input     ]  PopInputFieldV2(
+             💡 const val POP_INPUT_FIELD_PREVIEWS_PREVIEW_POP_INPUT_FIELD_SUCCESS_INPUT = "pop_input_field_previews_preview_pop_input_field_success_input"
+
+  Composable: PreviewPopInputFieldAllStates > PreviewPopInputFieldError > PreviewPopInputFieldSuccess > PreviewPopInputFieldDisabled
+    Line  240  [input     ]  PopInputFieldV2(
+             💡 const val POP_INPUT_FIELD_PREVIEWS_PREVIEW_POP_INPUT_FIELD_DISABLED_INPUT = "pop_input_field_previews_preview_pop_input_field_disabled_input"
+
+  Composable: PreviewPopInputFieldAllStates > PreviewPopInputFieldError > PreviewPopInputFieldSuccess > PreviewPopInputFieldDisabled > PreviewPopInputFieldUnderlineNakedSmallStartIcon
+    Line  270  [input     ]  PopInputFieldV2(
+             💡 const val POP_INPUT_FIELD_PREVIEWS_PREVIEW_POP_INPUT_FIELD_UNDERLINE_NAKED_SMALL_START_ICON_INPUT = "pop_input_field_previews_preview_pop_input_field_underline_naked_small_start_icon_input"
+    Line  288  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldUnderlineNakedSmallStartIconInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_underline_naked_small_start_icon_input_item_$index"
+    Line  306  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldUnderlineNakedSmallStartIconInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_underline_naked_small_start_icon_input_item_$index"
+    Line  324  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldUnderlineNakedSmallStartIconInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_underline_naked_small_start_icon_input_item_$index"
+    Line  342  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldUnderlineNakedSmallStartIconInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_underline_naked_small_start_icon_input_item_$index"
+    Line  362  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldUnderlineNakedSmallStartIconInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_underline_naked_small_start_icon_input_item_$index"
+
+  Composable: PreviewPopInputFieldAllStates > PreviewPopInputFieldError > PreviewPopInputFieldSuccess > PreviewPopInputFieldDisabled > PreviewPopInputFieldUnderlineNakedSmallStartIcon > PreviewPopInputFieldUnderlineNakedSmallEndIcon
+    Line  400  [input     ]  PopInputFieldV2(
+             💡 const val POP_INPUT_FIELD_PREVIEWS_PREVIEW_POP_INPUT_FIELD_UNDERLINE_NAKED_SMALL_END_ICON_INPUT = "pop_input_field_previews_preview_pop_input_field_underline_naked_small_end_icon_input"
+    Line  418  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldUnderlineNakedSmallEndIconInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_underline_naked_small_end_icon_input_item_$index"
+    Line  436  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldUnderlineNakedSmallEndIconInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_underline_naked_small_end_icon_input_item_$index"
+    Line  456  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldUnderlineNakedSmallEndIconInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_underline_naked_small_end_icon_input_item_$index"
+
+  Composable: PreviewPopInputFieldAllStates > PreviewPopInputFieldError > PreviewPopInputFieldSuccess > PreviewPopInputFieldDisabled > PreviewPopInputFieldUnderlineNakedSmallStartIcon > PreviewPopInputFieldUnderlineNakedSmallEndIcon > PreviewPopInputFieldUnderlineNakedSmallEndSlot
+    Line  494  [input     ]  PopInputFieldV2(
+             💡 const val POP_INPUT_FIELD_PREVIEWS_PREVIEW_POP_INPUT_FIELD_UNDERLINE_NAKED_SMALL_END_SLOT_INPUT = "pop_input_field_previews_preview_pop_input_field_underline_naked_small_end_slot_input"
+    Line  501  [button    ]  TextButton(
+             💡 const val POP_INPUT_FIELD_PREVIEWS_PREVIEW_POP_INPUT_FIELD_UNDERLINE_NAKED_SMALL_END_SLOT_BUTTON = "pop_input_field_previews_preview_pop_input_field_underline_naked_small_end_slot_button"
+    Line  515  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldUnderlineNakedSmallEndSlotInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_underline_naked_small_end_slot_input_item_$index"
+    Line  541  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldUnderlineNakedSmallEndSlotInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_underline_naked_small_end_slot_input_item_$index"
+    Line  555  [button    ]  TextButton(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldUnderlineNakedSmallEndSlotButtonItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_underline_naked_small_end_slot_button_item_$index"
+    Line  569  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldUnderlineNakedSmallEndSlotInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_underline_naked_small_end_slot_input_item_$index"
+    Line  602  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldUnderlineNakedSmallEndSlotInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_underline_naked_small_end_slot_input_item_$index"
+    Line  609  [button    ]  TextButton(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldUnderlineNakedSmallEndSlotButtonItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_underline_naked_small_end_slot_button_item_$index"
+    Line  625  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldUnderlineNakedSmallEndSlotInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_underline_naked_small_end_slot_input_item_$index"
+    Line  632  [button    ]  TextButton(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldUnderlineNakedSmallEndSlotButtonItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_underline_naked_small_end_slot_button_item_$index"
+    Line  648  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldUnderlineNakedSmallEndSlotInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_underline_naked_small_end_slot_input_item_$index"
+    Line  676  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldUnderlineNakedSmallEndSlotInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_underline_naked_small_end_slot_input_item_$index"
+
+  Composable: PreviewPopInputFieldAllStates > PreviewPopInputFieldError > PreviewPopInputFieldSuccess > PreviewPopInputFieldDisabled > PreviewPopInputFieldUnderlineNakedSmallStartIcon > PreviewPopInputFieldUnderlineNakedSmallEndIcon > PreviewPopInputFieldUnderlineNakedSmallEndSlot > PreviewPopInputFieldLargeAllStates
+    Line  722  [input     ]  PopInputFieldV2(
+             💡 const val POP_INPUT_FIELD_PREVIEWS_PREVIEW_POP_INPUT_FIELD_LARGE_ALL_STATES_INPUT = "pop_input_field_previews_preview_pop_input_field_large_all_states_input"
+    Line  731  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldLargeAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_large_all_states_input_item_$index"
+    Line  740  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldLargeAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_large_all_states_input_item_$index"
+    Line  749  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldLargeAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_large_all_states_input_item_$index"
+    Line  759  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldLargeAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_large_all_states_input_item_$index"
+    Line  770  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldLargeAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_large_all_states_input_item_$index"
+    Line  782  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldLargeAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_large_all_states_input_item_$index"
+    Line  793  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldLargeAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_large_all_states_input_item_$index"
+    Line  804  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldLargeAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_large_all_states_input_item_$index"
+    Line  813  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldLargeAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_large_all_states_input_item_$index"
+
+  Composable: PreviewPopInputFieldAllStates > PreviewPopInputFieldError > PreviewPopInputFieldSuccess > PreviewPopInputFieldDisabled > PreviewPopInputFieldUnderlineNakedSmallStartIcon > PreviewPopInputFieldUnderlineNakedSmallEndIcon > PreviewPopInputFieldUnderlineNakedSmallEndSlot > PreviewPopInputFieldLargeAllStates > PreviewPopInputFieldLargeError
+    Line  841  [input     ]  PopInputFieldV2(
+             💡 const val POP_INPUT_FIELD_PREVIEWS_PREVIEW_POP_INPUT_FIELD_LARGE_ERROR_INPUT = "pop_input_field_previews_preview_pop_input_field_large_error_input"
+
+  Composable: PreviewPopInputFieldAllStates > PreviewPopInputFieldError > PreviewPopInputFieldSuccess > PreviewPopInputFieldDisabled > PreviewPopInputFieldUnderlineNakedSmallStartIcon > PreviewPopInputFieldUnderlineNakedSmallEndIcon > PreviewPopInputFieldUnderlineNakedSmallEndSlot > PreviewPopInputFieldLargeAllStates > PreviewPopInputFieldLargeError > PreviewPopInputFieldLargeSuccess
+    Line  870  [input     ]  PopInputFieldV2(
+             💡 const val POP_INPUT_FIELD_PREVIEWS_PREVIEW_POP_INPUT_FIELD_LARGE_SUCCESS_INPUT = "pop_input_field_previews_preview_pop_input_field_large_success_input"
+
+  Composable: PreviewPopInputFieldAllStates > PreviewPopInputFieldError > PreviewPopInputFieldSuccess > PreviewPopInputFieldDisabled > PreviewPopInputFieldUnderlineNakedSmallStartIcon > PreviewPopInputFieldUnderlineNakedSmallEndIcon > PreviewPopInputFieldUnderlineNakedSmallEndSlot > PreviewPopInputFieldLargeAllStates > PreviewPopInputFieldLargeError > PreviewPopInputFieldLargeSuccess > PreviewPopInputFieldLargeDisabled
+    Line  898  [input     ]  PopInputFieldV2(
+             💡 const val POP_INPUT_FIELD_PREVIEWS_PREVIEW_POP_INPUT_FIELD_LARGE_DISABLED_INPUT = "pop_input_field_previews_preview_pop_input_field_large_disabled_input"
+
+  Composable: PreviewPopInputFieldAllStates > PreviewPopInputFieldError > PreviewPopInputFieldSuccess > PreviewPopInputFieldDisabled > PreviewPopInputFieldUnderlineNakedSmallStartIcon > PreviewPopInputFieldUnderlineNakedSmallEndIcon > PreviewPopInputFieldUnderlineNakedSmallEndSlot > PreviewPopInputFieldLargeAllStates > PreviewPopInputFieldLargeError > PreviewPopInputFieldLargeSuccess > PreviewPopInputFieldLargeDisabled > PreviewPopInputFieldMobileAllStates
+    Line  927  [input     ]  PopInputFieldV2(
+             💡 const val POP_INPUT_FIELD_PREVIEWS_PREVIEW_POP_INPUT_FIELD_MOBILE_ALL_STATES_INPUT = "pop_input_field_previews_preview_pop_input_field_mobile_all_states_input"
+    Line  937  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldMobileAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_mobile_all_states_input_item_$index"
+    Line  947  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldMobileAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_mobile_all_states_input_item_$index"
+    Line  957  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldMobileAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_mobile_all_states_input_item_$index"
+    Line  968  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldMobileAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_mobile_all_states_input_item_$index"
+    Line  980  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldMobileAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_mobile_all_states_input_item_$index"
+    Line  993  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldMobileAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_mobile_all_states_input_item_$index"
+    Line 1005  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldMobileAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_mobile_all_states_input_item_$index"
+    Line 1017  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldMobileAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_mobile_all_states_input_item_$index"
+    Line 1027  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldMobileAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_mobile_all_states_input_item_$index"
+
+  Composable: PreviewPopInputFieldAllStates > PreviewPopInputFieldError > PreviewPopInputFieldSuccess > PreviewPopInputFieldDisabled > PreviewPopInputFieldUnderlineNakedSmallStartIcon > PreviewPopInputFieldUnderlineNakedSmallEndIcon > PreviewPopInputFieldUnderlineNakedSmallEndSlot > PreviewPopInputFieldLargeAllStates > PreviewPopInputFieldLargeError > PreviewPopInputFieldLargeSuccess > PreviewPopInputFieldLargeDisabled > PreviewPopInputFieldMobileAllStates > PreviewPopInputFieldMobileError
+    Line 1056  [input     ]  PopInputFieldV2(
+             💡 const val POP_INPUT_FIELD_PREVIEWS_PREVIEW_POP_INPUT_FIELD_MOBILE_ERROR_INPUT = "pop_input_field_previews_preview_pop_input_field_mobile_error_input"
+
+  Composable: PreviewPopInputFieldAllStates > PreviewPopInputFieldError > PreviewPopInputFieldSuccess > PreviewPopInputFieldDisabled > PreviewPopInputFieldUnderlineNakedSmallStartIcon > PreviewPopInputFieldUnderlineNakedSmallEndIcon > PreviewPopInputFieldUnderlineNakedSmallEndSlot > PreviewPopInputFieldLargeAllStates > PreviewPopInputFieldLargeError > PreviewPopInputFieldLargeSuccess > PreviewPopInputFieldLargeDisabled > PreviewPopInputFieldMobileAllStates > PreviewPopInputFieldMobileError > PreviewPopInputFieldMobileSuccess
+    Line 1086  [input     ]  PopInputFieldV2(
+             💡 const val POP_INPUT_FIELD_PREVIEWS_PREVIEW_POP_INPUT_FIELD_MOBILE_SUCCESS_INPUT = "pop_input_field_previews_preview_pop_input_field_mobile_success_input"
+
+  Composable: PreviewPopInputFieldAllStates > PreviewPopInputFieldError > PreviewPopInputFieldSuccess > PreviewPopInputFieldDisabled > PreviewPopInputFieldUnderlineNakedSmallStartIcon > PreviewPopInputFieldUnderlineNakedSmallEndIcon > PreviewPopInputFieldUnderlineNakedSmallEndSlot > PreviewPopInputFieldLargeAllStates > PreviewPopInputFieldLargeError > PreviewPopInputFieldLargeSuccess > PreviewPopInputFieldLargeDisabled > PreviewPopInputFieldMobileAllStates > PreviewPopInputFieldMobileError > PreviewPopInputFieldMobileSuccess > PreviewPopInputFieldMobileDisabled
+    Line 1115  [input     ]  PopInputFieldV2(
+             💡 const val POP_INPUT_FIELD_PREVIEWS_PREVIEW_POP_INPUT_FIELD_MOBILE_DISABLED_INPUT = "pop_input_field_previews_preview_pop_input_field_mobile_disabled_input"
+
+  Composable: PreviewPopInputFieldAllStates > PreviewPopInputFieldError > PreviewPopInputFieldSuccess > PreviewPopInputFieldDisabled > PreviewPopInputFieldUnderlineNakedSmallStartIcon > PreviewPopInputFieldUnderlineNakedSmallEndIcon > PreviewPopInputFieldUnderlineNakedSmallEndSlot > PreviewPopInputFieldLargeAllStates > PreviewPopInputFieldLargeError > PreviewPopInputFieldLargeSuccess > PreviewPopInputFieldLargeDisabled > PreviewPopInputFieldMobileAllStates > PreviewPopInputFieldMobileError > PreviewPopInputFieldMobileSuccess > PreviewPopInputFieldMobileDisabled > PreviewPopInputFieldBasicAllStates
+    Line 1145  [input     ]  PopInputFieldV2(
+             💡 const val POP_INPUT_FIELD_PREVIEWS_PREVIEW_POP_INPUT_FIELD_BASIC_ALL_STATES_INPUT = "pop_input_field_previews_preview_pop_input_field_basic_all_states_input"
+    Line 1155  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldBasicAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_basic_all_states_input_item_$index"
+    Line 1165  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldBasicAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_basic_all_states_input_item_$index"
+    Line 1175  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldBasicAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_basic_all_states_input_item_$index"
+    Line 1186  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldBasicAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_basic_all_states_input_item_$index"
+    Line 1199  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldBasicAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_basic_all_states_input_item_$index"
+    Line 1213  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldBasicAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_basic_all_states_input_item_$index"
+    Line 1226  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldBasicAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_basic_all_states_input_item_$index"
+
+  Composable: PreviewPopInputFieldAllStates > PreviewPopInputFieldError > PreviewPopInputFieldSuccess > PreviewPopInputFieldDisabled > PreviewPopInputFieldUnderlineNakedSmallStartIcon > PreviewPopInputFieldUnderlineNakedSmallEndIcon > PreviewPopInputFieldUnderlineNakedSmallEndSlot > PreviewPopInputFieldLargeAllStates > PreviewPopInputFieldLargeError > PreviewPopInputFieldLargeSuccess > PreviewPopInputFieldLargeDisabled > PreviewPopInputFieldMobileAllStates > PreviewPopInputFieldMobileError > PreviewPopInputFieldMobileSuccess > PreviewPopInputFieldMobileDisabled > PreviewPopInputFieldBasicAllStates > PreviewPopInputFieldBasicError
+    Line 1257  [input     ]  PopInputFieldV2(
+             💡 const val POP_INPUT_FIELD_PREVIEWS_PREVIEW_POP_INPUT_FIELD_BASIC_ERROR_INPUT = "pop_input_field_previews_preview_pop_input_field_basic_error_input"
+
+  Composable: PreviewPopInputFieldAllStates > PreviewPopInputFieldError > PreviewPopInputFieldSuccess > PreviewPopInputFieldDisabled > PreviewPopInputFieldUnderlineNakedSmallStartIcon > PreviewPopInputFieldUnderlineNakedSmallEndIcon > PreviewPopInputFieldUnderlineNakedSmallEndSlot > PreviewPopInputFieldLargeAllStates > PreviewPopInputFieldLargeError > PreviewPopInputFieldLargeSuccess > PreviewPopInputFieldLargeDisabled > PreviewPopInputFieldMobileAllStates > PreviewPopInputFieldMobileError > PreviewPopInputFieldMobileSuccess > PreviewPopInputFieldMobileDisabled > PreviewPopInputFieldBasicAllStates > PreviewPopInputFieldBasicError > PreviewPopInputFieldBasicSuccess
+    Line 1286  [input     ]  PopInputFieldV2(
+             💡 const val POP_INPUT_FIELD_PREVIEWS_PREVIEW_POP_INPUT_FIELD_BASIC_SUCCESS_INPUT = "pop_input_field_previews_preview_pop_input_field_basic_success_input"
+
+  Composable: PreviewPopInputFieldAllStates > PreviewPopInputFieldError > PreviewPopInputFieldSuccess > PreviewPopInputFieldDisabled > PreviewPopInputFieldUnderlineNakedSmallStartIcon > PreviewPopInputFieldUnderlineNakedSmallEndIcon > PreviewPopInputFieldUnderlineNakedSmallEndSlot > PreviewPopInputFieldLargeAllStates > PreviewPopInputFieldLargeError > PreviewPopInputFieldLargeSuccess > PreviewPopInputFieldLargeDisabled > PreviewPopInputFieldMobileAllStates > PreviewPopInputFieldMobileError > PreviewPopInputFieldMobileSuccess > PreviewPopInputFieldMobileDisabled > PreviewPopInputFieldBasicAllStates > PreviewPopInputFieldBasicError > PreviewPopInputFieldBasicSuccess > PreviewPopInputFieldBasicStartIcon
+    Line 1316  [input     ]  PopInputFieldV2(
+             💡 const val POP_INPUT_FIELD_PREVIEWS_PREVIEW_POP_INPUT_FIELD_BASIC_START_ICON_INPUT = "pop_input_field_previews_preview_pop_input_field_basic_start_icon_input"
+    Line 1335  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldBasicStartIconInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_basic_start_icon_input_item_$index"
+    Line 1354  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldBasicStartIconInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_basic_start_icon_input_item_$index"
+    Line 1373  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldBasicStartIconInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_basic_start_icon_input_item_$index"
+
+  Composable: PreviewPopInputFieldAllStates > PreviewPopInputFieldError > PreviewPopInputFieldSuccess > PreviewPopInputFieldDisabled > PreviewPopInputFieldUnderlineNakedSmallStartIcon > PreviewPopInputFieldUnderlineNakedSmallEndIcon > PreviewPopInputFieldUnderlineNakedSmallEndSlot > PreviewPopInputFieldLargeAllStates > PreviewPopInputFieldLargeError > PreviewPopInputFieldLargeSuccess > PreviewPopInputFieldLargeDisabled > PreviewPopInputFieldMobileAllStates > PreviewPopInputFieldMobileError > PreviewPopInputFieldMobileSuccess > PreviewPopInputFieldMobileDisabled > PreviewPopInputFieldBasicAllStates > PreviewPopInputFieldBasicError > PreviewPopInputFieldBasicSuccess > PreviewPopInputFieldBasicStartIcon > PreviewPopInputFieldBasicEndIcon
+    Line 1410  [input     ]  PopInputFieldV2(
+             💡 const val POP_INPUT_FIELD_PREVIEWS_PREVIEW_POP_INPUT_FIELD_BASIC_END_ICON_INPUT = "pop_input_field_previews_preview_pop_input_field_basic_end_icon_input"
+    Line 1429  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldBasicEndIconInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_basic_end_icon_input_item_$index"
+
+  Composable: PreviewPopInputFieldAllStates > PreviewPopInputFieldError > PreviewPopInputFieldSuccess > PreviewPopInputFieldDisabled > PreviewPopInputFieldUnderlineNakedSmallStartIcon > PreviewPopInputFieldUnderlineNakedSmallEndIcon > PreviewPopInputFieldUnderlineNakedSmallEndSlot > PreviewPopInputFieldLargeAllStates > PreviewPopInputFieldLargeError > PreviewPopInputFieldLargeSuccess > PreviewPopInputFieldLargeDisabled > PreviewPopInputFieldMobileAllStates > PreviewPopInputFieldMobileError > PreviewPopInputFieldMobileSuccess > PreviewPopInputFieldMobileDisabled > PreviewPopInputFieldBasicAllStates > PreviewPopInputFieldBasicError > PreviewPopInputFieldBasicSuccess > PreviewPopInputFieldBasicStartIcon > PreviewPopInputFieldBasicEndIcon > PreviewPopInputFieldBasicBothIcons
+    Line 1466  [input     ]  PopInputFieldV2(
+             💡 const val POP_INPUT_FIELD_PREVIEWS_PREVIEW_POP_INPUT_FIELD_BASIC_BOTH_ICONS_INPUT = "pop_input_field_previews_preview_pop_input_field_basic_both_icons_input"
+    Line 1491  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldBasicBothIconsInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_basic_both_icons_input_item_$index"
+    Line 1516  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldBasicBothIconsInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_basic_both_icons_input_item_$index"
+
+  Composable: PreviewPopInputFieldAllStates > PreviewPopInputFieldError > PreviewPopInputFieldSuccess > PreviewPopInputFieldDisabled > PreviewPopInputFieldUnderlineNakedSmallStartIcon > PreviewPopInputFieldUnderlineNakedSmallEndIcon > PreviewPopInputFieldUnderlineNakedSmallEndSlot > PreviewPopInputFieldLargeAllStates > PreviewPopInputFieldLargeError > PreviewPopInputFieldLargeSuccess > PreviewPopInputFieldLargeDisabled > PreviewPopInputFieldMobileAllStates > PreviewPopInputFieldMobileError > PreviewPopInputFieldMobileSuccess > PreviewPopInputFieldMobileDisabled > PreviewPopInputFieldBasicAllStates > PreviewPopInputFieldBasicError > PreviewPopInputFieldBasicSuccess > PreviewPopInputFieldBasicStartIcon > PreviewPopInputFieldBasicEndIcon > PreviewPopInputFieldBasicBothIcons > PreviewPopInputFieldBasicEndSlot
+    Line 1559  [input     ]  PopInputFieldV2(
+             💡 const val POP_INPUT_FIELD_PREVIEWS_PREVIEW_POP_INPUT_FIELD_BASIC_END_SLOT_INPUT = "pop_input_field_previews_preview_pop_input_field_basic_end_slot_input"
+    Line 1566  [button    ]  TextButton(
+             💡 const val POP_INPUT_FIELD_PREVIEWS_PREVIEW_POP_INPUT_FIELD_BASIC_END_SLOT_BUTTON = "pop_input_field_previews_preview_pop_input_field_basic_end_slot_button"
+    Line 1580  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldBasicEndSlotInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_basic_end_slot_input_item_$index"
+    Line 1606  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldBasicEndSlotInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_basic_end_slot_input_item_$index"
+    Line 1620  [button    ]  TextButton(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldBasicEndSlotButtonItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_basic_end_slot_button_item_$index"
+    Line 1634  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldBasicEndSlotInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_basic_end_slot_input_item_$index"
+
+  Composable: PreviewPopInputFieldAllStates > PreviewPopInputFieldError > PreviewPopInputFieldSuccess > PreviewPopInputFieldDisabled > PreviewPopInputFieldUnderlineNakedSmallStartIcon > PreviewPopInputFieldUnderlineNakedSmallEndIcon > PreviewPopInputFieldUnderlineNakedSmallEndSlot > PreviewPopInputFieldLargeAllStates > PreviewPopInputFieldLargeError > PreviewPopInputFieldLargeSuccess > PreviewPopInputFieldLargeDisabled > PreviewPopInputFieldMobileAllStates > PreviewPopInputFieldMobileError > PreviewPopInputFieldMobileSuccess > PreviewPopInputFieldMobileDisabled > PreviewPopInputFieldBasicAllStates > PreviewPopInputFieldBasicError > PreviewPopInputFieldBasicSuccess > PreviewPopInputFieldBasicStartIcon > PreviewPopInputFieldBasicEndIcon > PreviewPopInputFieldBasicBothIcons > PreviewPopInputFieldBasicEndSlot > PreviewPopInputFieldSearchAllStates
+    Line 1685  [input     ]  PopInputFieldV2(
+             💡 const val POP_INPUT_FIELD_PREVIEWS_PREVIEW_POP_INPUT_FIELD_SEARCH_ALL_STATES_INPUT = "pop_input_field_previews_preview_pop_input_field_search_all_states_input"
+    Line 1696  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldSearchAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_search_all_states_input_item_$index"
+    Line 1708  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldSearchAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_search_all_states_input_item_$index"
+    Line 1721  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldSearchAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_search_all_states_input_item_$index"
+    Line 1735  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldSearchAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_search_all_states_input_item_$index"
+    Line 1748  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldSearchAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_search_all_states_input_item_$index"
+    Line 1761  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldSearchAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_search_all_states_input_item_$index"
+    Line 1772  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldSearchAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_search_all_states_input_item_$index"
+    Line 1785  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldSearchAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_search_all_states_input_item_$index"
+    Line 1796  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldSearchAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_search_all_states_input_item_$index"
+    Line 1808  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldSearchAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_search_all_states_input_item_$index"
+    Line 1821  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldSearchAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_search_all_states_input_item_$index"
+    Line 1835  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldSearchAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_search_all_states_input_item_$index"
+    Line 1848  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldSearchAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_search_all_states_input_item_$index"
+    Line 1861  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldSearchAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_search_all_states_input_item_$index"
+    Line 1872  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldSearchAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_search_all_states_input_item_$index"
+
+  Composable: PreviewPopInputFieldAllStates > PreviewPopInputFieldError > PreviewPopInputFieldSuccess > PreviewPopInputFieldDisabled > PreviewPopInputFieldUnderlineNakedSmallStartIcon > PreviewPopInputFieldUnderlineNakedSmallEndIcon > PreviewPopInputFieldUnderlineNakedSmallEndSlot > PreviewPopInputFieldLargeAllStates > PreviewPopInputFieldLargeError > PreviewPopInputFieldLargeSuccess > PreviewPopInputFieldLargeDisabled > PreviewPopInputFieldMobileAllStates > PreviewPopInputFieldMobileError > PreviewPopInputFieldMobileSuccess > PreviewPopInputFieldMobileDisabled > PreviewPopInputFieldBasicAllStates > PreviewPopInputFieldBasicError > PreviewPopInputFieldBasicSuccess > PreviewPopInputFieldBasicStartIcon > PreviewPopInputFieldBasicEndIcon > PreviewPopInputFieldBasicBothIcons > PreviewPopInputFieldBasicEndSlot > PreviewPopInputFieldSearchAllStates > PreviewPopInputFieldSearchError
+    Line 1902  [input     ]  PopInputFieldV2(
+             💡 const val POP_INPUT_FIELD_PREVIEWS_PREVIEW_POP_INPUT_FIELD_SEARCH_ERROR_INPUT = "pop_input_field_previews_preview_pop_input_field_search_error_input"
+
+  Composable: PreviewPopInputFieldAllStates > PreviewPopInputFieldError > PreviewPopInputFieldSuccess > PreviewPopInputFieldDisabled > PreviewPopInputFieldUnderlineNakedSmallStartIcon > PreviewPopInputFieldUnderlineNakedSmallEndIcon > PreviewPopInputFieldUnderlineNakedSmallEndSlot > PreviewPopInputFieldLargeAllStates > PreviewPopInputFieldLargeError > PreviewPopInputFieldLargeSuccess > PreviewPopInputFieldLargeDisabled > PreviewPopInputFieldMobileAllStates > PreviewPopInputFieldMobileError > PreviewPopInputFieldMobileSuccess > PreviewPopInputFieldMobileDisabled > PreviewPopInputFieldBasicAllStates > PreviewPopInputFieldBasicError > PreviewPopInputFieldBasicSuccess > PreviewPopInputFieldBasicStartIcon > PreviewPopInputFieldBasicEndIcon > PreviewPopInputFieldBasicBothIcons > PreviewPopInputFieldBasicEndSlot > PreviewPopInputFieldSearchAllStates > PreviewPopInputFieldSearchError > PreviewPopInputFieldSearchSuccess
+    Line 1932  [input     ]  PopInputFieldV2(
+             💡 const val POP_INPUT_FIELD_PREVIEWS_PREVIEW_POP_INPUT_FIELD_SEARCH_SUCCESS_INPUT = "pop_input_field_previews_preview_pop_input_field_search_success_input"
+
+  Composable: PreviewPopInputFieldAllStates > PreviewPopInputFieldError > PreviewPopInputFieldSuccess > PreviewPopInputFieldDisabled > PreviewPopInputFieldUnderlineNakedSmallStartIcon > PreviewPopInputFieldUnderlineNakedSmallEndIcon > PreviewPopInputFieldUnderlineNakedSmallEndSlot > PreviewPopInputFieldLargeAllStates > PreviewPopInputFieldLargeError > PreviewPopInputFieldLargeSuccess > PreviewPopInputFieldLargeDisabled > PreviewPopInputFieldMobileAllStates > PreviewPopInputFieldMobileError > PreviewPopInputFieldMobileSuccess > PreviewPopInputFieldMobileDisabled > PreviewPopInputFieldBasicAllStates > PreviewPopInputFieldBasicError > PreviewPopInputFieldBasicSuccess > PreviewPopInputFieldBasicStartIcon > PreviewPopInputFieldBasicEndIcon > PreviewPopInputFieldBasicBothIcons > PreviewPopInputFieldBasicEndSlot > PreviewPopInputFieldSearchAllStates > PreviewPopInputFieldSearchError > PreviewPopInputFieldSearchSuccess > PreviewPopInputFieldSearchDisabled
+    Line 1961  [input     ]  PopInputFieldV2(
+             💡 const val POP_INPUT_FIELD_PREVIEWS_PREVIEW_POP_INPUT_FIELD_SEARCH_DISABLED_INPUT = "pop_input_field_previews_preview_pop_input_field_search_disabled_input"
+
+  Composable: PreviewPopInputFieldAllStates > PreviewPopInputFieldError > PreviewPopInputFieldSuccess > PreviewPopInputFieldDisabled > PreviewPopInputFieldUnderlineNakedSmallStartIcon > PreviewPopInputFieldUnderlineNakedSmallEndIcon > PreviewPopInputFieldUnderlineNakedSmallEndSlot > PreviewPopInputFieldLargeAllStates > PreviewPopInputFieldLargeError > PreviewPopInputFieldLargeSuccess > PreviewPopInputFieldLargeDisabled > PreviewPopInputFieldMobileAllStates > PreviewPopInputFieldMobileError > PreviewPopInputFieldMobileSuccess > PreviewPopInputFieldMobileDisabled > PreviewPopInputFieldBasicAllStates > PreviewPopInputFieldBasicError > PreviewPopInputFieldBasicSuccess > PreviewPopInputFieldBasicStartIcon > PreviewPopInputFieldBasicEndIcon > PreviewPopInputFieldBasicBothIcons > PreviewPopInputFieldBasicEndSlot > PreviewPopInputFieldSearchAllStates > PreviewPopInputFieldSearchError > PreviewPopInputFieldSearchSuccess > PreviewPopInputFieldSearchDisabled > PreviewPopInputFieldSearchBorderStyles
+    Line 1991  [input     ]  PopInputFieldV2(
+             💡 const val POP_INPUT_FIELD_PREVIEWS_PREVIEW_POP_INPUT_FIELD_SEARCH_BORDER_STYLES_INPUT = "pop_input_field_previews_preview_pop_input_field_search_border_styles_input"
+    Line 2002  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldSearchBorderStylesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_search_border_styles_input_item_$index"
+    Line 2014  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldSearchBorderStylesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_search_border_styles_input_item_$index"
+    Line 2025  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldSearchBorderStylesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_search_border_styles_input_item_$index"
+
+  Composable: PreviewPopInputFieldAllStates > PreviewPopInputFieldError > PreviewPopInputFieldSuccess > PreviewPopInputFieldDisabled > PreviewPopInputFieldUnderlineNakedSmallStartIcon > PreviewPopInputFieldUnderlineNakedSmallEndIcon > PreviewPopInputFieldUnderlineNakedSmallEndSlot > PreviewPopInputFieldLargeAllStates > PreviewPopInputFieldLargeError > PreviewPopInputFieldLargeSuccess > PreviewPopInputFieldLargeDisabled > PreviewPopInputFieldMobileAllStates > PreviewPopInputFieldMobileError > PreviewPopInputFieldMobileSuccess > PreviewPopInputFieldMobileDisabled > PreviewPopInputFieldBasicAllStates > PreviewPopInputFieldBasicError > PreviewPopInputFieldBasicSuccess > PreviewPopInputFieldBasicStartIcon > PreviewPopInputFieldBasicEndIcon > PreviewPopInputFieldBasicBothIcons > PreviewPopInputFieldBasicEndSlot > PreviewPopInputFieldSearchAllStates > PreviewPopInputFieldSearchError > PreviewPopInputFieldSearchSuccess > PreviewPopInputFieldSearchDisabled > PreviewPopInputFieldSearchBorderStyles > PreviewPopInputFieldSearchWithEndSlot
+    Line 2055  [input     ]  PopInputFieldV2(
+             💡 const val POP_INPUT_FIELD_PREVIEWS_PREVIEW_POP_INPUT_FIELD_SEARCH_WITH_END_SLOT_INPUT = "pop_input_field_previews_preview_pop_input_field_search_with_end_slot_input"
+    Line 2074  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldSearchWithEndSlotInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_search_with_end_slot_input_item_$index"
+    Line 2093  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldSearchWithEndSlotInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_search_with_end_slot_input_item_$index"
+    Line 2114  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldSearchWithEndSlotInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_search_with_end_slot_input_item_$index"
+    Line 2134  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldSearchWithEndSlotInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_search_with_end_slot_input_item_$index"
+
+  Composable: PreviewPopInputFieldAllStates > PreviewPopInputFieldError > PreviewPopInputFieldSuccess > PreviewPopInputFieldDisabled > PreviewPopInputFieldUnderlineNakedSmallStartIcon > PreviewPopInputFieldUnderlineNakedSmallEndIcon > PreviewPopInputFieldUnderlineNakedSmallEndSlot > PreviewPopInputFieldLargeAllStates > PreviewPopInputFieldLargeError > PreviewPopInputFieldLargeSuccess > PreviewPopInputFieldLargeDisabled > PreviewPopInputFieldMobileAllStates > PreviewPopInputFieldMobileError > PreviewPopInputFieldMobileSuccess > PreviewPopInputFieldMobileDisabled > PreviewPopInputFieldBasicAllStates > PreviewPopInputFieldBasicError > PreviewPopInputFieldBasicSuccess > PreviewPopInputFieldBasicStartIcon > PreviewPopInputFieldBasicEndIcon > PreviewPopInputFieldBasicBothIcons > PreviewPopInputFieldBasicEndSlot > PreviewPopInputFieldSearchAllStates > PreviewPopInputFieldSearchError > PreviewPopInputFieldSearchSuccess > PreviewPopInputFieldSearchDisabled > PreviewPopInputFieldSearchBorderStyles > PreviewPopInputFieldSearchWithEndSlot > PreviewPopInputFieldSmallAllStates
+    Line 2172  [input     ]  PopInputFieldV2(
+             💡 const val POP_INPUT_FIELD_PREVIEWS_PREVIEW_POP_INPUT_FIELD_SMALL_ALL_STATES_INPUT = "pop_input_field_previews_preview_pop_input_field_small_all_states_input"
+    Line 2184  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldSmallAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_small_all_states_input_item_$index"
+    Line 2196  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldSmallAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_small_all_states_input_item_$index"
+    Line 2208  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldSmallAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_small_all_states_input_item_$index"
+    Line 2220  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldSmallAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_small_all_states_input_item_$index"
+    Line 2234  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldSmallAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_small_all_states_input_item_$index"
+    Line 2248  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldSmallAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_small_all_states_input_item_$index"
+    Line 2261  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldSmallAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_small_all_states_input_item_$index"
+    Line 2273  [input     ]  PopInputFieldV2(
+             💡 fun popInputFieldPreviewsPreviewPopInputFieldSmallAllStatesInputItem(index: Int) = "pop_input_field_previews_preview_pop_input_field_small_all_states_input_item_$index"
+
+  Composable: PreviewPopInputFieldAllStates > PreviewPopInputFieldError > PreviewPopInputFieldSuccess > PreviewPopInputFieldDisabled > PreviewPopInputFieldUnderlineNakedSmallStartIcon > PreviewPopInputFieldUnderlineNakedSmallEndIcon > PreviewPopInputFieldUnderlineNakedSmallEndSlot > PreviewPopInputFieldLargeAllStates > PreviewPopInputFieldLargeError > PreviewPopInputFieldLargeSuccess > PreviewPopInputFieldLargeDisabled > PreviewPopInputFieldMobileAllStates > PreviewPopInputFieldMobileError > PreviewPopInputFieldMobileSuccess > PreviewPopInputFieldMobileDisabled > PreviewPopInputFieldBasicAllStates > PreviewPopInputFieldBasicError > PreviewPopInputFieldBasicSuccess > PreviewPopInputFieldBasicStartIcon > PreviewPopInputFieldBasicEndIcon > PreviewPopInputFieldBasicBothIcons > PreviewPopInputFieldBasicEndSlot > PreviewPopInputFieldSearchAllStates > PreviewPopInputFieldSearchError > PreviewPopInputFieldSearchSuccess > PreviewPopInputFieldSearchDisabled > PreviewPopInputFieldSearchBorderStyles > PreviewPopInputFieldSearchWithEndSlot > PreviewPopInputFieldSmallAllStates > PreviewPopInputFieldSmallError
+    Line 2304  [input     ]  PopInputFieldV2(
+             💡 const val POP_INPUT_FIELD_PREVIEWS_PREVIEW_POP_INPUT_FIELD_SMALL_ERROR_INPUT = "pop_input_field_previews_preview_pop_input_field_small_error_input"
+
+  Composable: PreviewPopInputFieldAllStates > PreviewPopInputFieldError > PreviewPopInputFieldSuccess > PreviewPopInputFieldDisabled > PreviewPopInputFieldUnderlineNakedSmallStartIcon > PreviewPopInputFieldUnderlineNakedSmallEndIcon > PreviewPopInputFieldUnderlineNakedSmallEndSlot > PreviewPopInputFieldLargeAllStates > PreviewPopInputFieldLargeError > PreviewPopInputFieldLargeSuccess > PreviewPopInputFieldLargeDisabled > PreviewPopInputFieldMobileAllStates > PreviewPopInputFieldMobileError > PreviewPopInputFieldMobileSuccess > PreviewPopInputFieldMobileDisabled > PreviewPopInputFieldBasicAllStates > PreviewPopInputFieldBasicError > PreviewPopInputFieldBasicSuccess > PreviewPopInputFieldBasicStartIcon > PreviewPopInputFieldBasicEndIcon > PreviewPopInputFieldBasicBothIcons > PreviewPopInputFieldBasicEndSlot > PreviewPopInputFieldSearchAllStates > PreviewPopInputFieldSearchError > PreviewPopInputFieldSearchSuccess > PreviewPopInputFieldSearchDisabled > PreviewPopInputFieldSearchBorderStyles > PreviewPopInputFieldSearchWithEndSlot > PreviewPopInputFieldSmallAllStates > PreviewPopInputFieldSmallError > PreviewPopInputFieldSmallSuccess
+    Line 2336  [input     ]  PopInputFieldV2(
+             💡 const val POP_INPUT_FIELD_PREVIEWS_PREVIEW_POP_INPUT_FIELD_SMALL_SUCCESS_INPUT = "pop_input_field_previews_preview_pop_input_field_small_success_input"
+
+  Composable: PreviewPopInputFieldAllStates > PreviewPopInputFieldError > PreviewPopInputFieldSuccess > PreviewPopInputFieldDisabled > PreviewPopInputFieldUnderlineNakedSmallStartIcon > PreviewPopInputFieldUnderlineNakedSmallEndIcon > PreviewPopInputFieldUnderlineNakedSmallEndSlot > PreviewPopInputFieldLargeAllStates > PreviewPopInputFieldLargeError > PreviewPopInputFieldLargeSuccess > PreviewPopInputFieldLargeDisabled > PreviewPopInputFieldMobileAllStates > PreviewPopInputFieldMobileError > PreviewPopInputFieldMobileSuccess > PreviewPopInputFieldMobileDisabled > PreviewPopInputFieldBasicAllStates > PreviewPopInputFieldBasicError > PreviewPopInputFieldBasicSuccess > PreviewPopInputFieldBasicStartIcon > PreviewPopInputFieldBasicEndIcon > PreviewPopInputFieldBasicBothIcons > PreviewPopInputFieldBasicEndSlot > PreviewPopInputFieldSearchAllStates > PreviewPopInputFieldSearchError > PreviewPopInputFieldSearchSuccess > PreviewPopInputFieldSearchDisabled > PreviewPopInputFieldSearchBorderStyles > PreviewPopInputFieldSearchWithEndSlot > PreviewPopInputFieldSmallAllStates > PreviewPopInputFieldSmallError > PreviewPopInputFieldSmallSuccess > PreviewPopInputFieldSmallDisabled
+    Line 2367  [input     ]  PopInputFieldV2(
+             💡 const val POP_INPUT_FIELD_PREVIEWS_PREVIEW_POP_INPUT_FIELD_SMALL_DISABLED_INPUT = "pop_input_field_previews_preview_pop_input_field_small_disabled_input"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopInputFieldV2
+File   : ui_components/src/main/java/com/pop/components/ds_components/PopInputFieldV2.kt
+
+  Composable: PopInputFieldV2 > PopInputFieldV2 > PopInputFieldUnderlineNakedSmall
+    Line  788  [input     ]  BasicTextField(
+             💡 const val POP_INPUT_FIELD_V2_POP_INPUT_FIELD_UNDERLINE_NAKED_SMALL_INPUT = "pop_input_field_v2_pop_input_field_underline_naked_small_input"
+
+  Composable: PopInputFieldV2 > PopInputFieldV2 > PopInputFieldUnderlineNakedSmall > PopInputFieldUnderlineNakedLarge
+    Line  952  [input     ]  BasicTextField(
+             💡 const val POP_INPUT_FIELD_V2_POP_INPUT_FIELD_UNDERLINE_NAKED_LARGE_INPUT = "pop_input_field_v2_pop_input_field_underline_naked_large_input"
+    Line  992  [input     ]  BasicTextField(
+             💡 fun popInputFieldV2PopInputFieldUnderlineNakedLargeInputItem(index: Int) = "pop_input_field_v2_pop_input_field_underline_naked_large_input_item_$index"
+
+  Composable: PopInputFieldV2 > PopInputFieldV2 > PopInputFieldUnderlineNakedSmall > PopInputFieldUnderlineNakedLarge > PopInputFieldBasic
+    Line 1259  [input     ]  BasicTextField(
+             💡 const val POP_INPUT_FIELD_V2_POP_INPUT_FIELD_BASIC_INPUT = "pop_input_field_v2_pop_input_field_basic_input"
+
+  Composable: PopInputFieldV2 > PopInputFieldV2 > PopInputFieldUnderlineNakedSmall > PopInputFieldUnderlineNakedLarge > PopInputFieldBasic > PopInputFieldMobile
+    Line 1498  [row       ]  .clickable(
+             💡 const val POP_INPUT_FIELD_V2_POP_INPUT_FIELD_MOBILE_ROW = "pop_input_field_v2_pop_input_field_mobile_row"
+    Line 1537  [row       ]  if (enabled) Modifier.clickable(
+             💡 fun popInputFieldV2PopInputFieldMobileRowItem(index: Int) = "pop_input_field_v2_pop_input_field_mobile_row_item_$index"
+    Line 1571  [input     ]  BasicTextField(
+             💡 const val POP_INPUT_FIELD_V2_POP_INPUT_FIELD_MOBILE_INPUT = "pop_input_field_v2_pop_input_field_mobile_input"
+
+  Composable: PopInputFieldV2 > PopInputFieldV2 > PopInputFieldUnderlineNakedSmall > PopInputFieldUnderlineNakedLarge > PopInputFieldBasic > PopInputFieldMobile > PopInputFieldBasicNoPadding
+    Line 1901  [input     ]  BasicTextField(
+             💡 const val POP_INPUT_FIELD_V2_POP_INPUT_FIELD_BASIC_NO_PADDING_INPUT = "pop_input_field_v2_pop_input_field_basic_no_padding_input"
+
+  Composable: PopInputFieldV2 > PopInputFieldV2 > PopInputFieldUnderlineNakedSmall > PopInputFieldUnderlineNakedLarge > PopInputFieldBasic > PopInputFieldMobile > PopInputFieldBasicNoPadding > PopInputFieldSearch
+    Line 2082  [row       ]  .clickable(
+             💡 const val POP_INPUT_FIELD_V2_POP_INPUT_FIELD_SEARCH_ROW = "pop_input_field_v2_pop_input_field_search_row"
+    Line 2138  [row       ]  .clickable(
+             💡 fun popInputFieldV2PopInputFieldSearchRowItem(index: Int) = "pop_input_field_v2_pop_input_field_search_row_item_$index"
+    Line 2158  [input     ]  BasicTextField(
+             💡 const val POP_INPUT_FIELD_V2_POP_INPUT_FIELD_SEARCH_INPUT = "pop_input_field_v2_pop_input_field_search_input"
+    Line 2222  [row       ]  .clickable(
+             💡 fun popInputFieldV2PopInputFieldSearchRowItem(index: Int) = "pop_input_field_v2_pop_input_field_search_row_item_$index"
+
+  Composable: PopInputFieldV2 > PopInputFieldV2 > PopInputFieldUnderlineNakedSmall > PopInputFieldUnderlineNakedLarge > PopInputFieldBasic > PopInputFieldMobile > PopInputFieldBasicNoPadding > PopInputFieldSearch > PopInputFieldSmall
+    Line 2436  [input     ]  BasicTextField(
+             💡 const val POP_INPUT_FIELD_V2_POP_INPUT_FIELD_SMALL_INPUT = "pop_input_field_v2_pop_input_field_small_input"
+    Line 2494  [row       ]  .clickable(
+             💡 const val POP_INPUT_FIELD_V2_POP_INPUT_FIELD_SMALL_ROW = "pop_input_field_v2_pop_input_field_small_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopInputFieldV2KeyPadTestActivity
+File   : pop/src/main/java/com/popclub/android/PopInputFieldV2KeyPadTestActivity.kt
+
+  Composable: PopInputFieldV2KeyPadTestScreen
+    Line  105  [input     ]  PopInputFieldV2(
+             💡 const val POP_INPUT_FIELD_V2_KEY_PAD_TEST_ACTIVITY_POP_INPUT_FIELD_V2_KEY_PAD_TEST_SCREEN_INPUT = "pop_input_field_v2_key_pad_test_activity_pop_input_field_v2_key_pad_test_screen_input"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopKeyPad
+File   : ui_components/src/main/java/com/pop/components/ds_components/PopKeyPad.kt
+
+  Composable: PopKeyPad > KeyPadButton
+    Line  220  [row       ]  Modifier.clickable(
+             💡 const val POP_KEY_PAD_KEY_PAD_BUTTON_ROW = "pop_key_pad_key_pad_button_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopListItem
+File   : ui_components/src/main/java/com/pop/components/ds_components/PopListItem.kt
+
+  Composable: PopListItem
+    Line  244  [row       ]  Modifier.clickable(
+             💡 const val POP_LIST_ITEM_ROW = "pop_list_item_row"
+    Line  286  [row       ]  Modifier.clickable(
+             💡 fun popListItemRowItem(index: Int) = "pop_list_item_row_item_$index"
+    Line  334  [row       ]  Modifier.clickable(
+             💡 fun popListItemRowItem(index: Int) = "pop_list_item_row_item_$index"
+    Line  377  [row       ]  Modifier.clickable(
+             💡 fun popListItemRowItem(index: Int) = "pop_list_item_row_item_$index"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopListItemScreenshotTest
+File   : ui_components/src/androidTest/kotlin/com/pop/components/compose_components/PopListItemScreenshotTest.kt
+
+  Composable: BasicTextOnlyScreenshot > WithSupportingTextScreenshot > WithLeadingIconScreenshot > WithLeadingAvatarPersonScreenshot > WithLeadingAvatarNonPersonScreenshot > WithTrailingIconScreenshot > WithTrailingSwitchScreenshot
+    Line  327  [switch    ]  Switch(
+             💡 const val POP_LIST_ITEM_SCREENSHOT_TEST_WITH_TRAILING_SWITCH_SCREENSHOT_SWITCH = "pop_list_item_screenshot_test_with_trailing_switch_screenshot_switch"
+
+  Composable: BasicTextOnlyScreenshot > WithSupportingTextScreenshot > WithLeadingIconScreenshot > WithLeadingAvatarPersonScreenshot > WithLeadingAvatarNonPersonScreenshot > WithTrailingIconScreenshot > WithTrailingSwitchScreenshot > WithTrailingTextScreenshot > LeadingIconTrailingIconScreenshot > LeadingAvatarTrailingSwitchScreenshot
+    Line  411  [switch    ]  Switch(
+             💡 const val POP_LIST_ITEM_SCREENSHOT_TEST_LEADING_AVATAR_TRAILING_SWITCH_SCREENSHOT_SWITCH = "pop_list_item_screenshot_test_leading_avatar_trailing_switch_screenshot_switch"
+
+  Composable: BasicTextOnlyScreenshot > WithSupportingTextScreenshot > WithLeadingIconScreenshot > WithLeadingAvatarPersonScreenshot > WithLeadingAvatarNonPersonScreenshot > WithTrailingIconScreenshot > WithTrailingSwitchScreenshot > WithTrailingTextScreenshot > LeadingIconTrailingIconScreenshot > LeadingAvatarTrailingSwitchScreenshot > LeadingAvatarSupportingTextTrailingIconScreenshot > DisabledScreenshot > NonClickableScreenshot > LongHeadlineScreenshot > LongSupportingTextScreenshot > AllCombinationsScreenshot
+    Line  590  [switch    ]  Switch(
+             💡 const val POP_LIST_ITEM_SCREENSHOT_TEST_ALL_COMBINATIONS_SCREENSHOT_SWITCH = "pop_list_item_screenshot_test_all_combinations_screenshot_switch"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopOfferToggle
+File   : ui_components/src/main/java/com/pop/components/ds_components/PopOfferToggle.kt
+
+  Composable: PopOfferToggle
+    Line  215  [icon_button]  IconButton(
+             💡 const val POP_OFFER_TOGGLE_ICON_BUTTON = "pop_offer_toggle_icon_button"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopOtpField
+File   : ui_components/src/main/java/com/pop/components/ds_components/PopOtpField.kt
+
+  Composable: PopOtpField > PopOtpFieldDiscrete
+    Line  242  [input     ]  BasicTextField(
+             💡 const val POP_OTP_FIELD_DISCRETE_INPUT = "pop_otp_field_discrete_input"
+
+  Composable: PopOtpField > PopOtpFieldDiscrete > PopOtpFieldDiscreteNaked
+    Line  389  [input     ]  BasicTextField(
+             💡 const val POP_OTP_FIELD_DISCRETE_NAKED_INPUT = "pop_otp_field_discrete_naked_input"
+
+  Composable: PopOtpField > PopOtpFieldDiscrete > PopOtpFieldDiscreteNaked > OtpFieldMessageSection > OtpFieldResendSection
+    Line  556  [row       ]  .clickable(enabled = isClickable) {
+             💡 const val POP_OTP_FIELD_OTP_FIELD_RESEND_SECTION_ROW = "pop_otp_field_otp_field_resend_section_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopOtpFieldTestActivity
+File   : pop/src/main/java/com/popclub/android/PopOtpFieldTestActivity.kt
+
+  Composable: OtpVerificationScreen
+    Line  185  [row       ]  modifier = Modifier.clickable {
+             💡 const val POP_OTP_FIELD_TEST_ACTIVITY_OTP_VERIFICATION_SCREEN_ROW = "pop_otp_field_test_activity_otp_verification_screen_row"
+    Line  195  [radio     ]  PopRadio(
+             💡 const val POP_OTP_FIELD_TEST_ACTIVITY_OTP_VERIFICATION_SCREEN_RADIO = "pop_otp_field_test_activity_otp_verification_screen_radio"
+    Line  213  [row       ]  modifier = Modifier.clickable {
+             💡 fun popOtpFieldTestActivityOtpVerificationScreenRowItem(index: Int) = "pop_otp_field_test_activity_otp_verification_screen_row_item_$index"
+    Line  223  [radio     ]  PopRadio(
+             💡 fun popOtpFieldTestActivityOtpVerificationScreenRadioItem(index: Int) = "pop_otp_field_test_activity_otp_verification_screen_radio_item_$index"
+    Line  258  [row       ]  modifier = Modifier.clickable {
+             💡 fun popOtpFieldTestActivityOtpVerificationScreenRowItem(index: Int) = "pop_otp_field_test_activity_otp_verification_screen_row_item_$index"
+    Line  268  [radio     ]  PopRadio(
+             💡 fun popOtpFieldTestActivityOtpVerificationScreenRadioItem(index: Int) = "pop_otp_field_test_activity_otp_verification_screen_radio_item_$index"
+    Line  286  [row       ]  modifier = Modifier.clickable {
+             💡 fun popOtpFieldTestActivityOtpVerificationScreenRowItem(index: Int) = "pop_otp_field_test_activity_otp_verification_screen_row_item_$index"
+    Line  296  [radio     ]  PopRadio(
+             💡 fun popOtpFieldTestActivityOtpVerificationScreenRadioItem(index: Int) = "pop_otp_field_test_activity_otp_verification_screen_radio_item_$index"
+    Line  389  [button    ]  PopButtonV2(
+             💡 const val POP_OTP_FIELD_TEST_ACTIVITY_OTP_VERIFICATION_SCREEN_BUTTON = "pop_otp_field_test_activity_otp_verification_screen_button"
+
+  Composable: OtpVerificationScreen > TestScenarioRadio
+    Line  628  [row       ]  .clickable { onSelect() }
+             💡 const val POP_OTP_FIELD_TEST_ACTIVITY_TEST_SCENARIO_RADIO_ROW = "pop_otp_field_test_activity_test_scenario_radio_row"
+    Line  633  [radio     ]  PopRadio(
+             💡 const val POP_OTP_FIELD_TEST_ACTIVITY_TEST_SCENARIO_RADIO = "pop_otp_field_test_activity_test_scenario_radio"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopPills
+File   : ui_components/src/main/java/com/pop/components/ds_components/PopPills.kt
+
+  Composable: PopPills > PopPillUnit
+    Line  183  [row       ]  .then(if (!isDisabled) Modifier.clickable(onClick = onClick) else Modifier)
+             💡 const val POP_PILLS_POP_PILL_UNIT_ROW = "pop_pills_pop_pill_unit_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopRadio
+File   : ui_components/src/main/java/com/pop/components/ds_components/PopRadio.kt
+
+  Composable: PopRadio
+    Line  114  [row       ]  .then(if (enabled) Modifier.clickable(onClick = onClick) else Modifier),
+             💡 const val POP_RADIO_ROW = "pop_radio_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopScanPayCircleWidget
+File   : pop/src/main/java/com/popclub/android/widget/PopScanPayCircleWidget.kt
+
+  Composable: Content
+    Line   48  [row       ]  .clickable({
+             💡 const val POP_SCAN_PAY_CIRCLE_WIDGET_CONTENT_ROW = "pop_scan_pay_circle_widget_content_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopScanPayRectWidget
+File   : pop/src/main/java/com/popclub/android/widget/PopScanPayRectWidget.kt
+
+  Composable: Content
+    Line   50  [row       ]  .clickable({
+             💡 const val POP_SCAN_PAY_RECT_WIDGET_CONTENT_ROW = "pop_scan_pay_rect_widget_content_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopSearchBar
+File   : ui_components/src/main/java/com/pop/components/compose_components/PopSearchBar.kt
+
+  Composable: PopSearchBar
+    Line  102  [input     ]  BasicTextField(
+             💡 const val POP_SEARCH_BAR_INPUT = "pop_search_bar_input"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopStickyHeader
+File   : ui_components/src/main/java/com/pop/components/ds_components/PopStickyHeader.kt
+
+  Composable: PopStickyHeaderContent
+    Line  200  [row       ]  .clickable(
+             💡 const val POP_STICKY_HEADER_CONTENT_ROW = "pop_sticky_header_content_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopStickyHeaderGrid
+File   : ui_components/src/main/java/com/pop/components/ds_components/PopStickyHeaderGrid.kt
+
+  Composable: PopStickyHeaderGridItemContent
+    Line  135  [row       ]  .clickable(
+             💡 const val POP_STICKY_HEADER_GRID_ITEM_CONTENT_ROW = "pop_sticky_header_grid_item_content_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopTitleBar
+File   : ui_components/src/main/java/com/pop/components/ds_components/PopTitleBar.kt
+
+  Composable: PopTitleBar > IconWithSize
+    Line  306  [row       ]  Modifier.clickable { onClick() }
+             💡 const val POP_TITLE_BAR_ICON_WITH_SIZE_ROW = "pop_title_bar_icon_with_size_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopToastView
+File   : ui_components/src/main/java/com/pop/components/ds_components/PopToastView.kt
+
+  Composable: PopToastView > PopToastView
+    Line  199  [row       ]  .clickable(onClick = safeOnClose)
+             💡 const val POP_TOAST_VIEW_ROW = "pop_toast_view_row"
+    Line  219  [button    ]  PopButtonV2(
+             💡 const val POP_TOAST_VIEW_BUTTON = "pop_toast_view_button"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopToggle
+File   : ui_components/src/main/java/com/pop/components/ds_components/PopToggle.kt
+
+  Composable: PopToggle > PopToggle
+    Line  271  [row       ]  .then(if (canToggle) Modifier.clickable { handleToggleClick() } else Modifier),
+             💡 const val POP_TOGGLE_ROW = "pop_toggle_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopTopBar
+File   : ui_components/src/main/java/com/pop/components/ds_components/PopTopBar.kt
+
+  Composable: PopTopBar
+    Line  363  [row       ]  Modifier.clickable(onClick = config.onMerchantImageClick)
+             💡 const val POP_TOP_BAR_ROW = "pop_top_bar_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopTopBarWithContent
+File   : ui_components/src/main/java/com/pop/components/ds_components/PopTopBarWithContent.kt
+
+  Composable: PopTopBarWithContent
+    Line  883  [row       ]  Modifier.clickable(onClick = topBarConfig.onMerchantImageClick)
+             💡 const val POP_TOP_BAR_WITH_CONTENT_ROW = "pop_top_bar_with_content_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopTopBarWithXmlContent
+File   : ui_components/src/main/java/com/pop/components/ds_components/PopTopBarWithXmlContent.kt
+
+  Composable: 
+    Line  218  [row       ]  .clickable { topBarConfig.onMerchantImageClick.invoke() }
+             💡 const val POP_TOP_BAR_WITH_XML_ROW = "pop_top_bar_with_xml_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopTssTransactionTable
+File   : feature/upi/src/main/java/com/pop/feature/upi/ui/tss/components/PopTssTransactionTable.kt
+
+  Composable: PopTssTransactionTable > TransactionDetailRow
+    Line  383  [row       ]  .clickable(
+             💡 const val POP_TSS_TRANSACTION_TABLE_TRANSACTION_DETAIL_ROW = "pop_tss_transaction_table_transaction_detail_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopUpiGridWidget
+File   : pop/src/main/java/com/popclub/android/widget/PopUpiGridWidget.kt
+
+  Composable: Content > UpiActionButton
+    Line  132  [row       ]  .clickable({
+             💡 const val POP_UPI_GRID_WIDGET_UPI_ACTION_BUTTON_ROW = "pop_upi_grid_widget_upi_action_button_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PopVerticalButton
+File   : ui_components/src/main/java/com/pop/components/ds_components/PopVerticalButton.kt
+
+  Composable: PopVerticalButton
+    Line   95  [row       ]  Modifier.clickable(onClick = onClick)
+             💡 const val POP_VERTICAL_BUTTON_ROW = "pop_vertical_button_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : PortraitCarouselWidget
+File   : feature/home/src/main/java/com/pop/feature/clp/compose/widgets/PortraitCarouselWidget.kt
+
+  Composable: PortraitCarouselWidget
+    Line  236  [row       ]  .clickable {
+             💡 const val PORTRAIT_CAROUSEL_WIDGET_ROW = "portrait_carousel_widget_row"
+    Line  337  [row       ]  .clickable {
+             💡 fun portraitCarouselWidgetRowItem(index: Int) = "portrait_carousel_widget_row_item_$index"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : ProductDetailsFragmentV2
+File   : feature/ecom/src/main/java/com/pop/ecom/productdetails/ProductDetailsFragmentV2.kt
+
+  Composable: ProductDetailsScreen > SizeChartFullPageDialog > ProductImageCarousel > ProductInfoSection > SizeSelectionSection
+    Line 1249  [row       ]  modifier = Modifier.clickable { onSizeChartClick() }.qaTestTag(TestTags.PRODUCT_DETAILS_SIZE_CHART_B
+             💡 const val PRODUCT_DETAILS_FRAGMENT_V2_SIZE_SELECTION_SECTION_ROW = "product_details_fragment_v2_size_selection_section_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : ProfileMenuSection
+File   : pop/src/main/java/com/popclub/android/profile/ProfileMenuSection.kt
+
+  Composable: ProfileMenuSection > ProfileSectionHeader
+    Line  384  [row       ]  Modifier.clickable { onClick() }
+             💡 const val PROFILE_MENU_SECTION_PROFILE_SECTION_HEADER_ROW = "profile_menu_section_profile_section_header_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : ReasonSelection
+File   : feature/ecom/src/main/java/com/pop/ecom/presentation/ui/orders/returns/composables/ReasonSelection.kt
+
+  Composable: SelectReasonStep
+    Line   89  [button    ]  PopButton(
+             💡 const val REASON_SELECTION_SELECT_REASON_STEP_BUTTON = "reason_selection_select_reason_step_button"
+
+  Composable: SelectReasonStep > SelectReason > SelectedReturnReason
+    Line  183  [row       ]  .clickable(
+             💡 const val REASON_SELECTION_SELECTED_RETURN_REASON_ROW = "reason_selection_selected_return_reason_row"
+
+  Composable: SelectReasonStep > SelectReason > SelectedReturnReason > Reason
+    Line  240  [row       ]  .clickable(
+             💡 const val REASON_SELECTION_REASON_ROW = "reason_selection_reason_row"
+
+  Composable: SelectReasonStep > SelectReason > SelectedReturnReason > Reason > TellUsMore
+    Line  308  [radio     ]  PopRadioButton(
+             💡 const val REASON_SELECTION_TELL_US_MORE_RADIO = "reason_selection_tell_us_more_radio"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : ReturnOrder
+File   : feature/ecom/src/main/java/com/pop/ecom/presentation/ui/orders/returns/ReturnOrder.kt
+
+  Composable: ReturnOrderBottomSheet
+    Line  218  [icon_button]  IconButton(
+             💡 const val RETURN_ORDER_BOTTOM_SHEET_ICON_BUTTON = "return_order_bottom_sheet_icon_button"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : ReturnOrderV2
+File   : feature/ecom/src/main/java/com/pop/ecom/presentation/ui/orders/returns/v2/ReturnOrderV2.kt
+
+  Composable: ReturnOrderBottomSheetV2 > UploadProofMediaStepV2Wrapper > ReturnSummaryStepV2Wrapper > UpiSelectionBottomSheetV2 > ConfirmCloseDialogV2 > ConfirmCloseContentV2
+    Line  976  [button    ]  PopButtonV2(
+             💡 const val RETURN_ORDER_V2_CONFIRM_CLOSE_CONTENT_V2_BUTTON = "return_order_v2_confirm_close_content_v2_button"
+    Line  986  [button    ]  PopButtonV2(
+             💡 fun returnOrderV2ConfirmCloseContentV2ButtonItem(index: Int) = "return_order_v2_confirm_close_content_v2_button_item_$index"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : ReturnSummary
+File   : feature/ecom/src/main/java/com/pop/ecom/presentation/ui/orders/returns/composables/ReturnSummary.kt
+
+  Composable: ReturnSummaryStep
+    Line  147  [button    ]  PopButton(
+             💡 const val RETURN_SUMMARY_STEP_BUTTON = "return_summary_step_button"
+
+  Composable: ReturnSummaryStep > UploadedMedia
+    Line  221  [row       ]  modifier = Modifier.clickable(
+             💡 const val RETURN_SUMMARY_UPLOADED_MEDIA_ROW = "return_summary_uploaded_media_row"
+
+  Composable: ReturnSummaryStep > UploadedMedia > UploadedImageCard > PickUpAddress > RefundAccountDetails
+    Line  395  [row       ]  modifier = Modifier.clickable(
+             💡 const val RETURN_SUMMARY_REFUND_ACCOUNT_DETAILS_ROW = "return_summary_refund_account_details_row"
+    Line  435  [button    ]  PopButton(
+             💡 const val RETURN_SUMMARY_REFUND_ACCOUNT_DETAILS_BUTTON = "return_summary_refund_account_details_button"
+
+  Composable: ReturnSummaryStep > UploadedMedia > UploadedImageCard > PickUpAddress > RefundAccountDetails > ReturnForCodOrders > GetYourMoneyBack
+    Line  593  [icon_button]  IconButton(
+             💡 const val RETURN_SUMMARY_GET_YOUR_MONEY_BACK_ICON_BUTTON = "return_summary_get_your_money_back_icon_button"
+    Line  634  [button    ]  PopButton(
+             💡 const val RETURN_SUMMARY_GET_YOUR_MONEY_BACK_BUTTON = "return_summary_get_your_money_back_button"
+
+  Composable: ReturnSummaryStep > UploadedMedia > UploadedImageCard > PickUpAddress > RefundAccountDetails > ReturnForCodOrders > GetYourMoneyBack > UpiSelectionCard
+    Line  750  [radio     ]  RadioButton(
+             💡 const val RETURN_SUMMARY_UPI_SELECTION_CARD_RADIO = "return_summary_upi_selection_card_radio"
+    Line  778  [radio     ]  RadioButton(
+             💡 fun returnSummaryUpiSelectionCardRadioItem(index: Int) = "return_summary_upi_selection_card_radio_item_$index"
+    Line  792  [input     ]  OutlinedTextField(
+             💡 const val RETURN_SUMMARY_UPI_SELECTION_CARD_INPUT = "return_summary_upi_selection_card_input"
+    Line  827  [button    ]  TextButton(
+             💡 const val RETURN_SUMMARY_UPI_SELECTION_CARD_BUTTON = "return_summary_upi_selection_card_button"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : RewardsCarouselWidget
+File   : feature/home/src/main/java/com/pop/feature/clp/compose/widgets/RewardsCarouselWidget.kt
+
+  Composable: RewardsCarouselWidget
+    Line  176  [row       ]  .clickable {
+             💡 const val REWARDS_CAROUSEL_WIDGET_ROW = "rewards_carousel_widget_row"
+
+  Composable: RewardsCarouselWidget > RewardCard
+    Line  250  [row       ]  .clickable {
+             💡 const val REWARDS_CAROUSEL_WIDGET_REWARD_CARD_ROW = "rewards_carousel_widget_reward_card_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : RiveLoader
+File   : ui_components/src/main/java/com/pop/components/compose_components/RiveLoader.kt
+
+  Composable: RiveLoader
+    Line   37  [row       ]  .clickable(enabled = false) {}, // Block touches while visible
+             💡 const val RIVE_LOADER_ROW = "rive_loader_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : RupayCreditCardPromoCard
+File   : pop/src/main/java/com/popclub/android/profile/RupayCreditCardPromoCard.kt
+
+  Composable: RupayCreditCardPromoCard
+    Line   44  [row       ]  .padding(horizontal = 16.dp, vertical = 12.dp).popClickable{
+             💡 const val RUPAY_CREDIT_CARD_PROMO_CARD_ROW = "rupay_credit_card_promo_card_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : SDKActivateCardFragmentV2
+File   : feature/cc_sdk/src/main/java/com/ccsdk/presentation/ui/sdkfragments/SDKActivateCardFragmentV2.kt
+
+  Composable: CardActivationScreen
+    Line  743  [button    ]  PopButtonV2(
+             💡 const val SDK_ACTIVATE_CARD_FRAGMENT_V2_CARD_ACTIVATION_SCREEN_BUTTON = "sdk_activate_card_fragment_v2_card_activation_screen_button"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : SDKCardActivatedPageFragmentV2
+File   : feature/cc_sdk/src/main/java/com/ccsdk/presentation/ui/sdkfragments/SDKCardActivatedPageFragmentV2.kt
+
+  Composable: CardActivatedScreen
+    Line  146  [button    ]  PopButtonV2(
+             💡 const val SDK_CARD_ACTIVATED_PAGE_FRAGMENT_V2_CARD_ACTIVATED_SCREEN_BUTTON = "sdk_card_activated_page_fragment_v2_card_activated_screen_button"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : SDKCardControlFragmentV2
+File   : feature/cc_sdk/src/main/java/com/ccsdk/presentation/ui/sdkfragments/SDKCardControlFragmentV2.kt
+
+  Composable: CardControlScreen
+    Line 1502  [button    ]  PopButtonV2(
+             💡 const val SDK_CARD_CONTROL_FRAGMENT_V2_CARD_CONTROL_SCREEN_BUTTON = "sdk_card_control_fragment_v2_card_control_screen_button"
+
+  Composable: CardControlScreen > CardControlRowShimmer > TabSelectionSection > CardControlRow > UPITransactionItem > LimitSliderSection > DiscardChangesDialogContent
+    Line 2064  [button    ]  PopButtonV2(
+             💡 const val SDK_CARD_CONTROL_FRAGMENT_V2_DISCARD_CHANGES_DIALOG_CONTENT_BUTTON = "sdk_card_control_fragment_v2_discard_changes_dialog_content_button"
+    Line 2073  [button    ]  PopButtonV2(
+             💡 fun sdkCardControlFragmentV2DiscardChangesDialogContentButtonItem(index: Int) = "sdk_card_control_fragment_v2_discard_changes_dialog_content_button_item_$index"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : SDKCardDetailsCompose
+File   : feature/home/src/main/java/com/pop/feature/clp/adapters/SDKCardDetailsCompose.kt
+
+  Composable: SDKCardDetailsContent > LockedCardContent
+    Line  138  [row       ]  .clickable(onClick = onClick)
+             💡 const val SDK_CARD_DETAILS_COMPOSE_LOCKED_CARD_CONTENT_ROW = "sdk_card_details_compose_locked_card_content_row"
+
+  Composable: SDKCardDetailsContent > LockedCardContent > ShimmerCardContent > DataCardContent
+    Line  309  [button    ]  PopButtonV2(
+             💡 const val SDK_CARD_DETAILS_COMPOSE_DATA_CARD_CONTENT_BUTTON = "sdk_card_details_compose_data_card_content_button"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : SDKCardViewWidgetAdapter
+File   : feature/home/src/main/java/com/pop/feature/clp/adapters/SDKCardViewWidgetAdapter.kt
+
+  Composable: SDKCardViewWidgetContent
+    Line  219  [row       ]  .clickable {
+             💡 const val SDK_CARD_VIEW_WIDGET_ADAPTER_SDK_CARD_VIEW_WIDGET_CONTENT_ROW = "sdk_card_view_widget_adapter_sdk_card_view_widget_content_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : SDKDeviceConsentVerifiedFragmentV2
+File   : feature/cc_sdk/src/main/java/com/ccsdk/presentation/ui/sdkfragments/SDKDeviceConsentVerifiedFragmentV2.kt
+
+  Composable: DeviceConsentRiveContent > VerifiedScreen
+    Line  973  [button    ]  PopButtonV2(
+             💡 const val SDK_DEVICE_CONSENT_VERIFIED_FRAGMENT_V2_VERIFIED_SCREEN_BUTTON = "sdk_device_consent_verified_fragment_v2_verified_screen_button"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : SDKPrerequisiteListBottomSheetDialogV2
+File   : feature/cc_sdk/src/main/java/com/ccsdk/presentation/ui/sdkfragments/SDKPrerequisiteListBottomSheetDialogV2.kt
+
+  Composable: PrerequisiteListBottomSheetContent
+    Line  286  [button    ]  PopButtonV2(
+             💡 const val SDK_PREREQUISITE_LIST_BOTTOM_SHEET_DIALOG_V2_PREREQUISITE_LIST_BOTTOM_SHEET_CONTENT_BUTTON = "sdk_prerequisite_list_bottom_sheet_dialog_v2_prerequisite_list_bottom_sheet_content_button"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : SDKSimSelectionFragmentV2
+File   : feature/cc_sdk/src/main/java/com/ccsdk/presentation/ui/sdkfragments/SDKSimSelectionFragmentV2.kt
+
+  Composable: VerificationRiveScreen > SimSelectionScreen
+    Line  714  [button    ]  PopButtonV2(
+             💡 const val SDK_SIM_SELECTION_FRAGMENT_V2_SIM_SELECTION_SCREEN_BUTTON = "sdk_sim_selection_fragment_v2_sim_selection_screen_button"
+
+  Composable: VerificationRiveScreen > SimSelectionScreen > SimRow
+    Line  745  [row       ]  .clickable(onClick = onSelect)
+             💡 const val SDK_SIM_SELECTION_FRAGMENT_V2_SIM_ROW = "sdk_sim_selection_fragment_v2_sim_row"
+    Line  775  [radio     ]  PopRadio(
+             💡 const val SDK_SIM_SELECTION_FRAGMENT_V2_SIM_ROW_RADIO = "sdk_sim_selection_fragment_v2_sim_row_radio"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : SDKUnbilledTransactionFragmentV2
+File   : feature/cc_sdk/src/main/java/com/ccsdk/presentation/ui/sdkfragments/SDKUnbilledTransactionFragmentV2.kt
+
+  Composable: UnbilledTransactionScreen
+    Line  870  [row       ]  .clickable(
+             💡 const val SDK_UNBILLED_TRANSACTION_FRAGMENT_V2_UNBILLED_TRANSACTION_SCREEN_ROW = "sdk_unbilled_transaction_fragment_v2_unbilled_transaction_screen_row"
+    Line  933  [input     ]  PopInputFieldV2(
+             💡 const val SDK_UNBILLED_TRANSACTION_FRAGMENT_V2_UNBILLED_TRANSACTION_SCREEN_INPUT = "sdk_unbilled_transaction_fragment_v2_unbilled_transaction_screen_input"
+
+  Composable: UnbilledTransactionScreen > FilterChipsRow > TransactionListItem > NoSearchResultsView > NoFilterResultsView > MonthHeaderRow
+    Line 1489  [row       ]  .clickable(onClick = onToggle)
+             💡 const val SDK_UNBILLED_TRANSACTION_FRAGMENT_V2_MONTH_HEADER_ROW = "sdk_unbilled_transaction_fragment_v2_month_header_row"
+
+  Composable: UnbilledTransactionScreen > FilterChipsRow > TransactionListItem > NoSearchResultsView > NoFilterResultsView > MonthHeaderRow > MonthlyTransactionCard
+    Line 1549  [row       ]  .clickable(onClick = onToggle)
+             💡 const val SDK_UNBILLED_TRANSACTION_FRAGMENT_V2_MONTHLY_TRANSACTION_CARD_ROW = "sdk_unbilled_transaction_fragment_v2_monthly_transaction_card_row"
+
+  Composable: UnbilledTransactionScreen > FilterChipsRow > TransactionListItem > NoSearchResultsView > NoFilterResultsView > MonthHeaderRow > MonthlyTransactionCard > EmptyStateView > TransactionListShimmer > FilterBottomSheet
+    Line 1694  [button    ]  PopButtonV2(
+             💡 const val SDK_UNBILLED_TRANSACTION_FRAGMENT_V2_FILTER_BOTTOM_SHEET_BUTTON = "sdk_unbilled_transaction_fragment_v2_filter_bottom_sheet_button"
+    Line 1705  [button    ]  PopButtonV2(
+             💡 fun sdkUnbilledTransactionFragmentV2FilterBottomSheetButtonItem(index: Int) = "sdk_unbilled_transaction_fragment_v2_filter_bottom_sheet_button_item_$index"
+
+  Composable: UnbilledTransactionScreen > FilterChipsRow > TransactionListItem > NoSearchResultsView > NoFilterResultsView > MonthHeaderRow > MonthlyTransactionCard > EmptyStateView > TransactionListShimmer > FilterBottomSheet > FilterMonthItem
+    Line 1735  [row       ]  .clickable(onClick = onClick)
+             💡 const val SDK_UNBILLED_TRANSACTION_FRAGMENT_V2_FILTER_MONTH_ITEM_ROW = "sdk_unbilled_transaction_fragment_v2_filter_month_item_row"
+    Line 1746  [radio     ]  PopRadio(
+             💡 const val SDK_UNBILLED_TRANSACTION_FRAGMENT_V2_FILTER_MONTH_ITEM_RADIO = "sdk_unbilled_transaction_fragment_v2_filter_month_item_radio"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : ScanningScreen
+File   : feature/upi/src/main/java/com/pop/feature/upi/ui/home/components/ScanningScreen.kt
+
+  Composable: ScanningScreen
+    Line  181  [button    ]  Button(
+             💡 const val SCANNING_SCREEN_BUTTON = "scanning_screen_button"
+    Line  206  [row       ]  .clickable {
+             💡 const val SCANNING_SCREEN_ROW = "scanning_screen_row"
+    Line  235  [row       ]  .clickable {
+             💡 fun scanningScreenRowItem(index: Int) = "scanning_screen_row_item_$index"
+    Line  261  [row       ]  .clickable {
+             💡 fun scanningScreenRowItem(index: Int) = "scanning_screen_row_item_$index"
+
+  Composable: ScanningScreen > ScanningControlButtons
+    Line  320  [row       ]  .clickable {
+             💡 const val SCANNING_CONTROL_BUTTONS_ROW = "scanning_control_buttons_row"
+    Line  336  [row       ]  .clickable {
+             💡 fun scanningControlButtonsRowItem(index: Int) = "scanning_control_buttons_row_item_$index"
+    Line  363  [row       ]  .clickable {
+             💡 fun scanningControlButtonsRowItem(index: Int) = "scanning_control_buttons_row_item_$index"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : SearchProductsFragmentV2
+File   : feature/ecom/src/main/java/com/pop/ecom/search/SearchProductsFragmentV2.kt
+
+  Composable: SearchProductsScreen
+    Line  225  [input     ]  PopInputFieldV2(
+             💡 const val SEARCH_PRODUCTS_FRAGMENT_V2_SEARCH_PRODUCTS_SCREEN_INPUT = "search_products_fragment_v2_search_products_screen_input"
+
+  Composable: SearchProductsScreen > RecentSearchChip
+    Line  328  [row       ]  .clickable { onClick() }
+             💡 const val SEARCH_PRODUCTS_FRAGMENT_V2_RECENT_SEARCH_CHIP_ROW = "search_products_fragment_v2_recent_search_chip_row"
+
+  Composable: SearchProductsScreen > RecentSearchChip > SuggestionRow
+    Line  349  [row       ]  .clickable { onClick() }
+             💡 const val SEARCH_PRODUCTS_FRAGMENT_V2_SUGGESTION_ROW = "search_products_fragment_v2_suggestion_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : SelfTransferScreen
+File   : feature/upi/src/main/java/com/pop/feature/upi/ui/screens/SelfTransferScreen.kt
+
+  Composable: SelfTransferScreen
+    Line  156  [row       ]  .clickable(
+             💡 const val SELF_TRANSFER_SCREEN_ROW = "self_transfer_screen_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : SendMoneyContent
+File   : feature/upi/src/main/java/com/pop/feature/upi/ui/screens/SendMoneyContent.kt
+
+  Composable: SendMoneyContent
+    Line  805  [row       ]  modifier = Modifier.popClickable {
+             💡 const val SEND_MONEY_CONTENT_ROW = "send_money_content_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : SetPinScreen
+File   : feature/upi/src/main/java/com/pop/feature/upi/ui/screens/SetPinScreen.kt
+
+  Composable: SetPinScreen
+    Line  235  [button    ]  PopButton(
+             💡 const val SET_PIN_SCREEN_BUTTON = "set_pin_screen_button"
+    Line  301  [input     ]  OutlinedTextField(
+             💡 const val SET_PIN_SCREEN_INPUT = "set_pin_screen_input"
+    Line  342  [input     ]  OutlinedTextField(
+             💡 fun setPinScreenInputItem(index: Int) = "set_pin_screen_input_item_$index"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : ShopPaymentProcessingUI
+File   : feature/ecom/src/main/java/com/pop/ecom/cart/payment/ShopPaymentProcessingUI.kt
+
+  Composable: ShopPaymentProcessingScreen
+    Line  234  [button    ]  PopButtonV2(
+             💡 const val SHOP_PAYMENT_PROCESSING_UI_SHOP_PAYMENT_PROCESSING_SCREEN_BUTTON = "shop_payment_processing_ui_shop_payment_processing_screen_button"
+    Line  245  [button    ]  PopButtonV2(
+             💡 fun shopPaymentProcessingUiShopPaymentProcessingScreenButtonItem(index: Int) = "shop_payment_processing_ui_shop_payment_processing_screen_button_item_$index"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : TncSection
+File   : feature/credit_card/src/main/java/com/pop/credit_card/ui/compose/steps/pan/TncSection.kt
+
+  Composable: TncSection > TncBottomSheetContent > ClickableTextWithDottedUnderline > TncCheckboxItemV2
+    Line  468  [row       ]  Modifier.clickable { onStateChange(PopCheckBoxState.Selected) }
+             💡 const val TNC_SECTION_TNC_CHECKBOX_ITEM_V2_ROW = "tnc_section_tnc_checkbox_item_v2_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : TransactionDetailsContent
+File   : feature/billpay/src/main/java/com/pop/billpay/presentation/ui/compose/TransactionDetailsContent.kt
+
+  Composable: TransactionDetailsContent > TransactionPaymentAccountAccordion > ContactDetailsSection > TransactionIdRow
+    Line  246  [row       ]  .popClickable { onCopy(transactionId) }
+             💡 const val TRANSACTION_DETAILS_TRANSACTION_ID_ROW = "transaction_details_transaction_id_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : UPIHomeBottomsheet
+File   : feature/upi/src/main/java/com/pop/feature/upi/ui/upi_number/UPIHomeBottomsheet.kt
+
+  Composable: UPIHomeBottomsheet
+    Line  254  [button    ]  PopButtonV2(
+             💡 const val UPI_HOME_BOTTOMSHEET_BUTTON = "upi_home_bottomsheet_button"
+
+  Composable: UPIHomeBottomsheet > UPIHomeBottomsheetContent
+    Line  374  [button    ]  PopButtonV2(
+             💡 const val UPI_HOME_BOTTOMSHEET_CONTENT_BUTTON = "upi_home_bottomsheet_content_button"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : UPILiteItem
+File   : feature/upi/src/main/java/com/pop/feature/upi/ui/shoppayments/components/UPILiteItem.kt
+
+  Composable: UPILiteItem
+    Line   74  [radio     ]  PopRadioButton(
+             💡 const val UPI_LITE_ITEM_RADIO = "upi_lite_item_radio"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : UnifiedPendingRequestsDialog
+File   : feature/upi/src/main/java/com/pop/feature/upi/ui/pendingRequests/UnifiedPendingRequestsDialog.kt
+
+  Composable: UnifiedPendingRequestsScreen
+    Line  360  [row       ]  Row(modifier = Modifier.fillMaxWidth().clickable{
+             💡 const val UNIFIED_PENDING_REQUESTS_SCREEN_ROW = "unified_pending_requests_screen_row"
+    Line  375  [row       ]  Row(modifier = Modifier.fillMaxWidth().clickable{
+             💡 fun unifiedPendingRequestsScreenRowItem(index: Int) = "unified_pending_requests_screen_row_item_$index"
+    Line  390  [row       ]  Row(modifier = Modifier.fillMaxWidth().clickable{
+             💡 fun unifiedPendingRequestsScreenRowItem(index: Int) = "unified_pending_requests_screen_row_item_$index"
+    Line  405  [row       ]  Row(modifier = Modifier.fillMaxWidth().clickable{
+             💡 fun unifiedPendingRequestsScreenRowItem(index: Int) = "unified_pending_requests_screen_row_item_$index"
+    Line  525  [row       ]  Row(modifier = Modifier.fillMaxWidth().clickable{
+             💡 fun unifiedPendingRequestsScreenRowItem(index: Int) = "unified_pending_requests_screen_row_item_$index"
+    Line  540  [row       ]  Row(modifier = Modifier.fillMaxWidth().clickable{
+             💡 fun unifiedPendingRequestsScreenRowItem(index: Int) = "unified_pending_requests_screen_row_item_$index"
+    Line  555  [row       ]  Row(modifier = Modifier.fillMaxWidth().clickable{
+             💡 fun unifiedPendingRequestsScreenRowItem(index: Int) = "unified_pending_requests_screen_row_item_$index"
+    Line  570  [row       ]  Row(modifier = Modifier.fillMaxWidth().clickable{
+             💡 fun unifiedPendingRequestsScreenRowItem(index: Int) = "unified_pending_requests_screen_row_item_$index"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : UpiHomePagePill
+File   : feature/home/src/main/java/com/pop/feature/clp/compose/widgets/UpiHomePagePill.kt
+
+  Composable: UpiHomePagePill > UpiHomePagePillContent
+    Line  102  [row       ]  .popClickable {
+             💡 const val UPI_HOME_PAGE_PILL_CONTENT_ROW = "upi_home_page_pill_content_row"
+    Line  116  [row       ]  .popClickable {
+             💡 fun upiHomePagePillContentRowItem(index: Int) = "upi_home_page_pill_content_row_item_$index"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : UpiLiteSection
+File   : feature/upi/src/main/java/com/pop/feature/upi/ui/UpiLiteSection.kt
+
+  Composable: UpiLiteSection
+    Line   73  [button    ]  PopButton(text = "Setup Now", isFullWidth = false, size = FlashButtonSize.Small, variant = FlashButt
+             💡 const val UPI_LITE_SECTION_BUTTON = "upi_lite_section_button"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : UpiNavigationScreen
+File   : feature/upi/src/main/java/com/pop/feature/upi/ui/fragments/UpiNavigationScreen.kt
+
+  Composable: UpiNavigationScreen
+    Line  321  [row       ]  .clickable(
+             💡 const val UPI_NAVIGATION_SCREEN_ROW = "upi_navigation_screen_row"
+    Line  336  [icon_button]  IconButton(onClick = {
+             💡 const val UPI_NAVIGATION_SCREEN_ICON_BUTTON = "upi_navigation_screen_icon_button"
+    Line  359  [icon_button]  IconButton(onClick = {
+             💡 fun upiNavigationScreenIconButtonItem(index: Int) = "upi_navigation_screen_icon_button_item_$index"
+    Line  370  [icon_button]  IconButton(onClick = {
+             💡 fun upiNavigationScreenIconButtonItem(index: Int) = "upi_navigation_screen_icon_button_item_$index"
+    Line  381  [icon_button]  IconButton(onClick = {
+             💡 fun upiNavigationScreenIconButtonItem(index: Int) = "upi_navigation_screen_icon_button_item_$index"
+    Line  393  [icon_button]  IconButton(onClick = {
+             💡 fun upiNavigationScreenIconButtonItem(index: Int) = "upi_navigation_screen_icon_button_item_$index"
+    Line  405  [icon_button]  IconButton(onClick = {
+             💡 fun upiNavigationScreenIconButtonItem(index: Int) = "upi_navigation_screen_icon_button_item_$index"
+    Line  416  [icon_button]  IconButton(onClick = {
+             💡 fun upiNavigationScreenIconButtonItem(index: Int) = "upi_navigation_screen_icon_button_item_$index"
+    Line  427  [icon_button]  IconButton(onClick = {
+             💡 fun upiNavigationScreenIconButtonItem(index: Int) = "upi_navigation_screen_icon_button_item_$index"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : UserProfileSection
+File   : pop/src/main/java/com/popclub/android/profile/UserProfileSection.kt
+
+  Composable: UserProfileSection
+    Line  161  [row       ]  Modifier.popClickable { onCardClick() }
+             💡 const val USER_PROFILE_SECTION_ROW = "user_profile_section_row"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : ViewReturnDetails
+File   : feature/ecom/src/main/java/com/pop/ecom/presentation/ui/orders/returns/composables/ViewReturnDetails.kt
+
+  Composable: ViewReturnDetailsBottomSheet
+    Line   62  [icon_button]  IconButton(
+             💡 const val VIEW_RETURN_DETAILS_BOTTOM_SHEET_ICON_BUTTON = "view_return_details_bottom_sheet_icon_button"
+
+────────────────────────────────────────────────────────────────────────────────
+Screen : WishListFragment
+File   : feature/ecom/src/main/java/com/pop/ecom/wishlist/WishListFragment.kt
+
+  Composable: WishListWithTopBarContent > WishListContent
+    Line  549  [button    ]  PopButtonV2(
+             💡 const val WISH_LIST_CONTENT_BUTTON = "wish_list_content_button"

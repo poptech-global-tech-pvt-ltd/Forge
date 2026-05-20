@@ -30,11 +30,14 @@ steps:
     element: otp_input
     value: 560102
 
-  - action: tap
-    element: skip_tour
+
+
+  - action: scanTags
 
   - action: waitFor
     element: home_tab
+
+  - action: scanTags
 
   - action: verifyElement
     element: home_tab
@@ -42,7 +45,7 @@ steps:
   - action: tap
     element: shop_tab
 
-
+  - action: scanTags
 
   - action: waitFor
     element: shop_search_icon

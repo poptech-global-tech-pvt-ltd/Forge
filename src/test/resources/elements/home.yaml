@@ -28,3 +28,75 @@ skip_tour:
     - type: accessibilityId
       value: Close
 
+
+# ─── Home Brand ────────────────────────────────────────────────────────────────
+home_brand_item_0:
+  android:
+    - type: accessibilityId
+      value: home_brand_item_0
+home_brand_item_1:
+  android:
+    - type: accessibilityId
+      value: home_brand_item_1
+
+# ─── Home Editor ───────────────────────────────────────────────────────────────
+home_editor_pick_item_0:
+  android:
+    - type: accessibilityId
+      value: home_editor_pick_item_0
+home_editor_pick_item_1:
+  android:
+    - type: accessibilityId
+      value: home_editor_pick_item_1
+
+# ─── Home Grid ─────────────────────────────────────────────────────────────────
+home_grid_item_0:
+  android:
+    - type: accessibilityId
+      value: home_grid_item_0
+home_grid_item_1:
+  android:
+    - type: accessibilityId
+      value: home_grid_item_1
+
+# ─── Home Hero ─────────────────────────────────────────────────────────────────
+home_hero_banner_item_0:
+  android:
+    - type: accessibilityId
+      value: home_hero_banner_item_0
+home_hero_banner_item_1:
+  android:
+    - type: accessibilityId
+      value: home_hero_banner_item_1
+
+# ─── Home Product ──────────────────────────────────────────────────────────────
+home_product_item_0:
+  android:
+    - type: accessibilityId
+      value: home_product_item_0
+home_product_item_1:
+  android:
+    - type: accessibilityId
+      value: home_product_item_1
+
+# ─── Home Search ───────────────────────────────────────────────────────────────
+home_search_bar:
+  android:
+    - type: accessibilityId
+      value: home_search_bar
+
+# ─── Home Spotlight ────────────────────────────────────────────────────────────
+home_spotlight_item_0:
+  android:
+    - type: accessibilityId
+      value: home_spotlight_item_0
+home_spotlight_item_1:
+  android:
+    - type: accessibilityId
+      value: home_spotlight_item_1
+
+# ─── Home View ─────────────────────────────────────────────────────────────────
+home_view_all_button:
+  android:
+    - type: accessibilityId
+      value: home_view_all_button

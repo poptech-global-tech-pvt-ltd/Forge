@@ -24,3 +24,71 @@ skip_tour:
     - type: accessibilityId
       value: Close
 
+
+# ─── Login Continue ────────────────────────────────────────────────────────────
+login_continue_button:
+  android:
+    - type: accessibilityId
+      value: login_continue_button
+
+# ─── Login Merged ──────────────────────────────────────────────────────────────
+login_merged_login_and_otp_screen_button:
+  android:
+    - type: accessibilityId
+      value: login_merged_login_and_otp_screen_button
+login_merged_mobile_entry_content_input:
+  android:
+    - type: accessibilityId
+      value: login_merged_mobile_entry_content_input
+login_merged_mobile_entry_content_row:
+  android:
+    - type: accessibilityId
+      value: login_merged_mobile_entry_content_row
+login_merged_mobile_entry_content_row_1:
+  android:
+    - type: accessibilityId
+      value: login_merged_mobile_entry_content_row_1
+login_merged_otp_entry_content_button:
+  android:
+    - type: accessibilityId
+      value: login_merged_otp_entry_content_button
+
+# ─── Login Mobile ──────────────────────────────────────────────────────────────
+login_mobile_field_with_keypad_input:
+  android:
+    - type: accessibilityId
+      value: login_mobile_field_with_keypad_input
+
+# ─── Login Otp ─────────────────────────────────────────────────────────────────
+login_otp_input:
+  android:
+    - type: accessibilityId
+      value: login_otp_input
+login_otp_submit_button:
+  android:
+    - type: accessibilityId
+      value: login_otp_submit_button
+
+# ─── Login Phone ───────────────────────────────────────────────────────────────
+login_phone_input:
+  android:
+    - type: accessibilityId
+      value: login_phone_input
+
+# ─── Login Referral ────────────────────────────────────────────────────────────
+login_referral_input:
+  android:
+    - type: accessibilityId
+      value: login_referral_input
+
+# ─── Login Screen ──────────────────────────────────────────────────────────────
+login_screen_title_text:
+  android:
+    - type: accessibilityId
+      value: login_screen_title_text
+
+# ─── Login Tnc ─────────────────────────────────────────────────────────────────
+login_tnc_text:
+  android:
+    - type: accessibilityId
+      value: login_tnc_text

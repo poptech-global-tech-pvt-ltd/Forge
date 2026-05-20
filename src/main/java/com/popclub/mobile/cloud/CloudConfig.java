@@ -13,6 +13,7 @@ public class CloudConfig {
     private static final Properties props = new Properties();
 
     static {
+        // Load shared defaults first
         try (InputStream is = CloudConfig.class.getClassLoader()
                 .getResourceAsStream("cloud.properties")) {
             if (is != null) {
@@ -21,6 +22,14 @@ public class CloudConfig {
         } catch (Exception e) {
             System.out.println("[CloudConfig] cloud.properties not found, using system properties only.");
         }
+        // local.cloud.properties (gitignored) overrides shared values for local dev machines
+        try (InputStream is = CloudConfig.class.getClassLoader()
+                .getResourceAsStream("local.cloud.properties")) {
+            if (is != null) {
+                props.load(is);
+                System.out.println("[CloudConfig] Loaded local.cloud.properties");
+            }
+        } catch (Exception ignored) {}
     }
 
     private static String get(String key) {

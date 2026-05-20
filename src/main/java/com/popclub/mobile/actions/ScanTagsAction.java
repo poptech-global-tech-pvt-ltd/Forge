@@ -1,5 +1,6 @@
 package com.popclub.mobile.actions;
 
+import com.popclub.ai.app.QaTagAnalyzer;
 import com.popclub.mobile.driver.DriverManager;
 import com.popclub.model.Step;
 import com.popclub.parser.XmlElementParser;
@@ -11,10 +12,12 @@ import java.util.Map;
 /**
  * Action: scanTags
  *
- * Dumps all accessibility IDs visible on the current screen to the console.
- * Use this as a step in any test YAML to discover element names on any screen:
+ * Analyses QA test tags on the current screen: reports present tags, missing tags,
+ * and naming-convention violations. Writes per-screen YAML to reports/qa-app-scan/.
  *
+ * Usage in test YAML:
  *   - action: scanTags
+ *     value: MyScreenName   # optional; inferred from activity if omitted
  *
  * Output appears in the test run log under the step block.
  */
@@ -26,7 +29,7 @@ public class ScanTagsAction implements Action {
         AppiumDriver driver = DriverManager.getDriver();
 
         try {
-            Thread.sleep(800); // let UI settle before dumping source
+            Thread.sleep(800);
         } catch (InterruptedException ignored) {
             Thread.currentThread().interrupt();
         }
@@ -36,34 +39,27 @@ public class ScanTagsAction implements Action {
 
             List<Map<String, String>> elements = XmlElementParser.parse(xml);
 
-            List<String> testTags   = new java.util.ArrayList<>();
-            List<String> otherTags  = new java.util.ArrayList<>();
+            String screenName = resolveScreenName(step, driver);
 
-            for (Map<String, String> el : elements) {
-                String tag = el.get("accessibilityId");
-                if (tag != null && !tag.isBlank()) {
-                    if (tag.matches("[a-z][a-z0-9_]*")) {   // snake_case = test tag
-                        testTags.add(tag);
-                    } else {
-                        otherTags.add(tag);
-                    }
-                }
-            }
-
-            System.out.println("\n========= TEST TAGS (use these in your YAML) =========");
-            if (testTags.isEmpty()) {
-                System.out.println("  (none found)");
-            } else {
-                testTags.forEach(t -> System.out.println("  " + t));
-            }
-
-            System.out.println("\n--------- Other accessibility labels (skip these) -----");
-            otherTags.forEach(t -> System.out.println("  " + t));
-
-            System.out.println("=======================================================\n");
+            QaTagAnalyzer.ScreenReport report = QaTagAnalyzer.analyse(elements, screenName);
+            QaTagAnalyzer.printReport(report);
+            QaTagAnalyzer.writeYaml(report, "reports");
 
         } catch (Exception e) {
             throw new RuntimeException("scanTags failed: " + e.getMessage(), e);
+        }
+    }
+
+    private String resolveScreenName(Step step, AppiumDriver driver) {
+        if (step.value != null && !step.value.isBlank()) {
+            return step.value.trim();
+        }
+        try {
+            String activity = ((io.appium.java_client.android.AndroidDriver) driver).currentActivity();
+            String[] parts = activity.split("\\.");
+            return parts[parts.length - 1];
+        } catch (Exception ignored) {
+            return "unknown_screen";
         }
     }
 }

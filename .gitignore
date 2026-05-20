@@ -37,3 +37,7 @@ build/
 
 ### Mac OS ###
 .DS_Store*.apk
+
+### Local overrides (machine-specific, never commit) ###
+local.cloud.properties
+src/test/resources/local.cloud.properties

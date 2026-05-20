@@ -1,0 +1,610 @@
+
+# ─── Bill Pay ──────────────────────────────────────────────────────────────────
+bill_pay_all_bills_bills_tab:
+  android:
+    - type: accessibilityId
+      value: bill_pay_all_bills_bills_tab
+bill_pay_all_bills_category_filter_apply_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_all_bills_category_filter_apply_button
+bill_pay_all_bills_category_filter_chip:
+  android:
+    - type: accessibilityId
+      value: bill_pay_all_bills_category_filter_chip
+bill_pay_all_bills_category_filter_chip_with_close_row:
+  android:
+    - type: accessibilityId
+      value: bill_pay_all_bills_category_filter_chip_with_close_row
+bill_pay_all_bills_category_filter_chip_with_close_row_1:
+  android:
+    - type: accessibilityId
+      value: bill_pay_all_bills_category_filter_chip_with_close_row_1
+bill_pay_all_bills_category_filter_clear_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_all_bills_category_filter_clear_button
+bill_pay_all_bills_category_filter_item_0:
+  android:
+    - type: accessibilityId
+      value: bill_pay_all_bills_category_filter_item_0
+bill_pay_all_bills_category_filter_item_1:
+  android:
+    - type: accessibilityId
+      value: bill_pay_all_bills_category_filter_item_1
+bill_pay_all_bills_clear_all_filter_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_all_bills_clear_all_filter_button
+bill_pay_all_bills_custom_filter_chip_row:
+  android:
+    - type: accessibilityId
+      value: bill_pay_all_bills_custom_filter_chip_row
+bill_pay_all_bills_error_primary_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_all_bills_error_primary_button
+bill_pay_all_bills_error_secondary_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_all_bills_error_secondary_button
+bill_pay_all_bills_item_0:
+  android:
+    - type: accessibilityId
+      value: bill_pay_all_bills_item_0
+bill_pay_all_bills_item_1:
+  android:
+    - type: accessibilityId
+      value: bill_pay_all_bills_item_1
+bill_pay_all_bills_paid_filter_chip:
+  android:
+    - type: accessibilityId
+      value: bill_pay_all_bills_paid_filter_chip
+bill_pay_all_bills_recharges_tab:
+  android:
+    - type: accessibilityId
+      value: bill_pay_all_bills_recharges_tab
+bill_pay_all_bills_screen_row:
+  android:
+    - type: accessibilityId
+      value: bill_pay_all_bills_screen_row
+bill_pay_all_bills_search_input:
+  android:
+    - type: accessibilityId
+      value: bill_pay_all_bills_search_input
+bill_pay_all_bills_unpaid_filter_chip:
+  android:
+    - type: accessibilityId
+      value: bill_pay_all_bills_unpaid_filter_chip
+bill_pay_biller_details_error_primary_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_biller_details_error_primary_button
+bill_pay_biller_details_error_secondary_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_biller_details_error_secondary_button
+bill_pay_biller_details_input_field_0:
+  android:
+    - type: accessibilityId
+      value: bill_pay_biller_details_input_field_0
+bill_pay_biller_details_input_field_1:
+  android:
+    - type: accessibilityId
+      value: bill_pay_biller_details_input_field_1
+bill_pay_biller_details_proceed_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_biller_details_proceed_button
+bill_pay_biller_details_title_text:
+  android:
+    - type: accessibilityId
+      value: bill_pay_biller_details_title_text
+bill_pay_category_add_card_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_category_add_card_button
+bill_pay_category_biller_item_0:
+  android:
+    - type: accessibilityId
+      value: bill_pay_category_biller_item_0
+bill_pay_category_biller_item_1:
+  android:
+    - type: accessibilityId
+      value: bill_pay_category_biller_item_1
+bill_pay_category_details_page_bill_pay_category_details_screen_row:
+  android:
+    - type: accessibilityId
+      value: bill_pay_category_details_page_bill_pay_category_details_screen_row
+bill_pay_category_details_page_dynamic_input_field_input:
+  android:
+    - type: accessibilityId
+      value: bill_pay_category_details_page_dynamic_input_field_input
+bill_pay_category_error_primary_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_category_error_primary_button
+bill_pay_category_error_secondary_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_category_error_secondary_button
+bill_pay_category_manage_cancel_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_category_manage_cancel_button
+bill_pay_category_manage_confirm_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_category_manage_confirm_button
+bill_pay_category_manage_mark_paid_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_category_manage_mark_paid_button
+bill_pay_category_manage_remove_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_category_manage_remove_button
+bill_pay_category_page_bill_pay_category_screen_row:
+  android:
+    - type: accessibilityId
+      value: bill_pay_category_page_bill_pay_category_screen_row
+bill_pay_category_page_bill_pay_category_screen_row_1:
+  android:
+    - type: accessibilityId
+      value: bill_pay_category_page_bill_pay_category_screen_row_1
+bill_pay_category_page_biller_grid_item_row:
+  android:
+    - type: accessibilityId
+      value: bill_pay_category_page_biller_grid_item_row
+bill_pay_category_page_recent_bill_card_content_overlay_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_category_page_recent_bill_card_content_overlay_button
+bill_pay_category_page_recent_item_delete_bottom_sheet_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_category_page_recent_item_delete_bottom_sheet_button
+bill_pay_category_page_recent_item_delete_bottom_sheet_button_1:
+  android:
+    - type: accessibilityId
+      value: bill_pay_category_page_recent_item_delete_bottom_sheet_button_1
+bill_pay_category_page_search_bar_section_input:
+  android:
+    - type: accessibilityId
+      value: bill_pay_category_page_search_bar_section_input
+bill_pay_category_page_swipeable_recent_bill_card_row:
+  android:
+    - type: accessibilityId
+      value: bill_pay_category_page_swipeable_recent_bill_card_row
+bill_pay_category_recent_biller_item_0:
+  android:
+    - type: accessibilityId
+      value: bill_pay_category_recent_biller_item_0
+bill_pay_category_recent_biller_item_1:
+  android:
+    - type: accessibilityId
+      value: bill_pay_category_recent_biller_item_1
+bill_pay_category_search_input:
+  android:
+    - type: accessibilityId
+      value: bill_pay_category_search_input
+bill_pay_contact_permission_allow_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_contact_permission_allow_button
+bill_pay_contact_permission_go_to_settings_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_contact_permission_go_to_settings_button
+bill_pay_operator_item_0:
+  android:
+    - type: accessibilityId
+      value: bill_pay_operator_item_0
+bill_pay_operator_item_1:
+  android:
+    - type: accessibilityId
+      value: bill_pay_operator_item_1
+bill_pay_operator_state_search_input:
+  android:
+    - type: accessibilityId
+      value: bill_pay_operator_state_search_input
+bill_pay_payment_list_card_cvv_input:
+  android:
+    - type: accessibilityId
+      value: bill_pay_payment_list_card_cvv_input
+bill_pay_payment_list_card_expiry_input:
+  android:
+    - type: accessibilityId
+      value: bill_pay_payment_list_card_expiry_input
+bill_pay_payment_list_card_name_input:
+  android:
+    - type: accessibilityId
+      value: bill_pay_payment_list_card_name_input
+bill_pay_payment_list_card_number_input:
+  android:
+    - type: accessibilityId
+      value: bill_pay_payment_list_card_number_input
+bill_pay_payment_list_error_primary_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_payment_list_error_primary_button
+bill_pay_payment_list_error_secondary_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_payment_list_error_secondary_button
+bill_pay_payment_list_pay_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_payment_list_pay_button
+bill_pay_payment_list_payment_list_screen_row:
+  android:
+    - type: accessibilityId
+      value: bill_pay_payment_list_payment_list_screen_row
+bill_pay_payment_list_pop_upi_section_radio:
+  android:
+    - type: accessibilityId
+      value: bill_pay_payment_list_pop_upi_section_radio
+bill_pay_payment_list_upi_apps_section_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_payment_list_upi_apps_section_button
+bill_pay_payment_list_upi_vertical_button_row:
+  android:
+    - type: accessibilityId
+      value: bill_pay_payment_list_upi_vertical_button_row
+bill_pay_payment_list_upi_vpa_input:
+  android:
+    - type: accessibilityId
+      value: bill_pay_payment_list_upi_vpa_input
+bill_pay_payment_review_page_cc_payment_option_row_radio:
+  android:
+    - type: accessibilityId
+      value: bill_pay_payment_review_page_cc_payment_option_row_radio
+bill_pay_payment_review_page_postpaid_payment_option_row_radio:
+  android:
+    - type: accessibilityId
+      value: bill_pay_payment_review_page_postpaid_payment_option_row_radio
+bill_pay_recharge_contact_item_0:
+  android:
+    - type: accessibilityId
+      value: bill_pay_recharge_contact_item_0
+bill_pay_recharge_contact_item_1:
+  android:
+    - type: accessibilityId
+      value: bill_pay_recharge_contact_item_1
+bill_pay_recharge_delete_cancel_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_recharge_delete_cancel_button
+bill_pay_recharge_delete_confirm_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_recharge_delete_confirm_button
+bill_pay_recharge_error_primary_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_recharge_error_primary_button
+bill_pay_recharge_error_secondary_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_recharge_error_secondary_button
+bill_pay_recharge_my_number_item:
+  android:
+    - type: accessibilityId
+      value: bill_pay_recharge_my_number_item
+bill_pay_recharge_page_bill_pay_recharge_screen_row:
+  android:
+    - type: accessibilityId
+      value: bill_pay_recharge_page_bill_pay_recharge_screen_row
+bill_pay_recharge_page_custom_delete_button_row:
+  android:
+    - type: accessibilityId
+      value: bill_pay_recharge_page_custom_delete_button_row
+bill_pay_recharge_page_custom_manage_button_row:
+  android:
+    - type: accessibilityId
+      value: bill_pay_recharge_page_custom_manage_button_row
+bill_pay_recharge_page_mark_paid_confirmation_dialog_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_recharge_page_mark_paid_confirmation_dialog_button
+bill_pay_recharge_page_mark_paid_confirmation_dialog_button_1:
+  android:
+    - type: accessibilityId
+      value: bill_pay_recharge_page_mark_paid_confirmation_dialog_button_1
+bill_pay_recharge_page_remove_confirmation_dialog_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_recharge_page_remove_confirmation_dialog_button
+bill_pay_recharge_page_remove_confirmation_dialog_button_1:
+  android:
+    - type: accessibilityId
+      value: bill_pay_recharge_page_remove_confirmation_dialog_button_1
+bill_pay_recharge_page_search_bar_section_input:
+  android:
+    - type: accessibilityId
+      value: bill_pay_recharge_page_search_bar_section_input
+bill_pay_recharge_page_swipeable_recent_bill_card_row:
+  android:
+    - type: accessibilityId
+      value: bill_pay_recharge_page_swipeable_recent_bill_card_row
+bill_pay_recharge_plan_error_primary_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_recharge_plan_error_primary_button
+bill_pay_recharge_plan_error_secondary_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_recharge_plan_error_secondary_button
+bill_pay_recharge_plan_item_0:
+  android:
+    - type: accessibilityId
+      value: bill_pay_recharge_plan_item_0
+bill_pay_recharge_plan_item_1:
+  android:
+    - type: accessibilityId
+      value: bill_pay_recharge_plan_item_1
+bill_pay_recharge_plan_page_plan_item_card_row:
+  android:
+    - type: accessibilityId
+      value: bill_pay_recharge_plan_page_plan_item_card_row
+bill_pay_recharge_plan_page_recent_plan_card_row:
+  android:
+    - type: accessibilityId
+      value: bill_pay_recharge_plan_page_recent_plan_card_row
+bill_pay_recharge_plan_page_recharge_plan_screen_row:
+  android:
+    - type: accessibilityId
+      value: bill_pay_recharge_plan_page_recharge_plan_screen_row
+bill_pay_recharge_plan_page_recharge_plan_screen_row_1:
+  android:
+    - type: accessibilityId
+      value: bill_pay_recharge_plan_page_recharge_plan_screen_row_1
+bill_pay_recharge_plan_page_user_info_section_row:
+  android:
+    - type: accessibilityId
+      value: bill_pay_recharge_plan_page_user_info_section_row
+bill_pay_recharge_plan_proceed_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_recharge_plan_proceed_button
+bill_pay_recharge_plan_search_input:
+  android:
+    - type: accessibilityId
+      value: bill_pay_recharge_plan_search_input
+bill_pay_recharge_recent_item_0:
+  android:
+    - type: accessibilityId
+      value: bill_pay_recharge_recent_item_0
+bill_pay_recharge_recent_item_1:
+  android:
+    - type: accessibilityId
+      value: bill_pay_recharge_recent_item_1
+bill_pay_recharge_search_input:
+  android:
+    - type: accessibilityId
+      value: bill_pay_recharge_search_input
+bill_pay_review_amount_text:
+  android:
+    - type: accessibilityId
+      value: bill_pay_review_amount_text
+bill_pay_review_bill_due_text:
+  android:
+    - type: accessibilityId
+      value: bill_pay_review_bill_due_text
+bill_pay_review_cc_payment_apply_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_review_cc_payment_apply_button
+bill_pay_review_cc_payment_cancel_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_review_cc_payment_cancel_button
+bill_pay_review_cc_payment_custom_radio:
+  android:
+    - type: accessibilityId
+      value: bill_pay_review_cc_payment_custom_radio
+bill_pay_review_cc_payment_minimum_radio:
+  android:
+    - type: accessibilityId
+      value: bill_pay_review_cc_payment_minimum_radio
+bill_pay_review_cc_payment_total_radio:
+  android:
+    - type: accessibilityId
+      value: bill_pay_review_cc_payment_total_radio
+bill_pay_review_error_primary_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_review_error_primary_button
+bill_pay_review_error_secondary_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_review_error_secondary_button
+bill_pay_review_offer_toggle:
+  android:
+    - type: accessibilityId
+      value: bill_pay_review_offer_toggle
+bill_pay_review_pay_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_review_pay_button
+bill_pay_review_payment_mode_selector:
+  android:
+    - type: accessibilityId
+      value: bill_pay_review_payment_mode_selector
+bill_pay_review_postpaid_payment_apply_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_review_postpaid_payment_apply_button
+bill_pay_review_postpaid_payment_cancel_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_review_postpaid_payment_cancel_button
+bill_pay_review_postpaid_payment_custom_radio:
+  android:
+    - type: accessibilityId
+      value: bill_pay_review_postpaid_payment_custom_radio
+bill_pay_review_postpaid_payment_total_radio:
+  android:
+    - type: accessibilityId
+      value: bill_pay_review_postpaid_payment_total_radio
+bill_pay_review_proceed_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_review_proceed_button
+bill_pay_state_item_0:
+  android:
+    - type: accessibilityId
+      value: bill_pay_state_item_0
+bill_pay_state_item_1:
+  android:
+    - type: accessibilityId
+      value: bill_pay_state_item_1
+bill_pay_success_close_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_success_close_button
+bill_pay_success_done_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_success_done_button
+bill_pay_success_pay_other_bills_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_success_pay_other_bills_button
+bill_pay_success_retry_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_success_retry_button
+bill_pay_success_status_text:
+  android:
+    - type: accessibilityId
+      value: bill_pay_success_status_text
+bill_pay_txn_detail_payment_summary_text:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_detail_payment_summary_text
+bill_pay_txn_detail_pop_txn_id_copy:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_detail_pop_txn_id_copy
+bill_pay_txn_detail_recharge_txn_id_copy:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_detail_recharge_txn_id_copy
+bill_pay_txn_detail_status_accordion:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_detail_status_accordion
+bill_pay_txn_history_category_filter_chip_with_close_row:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_category_filter_chip_with_close_row
+bill_pay_txn_history_category_filter_chip_with_close_row_1:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_category_filter_chip_with_close_row_1
+bill_pay_txn_history_clear_all_filter_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_clear_all_filter_button
+bill_pay_txn_history_custom_filter_chip_row:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_custom_filter_chip_row
+bill_pay_txn_history_download_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_download_button
+bill_pay_txn_history_error_primary_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_error_primary_button
+bill_pay_txn_history_error_retry_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_error_retry_button
+bill_pay_txn_history_error_secondary_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_error_secondary_button
+bill_pay_txn_history_filter_apply_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_filter_apply_button
+bill_pay_txn_history_filter_bottom_sheet_content_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_filter_bottom_sheet_content_button
+bill_pay_txn_history_filter_bottom_sheet_content_preview_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_filter_bottom_sheet_content_preview_button
+bill_pay_txn_history_filter_bottom_sheet_content_preview_button_1:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_filter_bottom_sheet_content_preview_button_1
+bill_pay_txn_history_filter_bottom_sheet_content_radio:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_filter_bottom_sheet_content_radio
+bill_pay_txn_history_filter_bottom_sheet_content_radio_1:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_filter_bottom_sheet_content_radio_1
+bill_pay_txn_history_filter_bottom_sheet_content_radio_2:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_filter_bottom_sheet_content_radio_2
+bill_pay_txn_history_filter_bottom_sheet_content_radio_3:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_filter_bottom_sheet_content_radio_3
+bill_pay_txn_history_filter_bottom_sheet_content_radio_4:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_filter_bottom_sheet_content_radio_4
+bill_pay_txn_history_filter_bottom_sheet_content_row:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_filter_bottom_sheet_content_row
+bill_pay_txn_history_filter_bottom_sheet_content_row_1:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_filter_bottom_sheet_content_row_1
+bill_pay_txn_history_filter_chip:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_filter_chip
+bill_pay_txn_history_filter_clear_button:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_filter_clear_button
+bill_pay_txn_history_item_0:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_item_0
+bill_pay_txn_history_item_1:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_item_1
+bill_pay_txn_history_month_item_0:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_month_item_0
+bill_pay_txn_history_month_item_1:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_month_item_1
+bill_pay_txn_history_monthly_transaction_card_row:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_monthly_transaction_card_row
+bill_pay_txn_history_screen_row:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_screen_row
+bill_pay_txn_history_search_input:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_search_input
