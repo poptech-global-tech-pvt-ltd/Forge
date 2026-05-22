@@ -63,9 +63,16 @@ public class CloudConfig {
         return require("stf.base.url");
     }
 
-    /** Bearer token generated from STF → Settings → Keys */
-    public static String getStfApiToken() {
-        return require("stf.api.token");
+    /** Email used to auto-authenticate with the device farm (mock auth). */
+    public static String getStfAuthEmail() {
+        String val = get("stf.auth.email");
+        return (val != null && !val.isBlank()) ? val : "testdevices@popclub.co";
+    }
+
+    /** Display name used to auto-authenticate with the device farm (mock auth). */
+    public static String getStfAuthName() {
+        String val = get("stf.auth.name");
+        return (val != null && !val.isBlank()) ? val : "Forge";
     }
 
     /**

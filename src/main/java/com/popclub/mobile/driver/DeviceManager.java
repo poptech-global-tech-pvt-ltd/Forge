@@ -66,7 +66,8 @@ public class DeviceManager {
     private static DeviceInfo getCloudDevice() {
         STFClient stf = new STFClient(
                 CloudConfig.getStfBaseUrl(),
-                CloudConfig.getStfApiToken()
+                CloudConfig.getStfAuthEmail(),
+                CloudConfig.getStfAuthName()
         );
 
         // 1. Find an available device
@@ -139,7 +140,8 @@ public class DeviceManager {
         // Release reservation on STF
         STFClient stf = new STFClient(
                 CloudConfig.getStfBaseUrl(),
-                CloudConfig.getStfApiToken()
+                CloudConfig.getStfAuthEmail(),
+                CloudConfig.getStfAuthName()
         );
         stf.releaseDevice(serial);
 

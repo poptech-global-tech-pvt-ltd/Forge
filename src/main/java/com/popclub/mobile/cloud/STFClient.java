@@ -29,20 +29,49 @@ import java.util.List;
 public class STFClient {
 
     private final String baseUrl;
-    private final String token;
+    private String token;
     private final HttpClient http;
     private final ObjectMapper mapper = new ObjectMapper();
 
-    public STFClient(String baseUrl, String token) {
-        this.baseUrl = baseUrl.replaceAll("/$", ""); // strip trailing slash
-        this.token   = token;
-        // Disable Java 11+ HttpClient hostname verification for self-signed / IP-only certs
+    /**
+     * Creates a client and auto-generates a fresh token by calling the mock-auth endpoint.
+     * This ensures the token is always valid regardless of server restarts.
+     *
+     * @param baseUrl   e.g. https://10.25.11.235
+     * @param authEmail e.g. testdevices@popclub.co
+     * @param authName  e.g. Forge
+     */
+    public STFClient(String baseUrl, String authEmail, String authName) {
+        this.baseUrl = baseUrl.replaceAll("/$", "");
         System.setProperty("jdk.internal.httpclient.disableHostnameVerification", "true");
-
-        this.http    = HttpClient.newBuilder()
+        this.http = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(30))
                 .sslContext(trustAllSslContext())
                 .build();
+        this.token = fetchToken(authEmail, authName);
+    }
+
+    /** Obtains a fresh JWT from the mock-auth endpoint. Called once per client instance. */
+    private String fetchToken(String email, String name) {
+        try {
+            String body = String.format("{\"email\":\"%s\",\"name\":\"%s\"}", email, name);
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(baseUrl + "/auth/api/v1/mock"))
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(body))
+                    .timeout(Duration.ofSeconds(30))
+                    .build();
+            HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
+            JsonNode json = mapper.readTree(response.body());
+            String jwt = json.path("jwt").asText(null);
+            if (jwt == null || jwt.isBlank()) {
+                throw new RuntimeException("Auth response did not contain a JWT: " + response.body());
+            }
+            System.out.println("[STF] Authenticated as " + email);
+            return jwt;
+        } catch (Exception e) {
+            throw new RuntimeException("[STF] Failed to authenticate with device farm at " + baseUrl, e);
+        }
     }
 
     /** Builds an SSL context that trusts all certificates (safe for internal/intranet servers). */

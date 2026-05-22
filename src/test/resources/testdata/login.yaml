@@ -19,6 +19,8 @@ retry: 2   #  retry at test level
 steps:
   - action: launchApp
 
+  - action: scanTags
+
   - action: enterText
     element: login_input_phone
     value: 1234561122
@@ -31,6 +33,8 @@ steps:
     value: 560102
 
 
+#  - action: tap
+#    element: skip_tour
 
   - action: scanTags
 
@@ -61,10 +65,8 @@ steps:
 
   - action: scanTags
 
-
   - action: tap
     element: search_input
-
 
   - action: scanTags
 
