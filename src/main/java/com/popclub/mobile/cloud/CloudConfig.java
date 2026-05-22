@@ -58,9 +58,36 @@ public class CloudConfig {
 
     // ── STF settings ──────────────────────────────────────────────────────────
 
-    /** Base URL of the STF/DeviceFarmer instance e.g. https://10.25.11.235 */
+    /**
+     * Base URL of the STF/DeviceFarmer instance.
+     * If stf.base.url is set in cloud.properties or via -D, that value is used.
+     * Otherwise the IP is auto-detected from the en0 network interface (the Mac's WiFi/LAN IP),
+     * which is the same interface that start.sh uses to configure the device farm.
+     */
     public static String getStfBaseUrl() {
-        return require("stf.base.url");
+        String val = get("stf.base.url");
+        if (val != null && !val.isBlank()) return val;
+        return "https://" + detectLocalIp();
+    }
+
+    private static String detectLocalIp() {
+        try {
+            java.net.NetworkInterface en0 = java.net.NetworkInterface.getByName("en0");
+            if (en0 != null) {
+                java.util.Enumeration<java.net.InetAddress> addrs = en0.getInetAddresses();
+                while (addrs.hasMoreElements()) {
+                    java.net.InetAddress addr = addrs.nextElement();
+                    if (addr instanceof java.net.Inet4Address && !addr.isLoopbackAddress()) {
+                        System.out.println("[CloudConfig] Auto-detected STF host: " + addr.getHostAddress());
+                        return addr.getHostAddress();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[CloudConfig] Could not auto-detect IP from en0: " + e.getMessage());
+        }
+        throw new RuntimeException(
+            "[CloudConfig] Could not detect device farm IP. Set stf.base.url in cloud.properties.");
     }
 
     /** Email used to auto-authenticate with the device farm (mock auth). */
