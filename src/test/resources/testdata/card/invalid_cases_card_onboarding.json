@@ -1,0 +1,51 @@
+{
+  "auth": {
+    "invalidToken": "invalid-token-12345"
+  },
+  "sso": {
+    "emptyString": "",
+    "shortMobile": "12345",
+    "specialCharsMobile": "!@#$%^&*()",
+    "alphabeticMobile": "abcdefghij",
+    "tooLongMobile": "123456789012345"
+  },
+  "pan": {
+    "invalidPan": "INVALID",
+    "specialCharsPan": "@#$%^&*()",
+    "tooLongPan": "ABCDE1234FEXTRA",
+    "fakeValidPan": "AAAAA1111A"
+  },
+  "pincode": {
+    "lettersPincode": "ABCDEF",
+    "shortPincode": "12",
+    "specialCharsPincode": "!@#$%^",
+    "tooLongPincode": "12345678",
+    "invalidAddressPincode": "000000"
+  },
+  "basicDetails": {
+    "invalidEmail": "not-an-email",
+    "invalidDob": "99-99-9999",
+    "invalidGender": "INVALID_GENDER"
+  },
+  "personalDetails": {
+    "specialCharsName": "!@#$%^&*()"
+  },
+  "professionalDetails": {
+    "negativeIncome": "-50000",
+    "zeroIncome": "0"
+  },
+  "consent": {
+    "wrongMobile": "0000000000"
+  },
+  "deliveryAddress": {
+    "invalidAddressType": "INVALID_TYPE"
+  },
+  "serverError": {
+    "malformedJson": "{invalid json body",
+    "emptyBody": "",
+    "invalidContentType": "text/plain"
+  },
+  "errorCodes": {
+    "invalidPan": "ppc40001"
+  }
+}

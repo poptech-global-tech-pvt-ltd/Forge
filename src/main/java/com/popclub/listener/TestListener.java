@@ -184,7 +184,7 @@ public class TestListener implements ITestListener, ISuiteListener {
                     TestContext.getRunId(),
                     uuid,
                     status.id(),
-                    TestSigmaClient.USER_ID,
+                    TestSigmaConfig.userId(),
                     duration
             );
 

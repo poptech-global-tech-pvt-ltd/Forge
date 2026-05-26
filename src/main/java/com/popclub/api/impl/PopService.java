@@ -22,6 +22,12 @@ public class PopService extends BaseService {
                 .get(Routes.POP_CONSENTS.getPath());
     }
 
+    public Response getPopConsentsWithMobile(String mobileNumber) {
+        return buildPublicSpec()
+                .queryParam("mobile_number", mobileNumber)
+                .get(Routes.POP_CONSENTS.getPath());
+    }
+
     // Step 1.2: Post POP consents
     public Response postPopConsent(PopConsentRequestDto request) {
         return post(Routes.POP_CONSENTS.getPath(), request);

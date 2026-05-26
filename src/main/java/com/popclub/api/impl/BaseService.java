@@ -93,7 +93,45 @@ public class BaseService {
         }
     }
 
+    /**
+     * Validates that the response has expected status code.
+     * On failure, includes the method, path, actual status, and full response body
+     * in the assertion message so TestNG reports show the API error.
+     *
+     * Usage: popService.assertStatus(response, 200, "POST", "/ybl/consents");
+     */
+    public static void assertStatus(Response response, int expectedStatus, String method, String path) {
+        int actualStatus = response.statusCode();
+        if (actualStatus != expectedStatus) {
+            String body = response.body().asString();
+            String message = "";
+            try {
+                message = response.jsonPath().getString("message");
+            } catch (Exception ignored) {}
+
+            if (message == null || message.isEmpty()) {
+                message = body;
+            }
+
+            throw new AssertionError(
+                    method + " " + path + " | " + actualStatus + " | " + message
+            );
+        }
+    }
+
     public void reset() {
         this.token = null;
+    }
+
+    public static Response rawPost(String authToken, String contentType, String body, String path) {
+        return RestAssured.given()
+                .baseUri(ConfigManager.getBaseUrl())
+                .header("X-Source-Api-Key", ConfigManager.getXSourceApiKey())
+                .header("X-Auth-Token", authToken)
+                .contentType(contentType)
+                .filter(new RequestLoggingFilter())
+                .filter(new ResponseLoggingFilter())
+                .body(body)
+                .post(path);
     }
 }
