@@ -28,10 +28,12 @@ public class QaTagAnalyzer {
         "payment_success_", "bill_", "recharge_", "cart_", "shop_", "product_",
         "order_", "rewards_", "cashback_", "pop_coins_", "credit_card_", "cc_",
         "rupay_", "toolbar_", "common_", "app_update_", "faq_", "help_support_",
-        "address_", "wishlist_", "mandate_", "check_balance_", "request_money_",
-        "add_faves_", "bank_transfer_", "link_bank_", "split_", "activate_lite_",
+        "address_", "add_address_", "wishlist_", "mandate_", "check_balance_",
+        "request_money_", "add_faves_", "link_bank_", "split_", "activate_lite_",
         "biometric_", "refer_", "no_cashback_", "clp_", "search_", "onboarding_",
-        "kyc_", "notification_", "settings_", "voucher_", "offer_", "banner_"
+        "kyc_", "notification_", "settings_", "voucher_", "offer_", "banner_",
+        "checkout_", "payment_", "wallet_", "transaction_", "add_money_",
+        "verify_", "pin_", "qr_", "scanner_", "permission_"
     );
 
     // Tags that are purely accessibility labels — not test tags, skip them
@@ -199,6 +201,45 @@ public class QaTagAnalyzer {
         if (!hasKnownPrefix)
             return "no screen prefix — too generic (e.g. prefix with 'home_' or 'send_money_')";
         return null; // OK
+    }
+
+    // ── Public single-element API (used by Recorder) ──────────────────────────
+
+    /**
+     * Check a single element and return a TagStatus describing whether it has a
+     * valid tag, a badly named tag, or no tag at all (with a suggestion).
+     */
+    public static TagStatus checkElement(String screenName,
+                                         String tag, String text, String className) {
+        if (tag == null) tag = "";
+        tag = tag.trim();
+
+        if (!tag.isEmpty() && !ALLOWED_GENERIC.contains(tag)) {
+            String problem = checkConvention(tag);
+            if (problem == null) {
+                return new TagStatus(TagStatus.State.GOOD, tag, null);
+            } else {
+                String fix = suggestBadTag(screenName, tag, text, className);
+                return new TagStatus(TagStatus.State.BAD, tag, problem + "\n    → Fix: " + fix);
+            }
+        }
+        // No tag
+        String suggestion = suggestTag(screenName, text, className, 0, false);
+        return new TagStatus(TagStatus.State.MISSING, null,
+                "Add to TestTags.kt: " + suggestion);
+    }
+
+    public static class TagStatus {
+        public enum State { GOOD, BAD, MISSING }
+        public final State  state;
+        public final String tag;        // existing tag (null if MISSING)
+        public final String message;    // problem + suggestion (null if GOOD)
+
+        TagStatus(State state, String tag, String message) {
+            this.state   = state;
+            this.tag     = tag;
+            this.message = message;
+        }
     }
 
     // ── Suggestion engine ──────────────────────────────────────────────────────

@@ -1,0 +1,97 @@
+testName: Shop — Add to Cart and Remove Item from Cart
+platform: android
+noReset: true
+loginRequired: true
+
+testCaseIds:
+  - PO-SHOP-CART-REMOVE
+
+features:
+  - home
+  - login
+  - shop
+
+tags:
+  - smoke
+  - shop
+  - search
+  - cart
+  - remove
+
+retry: 1
+
+steps:
+  # ── 1. Launch & login ─────────────────────────────────────────────────────────
+  - action: launchApp
+
+  - action: tapIfPresent
+    element: skip_tour
+
+  # loginIfNeeded: logs in if login screen is visible, no-op if already logged in
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  # ── 2. Navigate to Shop ───────────────────────────────────────────────────────
+  - action: tap
+    element: shop_tab
+
+  - action: waitFor
+    element: shop_search_icon
+
+  # ── 3. Search and open first product ─────────────────────────────────────────
+  - action: tap
+    element: shop_search_icon
+
+  - action: enterText
+    element: search_input
+    value: yogabar
+
+  - action: pressKey
+    value: ENTER
+
+  - action: waitFor
+    element: product_list_filter_button
+
+  # ── 4. Open item 0 PDP ───────────────────────────────────────────────────────
+  - action: tap
+    element: product_list_item_0
+
+  - action: waitFor
+    element: product_details_title
+
+  # Capture the title so we can verify it's gone after removal
+  - action: captureText
+    element: product_details_title
+    value: cart_item_title
+
+  # ── 5. Add to cart ───────────────────────────────────────────────────────────
+  - action: tap
+    element: product_details_bottom_sticky_bar_button
+
+  - action: tapIfPresent
+    locator: size_selection_item_0
+
+  - action: tapIfPresent
+    locator: size_selection_add_to_cart_button
+
+  # ── 6. Navigate to Cart ───────────────────────────────────────────────────────
+  - action: tap
+    element: cart_icon
+
+  - action: waitFor
+    element: cart_item_image
+
+  # Verify the item was added to the cart
+  - action: assertStoredText
+    value: cart_item_title
+
+  # ── 7. Remove the item from the cart ─────────────────────────────────────────
+  # Taps cart_remove_product_button; CartRemoveAction handles the rest:
+  # — captures item title before removal
+  # — handles any confirm dialog
+  # — asserts item is no longer visible
+  - action: cartRemoveItem

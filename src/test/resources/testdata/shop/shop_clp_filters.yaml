@@ -1,0 +1,58 @@
+testName: Shop CLP Filters Verification
+platform: android
+noReset: true
+
+testCaseIds:
+  - PO-SHOP-CLP-FILTERS
+
+features:
+  - home
+  - login
+  - shop
+
+tags:
+  - clp
+  - shop
+  - filters
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: tapIfPresent
+    element: skip_tour
+
+  - action: enterText
+    element: login_input_phone
+    value: 1234561122
+
+  - action: tap
+    element: login_button
+
+  - action: enterText
+    element: otp_input
+    value: 560102
+
+  - action: captureToken
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: tap
+    element: shop_tab
+
+  - action: waitFor
+    element: shop_search_icon
+
+  # Fetch CLP + verify section titles (also stores filter data in TestContext)
+  - action: verifyCLP
+    value: SHOP
+
+  # Test every filter chip in every section:
+  #   Men / Women tabs  → verify content changes (dynamic, data-driven)
+  #   Category chips    → verify listing page opens (Sort + Filters bar)
+  - action: verifyCLPFilters
+    value: SHOP

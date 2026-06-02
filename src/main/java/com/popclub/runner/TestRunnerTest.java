@@ -30,16 +30,22 @@ public class TestRunnerTest {
     @DataProvider(name = "testData", parallel = false)
     public Object[][] getTestData(ITestContext context) {
 
-        File folder = new File("src/test/resources/testdata");
+        File root = new File("src/test/resources/testdata");
 
-        File[] files = folder.listFiles((dir, name) -> name.endsWith(".yaml"));
+        // Collect all .yaml files recursively (root + all subfolders)
+        List<File> allFiles = new ArrayList<>();
+        collectYamlFiles(root, allFiles);
 
-        if (files == null || files.length == 0) {
-            throw new RuntimeException("No YAML files found in testdata folder");
+        if (allFiles.isEmpty()) {
+            throw new RuntimeException("No YAML files found in testdata folder (including subfolders)");
         }
 
-        String tagParam      = context.getCurrentXmlTest().getParameter("tag");
-        String testFileParam = context.getCurrentXmlTest().getParameter("testFile");
+        String tagParam      = System.getProperty("tag",
+                                context.getCurrentXmlTest().getParameter("tag"));
+        // -DtestFile=shop_clp_full.yaml on the mvn command line takes priority
+        // over the <parameter name="testFile"> value in testng.xml
+        String testFileParam = System.getProperty("testFile",
+                                context.getCurrentXmlTest().getParameter("testFile"));
 
         // Build an ordered name list from the comma-separated testFile param
         List<String> orderedNames = new ArrayList<>();
@@ -49,13 +55,13 @@ public class TestRunnerTest {
             }
         }
 
-        // Index files by lowercase name for fast lookup
+        // Index files by lowercase filename (basename only) for -DtestFile= lookup
         Map<String, File> fileIndex = new java.util.HashMap<>();
-        for (File file : files) {
+        for (File file : allFiles) {
             fileIndex.put(file.getName().toLowerCase(), file);
         }
 
-        // Collect in declared order (or natural order if no filter)
+        // Collect in declared order (or natural discovery order if no filter)
         List<File> orderedFiles = new ArrayList<>();
         if (!orderedNames.isEmpty()) {
             for (String name : orderedNames) {
@@ -67,7 +73,7 @@ public class TestRunnerTest {
                 }
             }
         } else {
-            orderedFiles.addAll(List.of(files));
+            orderedFiles.addAll(allFiles);
         }
 
         List<Object[]> filtered = new ArrayList<>();
@@ -104,6 +110,24 @@ public class TestRunnerTest {
         }
 
         return filtered.toArray(new Object[0][0]);
+    }
+
+    /**
+     * Recursively collects all {@code .yaml} files under {@code dir},
+     * scanning subdirectories in alphabetical order so execution order
+     * is deterministic across machines.
+     */
+    private void collectYamlFiles(File dir, List<File> result) {
+        File[] entries = dir.listFiles();
+        if (entries == null) return;
+        java.util.Arrays.sort(entries); // alphabetical within each directory
+        for (File entry : entries) {
+            if (entry.isDirectory()) {
+                collectYamlFiles(entry, result);
+            } else if (entry.getName().endsWith(".yaml")) {
+                result.add(entry);
+            }
+        }
     }
 
     @Test(dataProvider = "testData")

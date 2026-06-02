@@ -10,10 +10,16 @@ public class LocatorUtil {
         switch (locator.type.toLowerCase()) {
 
             case "accessibilityid":
+            case "locator":
                 return AppiumBy.accessibilityId(locator.value);
 
             case "id":
-                return By.id(locator.value);
+            case "resourceid":
+                // Accept short ("submit_btn") or full ("com.pkg:id/submit_btn")
+                String resId = locator.value.contains(":id/")
+                        ? locator.value
+                        : "com.popclub.android:id/" + locator.value;
+                return By.id(resId);
 
             case "xpath":
                 return By.xpath(locator.value);
@@ -25,6 +31,11 @@ public class LocatorUtil {
             case "uiautomator":
                 return AppiumBy.androidUIAutomator(
                         "new UiSelector().textContains(\"" + locator.value + "\")");
+
+            case "point":
+                // "x,y" — handled directly in TapAction, not via By
+                // Return a dummy By that will be caught by TapAction before WaitUtil is called
+                throw new RuntimeException("POINT_LOCATOR:" + locator.value);
 
             default:
                 throw new RuntimeException("Unknown locator type: " + locator.type);

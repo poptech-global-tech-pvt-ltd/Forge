@@ -1,7 +1,7 @@
 package com.popclub.core;
 
-import io.appium.java_client.AppiumBy;
 import io.appium.java_client.AppiumDriver;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -16,7 +16,7 @@ public class WaitUtil {
         for (Locator locator : locators) {
 
             try {
-                AppiumBy by = (AppiumBy) (AppiumBy) LocatorUtil.getLocator(locator);
+                By by = LocatorUtil.getLocator(locator);
 
                 WebElement element = new WebDriverWait(driver, Duration.ofSeconds(20))
                         .until(ExpectedConditions.visibilityOfElementLocated(by));

@@ -21,7 +21,7 @@ public class TagFinder {
 
     private static final String REPORTS_DIR = "reports";
     private static final String APP_PACKAGE  = "com.popclub.android";
-    private static final String APP_ACTIVITY = "com.popclub.android.LauncherFresh";
+    private static final String APP_ACTIVITY = "com.popclub.android.LauncherClassic";
 
     public static void main(String[] args) throws Exception {
 
@@ -77,13 +77,35 @@ public class TagFinder {
     private static void launchApp(String udid) throws Exception {
         System.out.println("[3a] Waking screen...");
         adb(udid, "shell", "input", "keyevent", "224");
-        System.out.println("[3b] Force stopping app...");
+
+        // Verify the package is installed before trying to launch
+        System.out.println("[3b] Checking package installed...");
+        String installedPkg = adbOutput(udid, "shell", "pm", "list", "packages", APP_PACKAGE);
+        if (!installedPkg.contains(APP_PACKAGE)) {
+            System.out.println("  ✗ Package not found: " + APP_PACKAGE);
+            System.out.println("  Installed com.popclub.* packages:");
+            String allPkgs = adbOutput(udid, "shell", "pm", "list", "packages", "com.popclub");
+            System.out.println("  " + allPkgs.trim().replace("\n", "\n  "));
+            throw new RuntimeException(
+                "App not installed. Check APP_PACKAGE in TagFinder.java.\n" +
+                "Current value: " + APP_PACKAGE);
+        }
+        System.out.println("  ✓ Found: " + APP_PACKAGE);
+
+        System.out.println("[3c] Force stopping app...");
         Thread.sleep(500);
         adb(udid, "shell", "am", "force-stop", APP_PACKAGE);
-        System.out.println("[3c] Starting app...");
+
+        System.out.println("[3d] Starting app...");
         Thread.sleep(1000);
-        adb(udid, "shell", "am", "start", "-n", APP_PACKAGE + "/" + APP_ACTIVITY);
-        System.out.println("[3d] Waiting 4s for app to load...");
+        String startResult = adbOutput(udid, "shell", "am", "start", "-n",
+                APP_PACKAGE + "/" + APP_ACTIVITY);
+        System.out.println("  am start → " + startResult.trim());
+        if (startResult.contains("Error type") || startResult.contains("does not exist")) {
+            throw new RuntimeException("Failed to start app: " + startResult.trim());
+        }
+
+        System.out.println("[3e] Waiting 4s for app to load...");
         Thread.sleep(4000);
     }
 
@@ -155,18 +177,27 @@ public class TagFinder {
         return udids.get(0);
     }
 
-    // ── ADB helper ────────────────────────────────────────────────────────────
+    // ── ADB helpers ───────────────────────────────────────────────────────────
 
+    /** Run adb command, discard output. */
     private static void adb(String udid, String... cmd) throws Exception {
+        adbOutput(udid, cmd);
+    }
+
+    /** Run adb command, return stdout as string. */
+    private static String adbOutput(String udid, String... cmd) throws Exception {
         List<String> full = new ArrayList<>();
         full.add("adb"); full.add("-s"); full.add(udid);
         for (String c : cmd) full.add(c);
         ProcessBuilder pb = new ProcessBuilder(full);
         pb.redirectErrorStream(true);
         Process p = pb.start();
+        StringBuilder sb = new StringBuilder();
         try (BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
-            while (r.readLine() != null) {}
+            String line;
+            while ((line = r.readLine()) != null) sb.append(line).append("\n");
         }
         p.waitFor();
+        return sb.toString();
     }
 }

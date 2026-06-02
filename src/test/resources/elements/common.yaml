@@ -1874,3 +1874,29 @@ toolbar_search_button:
   android:
     - type: accessibilityId
       value: toolbar_search_button
+
+# ─── Bottom Nav Tabs ────────────────────────────────────────────────────────────
+common_home_tab:
+  android:
+    - type: accessibilityId
+      value: common_home_tab
+
+common_shop_tab:
+  android:
+    - type: accessibilityId
+      value: common_shop_tab
+
+common_card_tab:
+  android:
+    - type: accessibilityId
+      value: common_card_tab
+
+common_history_tab:
+  android:
+    - type: accessibilityId
+      value: common_history_tab
+
+common_back_button:
+  android:
+    - type: accessibilityId
+      value: common_back_button

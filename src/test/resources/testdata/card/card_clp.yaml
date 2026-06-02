@@ -1,0 +1,50 @@
+testName: Card CLP Verification
+platform: android
+noReset: true
+
+testCaseIds:
+  - PO-CARD-CLP
+
+features:
+  - home
+  - login
+  - credit_card
+
+tags:
+  - smoke
+  - clp
+  - card
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: tapIfPresent
+    element: skip_tour
+
+  - action: enterText
+    element: login_input_phone
+    value: 1234561122
+
+  - action: tap
+    element: login_button
+
+  - action: enterText
+    element: otp_input
+    value: 560102
+
+  # Login via API to get JWT — CI-safe, no logcat needed
+  - action: captureToken
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: tap
+    element: card_tab
+
+  # Fetch credit-card-2 API response and assert every section title is rendered
+  - action: verifyCLP
+    value: CARD

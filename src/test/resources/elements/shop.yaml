@@ -22,7 +22,7 @@ banner_image:
 search_input:
   android:
     - type: accessibilityId
-      value: Search
+      value: search_products_search_input   # qaDebug build only (qaTestTag enabled)
 
 search_key:
   android:
@@ -756,3 +756,88 @@ wishlist_size_selection_section_row:
   android:
     - type: accessibilityId
       value: wishlist_size_selection_section_row
+
+# ─── Shop CLP ──────────────────────────────────────────────────────────────────
+shop_search_button:
+  android:
+    - type: accessibilityId
+      value: shop_search_button
+
+shop_promo_banner_row:
+  android:
+    - type: accessibilityId
+      value: shop_promo_banner_row
+
+# ─── Product List ──────────────────────────────────────────────────────────────
+search_products_search_input:
+  android:
+    - type: accessibilityId
+      value: search_products_search_input
+
+product_list_item_0:
+  android:
+    - type: accessibilityId
+      value: product_list_item_0
+
+product_list_item_1:
+  android:
+    - type: accessibilityId
+      value: product_list_item_1
+
+product_list_item_2:
+  android:
+    - type: accessibilityId
+      value: product_list_item_2
+
+# ─── Product Details ───────────────────────────────────────────────────────────
+product_details_go_to_cart_button:
+  android:
+    - type: accessibilityId
+      value: product_details_go_to_cart_button
+
+# ─── Size Selection ────────────────────────────────────────────────────────────
+size_selection_item_0:
+  android:
+    - type: accessibilityId
+      value: size_selection_item_0
+
+size_selection_item_1:
+  android:
+    - type: accessibilityId
+      value: size_selection_item_1
+
+size_selection_item_2:
+  android:
+    - type: accessibilityId
+      value: size_selection_item_2
+
+size_selection_add_to_cart_button:
+  android:
+    - type: accessibilityId
+      value: size_selection_add_to_cart_button
+
+# ─── Cart ──────────────────────────────────────────────────────────────────────
+cart_item_row_0:
+  android:
+    - type: accessibilityId
+      value: cart_item_row_0
+
+cart_item_row_1:
+  android:
+    - type: accessibilityId
+      value: cart_item_row_1
+
+cart_to_pay_row:
+  android:
+    - type: accessibilityId
+      value: cart_to_pay_row
+
+cart_link_and_pay_button:
+  android:
+    - type: accessibilityId
+      value: cart_link_and_pay_button
+
+cart_item_delivery_date_chip:
+  android:
+    - type: accessibilityId
+      value: cart_item_delivery_date_chip

@@ -22,6 +22,7 @@ public class TestExecutor {
         // Platform
         TestContext.setPlatform(testCase.platform);
         TestContext.setNoReset(testCase.noReset);
+        TestContext.setLoginRequired(testCase.loginRequired);
 
         System.out.println("Starting Test: " + testCase.testName);
 
@@ -57,7 +58,7 @@ public class TestExecutor {
 
         for (Step step : testCase.steps) {
 
-            // Resolve locators
+            // Resolve locators — priority: element → locator → resourceId → text → bounds/xy
             if (step.element != null) {
 
                 step.locators = ElementRepository.getLocators(
@@ -67,17 +68,30 @@ public class TestExecutor {
 
             } else if (step.locator != null) {
 
+                // accessibilityId (qaTestTag) — best case
                 Locator locator = new Locator();
-
-                if (step.locator.contains(":id/")) {
-                    locator.type = "id";
-                } else {
-                    locator.type = "accessibilityId";
-                }
-
+                locator.type  = step.locator.contains(":id/") ? "id" : "accessibilityId";
                 locator.value = step.locator;
                 step.locators = List.of(locator);
+
+            } else if (step.text != null) {
+
+                // visible text fallback
+                Locator locator = new Locator();
+                locator.type  = "text";
+                locator.value = step.text;
+                step.locators = List.of(locator);
+
+            } else if (step.bounds != null) {
+
+                // bounds fallback — TapAction handles coordinate tap
+                Locator locator = new Locator();
+                locator.type  = "bounds";
+                locator.value = step.bounds;
+                step.locators = List.of(locator);
+
             }
+            // x/y fallback is handled directly in TapAction when locators is null
 
             int attempt = 0;
             boolean success = false;

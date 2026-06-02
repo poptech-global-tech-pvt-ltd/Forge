@@ -1,5 +1,6 @@
 package com.popclub.core;
 
+import com.popclub.clp.ClpSection;
 import java.io.File;
 import java.util.*;
 
@@ -23,9 +24,11 @@ public class TestContext {
             ThreadLocal.withInitial(HashSet::new);
 
     private static ThreadLocal<String> executionMode = new ThreadLocal<>();
-    private static ThreadLocal<Boolean> noReset = ThreadLocal.withInitial(() -> false);
+    private static ThreadLocal<Boolean> noReset        = ThreadLocal.withInitial(() -> false);
+    private static ThreadLocal<Boolean> loginRequired  = ThreadLocal.withInitial(() -> true);
     private static ThreadLocal<File> videoFile = new ThreadLocal<>();
     private static ThreadLocal<String> currentTestCase = new ThreadLocal<>();
+    private static ThreadLocal<String> userToken = new ThreadLocal<>();
 
     public static void setCurrentTestCase(String id) {
         currentTestCase.set(id);
@@ -57,6 +60,14 @@ public class TestContext {
 
     public static boolean isNoReset() {
         return noReset.get();
+    }
+
+    public static void setLoginRequired(boolean value) {
+        loginRequired.set(value);
+    }
+
+    public static boolean isLoginRequired() {
+        return loginRequired.get();
     }
 
     public static void markFailed(String testCaseId) {
@@ -153,6 +164,77 @@ public class TestContext {
         }
     }
 
+    // ---------------- USER TOKEN (captured after login) ----------------
+
+    public static void setUserToken(String token) { userToken.set(token); }
+
+    public static String getUserToken() { return userToken.get(); }
+
+    // ---------------- CLP DATA (fetched by verifyCLP, reusable by tapByText) ----------------
+
+    /** Key = page name upper-case (HOME / SHOP / CARD), value = ordered section list. */
+    private static ThreadLocal<Map<String, List<ClpSection>>> clpData =
+            ThreadLocal.withInitial(HashMap::new);
+
+    public static void setClpData(String page, List<ClpSection> sections) {
+        clpData.get().put(page.toUpperCase(), sections);
+    }
+
+    public static List<ClpSection> getClpData(String page) {
+        return clpData.get().getOrDefault(page.toUpperCase(), Collections.emptyList());
+    }
+
+    /**
+     * Returns a flat list of ALL text strings (section titles, subtitles, item titles,
+     * item subtitles) for the given page — ready for assertion or click lookup.
+     */
+    public static List<String> getAllClpTexts(String page) {
+        List<String> texts = new ArrayList<>();
+        for (ClpSection s : getClpData(page)) {
+            if (!s.sectionTitle.isEmpty())    texts.add(s.sectionTitle);
+            if (!s.sectionSubtitle.isEmpty()) texts.add(s.sectionSubtitle);
+            texts.addAll(s.itemTitles);
+            texts.addAll(s.itemSubtitles);
+        }
+        return texts;
+    }
+
+    /**
+     * Sections that are banners — stored separately because banners may have no
+     * section title but do carry tappable CTA buttons ("Explore", "Shop now").
+     */
+    private static ThreadLocal<Map<String, List<ClpSection>>> clpBanners =
+            ThreadLocal.withInitial(HashMap::new);
+
+    public static void setClpBanners(String page, List<ClpSection> banners) {
+        clpBanners.get().put(page.toUpperCase(), banners);
+    }
+
+    public static List<ClpSection> getClpBanners(String page) {
+        return clpBanners.get().getOrDefault(page.toUpperCase(), Collections.emptyList());
+    }
+
+    // ---------------- SCALAR STORE (captureText / assertStoredText) ----------------
+
+    /**
+     * Generic key-value store for values captured at runtime from the screen
+     * (e.g. product titles, prices).  Used by captureText + assertStoredText actions.
+     */
+    private static ThreadLocal<Map<String, String>> scalarStore =
+            ThreadLocal.withInitial(HashMap::new);
+
+    public static void setScalarData(String key, String value) {
+        scalarStore.get().put(key, value);
+    }
+
+    public static String getScalarData(String key) {
+        return scalarStore.get().getOrDefault(key, "");
+    }
+
+    public static Map<String, String> getAllScalarData() {
+        return Collections.unmodifiableMap(scalarStore.get());
+    }
+
     // ---------------- CLEANUP ----------------
 
     public static void clear() {
@@ -162,6 +244,9 @@ public class TestContext {
         testCaseId.remove();
         runId = null;
         videoFile.remove();
+        clpData.remove();
+        clpBanners.remove();
+        scalarStore.remove();
     }
 
 

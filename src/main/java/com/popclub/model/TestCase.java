@@ -19,6 +19,14 @@ public class TestCase {
 
     public boolean noReset = false;
 
+    /**
+     * loginRequired (default: true)
+     * Set to false to skip all login steps — the app is launched but no OTP
+     * login is attempted.  Useful for tests that don't need an authenticated
+     * session (e.g. browse-only, onboarding, deep-link tests).
+     */
+    public boolean loginRequired = true;
+
     public String mapping = "TEST";
 
 

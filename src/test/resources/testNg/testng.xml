@@ -6,6 +6,10 @@
         <listener class-name="com.popclub.listener.TestListener"/>
     </listeners>
 
+    <!-- Default file to run when -DtestFile is not passed on the mvn command line.
+         When -DtestFile=shop_clp_full.yaml is passed, that value wins (TestRunnerTest
+         checks System.getProperty first). To run ALL files, remove the value here
+         or pass -DtestFile="" -->
     <parameter name="testFile" value="login.yaml"/>
     <parameter name="deviceSerial" value="10BDCM0YJZ00043"/>
     <parameter name="runTitle" value="Regression Run - Build 453"/>
@@ -18,6 +22,21 @@
         </classes>
 
     </test>
+
+    <!--
+        ClpVerificationTest is a standalone diagnostic tool — run it explicitly:
+            mvn test -Dtest=ClpVerificationTest                    # all pages
+            mvn test -Dtest=ClpVerificationTest -DpageId=SHOP      # one page
+        It is intentionally NOT included in this suite so it does not trigger
+        on every -DtestFile run.
+    -->
+    <!--
+    <test name="CLP Verification">
+        <classes>
+            <class name="com.popclub.clp.ClpVerificationTest"/>
+        </classes>
+    </test>
+    -->
 
 </suite>
 
