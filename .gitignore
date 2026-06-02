@@ -59,3 +59,5 @@ allure-results/
 node_modules/
 ai/
 .gitignore.save
+screenshots/
+test-output/
