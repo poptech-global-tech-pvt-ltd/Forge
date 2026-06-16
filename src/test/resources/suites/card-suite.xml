@@ -1,0 +1,26 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Card Onboarding Suite">
+<!--
+  <listeners>
+        <listener class-name="com.popclub.testsigma.TestSigmaReportListener"/>
+    </listeners>
+!-->
+  <test name="Card Onboarding E2E">
+        <classes>
+            <class name="com.popclub.tests.CardOnboardingTest"/>
+        </classes>
+    </test>
+    <!--
+    <test name="Card Onboarding Negative">
+        <classes>
+            <class name="com.popclub.tests.CardOnboardingNegativeTest"/>
+        </classes>
+    </test>
+   !-->
+   <!-- <test name="Fake PAN Rejection">
+        <classes>
+            <class name="com.popclub.tests.FakePanTest"/>
+        </classes>
+    </test> !-->
+
+</suite>

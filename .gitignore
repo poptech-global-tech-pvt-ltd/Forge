@@ -12,6 +12,7 @@ target/
 *.iws
 *.iml
 *.ipr
+.idea/
 
 ### Eclipse ###
 .apt_generated
@@ -56,3 +57,9 @@ graphify-out/
 missing_test_tags.txt
 testsigma-ai.yaml
 .m2/
+allure-results/
+node_modules/
+ai/
+.gitignore.save
+screenshots/
+test-output/
