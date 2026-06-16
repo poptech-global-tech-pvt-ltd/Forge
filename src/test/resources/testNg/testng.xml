@@ -11,7 +11,7 @@
          checks System.getProperty first). To run ALL files, remove the value here
          or pass -DtestFile="" -->
     <parameter name="testFile" value="login.yaml"/>
-    <parameter name="deviceSerial" value="10BDCM0YJZ00043"/>
+    <parameter name="deviceSerial" value="emulator-5554"/>
     <parameter name="runTitle" value="Regression Run - Build 453"/>
     <parameter name="projectId" value="d8f4a221-bc6d-47d8-9448-0834f5d012ec"/>
 

@@ -1,0 +1,11 @@
+# Generated via Build Test
+
+testName: scan test 1781290067664
+platform: android
+noReset: true
+
+steps:
+  - action: waitFor
+    element: common_shop_tab
+  - action: tap
+    element: common_shop_tab

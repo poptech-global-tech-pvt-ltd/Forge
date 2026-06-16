@@ -4,7 +4,7 @@
 #   ./run-tag-finder.sh                     ← auto-detect device
 #   ./run-tag-finder.sh 10BDCM0YJZ00043     ← specific device
 #
-# APK: src/main/resources/pop-debug.apk
+# APK: src/main/resources/pop-qaDebug.apk
 #   - Auto-installed if app is not on device
 
 set -e
@@ -12,7 +12,7 @@ cd "$(dirname "$0")"
 
 APP_PACKAGE="com.popclub.android"
 APP_ACTIVITY="com.popclub.android.LauncherFresh"
-APK_PATH="src/main/resources/pop-debug.apk"
+APK_PATH="src/main/resources/pop-qaDebug.apk"
 
 # ── Detect device ─────────────────────────────────────────────────────────────
 UDID="${1:-}"
@@ -30,7 +30,7 @@ INSTALLED=$(adb -s "$UDID" shell pm list packages "$APP_PACKAGE" 2>/dev/null)
 if [ -z "$INSTALLED" ]; then
   if [ ! -f "$APK_PATH" ]; then
     echo "ERROR: App not installed and APK not found at $APK_PATH"
-    echo "Place the debug APK at: src/main/resources/pop-debug.apk"
+    echo "Place the debug APK at: src/main/resources/pop-qaDebug.apk"
     exit 1
   fi
   echo "Installing $APK_PATH ..."

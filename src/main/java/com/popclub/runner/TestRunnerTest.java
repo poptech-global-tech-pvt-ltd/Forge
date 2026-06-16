@@ -87,6 +87,7 @@ public class TestRunnerTest {
             }
 
             TestCase testCase = YamlParser.parse(file.getPath());
+            testCase.sourceFile = file.getPath(); // used by SelfHealingEngine
 
             // ✅ TAG FILTERING BEFORE EXECUTION
             if (tagParam != null && !tagParam.isEmpty()) {

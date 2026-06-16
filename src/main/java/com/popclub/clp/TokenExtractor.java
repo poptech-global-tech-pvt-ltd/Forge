@@ -39,35 +39,57 @@ public class TokenExtractor {
      */
     public static String get(String deviceSerial) {
 
-        // 1. Already configured
+        // 1. Already configured in local.properties
         if (!ApiConstants.USER_TOKEN.isBlank()) {
             log.info("[TokenExtractor] Using USER_TOKEN from properties");
             return ApiConstants.USER_TOKEN;
         }
 
-        // 2. Try SharedPreferences (fastest, works offline)
+        // 2. DataStore proto file (fastest — plain-text JWT in SpSharedPrefs.preferences_pb)
+        String fromDataStore = fromDataStore(deviceSerial);
+        if (fromDataStore != null) return fromDataStore;
+
+        // 3. Legacy SharedPreferences (usually encrypted now — kept as fallback)
         String fromPrefs = fromSharedPrefs(deviceSerial);
-        if (fromPrefs != null) {
-            log.info("[TokenExtractor] Got token from SharedPreferences");
-            return fromPrefs;
-        }
+        if (fromPrefs != null) return fromPrefs;
 
-        // 3. Try logcat (needs recent app activity)
+        // 4. Logcat (needs recent OkHttp activity)
         String fromLogcat = fromLogcat(deviceSerial);
-        if (fromLogcat != null) {
-            log.info("[TokenExtractor] Got token from logcat");
-            return fromLogcat;
-        }
+        if (fromLogcat != null) return fromLogcat;
 
-        log.warn("[TokenExtractor] No token found — CLP will use anonymous mode (APP_TOKEN only)");
+        log.warn("[TokenExtractor] No token found — run loginIfNeeded before captureToken");
         return null;
     }
 
-    // ── Strategy 2: SharedPreferences ────────────────────────────────────────
+    // ── Strategy 2: DataStore proto file ────────────────────────────────────
+    // The app stores user data (including jwt_access_token) in a proto DataStore
+    // at files/datastore/SpSharedPrefs.preferences_pb as a JSON-encoded string.
+    // This is readable as plain text — no decryption needed.
+
+    private static String fromDataStore(String deviceSerial) {
+        try {
+            String path = "/data/data/" + APP_PACKAGE + "/files/datastore/SpSharedPrefs.preferences_pb";
+            String content = run(buildAdb(deviceSerial,
+                    "run-as", APP_PACKAGE, "cat", path));
+
+            // The proto file contains a JSON blob with jwt_access_token
+            Pattern p = Pattern.compile("\"jwt_access_token\"\\s*:\\s*\"(eyJ[A-Za-z0-9._-]+)\"");
+            Matcher m = p.matcher(content);
+            if (m.find()) {
+                log.info("[TokenExtractor] Got token from DataStore SpSharedPrefs");
+                return m.group(1);
+            }
+        } catch (Exception e) {
+            log.debug("[TokenExtractor] DataStore extraction failed: {}", e.getMessage());
+        }
+        return null;
+    }
+
+    // ── Strategy 3 (legacy): SharedPreferences ────────────────────────────────
+    // Note: the app now uses EncryptedSharedPreferences so this rarely finds anything.
 
     private static String fromSharedPrefs(String deviceSerial) {
         try {
-            // List all prefs files
             String[] listCmd = buildAdb(deviceSerial,
                     "run-as", APP_PACKAGE,
                     "ls", "/data/data/" + APP_PACKAGE + "/shared_prefs/");

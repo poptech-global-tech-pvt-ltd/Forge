@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="bb311b52-c78a-4e8a-991d-fbad23c220bb" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/QA_TAG_PIPELINE.md" beforeDir="false" afterPath="$PROJECT_DIR$/QA_TAG_PIPELINE.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/run-record-and-build.sh" beforeDir="false" afterPath="$PROJECT_DIR$/run-record-and-build.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/run-recorder.sh" beforeDir="false" afterPath="$PROJECT_DIR$/run-recorder.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/run-tag-finder.sh" beforeDir="false" afterPath="$PROJECT_DIR$/run-tag-finder.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/popclub/core/ElementRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/popclub/core/ElementRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/popclub/core/TestContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/popclub/core/TestContext.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/popclub/listener/TestListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/popclub/listener/TestListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/popclub/mobile/actions/ActionFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/popclub/mobile/actions/ActionFactory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/popclub/mobile/actions/AssertStoredTextAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/popclub/mobile/actions/AssertStoredTextAction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/popclub/mobile/actions/CaptureTextAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/popclub/mobile/actions/CaptureTextAction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/popclub/mobile/actions/CaptureTokenAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/popclub/mobile/actions/CaptureTokenAction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/popclub/mobile/actions/CartRemoveAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/popclub/mobile/actions/CartRemoveAction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/popclub/mobile/actions/LaunchAppAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/popclub/mobile/actions/LaunchAppAction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/popclub/mobile/actions/LoginIfNeededAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/popclub/mobile/actions/LoginIfNeededAction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/popclub/mobile/actions/PressKeyAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/popclub/mobile/actions/PressKeyAction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/popclub/mobile/actions/SearchCartPriceAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/popclub/mobile/actions/SearchCartPriceAction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/popclub/mobile/actions/VerifyClpRedirectAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/popclub/mobile/actions/VerifyClpRedirectAction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/popclub/mobile/cloud/STFClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/popclub/mobile/cloud/STFClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/popclub/mobile/driver/AppiumDriverManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/popclub/mobile/driver/AppiumDriverManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/popclub/model/Step.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/popclub/model/Step.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/popclub/model/TestCase.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/popclub/model/TestCase.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/popclub/runner/TestExecutor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/popclub/runner/TestExecutor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/popclub/runner/TestRunnerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/popclub/runner/TestRunnerTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/elements/home.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/elements/home.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/elements/shop.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/elements/shop.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/testNg/testng.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/testNg/testng.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/testdata/shop/shop_cart_remove.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/testdata/shop/shop_cart_remove.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/testdata/shop/shop_clp_full.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/testdata/shop/shop_clp_full.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/testdata/shop/shop_search_yogabar_cart_price.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/testdata/shop/shop_search_yogabar_cart_price.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/testdata/shop/ts_shop_checkout.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/testdata/shop/ts_shop_checkout.yaml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Interface" />
+        <option value="Enum" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="jar://$USER_HOME$/Library/Java/JavaVirtualMachines/openjdk-25.0.2/Contents/Home/lib/src.zip!/java.base/java/lang/RuntimeException.java" root0="SKIP_INSPECTION" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
+  <component name="ProjectId" id="3BLHqQGcP6QeDX5GfpG1TvDySMk" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.TagFinder.executor&quot;: &quot;Run&quot;,
+    &quot;Maven.Forge [clean].executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SHELLCHECK.PATH&quot;: &quot;I do mind&quot;,
+    &quot;TestNG./Users/deepa/repos/Forge/reports/recorded/test_20260521_110253/test_20260521_110253.yaml.executor&quot;: &quot;Run&quot;,
+    &quot;TestNG./Users/deepa/repos/Forge/reports/shop_import/ts_po_10989_plp_electronics_image_1x1_ratio.yaml.executor&quot;: &quot;Run&quot;,
+    &quot;TestNG./Users/deepa/repos/Forge/src/test/resources/testNg/testng-api.xml.executor&quot;: &quot;Run&quot;,
+    &quot;TestNG./Users/deepa/repos/Forge/src/test/resources/testNg/testng-web.xml.executor&quot;: &quot;Run&quot;,
+    &quot;TestNG./Users/deepa/repos/Forge/src/test/resources/testNg/testng.xml.executor&quot;: &quot;Run&quot;,
+    &quot;TestNG./Users/deepa/repos/Forge/src/test/resources/testdata/shop/shop_clp.yaml.executor&quot;: &quot;Run&quot;,
+    &quot;TestNG./Users/deepa/repos/Forge/src/test/resources/testdata/shop_clp_filters.yaml.executor&quot;: &quot;Run&quot;,
+    &quot;TestNG.FullApplicationFlowTest.fullEligibilityApplicationFlow.executor&quot;: &quot;Run&quot;,
+    &quot;TestNG.FullApplicationFlowTest.verifyConsentItemsExpandOnToggle.executor&quot;: &quot;Run&quot;,
+    &quot;TestNG.FullApplicationFlowTest.verifyLandingPageLoads.executor&quot;: &quot;Run&quot;,
+    &quot;TestNG.FullApplicationFlowTest.verifyOtpPageElements.executor&quot;: &quot;Run&quot;,
+    &quot;TestNG.FullApplicationFlowTest.verifyTermsPageLoadsAfterPhoneEntry.executor&quot;: &quot;Run&quot;,
+    &quot;TestNG.TestRunner.runTest.executor&quot;: &quot;Run&quot;,
+    &quot;TestNG.TestRunnerTest.executor&quot;: &quot;Run&quot;,
+    &quot;TestNG.TestRunnerTest.loginTest.executor&quot;: &quot;Run&quot;,
+    &quot;TestNG.TestRunnerTest.runTest.executor&quot;: &quot;Run&quot;,
+    &quot;TestNG.TestRunnerTest.validateTags.executor&quot;: &quot;Run&quot;,
+    &quot;TestNG.TestSigmaAiRunner.executor&quot;: &quot;Run&quot;,
+    &quot;TestNG.TestSigmaAiRunner.generateYamlFromTestSigma.executor&quot;: &quot;Run&quot;,
+    &quot;TestNG.TestSigmaAiRunner.runTestSigmaStepsWithAppium.executor&quot;: &quot;Run&quot;,
+    &quot;TestNG.src/test/resources/testNg/testng.xml   .executor&quot;: &quot;Run&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;android__automation&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/deepa/repos/Forge/src/main/resources&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.4816092&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;coverage&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/resources" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/resources" />
+      <recent name="$PROJECT_DIR$/src/test/resources/testdata/shop" />
+    </key>
+  </component>
+  <component name="RunAnythingCache">
+    <option name="myCommands">
+      <command value="mvn clean" />
+    </option>
+  </component>
+  <component name="RunManager" selected="TestNG./Users/deepa/repos/Forge/src/test/resources/testdata/shop/shop_clp.yaml">
+    <configuration name="/Users/deepa/repos/Forge/reports/recorded/test_20260521_110253/test_20260521_110253.yaml" type="TestNG" temporary="true" nameIsGenerated="true">
+      <module name="Forge" />
+      <option name="SUITE_NAME" value="$PROJECT_DIR$/reports/recorded/test_20260521_110253/test_20260521_110253.yaml" />
+      <option name="TEST_OBJECT" value="SUITE" />
+      <properties />
+      <listeners />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="/Users/deepa/repos/Forge/reports/shop_import/ts_po_10989_plp_electronics_image_1x1_ratio.yaml" type="TestNG" temporary="true" nameIsGenerated="true">
+      <module name="Forge" />
+      <option name="SUITE_NAME" value="$PROJECT_DIR$/reports/shop_import/ts_po_10989_plp_electronics_image_1x1_ratio.yaml" />
+      <option name="TEST_OBJECT" value="SUITE" />
+      <properties />
+      <listeners />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="/Users/deepa/repos/Forge/src/test/resources/testdata/shop_clp_filters.yaml" type="TestNG" temporary="true" nameIsGenerated="true">
+      <module name="Forge" />
+      <option name="SUITE_NAME" value="$PROJECT_DIR$/src/test/resources/testdata/shop_clp_filters.yaml" />
+      <option name="TEST_OBJECT" value="SUITE" />
+      <properties />
+      <listeners />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="/Users/deepa/repos/Forge/src/test/resources/testdata/shop/shop_clp.yaml" type="TestNG" temporary="true" nameIsGenerated="true">
+      <module name="Forge" />
+      <option name="SUITE_NAME" value="$PROJECT_DIR$/src/test/resources/testdata/shop/shop_clp.yaml" />
+      <option name="TEST_OBJECT" value="SUITE" />
+      <properties />
+      <listeners />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="src/test/resources/testNg/testng.xml   " type="TestNG" temporary="true" nameIsGenerated="true">
+      <shortenClasspath name="NONE" />
+      <useClassPathOnly />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.popclub.web.tests.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+      <option name="ALTERNATIVE_JRE_PATH" value="$USER_HOME$/Library/Java/JavaVirtualMachines/openjdk-25.0.2/Contents/Home" />
+      <option name="SUITE_NAME" value="src/test/resources/testNg/testng.xml   " />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="GROUP_NAME" value="" />
+      <option name="TEST_OBJECT" value="SUITE" />
+      <option name="PARAMETERS" value="" />
+      <option name="OUTPUT_DIRECTORY" value="" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="wholeProject" />
+      </option>
+      <option name="PROPERTIES_FILE" value="" />
+      <properties />
+      <listeners />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="TestNG.TestNG Suite" />
+      <item itemvalue="TestNG./Users/deepa/repos/Forge/reports/recorded/test_20260521_110253/test_20260521_110253.yaml" />
+      <item itemvalue="TestNG./Users/deepa/repos/Forge/reports/shop_import/ts_po_10989_plp_electronics_image_1x1_ratio.yaml" />
+      <item itemvalue="TestNG./Users/deepa/repos/Forge/src/test/resources/testdata/shop/shop_clp.yaml" />
+      <item itemvalue="TestNG./Users/deepa/repos/Forge/src/test/resources/testdata/shop_clp_filters.yaml" />
+      <item itemvalue="TestNG.src/test/resources/testNg/testng.xml   " />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="TestNG./Users/deepa/repos/Forge/src/test/resources/testdata/shop/shop_clp.yaml" />
+        <item itemvalue="TestNG./Users/deepa/repos/Forge/src/test/resources/testdata/shop_clp_filters.yaml" />
+        <item itemvalue="TestNG./Users/deepa/repos/Forge/reports/shop_import/ts_po_10989_plp_electronics_image_1x1_ratio.yaml" />
+        <item itemvalue="TestNG./Users/deepa/repos/Forge/reports/recorded/test_20260521_110253/test_20260521_110253.yaml" />
+        <item itemvalue="TestNG.src/test/resources/testNg/testng.xml   " />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-30f59d01ecdd-26cb7f24e5b0-intellij.indexing.shared.core-IU-253.29346.240" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="bb311b52-c78a-4e8a-991d-fbad23c220bb" name="Changes" comment="" />
+      <created>1774261624087</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1774261624087</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <breakpoint enabled="true" type="java-exception">
+          <properties class="java.lang.RuntimeException" package="java.lang" />
+          <option name="timeStamp" value="1" />
+        </breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/popclub/web/pages/TermsConditionsPage.java</url>
+          <line>67</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>

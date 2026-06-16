@@ -5,6 +5,7 @@ import com.popclub.mobile.driver.DriverManager;
 import com.popclub.model.Step;
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.AppiumDriver;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
@@ -71,13 +72,56 @@ public class CaptureTextAction implements Action {
                 "captureText: element not found for key='" + storeKey + "'"
                 + describeLocator(step));
 
-        String captured = el.getText();
-        if (captured == null) captured = "";
-        captured = captured.trim();
+        String captured = extractText(el);
 
         TestContext.setScalarData(storeKey, captured);
 
         System.out.printf("  ✅ captureText [%s] = \"%s\"%n", storeKey, captured);
+    }
+
+    // ── Text extraction ───────────────────────────────────────────────────────
+
+    /**
+     * Extract visible text from an element with three fallback layers:
+     *
+     *  1. el.getText()           — works for XML views and simple Compose Text nodes
+     *  2. child text nodes       — Compose Buttons wrap text in a child Text composable
+     *                              whose .getText() holds the label
+     *  3. content-desc attribute — last resort; some elements expose text via contentDescription
+     *
+     * We log which strategy succeeded so it's easy to trace in the output.
+     */
+    private String extractText(WebElement el) {
+        // 1. Direct text
+        String text = el.getText();
+        if (text != null && !text.isBlank()) {
+            System.out.println("  [captureText] strategy=direct");
+            return text.trim();
+        }
+
+        // 2. Child text nodes (Compose Button wraps its label in a child Text composable)
+        try {
+            List<WebElement> children = el.findElements(By.xpath(".//*[@text!='']"));
+            for (WebElement child : children) {
+                String ct = child.getText();
+                if (ct != null && !ct.isBlank()) {
+                    System.out.println("  [captureText] strategy=child-text");
+                    return ct.trim();
+                }
+            }
+        } catch (Exception ignored) {}
+
+        // 3. content-desc attribute
+        try {
+            String desc = el.getAttribute("content-desc");
+            if (desc != null && !desc.isBlank()) {
+                System.out.println("  [captureText] strategy=content-desc");
+                return desc.trim();
+            }
+        } catch (Exception ignored) {}
+
+        System.out.println("  [captureText] strategy=none — element found but all text sources empty");
+        return "";
     }
 
     // ── Element resolution ────────────────────────────────────────────────────

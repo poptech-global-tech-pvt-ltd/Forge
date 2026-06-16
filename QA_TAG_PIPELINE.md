@@ -396,5 +396,5 @@ QA engineer:
   [ ] git checkout android_automation
   [ ] brew install gh && gh auth login
   [ ] adb devices → confirm device appears
-  [ ] Place debug APK at Forge/src/main/resources/pop-debug.apk
+  [ ] Place debug APK at Forge/src/main/resources/pop-qaDebug.apk
 ```

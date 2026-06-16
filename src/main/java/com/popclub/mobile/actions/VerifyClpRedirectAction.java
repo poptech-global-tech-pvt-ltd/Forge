@@ -35,7 +35,7 @@ import java.util.List;
  */
 public class VerifyClpRedirectAction implements Action {
 
-    private static final long  NAV_WAIT     = 1500;  // ms after tap, wait for nav
+    private static final long  NAV_WAIT     = 800;   // ms after tap, wait for nav (isBackButtonVisible retries for up to 5s)
     private static final long  BACK_WAIT    = 1200;  // ms after back press
     private static final int   MAX_SCROLLS  = 8;
     private static final long  SCROLL_WAIT  = 500;
@@ -95,8 +95,14 @@ public class VerifyClpRedirectAction implements Action {
 
             for (int i = 0; i < limit; i++) {
                 String itemTitle = section.itemTitles.get(i);
-                totalTapped++;
 
+                // Skip items with no usable title (empty string from API)
+                if (itemTitle == null || itemTitle.isBlank()) {
+                    System.out.printf("    ⚠️  [%d] (empty title) — skipping%n", i);
+                    continue;
+                }
+
+                totalTapped++;
                 System.out.printf("    [%d] Tapping \"%s\" …%n", i, itemTitle);
 
                 // 1. Find and tap the item
@@ -161,22 +167,27 @@ public class VerifyClpRedirectAction implements Action {
 
     // ── Helpers ────────────────────────────────────────────────────────────────
 
-    private boolean isBackButtonVisible(AppiumDriver driver) {
-        try {
-            // UIAutomator looks for the Navigate up / back button via content-desc
-            String[] backDescriptions = {
-                "Navigate up", "Back", "Go back", "navigate_up", "back_button"
-            };
-            for (String desc : backDescriptions) {
-                String sel = "new UiSelector().descriptionContains(\"" + desc + "\")";
-                if (!driver.findElements(AppiumBy.androidUIAutomator(sel)).isEmpty()) {
-                    return true;
+    private boolean isBackButtonVisible(AppiumDriver driver) throws InterruptedException {
+        // UIAutomator looks for the Navigate up / back button via content-desc.
+        // Retry up to 5 s (10 × 500 ms) to handle slow fragment transitions or
+        // API-bound screens that render the AppBar after a short delay.
+        String[] backDescriptions = {
+            "Navigate up", "Back", "Go back", "navigate_up", "back_button", "Navigation"
+        };
+        for (int attempt = 0; attempt < 10; attempt++) {
+            try {
+                for (String desc : backDescriptions) {
+                    String sel = "new UiSelector().descriptionContains(\"" + desc + "\")";
+                    if (!driver.findElements(AppiumBy.androidUIAutomator(sel)).isEmpty()) {
+                        return true;
+                    }
                 }
+            } catch (Exception e) {
+                // ignore transient driver errors; keep retrying
             }
-            return false;
-        } catch (Exception e) {
-            return false;
+            Thread.sleep(500);
         }
+        return false;
     }
 
     private boolean isTextVisible(AppiumDriver driver, String text) {

@@ -15,17 +15,6 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Minimal REST client for OpenSTF / DeviceFarmer.
- *
- * API reference: https://github.com/DeviceFarmer/stf/blob/master/doc/API.md
- *
- * Endpoints used:
- *   GET  /api/v1/devices                              – list all devices
- *   POST /api/v1/user/devices                         – reserve a device
- *   POST /api/v1/user/devices/{serial}/remoteConnect  – get ADB-over-TCP URL
- *   DELETE /api/v1/user/devices/{serial}              – release a device
- */
 public class STFClient {
 
     private final String baseUrl;

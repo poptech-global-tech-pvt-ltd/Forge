@@ -29,5 +29,6 @@ public class TestCase {
 
     public String mapping = "TEST";
 
-
+    /** Set at load time by TestRunnerTest — not in YAML, used for self-healing write-back. */
+    public transient String sourceFile;
 }

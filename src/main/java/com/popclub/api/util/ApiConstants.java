@@ -7,6 +7,16 @@ public class ApiConstants {
     // Optional user JWT — set USER_TOKEN in local.properties (grab from OkHttp logcat X-Access-Token)
     public static final String USER_TOKEN = ApiConfig.get("USER_TOKEN", "");
 
+    // ── API base URLs (use in fetchApi steps as ${APP_API_URL} etc.) ─────────
+    // Override in local.properties e.g: APP_API_URL=https://uat.popclub.co.in/api/
+    /** debug / release — main app API */
+    public static final String APP_API_URL     = ApiConfig.get("APP_API_URL",     "https://app.popclub.co.in/api/");
+    /** UAT environment */
+    public static final String UAT_API_URL     = ApiConfig.get("UAT_API_URL",     "https://uat.popclub.co.in/api/");
+    /** Backend direct */
+    public static final String BACKEND_API_URL = ApiConfig.get("BACKEND_API_URL", "https://api.popclub.co.in/");
+
+    // ── Service base URLs ─────────────────────────────────────────────────────
     public static final String APP_BASE_URL          = ApiConfig.get("APP_BASE_URL",          "https://app.popclub.co.in");
     public static final String HASHIRA_BASE_URL       = ApiConfig.get("HASHIRA_BASE_URL",       "https://hashira.popclub.co.in");
     public static final String USER_PROFILE_BASE_URL  = ApiConfig.get("USER_PROFILE_BASE_URL",  "https://userprofile.popclub.co.in");

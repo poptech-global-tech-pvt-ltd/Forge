@@ -71,18 +71,8 @@ public class CartRemoveAction implements Action {
         System.out.printf("  📦 Item to remove: \"%s\"%n",
                 removedTitle.isEmpty() ? "(title not captured)" : removedTitle);
 
-        // ── 4. Tap the remove button ───────────────────────────────────────────
-        WebElement removeBtn = waitFor(driver, "accessibilityId",
-                "cart_remove_product_button", 5_000);
-        if (removeBtn == null)
-            throw new RuntimeException(
-                "cartRemoveItem: cart_remove_product_button not found");
-
-        removeBtn.click();
-        Thread.sleep(SHORT_WAIT);
-
-        // ── 5. Handle any confirmation dialog / bottom sheet ──────────────────
-        handleRemoveConfirmation(driver);
+        // ── 4. Decrease quantity to 1, then remove ────────────────────────────
+        decreaseToOneAndRemove(driver);
 
         Thread.sleep(SHORT_WAIT);
 
@@ -96,19 +86,19 @@ public class CartRemoveAction implements Action {
                 stillVisible = isTextVisible(driver, removedTitle);
             }
             if (stillVisible) {
-                System.out.printf("  ❌ Item \"%s\" still visible after removal%n", removedTitle);
+                System.out.printf("   Item \"%s\" still visible after removal%n", removedTitle);
                 throw new RuntimeException(
                     "cartRemoveItem: item \"" + removedTitle + "\" still visible after removal");
             }
-            System.out.printf("  ✅ Item \"%s\" successfully removed from cart%n", removedTitle);
+            System.out.printf("   Item \"%s\" successfully removed from cart%n", removedTitle);
         } else {
             // No title captured — just verify the remove button is gone or cart is empty
             WebElement emptyIndicator = waitFor(driver, "accessibilityId",
                     "cart_shop_more_button", 3_000);
             if (emptyIndicator != null) {
-                System.out.println("  ✅ Cart is now empty after removal");
+                System.out.println("   Cart is now empty after removal");
             } else {
-                System.out.println("  ✅ Remove tapped — item title not available for re-check");
+                System.out.println("   Remove tapped — item title not available for re-check");
             }
         }
 
@@ -116,6 +106,99 @@ public class CartRemoveAction implements Action {
     }
 
     // ── Helpers ────────────────────────────────────────────────────────────────
+
+    /**
+     * Decreases item quantity to 1, then taps the remove button.
+     *
+     * Strategy:
+     *  1. Read the current quantity from the stepper counter text (looks for a
+     *     standalone numeric TextView between the –/+ buttons).
+     *  2. Tap the decrease button (qty–1) for each unit above 1, waiting 800 ms
+     *     between taps so the counter animates.
+     *  3. After reaching 1, tap the remove button (cart_remove_product_button)
+     *     OR rely on the last decrease tap triggering a removal confirmation
+     *     sheet — either way we confirm removal.
+     *
+     * Max 20 decrements as a safety net so the loop never spins forever.
+     */
+    private void decreaseToOneAndRemove(AppiumDriver driver) throws InterruptedException {
+
+        final int MAX_DECREMENTS = 20;
+
+        for (int attempt = 0; attempt < MAX_DECREMENTS; attempt++) {
+
+            // Read quantity from the counter label between –/+ buttons
+            int qty = readQuantity(driver);
+            System.out.printf("  🔢 Current quantity: %s%n",
+                    qty < 0 ? "(unknown)" : String.valueOf(qty));
+
+            if (qty == 1 || qty < 0) {
+                // Quantity is 1 (or unreadable) — proceed to removal
+                break;
+            }
+
+            // qty > 1 — tap decrease
+            WebElement decreaseBtn = find(driver, "accessibilityId", "cart_item_decrease_button");
+            if (decreaseBtn == null) {
+                System.out.println("  ⚠️  cart_item_decrease_button not found — proceeding to remove");
+                break;
+            }
+            System.out.printf("  ➖ Decreasing quantity (was %d)…%n", qty);
+            decreaseBtn.click();
+            Thread.sleep(800);
+
+            // If a remove confirmation sheet appeared (app showed it early), confirm & return
+            WebElement earlyConfirm = find(driver, "accessibilityId", "cart_remove_product_button");
+            if (earlyConfirm != null) {
+                System.out.println("  📋 Remove confirmation appeared during decrease — confirming");
+                earlyConfirm.click();
+                Thread.sleep(SHORT_WAIT);
+                return;
+            }
+        }
+
+        // ── Now tap the remove button ──────────────────────────────────────────
+        WebElement removeBtn = waitFor(driver, "accessibilityId",
+                "cart_remove_product_button", 5_000);
+        if (removeBtn == null)
+            throw new RuntimeException(
+                "cartRemoveItem: cart_remove_product_button not found after quantity decrease");
+
+        System.out.println("  🗑️  Tapping cart_remove_product_button…");
+        removeBtn.click();
+        Thread.sleep(SHORT_WAIT);
+
+        // ── Handle any confirmation dialog / bottom sheet ──────────────────────
+        handleRemoveConfirmation(driver);
+    }
+
+    /**
+     * Reads the quantity counter text from the cart stepper.
+     * Looks for a standalone integer TextView between the –/+ stepper buttons.
+     * Returns the quantity, or -1 if it cannot be determined.
+     */
+    private int readQuantity(AppiumDriver driver) {
+        try {
+            // The quantity stepper contains a TextView that shows just the count
+            // (e.g. "1", "2", "3"). We look for all short numeric TextViews on
+            // screen and return the first one that looks like a qty counter.
+            List<WebElement> textEls = driver.findElements(
+                AppiumBy.androidUIAutomator(
+                    "new UiSelector().className(\"android.widget.TextView\")"));
+            for (WebElement el : textEls) {
+                String txt = el.getText();
+                if (txt == null || txt.isBlank()) continue;
+                txt = txt.trim();
+                // Quantity counters are typically 1–2 digit integers
+                if (txt.matches("^[1-9][0-9]?$")) {
+                    // Skip text that looks like a section heading number
+                    int val = Integer.parseInt(txt);
+                    if (val <= 50) return val;  // sanity cap
+                }
+            }
+        } catch (Exception ignored) {}
+        return -1;  // unknown
+    }
 
     private void navigateToCart(AppiumDriver driver) throws Exception {
         // If there's already a cart icon visible, use it; otherwise assume we're on cart

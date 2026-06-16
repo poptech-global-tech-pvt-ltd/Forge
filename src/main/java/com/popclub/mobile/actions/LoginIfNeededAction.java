@@ -1,7 +1,8 @@
 package com.popclub.mobile.actions;
 
-import com.popclub.clp.AuthApiClient;
+import com.popclub.clp.TokenExtractor;
 import com.popclub.core.TestContext;
+import com.popclub.mobile.driver.AppiumDriverManager;
 import com.popclub.mobile.driver.DriverManager;
 import com.popclub.model.Step;
 import io.appium.java_client.AppiumBy;
@@ -16,8 +17,7 @@ import java.util.List;
 /**
  * LoginIfNeededAction — performs login only if the login screen is visible.
  *
- * If the app is already logged in (home screen showing), this action is a no-op
- * (it just captures the auth token via API and returns).
+ * If the app is already logged in (home screen showing), this action is a no-op.
  *
  * If the login screen IS visible, it completes the full OTP login flow:
  *   enter phone → tap continue → enter OTP → wait for home_tab
@@ -70,12 +70,11 @@ public class LoginIfNeededAction implements Action {
             System.out.println("[loginIfNeeded] Login screen detected — performing login…");
             doLogin(driver, phone, otp);
         } else {
-            System.out.println("[loginIfNeeded] App already logged in — navigating to home screen…");
-            navigateToHome(driver);
+            System.out.println("[loginIfNeeded] No login required — already on home screen.");
         }
 
-        // Always capture the auth token (idempotent — skips if already stored)
-        captureToken(phone, otp);
+        // Capture the token the app stored after login (SharedPreferences)
+        captureTokenFromDevice();
 
         System.out.println("[loginIfNeeded] ✅ Login step complete");
     }
@@ -129,49 +128,6 @@ public class LoginIfNeededAction implements Action {
         } catch (Exception ignored) {}
     }
 
-    // ── Navigate to home ──────────────────────────────────────────────────────
-
-    private void navigateToHome(AppiumDriver driver) {
-        // Session creation already launched the app fresh — just wait for home screen to load
-        if (isVisible(driver, HOME_TAB_TAG, 10_000)) {
-            tapHomeTab(driver);
-        } else {
-            System.out.println("[loginIfNeeded] ⚠️  Home tab not visible after 10s — proceeding anyway");
-        }
-    }
-
-    private void tapHomeTab(AppiumDriver driver) {
-        try {
-            List<WebElement> tabs = driver.findElements(AppiumBy.accessibilityId(HOME_TAB_TAG));
-            if (!tabs.isEmpty()) {
-                tabs.get(0).click();
-                System.out.println("[loginIfNeeded] Tapped Home tab — on home screen");
-                sleep(500);
-            }
-        } catch (Exception ignored) {}
-    }
-
-    // ── Token capture (via API) ────────────────────────────────────────────────
-
-    private void captureToken(String phone, String otp) {
-        if (TestContext.getUserToken() != null && !TestContext.getUserToken().isBlank()) {
-            System.out.println("[loginIfNeeded] Token already in context — skipping API call");
-            return;
-        }
-        try {
-            String token = AuthApiClient.login(phone, otp);
-            if (token != null && !token.isBlank()) {
-                TestContext.setUserToken(token);
-                String preview = token.length() > 20
-                        ? token.substring(0, 10) + "…" + token.substring(token.length() - 6)
-                        : token;
-                System.out.println("[loginIfNeeded] 🔑 Token captured: " + preview);
-            }
-        } catch (Exception e) {
-            System.out.println("[loginIfNeeded] ⚠️  API token capture failed: " + e.getMessage());
-        }
-    }
-
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     /** Returns true if the accessibilityId element appears within timeoutMs. */
@@ -196,5 +152,31 @@ public class LoginIfNeededAction implements Action {
 
     private void sleep(long ms) {
         try { Thread.sleep(ms); } catch (InterruptedException ignored) {}
+    }
+
+    /** Read the token the app stored in SharedPreferences after login and save to TestContext. */
+    private void captureTokenFromDevice() {
+        if (TestContext.getUserToken() != null && !TestContext.getUserToken().isBlank()) {
+            return; // already captured
+        }
+        try {
+            String deviceSerial = "";
+            try {
+                var info = AppiumDriverManager.getDeviceInfo();
+                if (info != null) deviceSerial = info.udid;
+            } catch (Exception ignored) {}
+
+            String token = TokenExtractor.get(deviceSerial);
+            if (token != null && !token.isBlank()) {
+                TestContext.setUserToken(token);
+                TestContext.setScalarData("auth_token", token);
+                String preview = token.length() > 20
+                        ? token.substring(0, 10) + "…" + token.substring(token.length() - 6)
+                        : token;
+                System.out.println("  🔑 Token captured: " + preview);
+            }
+        } catch (Exception e) {
+            System.out.println("  ⚠️  [loginIfNeeded] Could not capture token: " + e.getMessage());
+        }
     }
 }

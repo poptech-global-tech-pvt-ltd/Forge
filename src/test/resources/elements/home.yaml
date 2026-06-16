@@ -6,12 +6,12 @@ home_profile_icon:
 shop_tab:
   android:
     - type: accessibilityId
-      value: Shop
+      value: common_shop_tab
 
 card_tab:
   android:
     - type: accessibilityId
-      value: Card
+      value: common_card_tab
 
 scan_qr_code:
   android:
@@ -21,7 +21,7 @@ scan_qr_code:
 home_tab:
   android:
     - type: accessibilityId
-      value: Home
+      value: common_home_tab
 
 skip_tour:
   android:

@@ -23,9 +23,9 @@ set -e
 cd "$(dirname "$0")"
 
 POPDROID="../popdroid"
-APK_SRC="$POPDROID/pop/build/outputs/apk/debug/pop-debug.apk"
-APK_DEST="src/main/resources/pop-debug.apk"
-APK_BACKUP="src/main/resources/pop-debug-1.apk"
+APK_SRC="$POPDROID/pop/build/outputs/apk/debug/pop-qaDebug.apk"
+APK_DEST="src/main/resources/pop-qaDebug.apk"
+APK_BACKUP="src/main/resources/pop-qaDebug-1.apk"
 APP_PACKAGE="com.popclub.android"
 
 # ── Step 1: Record ────────────────────────────────────────────────────────────

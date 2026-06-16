@@ -1,5 +1,6 @@
 package com.popclub.mobile.actions;
 
+import com.popclub.core.TestContext;
 import com.popclub.mobile.driver.AppiumDriverManager;
 import com.popclub.mobile.driver.DriverManager;
 import com.popclub.model.Step;
@@ -44,13 +45,79 @@ public class LaunchAppAction implements Action {
         AppiumDriver driver = AppiumDriverManager.getDriver();
         DriverManager.setDriver(driver);
 
-        // 2. Wait until *something* is visible (app loaded past splash screen)
+        // 2. Wake device if screen is off (defensive — keepScreenOn should prevent this)
+        wakeDevice((AndroidDriver) driver);
+
+        // 3. Close and relaunch so every test starts from a clean app state.
+        //    Skip when noReset=true (e.g. "run from step N" resume mode — app must stay alive).
+        if (TestContext.isNoReset()) {
+            System.out.println("[LaunchApp] noReset=true — skipping app restart, attaching to running session.");
+        } else {
+            forceRestartApp((AndroidDriver) driver);
+        }
+
+        // 4. Wait until *something* is visible (app loaded past splash screen)
         waitForAppReady(driver);
 
-        // 4. Dismiss system / Google overlays that can block the login screen
-        dismissSystemDialogs(driver);
+        if (TestContext.isLoginRequired()) {
+            // 5a. Login flow — dismiss Google/GMS overlays that can block the login screen
+            dismissSystemDialogs(driver);
+        } else {
+            // 5b. No login — app is already authenticated, skip GMS dialogs
+            //     and wait directly for the home tab to be visible.
+            System.out.println("[LaunchApp] loginRequired=false — skipping GMS dialogs, waiting for home tab…");
+            waitForHomeTab(driver);
+        }
 
         System.out.println("[LaunchApp] App launch complete — proceeding with test steps.");
+    }
+
+    // ── wake device ───────────────────────────────────────────────────────────
+
+    private void wakeDevice(AndroidDriver driver) {
+        // 1. Unlock if locked
+        try {
+            if (driver.isDeviceLocked()) {
+                driver.unlockDevice();
+                sleep(500);
+                System.out.println("[LaunchApp] Device was locked — unlocked.");
+            }
+        } catch (Exception e) {
+            System.out.println("[LaunchApp] Wake/unlock skipped: " + e.getMessage());
+        }
+
+        // 2. Set screen timeout to max so it never sleeps during the test
+        try {
+            driver.executeScript("mobile: shell", java.util.Map.of(
+                    "command", "settings",
+                    "args",    java.util.List.of("put", "system", "screen_off_timeout", "2147483647")
+            ));
+            System.out.println("[LaunchApp] Screen timeout set to max.");
+        } catch (Exception e) {
+            System.out.println("[LaunchApp] Screen timeout override skipped: " + e.getMessage());
+        }
+
+        // 3a. Stay awake regardless of power state (not just USB)
+        try {
+            driver.executeScript("mobile: shell", java.util.Map.of(
+                    "command", "svc",
+                    "args",    java.util.List.of("power", "stayon", "true")
+            ));
+            System.out.println("[LaunchApp] Stay-awake (always) enabled.");
+        } catch (Exception e) {
+            System.out.println("[LaunchApp] svc stayon skipped: " + e.getMessage());
+        }
+
+        // 3b. stay_on_while_plugged_in = 7 (USB=1 + AC=2 + wireless=4)
+        try {
+            driver.executeScript("mobile: shell", java.util.Map.of(
+                    "command", "settings",
+                    "args",    java.util.List.of("put", "global", "stay_on_while_plugged_in", "7")
+            ));
+            System.out.println("[LaunchApp] stay_on_while_plugged_in=7 set.");
+        } catch (Exception e) {
+            System.out.println("[LaunchApp] stay_on_while_plugged_in skipped: " + e.getMessage());
+        }
     }
 
     // ── app restart ───────────────────────────────────────────────────────────
@@ -94,6 +161,20 @@ public class LaunchAppAction implements Action {
         } catch (Exception e) {
             System.out.println("[LaunchApp] ⚠️  activateApp failed: " + e.getMessage()
                     + " — proceeding anyway; loginIfNeeded will handle screen state");
+        }
+    }
+
+    // ── wait for home tab ─────────────────────────────────────────────────────
+
+    private void waitForHomeTab(AppiumDriver driver) {
+        try {
+            new WebDriverWait(driver, Duration.ofSeconds(APP_READY_TIMEOUT_SEC))
+                    .until(ExpectedConditions.presenceOfElementLocated(
+                            AppiumBy.accessibilityId("Home")));
+            System.out.println("[LaunchApp] Home tab visible — app ready.");
+        } catch (Exception e) {
+            System.out.println("[LaunchApp] ⚠️  Home tab not visible after "
+                    + APP_READY_TIMEOUT_SEC + "s: " + e.getMessage());
         }
     }
 

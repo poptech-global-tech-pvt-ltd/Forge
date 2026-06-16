@@ -1,0 +1,20 @@
+testName: sample2
+platform: android
+noReset: true
+
+features:
+  - common
+  - login
+  - shop
+
+tags:
+  - smoke
+retry: 1
+
+steps:
+  - action: tap
+    element: Shop
+  - action: tap
+    element: edge_image_banner_widget_row
+  - action: verifyElement
+  - action: verifyElement

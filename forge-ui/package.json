@@ -1,0 +1,15 @@
+{
+  "name": "forge-ui",
+  "version": "1.0.0",
+  "description": "Maestro Studio-like UI for Forge test runner",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "kill $(lsof -ti :3847) 2>/dev/null; node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "js-yaml": "^4.1.0",
+    "ws": "^8.16.0"
+  }
+}

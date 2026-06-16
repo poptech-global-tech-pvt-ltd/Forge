@@ -29,6 +29,10 @@ public class TestContext {
     private static ThreadLocal<File> videoFile = new ThreadLocal<>();
     private static ThreadLocal<String> currentTestCase = new ThreadLocal<>();
     private static ThreadLocal<String> userToken = new ThreadLocal<>();
+    private static ThreadLocal<String> failingElement = new ThreadLocal<>();
+
+    public static void setFailingElement(String element) { failingElement.set(element); }
+    public static String getFailingElement()             { return failingElement.get(); }
 
     public static void setCurrentTestCase(String id) {
         currentTestCase.set(id);
@@ -96,6 +100,11 @@ public class TestContext {
     public static String getPlatform() {
         return platform.get();
     }
+
+    private static ThreadLocal<String> testSourceFile = new ThreadLocal<>();
+
+    public static void setTestSourceFile(String path) { testSourceFile.set(path); }
+    public static String getTestSourceFile()          { return testSourceFile.get(); }
     public static void setRunId(String id) {
         runId = id;
     }

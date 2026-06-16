@@ -54,15 +54,30 @@ public class AppiumDriverManager {
                 options.setPlatformVersion(device.platformVersion);
             }
             options.setAutoGrantPermissions(true);
-            options.setApp(System.getProperty("user.dir") +
-                    "/src/main/resources/pop-debug.apk");
-            // Explicitly set package + main activity so Appium resolves the
-            // correct entry point when the APK declares multiple launcher activities.
-            options.setAppPackage("com.popclub.android");
-            options.setAppActivity("com.popclub.android.LauncherFresh");
-            options.setNoReset(TestContext.isNoReset());
+
+            boolean resumeMode = TestContext.isNoReset();
+            if (resumeMode) {
+                // Resume mode (run-from-step): attach to the already-running app.
+                // Do NOT set `app` — that triggers install + launch.
+                // Do NOT autoLaunch — keep whatever is on screen.
+                options.setAppPackage("com.popclub.android");
+                options.setCapability("appium:autoLaunch", false);
+                options.setNoReset(true);
+                System.out.println("[Driver] Resume mode — attaching to running app (no install, no launch)");
+            } else {
+                options.setApp(System.getProperty("user.dir") +
+                        "/src/main/resources/pop-qaDebug.apk");
+                // Explicitly set package + main activity so Appium resolves the
+                // correct entry point when the APK declares multiple launcher activities.
+                options.setAppPackage("com.popclub.android");
+                options.setAppActivity("com.popclub.android.LauncherFresh");
+                options.setNoReset(false);
+            }
+
             options.setNewCommandTimeout(Duration.ofSeconds(300));
-            TestContext.setFreshLaunch(true);
+            // Keep the screen on throughout the test run — prevents mid-test lock/sleep
+            options.setCapability("appium:keepScreenOn", true);
+            TestContext.setFreshLaunch(!resumeMode);
 
             // Unique UiAutomator2 system port to avoid stale-session collisions
             int systemPort;

@@ -21,22 +21,7 @@ retry: 1
 steps:
   - action: launchApp
 
-  - action: tapIfPresent
-    element: skip_tour
-
-  - action: enterText
-    element: login_input_phone
-    value: 1234561122
-
-  - action: tap
-    element: login_button
-
-  - action: enterText
-    element: otp_input
-    value: 560102
-
-  # Get JWT via API — CI-safe, no logcat needed
-  - action: captureToken
+  - action: loginIfNeeded
     value: "1234561122"
     text: "560102"
 

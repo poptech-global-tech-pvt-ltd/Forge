@@ -1,0 +1,19 @@
+testName: search
+platform: android
+noReset: false
+
+features:
+  - common
+  - login
+
+tags:
+  - smoke
+retry: 1
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  # Add steps below

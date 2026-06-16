@@ -1,0 +1,43 @@
+testName: login
+platform: android
+noReset: true
+
+features:
+  - common
+  - login
+
+tags:
+  - smoke
+retry: 1
+
+steps:
+  - action: tap
+    element: TODO_element
+  - action: tap
+    element: TODO_element
+  - action: tap
+  - action: tap
+  - action: tap
+    element: TODO_element
+  - action: tap
+  - action: tap
+  - action: tap
+    element: TODO_element
+  - action: tap
+  - action: tap
+  - action: tap
+    element: TODO_element
+  - action: tap
+    element: TODO_element
+  - action: tap
+    element: login_otp_submit_button
+  - action: tap
+  - action: tap
+    element: TODO_element
+  - action: tap
+    element: TODO_element
+  - action: tap
+    element: TODO_element
+  - action: tap
+  - action: tap
+  - action: tap

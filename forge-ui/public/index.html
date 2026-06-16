@@ -1,0 +1,3581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Forge UI</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/yaml/yaml.min.js"></script>
+<link  rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #0f1117;
+    --surface:   #1a1d27;
+    --surface2:  #22263a;
+    --border:    #2e3347;
+    --accent:    #6c63ff;
+    --accent2:   #8b85ff;
+    --green:     #22c55e;
+    --red:       #ef4444;
+    --yellow:    #f59e0b;
+    --blue:      #3b82f6;
+    --text:      #e2e8f0;
+    --muted:     #64748b;
+    --radius:    10px;
+    --font:      -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font); font-size: 14px; }
+
+  /* ── Layout ── */
+  .layout { display: flex; height: 100vh; overflow: hidden; }
+
+  /* ── Left — Device Screen ── */
+  .device-panel {
+    width: 360px;
+    min-width: 320px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 16px;
+    gap: 8px;
+    flex-shrink: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .device-panel::-webkit-scrollbar { width: 4px; }
+  .device-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .device-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    align-self: flex-start;
+  }
+
+  .device-frame {
+    width: 300px;
+    background: #000;
+    border-radius: 22px;
+    border: 3px solid #2a2d3e;
+    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0,0,0,.6);
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .device-frame::before {
+    content: '';
+    display: block;
+    width: 50px;
+    height: 4px;
+    background: #2a2d3e;
+    border-radius: 2px;
+    margin: 6px auto 0;
+  }
+
+  #screen-img {
+    width: 100%;
+    height: auto;
+    max-height: calc(100vh - 310px);
+    object-fit: contain;
+    display: block;
+    margin-top: 4px;
+    background: #111;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+
+  .device-frame::after {
+    content: '';
+    display: block;
+    width: 30px;
+    height: 30px;
+    background: #2a2d3e;
+    border-radius: 50%;
+    margin: 5px auto;
+  }
+
+  .device-screen-wrap {
+    position: relative;
+    width: 100%;
+    flex-shrink: 0;
+  }
+
+  .inspect-overlay {
+    position: absolute;
+    inset: 0;
+    cursor: crosshair;
+    border-radius: 0 0 25px 25px;
+  }
+
+  .inspect-highlight {
+    position: absolute;
+    border: 2px solid var(--accent);
+    background: rgba(108,99,255,.15);
+    pointer-events: none;
+    border-radius: 3px;
+    display: none;
+    transition: all .1s;
+  }
+
+  .inspect-mode-badge {
+    position: absolute;
+    top: -8px; right: -8px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 10px;
+    display: none;
+  }
+
+  .device-status {
+    font-size: 11px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--muted);
+    flex-shrink: 0;
+  }
+  .dot.online  { background: var(--green); box-shadow: 0 0 6px var(--green); }
+  .dot.offline { background: var(--red); }
+
+  /* ── Right — Control Panel ── */
+  .control-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-width: 0;
+  }
+
+  /* ── Header ── */
+  .header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .logo { font-size: 18px; font-weight: 700; color: var(--accent2); letter-spacing: -.02em; flex-shrink: 0; }
+  .logo span { color: var(--muted); font-weight: 400; }
+
+  .select-wrap { position: relative; flex: 1; min-width: 200px; }
+  .select-wrap select {
+    width: 100%;
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 8px 32px 8px 12px;
+    font-size: 13px;
+    font-family: var(--font);
+    appearance: none;
+    cursor: pointer;
+    outline: none;
+    transition: border-color .15s;
+  }
+  .select-wrap select:focus { border-color: var(--accent); }
+  .select-wrap::after {
+    content: '▾';
+    position: absolute;
+    right: 10px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    pointer-events: none;
+    font-size: 12px;
+  }
+
+  .btn {
+    padding: 8px 18px;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity .15s, transform .1s;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn:active { transform: scale(.97); }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+
+  .btn-run  { background: var(--accent); color: #fff; }
+  .btn-run:hover:not(:disabled)  { background: var(--accent2); }
+  .btn-stop { background: var(--red);    color: #fff; display: none; }
+  .btn-stop:hover { opacity: .85; }
+
+  /* ── Body ── */
+  .body { flex: 1; display: flex; overflow: hidden; }
+
+  /* ── Steps panel ── */
+  .steps-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-right: 1px solid var(--border);
+    min-width: 0;
+  }
+
+  .panel-title {
+    padding: 12px 18px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+
+  /* ── Tabs ── */
+  .tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+  }
+  .tab {
+    padding: 9px 18px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: color .15s, border-color .15s;
+    user-select: none;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent2); border-bottom-color: var(--accent); }
+
+  /* ── Editor panel ── */
+  .editor-wrap {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .editor-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+    flex-wrap: wrap;
+  }
+
+  .editor-filename {
+    font-size: 12px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    color: var(--muted);
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .editor-filename.unsaved { color: var(--yellow); }
+
+  .btn-editor {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all .15s;
+    flex-shrink: 0;
+  }
+  .btn-editor:hover { border-color: var(--accent); color: var(--accent2); }
+  .btn-editor.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn-editor.primary:hover { opacity: .85; }
+  .btn-editor.saved { background: rgba(34,197,94,.15); border-color: var(--green); color: var(--green); }
+
+  /* Override CodeMirror theme to fit our panel */
+  .CodeMirror {
+    height: 100% !important;
+    font-size: 12px !important;
+    font-family: 'SF Mono', 'Fira Code', 'Menlo', monospace !important;
+    background: #1e2030 !important;
+    flex: 1;
+  }
+  .CodeMirror-scroll { height: 100%; }
+  .cm-host { flex: 1; overflow: hidden; }
+
+  /* ── Action picker (tag → step insert) ── */
+  .action-picker {
+    position: fixed;
+    background: var(--surface2);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 8px;
+    z-index: 100;
+    box-shadow: 0 8px 24px rgba(0,0,0,.4);
+    min-width: 220px;
+    max-height: 260px;
+    overflow-y: auto;
+  }
+  .action-picker::-webkit-scrollbar { width: 4px; }
+  .action-picker::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .picker-header {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+    padding: 0 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .picker-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .picker-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 11px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    padding: 4px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all .1s;
+  }
+  .picker-btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  #test-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .steps-list { flex: 1; overflow-y: auto; padding: 8px 0; }
+  .steps-list::-webkit-scrollbar { width: 4px; }
+  .steps-list::-webkit-scrollbar-track { background: transparent; }
+  .steps-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .step-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 18px;
+    border-left: 3px solid transparent;
+    transition: background .15s, border-color .15s;
+  }
+
+  .step-item.running  { background: rgba(108,99,255,.08); border-left-color: var(--accent); }
+  .step-item.passed   { border-left-color: var(--green); }
+  .step-item.failed   { background: rgba(239,68,68,.06); border-left-color: var(--red); }
+  .step-item.retrying { background: rgba(245,158,11,.06); border-left-color: var(--yellow); }
+  .step-item.skipped  { opacity: .4; }
+  .step-item.running, .step-item.failed { scroll-margin-top: 80px; }
+  .step-item.log-pinned { box-shadow: inset 2px 0 0 var(--accent), inset 0 0 0 1px rgba(108,99,255,.25); cursor: pointer; }
+  .step-item.log-pinned::after { content: '📌'; position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-size: 10px; opacity: .6; pointer-events: none; }
+  .step-item { position: relative; }
+
+  .step-num {
+    font-size: 11px;
+    color: var(--muted);
+    min-width: 22px;
+    padding-top: 1px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .step-icon { font-size: 14px; flex-shrink: 0; width: 18px; text-align: center; }
+
+  .step-body { flex: 1; min-width: 0; }
+
+  .step-action {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .step-action .action-name {
+    background: var(--surface2);
+    padding: 1px 8px;
+    border-radius: 5px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 12px;
+    color: var(--accent2);
+  }
+
+  .step-action .element-name {
+    color: var(--muted);
+    font-size: 12px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .step-locator {
+    font-size: 10px;
+    color: #475569;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    margin-top: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .step-locator::before { content: '↳ '; color: #334155; }
+
+  .step-error {
+    font-size: 11px;
+    color: var(--red);
+    margin-top: 4px;
+    line-height: 1.5;
+    word-break: break-word;
+  }
+
+  .step-retry {
+    font-size: 11px;
+    color: var(--yellow);
+    margin-top: 3px;
+  }
+
+  /* Spinner */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner {
+    width: 13px; height: 13px;
+    border: 2px solid rgba(108,99,255,.3);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin .6s linear infinite;
+    flex-shrink: 0;
+  }
+
+  /* ── Log panel ── */
+  .log-resize-handle {
+    width: 4px;
+    cursor: col-resize;
+    flex-shrink: 0;
+    background: var(--border);
+    transition: background .15s;
+    position: relative;
+    z-index: 10;
+  }
+  .log-resize-handle:hover,
+  .log-resize-handle.dragging { background: var(--accent); }
+  /* Widen the grab target without changing visual width */
+  .log-resize-handle::after {
+    content: '';
+    position: absolute;
+    inset: 0 -4px;
+  }
+
+  .log-panel {
+    width: 380px;
+    min-width: 200px;
+    max-width: 70vw;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .log-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px 14px;
+    font-family: 'SF Mono', 'Fira Code', 'Menlo', monospace;
+    font-size: 11px;
+    line-height: 1.7;
+    color: #94a3b8;
+  }
+  .log-body::-webkit-scrollbar { width: 4px; }
+  .log-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .log-line { word-break: break-all; }
+  .log-line.step   { color: var(--accent2); }
+  .log-line.pass   { color: var(--green); }
+  .log-line.fail   { color: var(--red); }
+  .log-line.retry  { color: var(--yellow); }
+  .log-line.heal   { color: #a78bfa; }
+  .log-line.error  { color: var(--red); opacity: .7; }
+  .log-line.log-highlight {
+    background: rgba(108,99,255,.18);
+    border-radius: 2px;
+    outline: 1px solid rgba(108,99,255,.4);
+    outline-offset: -1px;
+  }
+
+  /* ── Summary bar ── */
+  .summary {
+    padding: 10px 18px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 12px;
+    background: var(--surface);
+    flex-wrap: wrap;
+  }
+
+  .stat { display: flex; align-items: center; gap: 5px; color: var(--muted); }
+  .stat .val { font-weight: 700; font-size: 13px; }
+  .stat.passed .val { color: var(--green); }
+  .stat.failed .val { color: var(--red); }
+  .stat.total  .val { color: var(--text); }
+
+  .result-badge {
+    margin-left: auto;
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 12px;
+    display: none;
+  }
+  .result-badge.success { background: rgba(34,197,94,.15); color: var(--green); display: block; }
+  .result-badge.failure { background: rgba(239,68,68,.15); color: var(--red);   display: block; }
+
+  /* ── Run-from-step button ── */
+  .step-run-from {
+    background: none;
+    border: 1px solid transparent;
+    color: var(--muted);
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    cursor: pointer;
+    opacity: 0;
+    transition: all .15s;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .step-item:hover .step-run-from { opacity: 1; border-color: var(--border); }
+  .step-run-from:hover { background: var(--accent); border-color: var(--accent); color: #fff; opacity: 1; }
+
+  /* ── Empty state ── */
+  .empty-state {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    gap: 8px;
+    padding: 40px;
+    text-align: center;
+  }
+  .empty-icon { font-size: 40px; opacity: .4; }
+  .empty-text { font-size: 13px; }
+  .empty-sub  { font-size: 12px; opacity: .6; }
+
+  /* ── Timer ── */
+  #timer { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+  /* Log clear btn */
+  .log-clear {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 11px;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  .log-clear:hover { color: var(--text); background: var(--surface2); }
+
+  /* Inspector toggle */
+  .btn-inspect {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all .15s;
+    flex-shrink: 0;
+  }
+  .btn-inspect.active {
+    background: rgba(108,99,255,.2);
+    border-color: var(--accent);
+    color: var(--accent2);
+  }
+  .btn-inspect:hover { color: var(--text); }
+
+  /* Inspector popup */
+  .inspector-popup {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    font-size: 12px;
+    display: none;
+  }
+  .inspector-popup.visible { display: block; }
+
+  #inspector-rows {
+    max-height: 180px;
+    overflow-y: auto;
+    margin: 0 -4px;
+    padding: 0 4px;
+  }
+  #inspector-rows::-webkit-scrollbar { width: 4px; }
+  #inspector-rows::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .inspector-title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .inspector-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 4px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .inspector-row:last-child { border-bottom: none; }
+
+  .inspector-key {
+    color: var(--muted);
+    min-width: 90px;
+    font-size: 11px;
+    flex-shrink: 0;
+    padding-top: 1px;
+  }
+
+  .inspector-val {
+    color: var(--text);
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 11px;
+    word-break: break-all;
+    flex: 1;
+  }
+  .inspector-val.highlight { color: var(--accent2); }
+  .inspector-val.empty     { color: var(--muted); font-style: italic; }
+  .inspector-val.badge-true  { color: var(--green); }
+  .inspector-val.badge-false { color: var(--muted); }
+
+  .copy-tag-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 11px;
+    padding: 3px 10px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: opacity .15s;
+    width: 100%;
+    margin-top: 10px;
+  }
+  .copy-tag-btn:hover { opacity: .85; }
+  .copy-tag-btn:disabled { opacity: .4; cursor: default; }
+  .copy-tag-btn.copied { background: var(--green) !important; border-color: var(--green) !important; color: #fff !important; }
+
+  .inspector-row-copyable { cursor: pointer; }
+  .inspector-row-copyable:hover { background: rgba(108,99,255,.08); border-radius: 4px; }
+
+  .inspector-copy-hint {
+    font-size: 9px;
+    color: var(--muted);
+    flex-shrink: 0;
+    opacity: 0;
+    transition: opacity .1s;
+    font-family: var(--font);
+  }
+  .inspector-row-copyable:hover .inspector-copy-hint { opacity: 1; }
+
+  .inspect-loading {
+    color: var(--muted);
+    font-size: 12px;
+    text-align: center;
+    padding: 8px 0;
+  }
+
+  /* ── Interaction bar ── */
+  .interaction-bar {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 4px;
+    width: 100%;
+  }
+
+  .interaction-bar-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 4px;
+    width: 100%;
+  }
+
+  .ibar-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 11px;
+    padding: 6px 4px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all .15s;
+    white-space: nowrap;
+    font-family: var(--font);
+    text-align: center;
+  }
+  .ibar-btn:hover { border-color: var(--accent); color: var(--text); }
+  .ibar-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  .ibar-sep {
+    width: 1px;
+    height: 18px;
+    background: var(--border);
+    margin: 0 2px;
+    flex-shrink: 0;
+  }
+
+  /* Tap ripple on screen */
+  .tap-ripple {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(108,99,255,.5);
+    border: 2px solid var(--accent);
+    transform: translate(-50%,-50%) scale(0);
+    pointer-events: none;
+    animation: ripple .4s ease-out forwards;
+  }
+  @keyframes ripple {
+    0%   { transform: translate(-50%,-50%) scale(0); opacity: 1; }
+    100% { transform: translate(-50%,-50%) scale(2); opacity: 0; }
+  }
+
+  /* Swipe arrow indicator */
+  .swipe-line {
+    position: absolute;
+    background: rgba(108,99,255,.7);
+    height: 3px;
+    border-radius: 2px;
+    transform-origin: left center;
+    pointer-events: none;
+  }
+
+  /* Floating tag panel */
+  #tag-tree-modal {
+    display: none;
+    position: fixed;
+    top: 60px;
+    right: 20px;
+    z-index: 300;
+    width: 420px;
+    max-width: calc(100vw - 40px);
+    max-height: calc(100vh - 80px);
+    background: var(--surface2);
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    flex-direction: column;
+    box-shadow: 0 8px 40px rgba(0,0,0,.6), 0 0 0 1px rgba(108,99,255,.2);
+    resize: both;
+    overflow: hidden;
+  }
+  #tag-tree-modal.visible { display: flex; }
+
+  /* Tag tree rows */
+  .tag-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 4px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background .1s;
+    border-bottom: 1px solid var(--border);
+  }
+  .tag-row:last-child { border-bottom: none; }
+  .tag-row:hover { background: var(--surface); }
+  .tag-row.selected { background: rgba(108,99,255,.12); }
+
+  .tag-icon { font-size: 11px; flex-shrink: 0; }
+  .tag-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .tag-name {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 11px;
+    color: var(--accent2);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .tag-text-val {
+    font-size: 10px;
+    color: var(--muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-style: italic;
+  }
+  .tag-class {
+    font-size: 10px;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+  .tag-copy {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .tag-copy:hover { color: var(--text); border-color: var(--accent); }
+
+  .tag-row-wrap { border-bottom: 1px solid var(--border); }
+  .tag-row-wrap:last-child { border-bottom: none; }
+  .tag-row { border-bottom: none; }
+
+  .inline-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 6px 10px 10px 36px;
+    background: var(--surface);
+  }
+
+  .inline-action-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--accent2);
+    font-size: 11px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    padding: 4px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all .1s;
+    font-weight: 600;
+  }
+  .inline-action-btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .inline-action-btn.muted { color: var(--muted); }
+
+  /* ── CodeMirror hint dropdown — dark theme override ── */
+  .CodeMirror-hints {
+    background: var(--surface2) !important;
+    border: 1px solid var(--accent) !important;
+    border-radius: 7px !important;
+    box-shadow: 0 6px 20px rgba(0,0,0,.5) !important;
+    font-family: 'SF Mono', 'Fira Code', monospace !important;
+    font-size: 12px !important;
+    max-height: 200px !important;
+    z-index: 9999 !important;
+  }
+  .CodeMirror-hint {
+    color: var(--text) !important;
+    padding: 4px 12px !important;
+    border-radius: 4px !important;
+  }
+  .CodeMirror-hint-active {
+    background: var(--accent) !important;
+    color: #fff !important;
+  }
+
+  /* ── Failure screenshot ── */
+  .step-fail-shot {
+    margin-top: 6px;
+    width: 54px;
+    height: 96px;
+    object-fit: cover;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    cursor: zoom-in;
+    display: block;
+    transition: opacity .15s;
+  }
+  .step-fail-shot:hover { opacity: .8; }
+
+  .fail-shot-lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.85);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: zoom-out;
+  }
+  .fail-shot-lightbox img {
+    max-width: 90vw;
+    max-height: 90vh;
+    border-radius: 10px;
+    box-shadow: 0 8px 60px rgba(0,0,0,.8);
+  }
+
+  /* ── Validation error badge on steps ── */
+  .step-item.invalid { background: rgba(245,158,11,.06); border-left-color: var(--yellow); }
+
+  /* ── Inline flow step rows ── */
+  .step-item.flow-step {
+    padding-left: 42px;
+    background: rgba(0,0,0,.04);
+    border-left-color: transparent;
+    position: relative;
+  }
+  .step-item.flow-step::before {
+    content: '';
+    position: absolute;
+    left: 18px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--border);
+  }
+  .step-item.flow-step.running  { background: rgba(108,99,255,.06); }
+  .step-item.flow-step.passed   { }
+  .step-item.flow-step.failed   { background: rgba(239,68,68,.04); }
+  .flow-step-badge {
+    font-size: 9px;
+    color: var(--muted);
+    background: var(--border);
+    border-radius: 3px;
+    padding: 1px 4px;
+    margin-left: 4px;
+    vertical-align: middle;
+    flex-shrink: 0;
+  }
+  .step-warn { font-size: 11px; color: var(--yellow); margin-top: 4px; }
+
+  /* ── Build Test mode inside tag modal ── */
+  .build-step-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 8px;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .build-step-row:last-child { border-bottom: none; }
+  .build-step-num  { font-size: 10px; color: var(--muted); min-width: 18px; }
+  .build-step-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .build-step-action { color: var(--accent2); font-family: monospace; font-size: 11px; font-weight: 600; }
+  .build-step-el     { color: var(--muted); font-family: monospace; font-size: 11px; }
+  .build-step-del    { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px; flex-shrink: 0; padding: 0 2px; }
+  .build-step-del:hover { color: var(--red); }
+
+  .build-panel {
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+    display: none;
+    flex-direction: column;
+  }
+  .build-panel.open { display: flex; }
+  .build-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 12px;
+    border-bottom: 1px solid var(--border);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--green);
+  }
+  .build-steps-list { max-height: 160px; overflow-y: auto; }
+  .build-steps-list::-webkit-scrollbar { width: 4px; }
+  .build-steps-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .build-footer {
+    display: flex;
+    gap: 8px;
+    padding: 8px 10px;
+    border-top: 1px solid var(--border);
+    align-items: center;
+  }
+  .build-name-input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 5px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-family: monospace;
+    outline: none;
+  }
+  .build-name-input:focus { border-color: var(--green); }
+  .build-generate-btn {
+    background: var(--green);
+    color: #000;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px 14px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: opacity .15s;
+  }
+  .build-generate-btn:hover { opacity: .85; }
+  .build-generate-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+  /* ── Tag Sync modal ── */
+  #tagsync-modal {
+    display: none;
+    position: fixed;
+    top: 60px;
+    left: 380px;
+    z-index: 310;
+    width: 500px;
+    max-width: calc(100vw - 40px);
+    max-height: calc(100vh - 80px);
+    background: var(--surface2);
+    border: 1px solid var(--yellow);
+    border-radius: 12px;
+    flex-direction: column;
+    box-shadow: 0 8px 40px rgba(0,0,0,.6), 0 0 0 1px rgba(245,158,11,.2);
+    resize: both;
+    overflow: hidden;
+  }
+  #tagsync-modal.visible { display: flex; }
+
+  .tagsync-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 8px;
+    border-bottom: 1px solid var(--border);
+    transition: background .1s;
+  }
+  .tagsync-row:last-child { border-bottom: none; }
+  .tagsync-row:hover { background: var(--surface); }
+
+  .tagsync-info { flex: 1; min-width: 0; }
+  .tagsync-text {
+    font-size: 12px;
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 500;
+  }
+  .tagsync-rid {
+    font-size: 10px;
+    color: var(--muted);
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-top: 1px;
+  }
+
+  .tagsync-tag-input {
+    width: 170px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 5px;
+    outline: none;
+    transition: border-color .15s;
+  }
+  .tagsync-tag-input:focus { border-color: var(--yellow); }
+
+  .tagsync-check {
+    width: 15px;
+    height: 15px;
+    accent-color: var(--yellow);
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+
+  .tagsync-apply-btn {
+    background: var(--yellow);
+    color: #000;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 13px;
+    font-weight: 700;
+    padding: 9px 20px;
+    cursor: pointer;
+    transition: opacity .15s;
+    flex-shrink: 0;
+  }
+  .tagsync-apply-btn:hover { opacity: .85; }
+  .tagsync-apply-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- ── Left: Device Screen ── -->
+  <div class="device-panel">
+    <div class="device-label">Device</div>
+
+    <div class="device-frame">
+      <div class="device-screen-wrap">
+        <img id="screen-img" src="" alt="device screen"/>
+        <div class="inspect-overlay" id="inspect-overlay"></div>
+        <div class="inspect-highlight" id="inspect-highlight"></div>
+        <div class="inspect-mode-badge" id="inspect-badge">INSPECT</div>
+      </div>
+    </div>
+
+    <div class="device-status">
+      <div class="dot" id="device-dot"></div>
+      <span id="device-label">Checking device…</span>
+    </div>
+
+    <!-- App install status -->
+    <div id="apk-bar" style="display:none;width:100%;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:8px 10px;font-size:11px">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span style="color:var(--yellow)">⚠ App not installed</span>
+        <div style="flex:1"></div>
+        <select id="apk-select" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:3px 6px;border-radius:5px;font-size:11px;outline:none;max-width:160px"></select>
+        <button class="ibar-btn" id="btn-install" onclick="installApk()" style="padding:4px 10px;font-size:11px;color:var(--yellow);border-color:rgba(245,158,11,.4)">⬇ Install</button>
+      </div>
+    </div>
+
+    <!-- Interaction toolbar — mode buttons (4-col grid) -->
+    <div class="interaction-bar">
+      <button class="ibar-btn active" id="ibar-tap"       onclick="setMode('tap')"       title="Tap">👆 Tap</button>
+      <button class="ibar-btn"        id="ibar-swipe"     onclick="setMode('swipe')"     title="Swipe">↕ Swipe</button>
+      <button class="ibar-btn"        id="ibar-longpress" onclick="setMode('longpress')" title="Long Press">✋ Hold</button>
+      <button class="ibar-btn"        id="ibar-inspect"   onclick="setMode('inspect')"   title="Inspect element">🔍 Inspect</button>
+    </div>
+    <!-- Nav buttons (3-col grid) -->
+    <div class="interaction-bar-nav">
+      <button class="ibar-btn" onclick="deviceKey(4)"   title="Back">◀ Back</button>
+      <button class="ibar-btn" onclick="deviceKey(3)"   title="Home">⬤ Home</button>
+      <button class="ibar-btn" onclick="deviceKey(187)" title="Recents">▣ Apps</button>
+    </div>
+
+    <!-- Text input row -->
+    <div style="display:flex;gap:6px;width:100%">
+      <input id="text-input" placeholder="Type text on device…"
+        style="flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:7px;font-size:12px;outline:none;font-family:var(--font)"
+        onkeydown="if(event.key==='Enter') sendText()"/>
+      <button class="ibar-btn" onclick="sendText()" style="flex-shrink:0;padding:6px 10px">⌨ Send</button>
+    </div>
+
+    <div style="display:flex;gap:6px;width:100%">
+      <button class="btn-inspect" id="btn-scan" style="flex:1" title="Scan all qaTestTag elements on screen">
+        📋 Scan Tags
+      </button>
+      <button class="btn-inspect" id="btn-tagsync" style="flex:1;color:var(--yellow);border-color:rgba(245,158,11,.35)" title="Find elements without qaTestTag and add them to popdroid">
+        🏷 Tag Sync
+      </button>
+    </div>
+
+    <!-- Inspector popup — click result -->
+    <div class="inspector-popup" id="inspector-popup">
+      <div class="inspector-title">
+        <span>Element</span>
+        <span id="inspect-status"></span>
+      </div>
+      <div id="inspector-rows">
+        <div class="inspect-loading">Click an element on screen</div>
+      </div>
+      <button class="copy-tag-btn" id="copy-tag-btn" disabled>
+        Copy accessibilityId
+      </button>
+      <button class="copy-tag-btn" id="copy-text-btn" style="display:none;margin-top:6px;background:var(--surface2);border:1px solid var(--border);color:var(--text)">
+        Copy text
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Tag tree — floating panel, no overlay, device stays fully visible -->
+  <div id="tag-tree-modal">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0;cursor:move" id="tag-modal-drag-handle">
+      <span style="font-size:13px;font-weight:700;color:var(--text)">🏷 Tagged Elements</span>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span id="tag-count" style="font-size:12px;color:var(--accent2)"></span>
+        <button id="btn-build-test" onclick="toggleBuildMode()"
+          style="background:var(--surface);border:1px solid var(--border);color:var(--muted);font-size:11px;font-weight:700;padding:3px 9px;border-radius:6px;cursor:pointer;transition:all .15s"
+          title="Build a test by picking element actions">🧪 Build Test</button>
+        <button onclick="closeTagTree()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;padding:0 4px">×</button>
+      </div>
+    </div>
+    <div style="padding:8px;border-bottom:1px solid var(--border);flex-shrink:0">
+      <input id="tag-filter" placeholder="🔍 Filter tags…" oninput="filterTags(this.value)"
+        style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:7px 12px;border-radius:7px;font-size:12px;outline:none;font-family:var(--font)"/>
+    </div>
+    <div id="tag-tree-rows" style="overflow-y:auto;flex:1;padding:4px 8px"></div>
+
+    <!-- Build Test panel — shown when build mode is active -->
+    <div class="build-panel" id="build-panel">
+      <div class="build-panel-header">
+        <span>🧪 Build Test  <span id="build-step-count" style="color:var(--muted);font-weight:400"></span></span>
+        <button onclick="clearBuildSteps()" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer">Clear all</button>
+      </div>
+      <div class="build-steps-list" id="build-steps-list">
+        <div style="padding:12px;text-align:center;color:var(--muted);font-size:11px">
+          Click an action on any element above to add a step
+        </div>
+      </div>
+      <div class="build-footer">
+        <input class="build-name-input" id="build-test-name" placeholder="test_name (e.g. shop_add_to_cart)"/>
+        <button class="build-generate-btn" id="btn-build-generate" onclick="generateTestFromScan()" disabled>
+          ⚡ Generate YAML
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tag Sync — floating panel showing elements without qaTestTag -->
+  <div id="tagsync-modal">
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0;cursor:move" id="tagsync-drag-handle">
+      <span style="font-size:13px;font-weight:700;color:var(--yellow)">🏷 Tag Sync</span>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span id="tagsync-count" style="font-size:12px;color:var(--muted)"></span>
+        <button onclick="closeTagSync()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;padding:0 4px">×</button>
+      </div>
+    </div>
+    <!-- Sub-header: explanation + filter -->
+    <div style="padding:8px 12px;border-bottom:1px solid var(--border);flex-shrink:0">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:6px">
+        Elements on screen without a <code style="background:var(--surface);padding:1px 4px;border-radius:3px">qaTestTag</code>.
+        Edit the suggested names then click <b style="color:var(--yellow)">Apply to popdroid</b>.
+      </div>
+      <input id="tagsync-filter" placeholder="🔍 Filter…" oninput="filterTagSync(this.value)"
+        style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:7px;font-size:12px;outline:none;font-family:var(--font)"/>
+    </div>
+    <!-- Column headers -->
+    <div style="display:flex;align-items:center;gap:8px;padding:5px 8px 5px 32px;border-bottom:1px solid var(--border);flex-shrink:0">
+      <span style="flex:1;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Element</span>
+      <span style="width:170px;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;flex-shrink:0">qaTestTag name</span>
+    </div>
+    <!-- Rows -->
+    <div id="tagsync-rows" style="overflow-y:auto;flex:1;padding:0"></div>
+    <!-- Footer: apply button -->
+    <div id="tagsync-footer" style="padding:10px 14px;border-top:1px solid var(--border);background:var(--surface);flex-shrink:0;display:none">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span id="tagsync-selected-count" style="font-size:12px;color:var(--muted)"></span>
+        <div style="flex:1"></div>
+        <button class="tagsync-apply-btn" id="btn-tagsync-apply" onclick="applyTagsToPopdroid()">
+          ⚡ Apply to popdroid
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Right: Control + Steps + Log ── -->
+  <div class="control-panel">
+
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">Forge <span>UI</span></div>
+
+      <div class="select-wrap">
+        <select id="test-select">
+          <option value="">— select a test —</option>
+        </select>
+      </div>
+
+      <button class="btn btn-run" id="btn-run" disabled>
+        ▶ Run
+      </button>
+      <button class="btn btn-stop" id="btn-stop">
+        ■ Stop
+      </button>
+
+      <span id="timer"></span>
+    </div>
+
+    <!-- Body -->
+    <div class="body">
+
+      <!-- Steps + Editor (tabbed) -->
+      <div class="steps-panel" style="position:relative">
+
+        <!-- Tabs -->
+        <div class="tabs">
+          <div class="tab active" id="tab-steps"    onclick="switchTab('steps')">▶ Steps</div>
+          <div class="tab"        id="tab-editor"   onclick="switchTab('editor')">✏ Editor</div>
+          <div class="tab"        id="tab-flows"    onclick="switchTab('flows')">♻ Flows</div>
+          <div class="tab"        id="tab-network"  onclick="switchTab('network')">🌐 Network <span id="net-badge" style="display:none;background:var(--accent);color:#fff;font-size:9px;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle">0</span></div>
+          <span id="test-name" style="font-size:12px;font-weight:600;color:var(--text);margin:auto 18px auto auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+        </div>
+
+        <!-- Steps view -->
+        <div id="view-steps" style="display:flex;flex-direction:column;flex:1;overflow:hidden">
+          <div class="steps-list" id="steps-list">
+            <div class="empty-state">
+              <div class="empty-icon">📋</div>
+              <div class="empty-text">Select a test to see steps</div>
+              <div class="empty-sub">Steps will highlight as they run</div>
+            </div>
+          </div>
+          <div class="summary">
+            <div class="stat total">
+              <span>Total</span><span class="val" id="stat-total">0</span>
+            </div>
+            <div class="stat passed">
+              <span>✓ Passed</span><span class="val" id="stat-passed">0</span>
+            </div>
+            <div class="stat failed">
+              <span>✗ Failed</span><span class="val" id="stat-failed">0</span>
+            </div>
+            <div class="result-badge" id="result-badge"></div>
+          </div>
+        </div>
+
+        <!-- Editor view -->
+        <div id="view-editor" style="display:none;flex-direction:column;flex:1;overflow:hidden">
+          <div class="editor-toolbar">
+            <span class="editor-filename" id="editor-filename">no file open</span>
+            <button class="btn-editor" id="btn-new-test" onclick="newTest()">+ New</button>
+            <button class="btn-editor primary" id="btn-save-test" onclick="saveTest()">Save</button>
+          </div>
+          <div id="yaml-error-bar" style="display:none;background:#fef2f2;color:#b91c1c;border-bottom:1px solid #fca5a5;padding:6px 12px;font-size:12px;font-family:monospace;white-space:pre-wrap;"></div>
+          <div class="cm-host" id="cm-host"></div>
+        </div>
+
+        <!-- Flows view -->
+        <div id="view-flows" style="display:none;flex-direction:column;flex:1;overflow:hidden">
+          <div class="editor-toolbar">
+            <span class="editor-filename">Reusable Flows</span>
+            <button class="btn-editor" onclick="newFlow()">+ New Flow</button>
+            <button class="btn-editor primary" id="btn-save-flow" onclick="saveFlow()" disabled>Save</button>
+            <button class="btn-editor" id="btn-delete-flow" onclick="deleteFlow()" disabled style="color:var(--red)">Delete</button>
+          </div>
+          <div style="display:flex;flex:1;overflow:hidden;gap:0">
+            <!-- Flow list sidebar -->
+            <div id="flow-list" style="width:150px;min-width:120px;border-right:1px solid var(--border);overflow-y:auto;padding:8px 0;flex-shrink:0"></div>
+            <!-- Flow editor -->
+            <div style="flex:1;overflow:hidden;display:flex;flex-direction:column">
+              <div id="yaml-error-bar-flow" style="display:none;background:#fef2f2;color:#b91c1c;border-bottom:1px solid #fca5a5;padding:6px 12px;font-size:12px;font-family:monospace;white-space:pre-wrap;"></div>
+              <div class="cm-host" id="cm-host-flow"></div>
+              <div style="padding:6px 14px;font-size:11px;color:var(--muted);border-top:1px solid var(--border)">
+                Call this flow from any test: &nbsp;<code style="color:var(--accent)">- action: call</code>&nbsp;&nbsp;<code style="color:var(--accent)">flow: <span id="flow-name-hint">flow_name</span></code>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Network view -->
+        <div id="view-network" style="display:none;flex-direction:column;flex:1;overflow:hidden">
+          <div style="display:flex;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid var(--border);flex-shrink:0">
+            <span style="font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.06em;text-transform:uppercase">Network Calls</span>
+            <span id="net-count" style="font-size:11px;color:var(--muted)">0 requests</span>
+            <button onclick="clearNetworkCalls()" style="margin-left:auto;background:none;border:1px solid var(--border);color:var(--muted);font-size:11px;padding:2px 8px;border-radius:4px;cursor:pointer">Clear</button>
+          </div>
+          <!-- Split: list left, detail right -->
+          <div style="display:flex;flex:1;overflow:hidden">
+            <!-- Call list -->
+            <div id="net-list" style="width:55%;min-width:200px;overflow-y:auto;border-right:1px solid var(--border);flex-shrink:0">
+              <div id="net-empty" style="padding:32px 16px;text-align:center;color:var(--muted);font-size:12px">
+                No network calls captured yet.<br>Run a test to see HTTP traffic.
+              </div>
+            </div>
+            <!-- Detail panel -->
+            <div id="net-detail" style="flex:1;overflow-y:auto;padding:12px 14px;font-size:12px;font-family:monospace;color:var(--text)">
+              <div style="color:var(--muted);font-size:12px;padding-top:24px;text-align:center">Select a call to inspect</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Floating action picker -->
+        <div class="action-picker" id="action-picker" style="display:none">
+          <div class="picker-header" id="picker-header">Insert tag as…</div>
+          <div class="picker-actions" id="picker-actions"></div>
+        </div>
+
+      </div>
+
+      <!-- Log resize handle -->
+      <div class="log-resize-handle" id="log-resize-handle"></div>
+
+      <!-- Log -->
+      <div class="log-panel" id="log-panel">
+        <div class="panel-title">
+          <span>Log</span>
+          <button class="log-clear" onclick="clearLog()">Clear</button>
+        </div>
+        <div style="padding:6px 10px;border-bottom:1px solid var(--border);flex-shrink:0">
+          <input id="log-search" placeholder="🔍 Search log…" oninput="filterLog(this.value)"
+            style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);
+                   padding:5px 9px;border-radius:6px;font-size:11px;outline:none;font-family:var(--font)"/>
+        </div>
+        <div class="log-body" id="log-body"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// ── State ──────────────────────────────────────────────────────────────────
+let steps         = [];
+let stepStates    = {};   // index → { status, error, attempt }
+let ws            = null;
+let running       = false;
+let currentLogStep = -1;  // step index currently executing — used to tag log lines
+let expandedSubSteps = {};  // parentIndex → [{subIndex, action, element}]
+let timerRef   = null;
+let timerStart = null;
+let screenPoll = null;
+
+// ── WebSocket ──────────────────────────────────────────────────────────────
+function connectWS() {
+  ws = new WebSocket(`ws://${location.host}`);
+
+  ws.onmessage = (e) => {
+    const msg = JSON.parse(e.data);
+    handleMessage(msg);
+  };
+
+  ws.onclose = () => {
+    setTimeout(connectWS, 2000);
+  };
+}
+
+function handleMessage(msg) {
+  switch (msg.type) {
+
+    case 'network_call':
+      addNetworkCall(msg);
+      break;
+
+    case 'started':
+      running = true;
+      stepStates = {};
+      currentLogStep = -1;
+      expandedSubSteps = {};
+      resetLogPin();
+      clearNetworkCalls();
+      // If resuming from a specific step, pre-mark earlier steps as skipped
+      if (msg.fromStep && msg.fromStep > 1) {
+        for (let i = 0; i < msg.fromStep - 1; i++) {
+          stepStates[i] = { status: 'skipped' };
+        }
+        appendLog(`⤵ Resuming from step ${msg.fromStep} — steps 1–${msg.fromStep - 1} skipped (app stays open)`, 'step');
+      } else {
+        appendLog(`▶ Running: ${msg.file}`, 'step');
+      }
+      renderSteps();
+      showBtnStop();
+      startTimer();
+      break;
+
+    case 'step_update':
+      if (!stepStates[msg.index]) stepStates[msg.index] = {};
+      Object.assign(stepStates[msg.index], msg);
+      if (msg.status === 'running') currentLogStep = msg.index;
+      renderStepItem(msg.index);
+      if (msg.status === 'running' || msg.status === 'failed') scrollToStep(msg.index);
+      updateStats();
+      break;
+
+    case 'log': {
+      // [STEP] log arrives before the step_update message — advance tracker early
+      // so this very line (and all subsequent lines) get tagged to the right step
+      const stepAnnounce = msg.line.match(/\[STEP\]\s+\[(\d+)\]/);
+      if (stepAnnounce) currentLogStep = parseInt(stepAnnounce[1], 10) - 1;
+      appendLog(msg.line, classForLog(msg.line, msg.level));
+      break;
+    }
+
+    case 'heal':
+      appendLog(msg.line, 'heal');
+      break;
+
+    case 'substep_update': {
+      // Update state
+      const ps = stepStates[msg.parentIndex] = stepStates[msg.parentIndex] || {};
+      ps.subSteps = ps.subSteps || {};
+      const isNew = !ps.subSteps[msg.subIndex];
+      ps.subSteps[msg.subIndex] = Object.assign(ps.subSteps[msg.subIndex] || {}, msg);
+
+      // Register sub-step metadata for inline rendering
+      if (!expandedSubSteps[msg.parentIndex]) expandedSubSteps[msg.parentIndex] = [];
+      if (isNew) {
+        expandedSubSteps[msg.parentIndex][msg.subIndex] = {
+          subIndex: msg.subIndex,
+          action  : msg.action || '',
+          element : '',   // element comes from server subSteps preload if available
+        };
+        // Insert new row into DOM right after parent (or after last sub-step)
+        insertSubStepRow(msg.parentIndex, msg.subIndex);
+      } else {
+        // Just update the existing row
+        updateSubStepRow(msg.parentIndex, msg.subIndex);
+      }
+      // Scroll failed sub-step into view
+      if (msg.status === 'failed') {
+        const el = document.getElementById(`substep-${msg.parentIndex}-${msg.subIndex}`);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+      break;
+    }
+
+    case 'done':
+      running = false;
+      showBtnRun();
+      stopTimer();
+      stopScreenPoll();
+      startScreenPoll(); // one final refresh
+      showResult(msg.success);
+      appendLog(msg.success ? '✅ BUILD SUCCESS' : '❌ BUILD FAILURE',
+                msg.success ? 'pass' : 'fail');
+      break;
+
+    case 'stopped':
+      running = false;
+      showBtnRun();
+      stopTimer();
+      break;
+
+    case 'apk_install_done':
+      // Refresh app status bar after install
+      setTimeout(checkApkStatus, 1000);
+      break;
+
+    case 'qa_tags_done': {
+      // Re-enable apply button and close tag sync modal after claude finishes
+      const applyBtn = document.getElementById('btn-tagsync-apply');
+      if (applyBtn) {
+        applyBtn.textContent = msg.success ? '✅ Done!' : '⚡ Apply to popdroid';
+        applyBtn.disabled    = false;
+        if (msg.success) {
+          setTimeout(() => { applyBtn.textContent = '⚡ Apply to popdroid'; }, 2500);
+        }
+      }
+      break;
+    }
+  }
+}
+
+function classForLog(line, level) {
+  if (level === 'error') return 'error';
+  if (line.startsWith('[STEP]'))  return 'step';
+  if (line.startsWith('[PASS]'))  return 'pass';
+  if (line.startsWith('[FAIL]'))  return 'fail';
+  if (line.includes('Retry step')) return 'retry';
+  if (line.includes('[SelfHeal]')) return 'heal';
+  return '';
+}
+
+// ── Tests list ────────────────────────────────────────────────────────────
+async function loadTests() {
+  const res  = await fetch('/api/tests');
+  const list = await res.json();
+  const sel  = document.getElementById('test-select');
+  for (const f of list) {
+    const opt = document.createElement('option');
+    opt.value = f;
+    opt.textContent = f;
+    sel.appendChild(opt);
+  }
+}
+
+document.getElementById('test-select').addEventListener('change', async (e) => {
+  const file = e.target.value;
+  document.getElementById('btn-run').disabled = !file;
+  if (!file) {
+    steps = [];
+    renderSteps();
+    return;
+  }
+  await loadSteps(file);
+  await loadEditorFile(file);   // keep editor in sync
+});
+
+async function loadSteps(file) {
+  const res  = await fetch(`/api/test-steps?file=${encodeURIComponent(file)}`);
+  const data = await res.json();
+  steps      = data.steps || [];
+  stepStates = {};
+  document.getElementById('test-name').textContent = data.testName || '';
+  renderSteps();
+  updateStats();
+}
+
+// ── Render steps ──────────────────────────────────────────────────────────
+function renderSteps() {
+  const list = document.getElementById('steps-list');
+
+  if (steps.length === 0) {
+    list.innerHTML = `
+      <div class="empty-state" id="empty-steps">
+        <div class="empty-icon">📋</div>
+        <div class="empty-text">Select a test to see steps</div>
+        <div class="empty-sub">Steps will highlight as they run</div>
+      </div>`;
+    return;
+  }
+
+  // Build flat list: each top-level step followed by its expanded sub-steps
+  const parts = [];
+  for (const s of steps) {
+    parts.push(stepHTML(s));
+    const subs = expandedSubSteps[s.index] || [];
+    for (let si = 0; si < subs.length; si++) {
+      if (subs[si]) parts.push(subStepRowHTML(s.index, si));
+    }
+  }
+  list.innerHTML = parts.join('');
+}
+
+function stepHTML(s) {
+  const state  = stepStates[s.index] || {};
+  const status = state.status || 'pending';
+  const icon   = iconFor(status);
+  const el     = s.element ? `<span class="element-name">${s.element}</span>` : '';
+  const val    = s.value   ? `<span class="element-name">"${s.value}"</span>` : '';
+  const urlTag = s.url     ? `<span class="element-name" style="color:#38bdf8;font-size:10px">${s.method||'GET'} ${s.url}</span>` : '';
+  // Show resolved locator value only when it differs from the element key
+  const locatorHTML = (s.locatorValue && s.locatorValue !== s.element)
+    ? `<div class="step-locator">${s.locatorValue}</div>` : '';
+  const warnHTML  = state.warn  ? `<div class="step-warn">⚠ ${state.warn}</div>` : '';
+  const errorHTML = state.error ? `<div class="step-error">⚠ ${state.error}</div>` : '';
+  const retryHTML = state.attempt ? `<div class="step-retry">↺ Retry ${state.attempt}</div>` : '';
+  const shotHTML  = state.failureScreenshot
+    ? `<img class="step-fail-shot" src="${state.failureScreenshot}?t=${Date.now()}"
+           onclick="showFailureShot('${state.failureScreenshot}')" title="Tap to enlarge failure screenshot"/>`
+    : '';
+
+  return `
+    <div class="step-item ${status}${state.warn ? ' invalid' : ''}" id="step-${s.index}" data-index="${s.index}"
+         onmouseenter="highlightStepLogs(${s.index})" onmouseleave="unhighlightStepLogs()"
+         onclick="pinStepLogs(${s.index})">
+      <div class="step-num">${s.index + 1}</div>
+      <div class="step-icon">${icon}</div>
+      <div class="step-body">
+        <div class="step-action">
+          <span class="action-name">${s.action}</span>
+          ${el}${val}${urlTag}
+          ${s.flow ? `<span class="element-name" style="opacity:.6">${s.flow}</span>` : ''}
+        </div>
+        ${locatorHTML}
+        ${retryHTML}${warnHTML}${errorHTML}
+        ${shotHTML}
+      </div>
+      ${status !== 'skipped' ? `<button class="step-run-from" onclick="event.stopPropagation();runFromStep(${s.index})" title="Run from step ${s.index + 1}">▶ from here</button>` : ''}
+    </div>`;
+}
+
+function subStepRowHTML(parentIndex, subIndex) {
+  const subs    = expandedSubSteps[parentIndex] || [];
+  const meta    = subs[subIndex] || {};
+  const ps      = stepStates[parentIndex] || {};
+  const ss      = (ps.subSteps || {})[subIndex] || {};
+  const status  = ss.status || 'pending';
+  const icon    = iconFor(status);
+  const action  = meta.action || ss.action || '?';
+  // action string from Java is "tap  element_name" — split on 2+ spaces
+  const parts   = action.split(/\s{2,}/);
+  const actName = parts[0] || action;
+  const elName  = parts[1] || meta.element || '';
+  const elHTML  = elName ? `<span class="element-name">${elName}</span>` : '';
+  const errHTML = ss.error ? `<div class="step-error">⚠ ${ss.error}</div>` : '';
+
+  return `
+    <div class="step-item flow-step ${status}" id="substep-${parentIndex}-${subIndex}"
+         data-parent="${parentIndex}" data-subindex="${subIndex}"
+         onmouseenter="highlightStepLogs(${parentIndex})" onmouseleave="unhighlightStepLogs()"
+         onclick="pinStepLogs(${parentIndex})">
+      <div class="step-num" style="opacity:.4">${subIndex + 1}</div>
+      <div class="step-icon">${icon}</div>
+      <div class="step-body">
+        <div class="step-action">
+          <span class="action-name">${actName}</span>
+          ${elHTML}
+          <span class="flow-step-badge">flow</span>
+        </div>
+        ${errHTML}
+      </div>
+    </div>`;
+}
+
+function insertSubStepRow(parentIndex, subIndex) {
+  const list = document.getElementById('steps-list');
+  if (!list) return;
+
+  const html = subStepRowHTML(parentIndex, subIndex);
+
+  // Find the insertion point: after parent step OR after the last existing sub-step of same parent
+  let anchor = null;
+  // Look for the last sub-step of this parent that already exists
+  for (let si = subIndex - 1; si >= 0; si--) {
+    const prev = document.getElementById(`substep-${parentIndex}-${si}`);
+    if (prev) { anchor = prev; break; }
+  }
+  // If no previous sub-step, anchor is the parent step itself
+  if (!anchor) anchor = document.getElementById(`step-${parentIndex}`);
+
+  if (anchor) {
+    anchor.insertAdjacentHTML('afterend', html);
+  } else {
+    list.insertAdjacentHTML('beforeend', html);
+  }
+}
+
+function updateSubStepRow(parentIndex, subIndex) {
+  const el = document.getElementById(`substep-${parentIndex}-${subIndex}`);
+  if (el) el.outerHTML = subStepRowHTML(parentIndex, subIndex);
+}
+
+function renderStepItem(index) {
+  const el = document.getElementById(`step-${index}`);
+  if (!el) return;
+  const step = steps[index];
+  if (!step) return;
+  el.outerHTML = stepHTML(step);
+}
+
+function iconFor(status) {
+  switch (status) {
+    case 'running':  return '<div class="spinner"></div>';
+    case 'passed':   return '✅';
+    case 'failed':   return '❌';
+    case 'retrying': return '↺';
+    case 'skipped':  return '⤵';
+    default:         return '○';
+  }
+}
+
+function scrollToStep(index) {
+  const el = document.getElementById(`step-${index}`);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ── Step ↔ Log hover/pin linking ─────────────────────────────────────────
+let pinnedLogStep = -1;
+
+function _applyLogHighlight(stepIndex, scrollTo) {
+  document.querySelectorAll('.log-line.log-highlight')
+          .forEach(l => l.classList.remove('log-highlight'));
+  const body  = document.getElementById('log-body');
+  const lines = body.querySelectorAll(`.log-line[data-step-index="${stepIndex}"]`);
+  if (!lines.length) return;
+  lines.forEach(l => l.classList.add('log-highlight'));
+  if (scrollTo) lines[0].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function highlightStepLogs(stepIndex) {
+  _applyLogHighlight(stepIndex, pinnedLogStep < 0);  // only scroll on hover when nothing is pinned
+}
+
+function unhighlightStepLogs() {
+  if (pinnedLogStep >= 0) {
+    _applyLogHighlight(pinnedLogStep, false);  // restore pinned highlight on mouse-out
+  } else {
+    document.querySelectorAll('.log-line.log-highlight')
+            .forEach(l => l.classList.remove('log-highlight'));
+  }
+}
+
+function pinStepLogs(stepIndex) {
+  if (pinnedLogStep === stepIndex) {
+    // Click same step again → unpin
+    pinnedLogStep = -1;
+    document.querySelectorAll('.log-line.log-highlight')
+            .forEach(l => l.classList.remove('log-highlight'));
+  } else {
+    pinnedLogStep = stepIndex;
+    _applyLogHighlight(stepIndex, true);
+  }
+  // Update pin indicator on all step rows
+  document.querySelectorAll('.step-item').forEach(el => {
+    const idx = parseInt(el.dataset.index ?? el.dataset.parent ?? -1);
+    el.classList.toggle('log-pinned', idx === pinnedLogStep);
+  });
+}
+
+// Reset pin when a new test run starts
+function resetLogPin() {
+  pinnedLogStep = -1;
+  document.querySelectorAll('.step-item.log-pinned')
+          .forEach(el => el.classList.remove('log-pinned'));
+}
+
+// ── Stats ─────────────────────────────────────────────────────────────────
+function updateStats() {
+  let passed = 0, failed = 0;
+  for (const s of Object.values(stepStates)) {
+    if (s.status === 'passed') passed++;
+    if (s.status === 'failed') failed++;
+  }
+  document.getElementById('stat-total').textContent  = steps.length;
+  document.getElementById('stat-passed').textContent = passed;
+  document.getElementById('stat-failed').textContent = failed;
+}
+
+function showResult(success) {
+  const badge = document.getElementById('result-badge');
+  badge.className = 'result-badge ' + (success ? 'success' : 'failure');
+  badge.textContent = success ? '✓ Passed' : '✗ Failed';
+}
+
+// ── Run / Stop ────────────────────────────────────────────────────────────
+document.getElementById('btn-run').addEventListener('click', async () => {
+  const file = document.getElementById('test-select').value;
+  if (!file || !ws) return;
+
+  // ── Validate elements before running ──
+  try {
+    const vRes  = await fetch(`/api/validate-test?file=${encodeURIComponent(file)}`);
+    const vData = await vRes.json();
+    if (!vData.valid && vData.errors.length) {
+      // Mark offending steps in yellow — still allow run with a confirm
+      vData.errors.forEach(e => {
+        if (!stepStates[e.stepIndex]) stepStates[e.stepIndex] = {};
+        stepStates[e.stepIndex].warn = e.message;
+      });
+      renderSteps();
+      const proceed = confirm(
+        `⚠ ${vData.errors.length} element(s) not found in element YAMLs:\n\n` +
+        vData.errors.map(e => `  Step ${e.stepIndex + 1}: ${e.element}`).join('\n') +
+        '\n\nRun anyway?'
+      );
+      if (!proceed) return;
+    }
+  } catch (_) { /* validation is best-effort */ }
+
+  stepStates = {};
+  renderSteps();
+  updateStats();
+  document.getElementById('result-badge').className = 'result-badge';
+
+  ws.send(JSON.stringify({ type: 'run', file }));
+  startScreenPoll();
+});
+
+document.getElementById('btn-stop').addEventListener('click', () => {
+  if (ws) ws.send(JSON.stringify({ type: 'stop' }));
+  stopScreenPoll();
+});
+
+function runFromStep(index) {
+  const file = document.getElementById('test-select').value;
+  if (!file || !ws) return;
+  stepStates = {};
+  renderSteps();
+  updateStats();
+  document.getElementById('result-badge').className = 'result-badge';
+  ws.send(JSON.stringify({ type: 'run', file, fromStep: index }));
+  startScreenPoll();
+  appendLog(`▶ Running from step ${index + 1}: ${steps[index]?.action || ''}`, 'step');
+}
+
+function showBtnRun() {
+  document.getElementById('btn-run').style.display  = '';
+  document.getElementById('btn-stop').style.display = 'none';
+}
+
+function showBtnStop() {
+  document.getElementById('btn-run').style.display  = 'none';
+  document.getElementById('btn-stop').style.display = '';
+}
+
+// ── Log ───────────────────────────────────────────────────────────────────
+function appendLog(line, cls = '') {
+  const body  = document.getElementById('log-body');
+  const div   = document.createElement('div');
+  div.className   = 'log-line ' + cls;
+  div.textContent = line;
+
+  // Tag with current step index so hover can find these lines
+  if (currentLogStep >= 0) div.dataset.stepIndex = currentLogStep;
+
+  // Apply active search filter immediately
+  const q = (document.getElementById('log-search')?.value || '').trim().toLowerCase();
+  if (q && !line.toLowerCase().includes(q)) div.style.display = 'none';
+
+  body.appendChild(div);
+  // Only auto-scroll when not searching (so found results stay in view)
+  if (!q) body.scrollTop = body.scrollHeight;
+}
+
+function filterLog(query) {
+  const q     = query.trim().toLowerCase();
+  const lines = document.getElementById('log-body').querySelectorAll('.log-line');
+  let   first = null;
+  for (const el of lines) {
+    const match = !q || el.textContent.toLowerCase().includes(q);
+    el.style.display = match ? '' : 'none';
+    if (match && first === null) first = el;
+  }
+  // Scroll first match into view
+  if (q && first) first.scrollIntoView({ block: 'nearest' });
+  // When cleared, scroll to bottom
+  if (!q) {
+    const body = document.getElementById('log-body');
+    body.scrollTop = body.scrollHeight;
+  }
+}
+
+function clearLog() {
+  document.getElementById('log-body').innerHTML = '';
+  document.getElementById('log-search').value = '';
+}
+
+// ── Timer ─────────────────────────────────────────────────────────────────
+function startTimer() {
+  timerStart = Date.now();
+  clearInterval(timerRef);
+  timerRef = setInterval(() => {
+    const s = Math.floor((Date.now() - timerStart) / 1000);
+    const m = Math.floor(s / 60).toString().padStart(2, '0');
+    const sec = (s % 60).toString().padStart(2, '0');
+    document.getElementById('timer').textContent = `${m}:${sec}`;
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(timerRef);
+}
+
+// ── Screenshot polling — AbortController so a tap can cancel in-flight ─────
+let screenshotBusy  = false;
+let screenshotAbort = null;
+
+function startScreenPoll() {
+  stopScreenPoll();
+  doRefresh();
+  screenPoll = setInterval(doRefresh, 700);
+}
+
+function stopScreenPoll() {
+  clearInterval(screenPoll);
+  screenPoll = null;
+}
+
+function doRefresh() {
+  if (screenshotBusy) return;
+  screenshotBusy = true;
+
+  const ctrl = new AbortController();
+  screenshotAbort = ctrl;
+
+  fetch(`/api/screenshot?t=${Date.now()}`, { signal: ctrl.signal })
+    .then(r => r.blob())
+    .then(blob => {
+      if (ctrl !== screenshotAbort) return; // superseded by forceRefresh
+      const url = URL.createObjectURL(blob);
+      const img = document.getElementById('screen-img');
+      const old = img.src;
+      img.src   = url;
+      if (old.startsWith('blob:')) URL.revokeObjectURL(old);
+      screenshotBusy = false;
+    })
+    .catch(() => { screenshotBusy = false; });
+}
+
+// Called after a device action — aborts current in-flight, starts fresh immediately
+function forceRefresh() {
+  if (screenshotAbort) screenshotAbort.abort();
+  screenshotBusy  = false;
+  screenshotAbort = null;
+  doRefresh();
+}
+
+function refreshScreen() { doRefresh(); }
+
+// ── Device check ──────────────────────────────────────────────────────────
+async function checkDevice() {
+  try {
+    const res  = await fetch('/api/device');
+    const data = await res.json();
+    const dot  = document.getElementById('device-dot');
+    const lbl  = document.getElementById('device-label');
+    if (data.device) {
+      dot.className = 'dot online';
+      lbl.textContent = data.device;
+    } else {
+      dot.className = 'dot offline';
+      lbl.textContent = 'No device connected';
+    }
+  } catch (_) {
+    document.getElementById('device-dot').className = 'dot offline';
+    document.getElementById('device-label').textContent = 'Server unreachable';
+  }
+  checkApkStatus();
+}
+
+// ── APK install ────────────────────────────────────────────────────────────
+let availableApks = [];
+
+async function checkApkStatus() {
+  try {
+    const res  = await fetch('/api/apk/status');
+    const data = await res.json();
+    const bar  = document.getElementById('apk-bar');
+
+    if (!data.installed && data.apks.length > 0) {
+      availableApks = data.apks;
+      const sel = document.getElementById('apk-select');
+      sel.innerHTML = data.apks.map(a =>
+        `<option value="${a.name}">${a.name} (${(a.size/1024/1024).toFixed(1)} MB)</option>`
+      ).join('');
+      bar.style.display = 'block';
+    } else {
+      bar.style.display = 'none';
+    }
+  } catch (_) {}
+}
+
+async function installApk() {
+  const apk = document.getElementById('apk-select').value;
+  if (!apk) return;
+
+  const btn = document.getElementById('btn-install');
+  btn.textContent = '⏳ Installing…';
+  btn.disabled    = true;
+
+  // Switch to log so user sees progress
+  appendLog(`▶ Installing ${apk}…`, 'step');
+
+  await fetch('/api/apk/install', {
+    method : 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body   : JSON.stringify({ apk })
+  });
+
+  btn.textContent = '⬇ Install';
+  btn.disabled    = false;
+}
+
+// ── Inspector ─────────────────────────────────────────────────────────────
+let inspectMode  = false;
+let screenSize   = { width: 1080, height: 2340 }; // default, updated on init
+let lastInspected = null;
+
+async function fetchScreenSize() {
+  try {
+    const res = await fetch('/api/screen-size');
+    const data = await res.json();
+    if (data.width) screenSize = data;
+  } catch (_) {}
+}
+
+// ── Screen coordinate helpers ─────────────────────────────────────────────────
+//
+// The device screenshot is displayed inside a CSS box that may not match the
+// image aspect ratio (object-fit: contain creates dead zones on the sides or
+// top/bottom).  ALL coordinate conversions must account for this.
+
+/** Returns the rendering metrics for the screen image (memoised per frame). */
+function imgMetrics() {
+  const img  = document.getElementById('screen-img');
+  const rect = img.getBoundingClientRect();
+  const natW = img.naturalWidth  || screenSize.width;
+  const natH = img.naturalHeight || screenSize.height;
+  const scale = Math.min(rect.width / natW, rect.height / natH);
+  const rendW = natW * scale;
+  const rendH = natH * scale;
+  const offX  = (rect.width  - rendW) / 2;  // horizontal dead zone
+  const offY  = (rect.height - rendH) / 2;  // vertical dead zone
+  return { rect, rendW, rendH, offX, offY };
+}
+
+/** Mouse event → device pixel coordinates. */
+function toDeviceCoords(e) {
+  const { rect, rendW, rendH, offX, offY } = imgMetrics();
+  const imgX = e.clientX - rect.left - offX;
+  const imgY = e.clientY - rect.top  - offY;
+  const devX = Math.round(Math.max(0, Math.min(imgX, rendW)) / rendW * screenSize.width);
+  const devY = Math.round(Math.max(0, Math.min(imgY, rendH)) / rendH * screenSize.height);
+  return { devX, devY };
+}
+
+/** Device pixel rect → CSS pixel position within device-screen-wrap. */
+function deviceRectToCSS(dx1, dy1, dx2, dy2) {
+  const img      = document.getElementById('screen-img');
+  const { rect, rendW, rendH, offX, offY } = imgMetrics();
+  const wrapRect = document.getElementById('inspect-overlay').parentElement.getBoundingClientRect();
+  const imgTop   = rect.top - wrapRect.top;   // img position within screen-wrap
+  return {
+    left:   offX + dx1 / screenSize.width  * rendW,
+    top:    imgTop + offY + dy1 / screenSize.height * rendH,
+    width:  (dx2 - dx1) / screenSize.width  * rendW,
+    height: (dy2 - dy1) / screenSize.height * rendH,
+  };
+}
+
+// inspect mode is triggered via ibar-inspect button (onclick="setMode('inspect')")
+
+document.getElementById('inspect-overlay').addEventListener('click', async (e) => {
+  if (!inspectMode) return;
+
+  const { devX, devY } = toDeviceCoords(e);
+
+  showInspectLoading();
+
+  try {
+    const img  = document.getElementById('screen-img');
+    const rect = img.getBoundingClientRect();
+    const res  = await fetch(`/api/inspect?x=${devX}&y=${devY}`);
+    const data = await res.json();
+    showInspectResult(data, rect, screenSize.width / rect.width, screenSize.height / rect.height);
+  } catch (err) {
+    document.getElementById('inspector-rows').innerHTML =
+      `<div class="inspect-loading" style="color:var(--red)">Inspect failed</div>`;
+  }
+});
+
+function showInspectLoading() {
+  document.getElementById('inspect-status').textContent = '…';
+  document.getElementById('inspector-rows').innerHTML =
+    `<div class="inspect-loading"><div class="spinner" style="margin:0 auto"></div></div>`;
+  document.getElementById('copy-tag-btn').disabled = true;
+}
+
+function showInspectResult(el, imgRect, ratioX, ratioY) {
+  lastInspected = el;
+  document.getElementById('inspect-status').textContent = '';
+
+  const rows = [
+    { key: 'accessibilityId', val: el.contentDesc, highlight: true },
+    { key: 'resource-id',     val: el.resourceId },
+    { key: 'text',            val: el.text },
+    { key: 'class',           val: el.className ? el.className.split('.').pop() : '' },
+    { key: 'bounds',          val: el.bounds },
+    { key: 'clickable',       val: el.clickable,  badge: true },
+    { key: 'scrollable',      val: el.scrollable, badge: true },
+  ];
+
+  document.getElementById('inspector-rows').innerHTML = rows.map(r => {
+    let valClass = '';
+    let display = r.val;
+    if (r.badge) {
+      valClass = r.val ? 'badge-true' : 'badge-false';
+      display  = r.val ? 'true' : 'false';
+    } else if (r.highlight && r.val) {
+      valClass = 'highlight';
+    } else if (!r.val && r.val !== false) {
+      valClass = 'empty';
+      display  = '—';
+    }
+    const copyable = !r.badge && r.val;
+    return `<div class="inspector-row ${copyable ? 'inspector-row-copyable' : ''}"
+                 ${copyable ? `onclick="copyInspectorVal(this, '${(r.val+'').replace(/'/g,"\\'")}')" title="Click to copy"` : ''}>
+      <span class="inspector-key">${r.key}</span>
+      <span class="inspector-val ${valClass}">${display}</span>
+      ${copyable ? `<span class="inspector-copy-hint">copy</span>` : ''}
+    </div>`;
+  }).join('');
+
+  // Highlight element on screen
+  const bm = el.bounds.match(/\[(\d+),(\d+)\]\[(\d+),(\d+)\]/);
+  if (bm) {
+    const css = deviceRectToCSS(parseInt(bm[1]), parseInt(bm[2]), parseInt(bm[3]), parseInt(bm[4]));
+    const hl  = document.getElementById('inspect-highlight');
+    hl.style.left    = `${css.left}px`;
+    hl.style.top     = `${css.top}px`;
+    hl.style.width   = `${css.width}px`;
+    hl.style.height  = `${css.height}px`;
+    hl.style.display = 'block';
+  }
+
+  // Copy buttons — accessibilityId and text value separately
+  const copyBtn  = document.getElementById('copy-tag-btn');
+  const copyText = document.getElementById('copy-text-btn');
+  const tagVal   = el.contentDesc || el.resourceId;
+  const textVal  = el.text;
+
+  copyBtn.disabled    = !tagVal;
+  copyBtn.textContent = tagVal ? `Copy accessibilityId  "${tagVal}"` : 'No accessibilityId found';
+
+  if (copyText) {
+    copyText.style.display = textVal ? 'block' : 'none';
+    copyText.textContent   = textVal ? `Copy text  "${textVal}"` : '';
+    copyText.onclick = () => {
+      navigator.clipboard.writeText(textVal).then(() => {
+        copyText.textContent = '✓ Copied!';
+        copyText.classList.add('copied');
+        setTimeout(() => {
+          copyText.textContent = `Copy text  "${textVal}"`;
+          copyText.classList.remove('copied');
+        }, 1500);
+      });
+    };
+  }
+}
+
+function copyInspectorVal(row, val) {
+  navigator.clipboard.writeText(val).then(() => {
+    const hint = row.querySelector('.inspector-copy-hint');
+    if (hint) { hint.textContent = '✓'; hint.style.color = 'var(--green)'; }
+    setTimeout(() => {
+      if (hint) { hint.textContent = 'copy'; hint.style.color = ''; }
+    }, 1200);
+  });
+}
+
+document.getElementById('copy-tag-btn').addEventListener('click', () => {
+  if (!lastInspected) return;
+  const val = lastInspected.contentDesc || lastInspected.resourceId;
+  if (!val) return;
+
+  navigator.clipboard.writeText(val).then(() => {
+    const btn = document.getElementById('copy-tag-btn');
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = `Copy  "${val}"`;
+      btn.classList.remove('copied');
+    }, 1500);
+  });
+});
+
+// ── Device interaction ────────────────────────────────────────────────────
+let interactMode = 'tap';   // tap | swipe | longpress | inspect
+let swipeStart   = null;
+
+function setMode(mode) {
+  interactMode = mode;
+  document.querySelectorAll('.ibar-btn[id^="ibar-"]').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('ibar-' + mode);
+  if (btn) btn.classList.add('active');
+
+  const overlay = document.getElementById('inspect-overlay');
+  // Always show overlay so we can intercept clicks
+  overlay.style.display = 'block';
+  overlay.style.cursor  = mode === 'inspect' ? 'crosshair' : mode === 'swipe' ? 'ns-resize' : 'pointer';
+
+  // Only keep inspect results visible in inspect mode
+  if (mode !== 'inspect') {
+    document.getElementById('inspector-popup').classList.remove('visible');
+    document.getElementById('inspect-highlight').style.display = 'none';
+  }
+  inspectMode = (mode === 'inspect');
+}
+
+async function deviceAction(body) {
+  try {
+    await fetch('/api/device-action', {
+      method : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body   : JSON.stringify(body)
+    });
+    // Cancel any in-flight screenshot and start fresh immediately after action
+    setTimeout(forceRefresh, 180);
+    setTimeout(doRefresh,    900);
+  } catch (e) {
+    console.error('Device action failed', e);
+  }
+}
+
+async function deviceKey(key) {
+  await deviceAction({ type: 'key', key });
+}
+
+async function sendText() {
+  const input = document.getElementById('text-input');
+  const text  = input.value;
+  if (!text) return;
+  await deviceAction({ type: 'text', text });
+  input.value = '';
+}
+
+function showRipple(clientX, clientY) {
+  const wrap   = document.getElementById('inspect-overlay').parentElement;
+  const rect   = wrap.getBoundingClientRect();
+  const ripple = document.createElement('div');
+  ripple.className = 'tap-ripple';
+  ripple.style.left = `${clientX - rect.left}px`;
+  ripple.style.top  = `${clientY - rect.top}px`;
+  wrap.appendChild(ripple);
+  setTimeout(() => ripple.remove(), 500);
+}
+
+// ── Override overlay click/drag to handle all modes ───────────────────────
+// ── Log panel resize ──────────────────────────────────────────────────────────
+(function () {
+  const handle   = document.getElementById('log-resize-handle');
+  const logPanel = document.getElementById('log-panel');
+  let startX = 0, startW = 0;
+
+  handle.addEventListener('mousedown', (e) => {
+    startX = e.clientX;
+    startW = logPanel.getBoundingClientRect().width;
+    handle.classList.add('dragging');
+    document.body.style.cursor    = 'col-resize';
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (!handle.classList.contains('dragging')) return;
+    // Dragging left → wider log; dragging right → narrower log
+    const delta = startX - e.clientX;
+    const newW  = Math.max(200, Math.min(window.innerWidth * 0.7, startW + delta));
+    logPanel.style.width = `${newW}px`;
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (!handle.classList.contains('dragging')) return;
+    handle.classList.remove('dragging');
+    document.body.style.cursor     = '';
+    document.body.style.userSelect = '';
+    // Persist across reloads
+    try { localStorage.setItem('forge_log_width', logPanel.style.width); } catch (_) {}
+  });
+
+  // Restore saved width
+  try {
+    const saved = localStorage.getItem('forge_log_width');
+    if (saved) logPanel.style.width = saved;
+  } catch (_) {}
+})();
+
+document.addEventListener('DOMContentLoaded', () => {
+  const overlay = document.getElementById('inspect-overlay');
+  overlay.style.display = 'block'; // always on
+
+  overlay.addEventListener('mousedown', (e) => {
+    if (interactMode === 'swipe') {
+      const { devX, devY } = toDeviceCoords(e);
+      swipeStart = { clientX: e.clientX, clientY: e.clientY, devX, devY };
+      e.preventDefault();
+    }
+  });
+
+  overlay.addEventListener('mouseup', async (e) => {
+    const { devX, devY } = toDeviceCoords(e);
+
+    if (interactMode === 'tap') {
+      showRipple(e.clientX, e.clientY);
+      await deviceAction({ type: 'tap', x: devX, y: devY });
+
+    } else if (interactMode === 'longpress') {
+      showRipple(e.clientX, e.clientY);
+      await deviceAction({ type: 'longpress', x: devX, y: devY });
+
+    } else if (interactMode === 'swipe' && swipeStart) {
+      const sx = swipeStart.devX, sy = swipeStart.devY;
+      if (Math.abs(devX - sx) > 5 || Math.abs(devY - sy) > 5) {
+        await deviceAction({ type: 'swipe', x: sx, y: sy, x2: devX, y2: devY, duration: 400 });
+      }
+      swipeStart = null;
+
+    } else if (interactMode === 'inspect') {
+      showInspectLoading();
+      try {
+        const img  = document.getElementById('screen-img');
+        const rect = img.getBoundingClientRect();
+        const res  = await fetch(`/api/inspect?x=${devX}&y=${devY}`);
+        const data = await res.json();
+        showInspectResult(data, rect, screenSize.width / rect.width, screenSize.height / rect.height);
+        document.getElementById('inspector-popup').classList.add('visible');
+      } catch (err) {
+        document.getElementById('inspector-rows').innerHTML =
+          `<div class="inspect-loading" style="color:var(--red)">Inspect failed</div>`;
+      }
+    }
+  });
+
+  // Scroll wheel over device screen = scroll device (stop propagation so panel doesn't also scroll)
+  overlay.addEventListener('wheel', async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const { devX, devY } = toDeviceCoords(e);
+    await deviceAction({ type: 'scroll', x: devX, y: devY, x2: e.deltaY > 0 ? 1 : -1 });
+  }, { passive: false });
+});
+
+// ── Tab switching ─────────────────────────────────────────────────────────
+function switchTab(tab) {
+  ['steps','editor','flows','network'].forEach(t => {
+    document.getElementById(`tab-${t}`)?.classList.toggle('active', t === tab);
+    const v = document.getElementById(`view-${t}`);
+    if (v) v.style.display = t === tab ? 'flex' : 'none';
+  });
+  if (tab === 'editor') { if (!cmEditor) initEditor(); else setTimeout(() => cmEditor.refresh(), 0); }
+  if (tab === 'flows')  { loadFlowList(); if (!cmFlow) initFlowEditor(); else setTimeout(() => cmFlow.refresh(), 0); }
+  if (tab === 'network') { document.getElementById('net-badge')?.style.setProperty('display','none'); }
+}
+
+// ── CodeMirror editor ─────────────────────────────────────────────────────
+let cmEditor    = null;
+let editorFile  = null;
+let editorDirty = false;
+
+function initEditor() {
+  // Register element-name autocomplete for YAML files
+  CodeMirror.registerHelper('hint', 'forge-yaml', (cm) => {
+    const cursor = cm.getCursor();
+    const line   = cm.getLine(cursor.line);
+
+    // element: <partial>  →  element autocomplete
+    const mEl = line.match(/^(\s*element:\s*)(\S*)$/);
+    if (mEl) {
+      const typed = mEl[2];
+      const list  = allElementKeys.filter(k => k.toLowerCase().startsWith(typed.toLowerCase()));
+      if (!list.length) return null;
+      return { list, from: CodeMirror.Pos(cursor.line, mEl[1].length), to: cursor };
+    }
+
+    // flow: <partial>  →  flow-name autocomplete
+    const mFl = line.match(/^(\s*flow:\s*)(\S*)$/);
+    if (mFl) {
+      const typed = mFl[2];
+      const list  = allFlowNames.filter(k => k.toLowerCase().startsWith(typed.toLowerCase()));
+      if (!list.length) return null;
+      return { list, from: CodeMirror.Pos(cursor.line, mFl[1].length), to: cursor };
+    }
+
+    return null;
+  });
+
+  const host = document.getElementById('cm-host');
+  cmEditor = CodeMirror(host, {
+    mode          : 'yaml',
+    theme         : 'dracula',
+    lineNumbers   : true,
+    tabSize       : 2,
+    indentWithTabs: false,
+    lineWrapping  : false,
+    autofocus     : true,
+    extraKeys     : {
+      'Tab'       : (cm) => cm.replaceSelection('  '),
+      'Ctrl-S'    : saveTest,
+      'Cmd-S'     : saveTest,
+      'Ctrl-Space': (cm) => CodeMirror.showHint(cm, CodeMirror.hint['forge-yaml'],
+                             { completeSingle: false }),
+    }
+  });
+
+  // Auto-trigger hint while typing on `element:` or `flow:` lines
+  cmEditor.on('inputRead', (cm, change) => {
+    if (change.origin === '+input') {
+      const line = cm.getLine(cm.getCursor().line);
+      if ((/^\s*element:\s*\S*$/.test(line) || /^\s*flow:\s*\S*$/.test(line))
+          && !cm.state.completionActive) {
+        CodeMirror.showHint(cm, CodeMirror.hint['forge-yaml'], { completeSingle: false });
+      }
+    }
+  });
+
+  // Mark dirty on change
+  cmEditor.on('change', () => {
+    if (!editorDirty) {
+      editorDirty = true;
+      const fn = document.getElementById('editor-filename');
+      fn.classList.add('unsaved');
+      fn.textContent = (editorFile || 'untitled') + ' •';
+    }
+  });
+
+  // If a file is already selected, load it
+  if (editorFile) loadEditorFile(editorFile);
+}
+
+async function loadEditorFile(file) {
+  editorFile = file;
+  document.getElementById('editor-filename').textContent = file;
+  document.getElementById('editor-filename').classList.remove('unsaved');
+  editorDirty = false;
+
+  if (!cmEditor) return; // will load when tab is opened
+
+  try {
+    const res  = await fetch(`/api/test-yaml?file=${encodeURIComponent(file)}`);
+    const text = await res.text();
+    cmEditor.setValue(text);
+    cmEditor.clearHistory();
+    editorDirty = false;
+    document.getElementById('editor-filename').classList.remove('unsaved');
+  } catch (e) {
+    cmEditor.setValue(`# Failed to load: ${e.message}`);
+  }
+}
+
+function showYamlError(msg) {
+  const bar = document.getElementById('yaml-error-bar');
+  if (!bar) return;
+  if (msg) {
+    bar.textContent = '⚠ YAML error: ' + msg;
+    bar.style.display = 'block';
+  } else {
+    bar.textContent = '';
+    bar.style.display = 'none';
+  }
+}
+
+async function saveTest() {
+  if (!editorFile || !cmEditor) return;
+  const content = cmEditor.getValue();
+  const btn = document.getElementById('btn-save-test');
+  btn.textContent = 'Saving…';
+
+  try {
+    const res = await fetch('/api/save-test', {
+      method : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body   : JSON.stringify({ file: editorFile, content })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      showYamlError(null);
+      editorDirty = false;
+      const fn = document.getElementById('editor-filename');
+      fn.textContent = editorFile;
+      fn.classList.remove('unsaved');
+      btn.textContent = '✓ Saved';
+      btn.classList.add('saved');
+      // Reload steps panel
+      await loadSteps(editorFile);
+      setTimeout(() => {
+        btn.textContent = 'Save';
+        btn.classList.remove('saved');
+      }, 1500);
+    } else if (data.yamlError) {
+      showYamlError(data.yamlError);
+      btn.textContent = 'Save';
+    } else {
+      showYamlError(null);
+      btn.textContent = 'Error: ' + data.error;
+      setTimeout(() => { btn.textContent = 'Save'; }, 2000);
+    }
+  } catch (e) {
+    btn.textContent = 'Save';
+  }
+}
+
+async function newTest() {
+  const name = prompt('Test file name (e.g. shop/my_test.yaml):');
+  if (!name) return;
+  const file = name.endsWith('.yaml') ? name : name + '.yaml';
+
+  try {
+    const res  = await fetch('/api/new-test', {
+      method : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body   : JSON.stringify({ file })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      // Add to dropdown
+      const sel = document.getElementById('test-select');
+      const opt = document.createElement('option');
+      opt.value = file;
+      opt.textContent = file;
+      sel.appendChild(opt);
+      sel.value = file;
+
+      editorFile  = file;
+      editorDirty = false;
+      if (cmEditor) {
+        cmEditor.setValue(data.content);
+        cmEditor.clearHistory();
+      }
+      document.getElementById('editor-filename').textContent = file;
+      document.getElementById('editor-filename').classList.remove('unsaved');
+      await loadSteps(file);
+    }
+  } catch (e) {
+    alert('Error: ' + e.message);
+  }
+}
+
+// ── Flows ──────────────────────────────────────────────────────────────────
+let cmFlow        = null;
+let currentFlow   = null;  // name without .yaml
+let flowDirty     = false;
+
+function initFlowEditor() {
+  const host = document.getElementById('cm-host-flow');
+  if (!host || cmFlow) return;
+  cmFlow = CodeMirror(host, {
+    mode       : 'yaml',
+    theme      : 'dracula',
+    lineNumbers: true,
+    tabSize    : 2,
+    indentWithTabs: false,
+    lineWrapping: false,
+    extraKeys  : { 'Ctrl-S': saveFlow, 'Cmd-S': saveFlow }
+  });
+  cmFlow.setSize('100%', '100%');
+  cmFlow.on('change', () => { flowDirty = true; updateFlowToolbar(); });
+}
+
+async function loadFlowList() {
+  const res   = await fetch('/api/flows');
+  const flows = await res.json();
+  const list  = document.getElementById('flow-list');
+  list.innerHTML = flows.length
+    ? flows.map(f => `
+        <div class="editor-file-item${f === currentFlow ? ' active' : ''}"
+             id="flowitem-${f}"
+             onclick="openFlow('${f}')"
+             style="padding:7px 12px;font-size:12px;cursor:pointer;border-bottom:1px solid var(--border);
+                    background:${f === currentFlow ? 'var(--surface2)' : 'transparent'};
+                    color:${f === currentFlow ? 'var(--text)' : 'var(--muted)'};
+                    white-space:nowrap;overflow:hidden;text-overflow:ellipsis"
+             title="${f}">♻ ${f}</div>`).join('')
+    : `<div style="padding:12px;font-size:11px;color:var(--muted);text-align:center">No flows yet</div>`;
+}
+
+async function openFlow(name) {
+  if (flowDirty && currentFlow && !confirm(`Discard unsaved changes to "${currentFlow}"?`)) return;
+  const res  = await fetch(`/api/flow?name=${encodeURIComponent(name)}`);
+  const text = await res.text();
+  if (!cmFlow) initFlowEditor();
+  cmFlow.setValue(text);
+  cmFlow.clearHistory();
+  currentFlow = name;
+  flowDirty   = false;
+  document.getElementById('flow-name-hint').textContent = name;
+  updateFlowToolbar();
+  loadFlowList();
+  setTimeout(() => { cmFlow.refresh(); cmFlow.focus(); }, 0);
+}
+
+async function newFlow() {
+  const name = prompt('Flow name (e.g. add_address, complete_payment):');
+  if (!name) return;
+  const safe = name.replace(/[^a-zA-Z0-9_-]/g, '_').replace(/\.yaml$/, '');
+  const template =
+`# Flow: ${safe}
+# Call from any test with:
+#   - action: call
+#     flow: ${safe}
+#     params:          # optional — values available as \${varName} below
+#       myParam: "value"
+
+steps:
+  - action: tap
+    element: some_element
+`;
+  if (!cmFlow) initFlowEditor();
+  cmFlow.setValue(template);
+  currentFlow = safe;
+  flowDirty   = true;
+  document.getElementById('flow-name-hint').textContent = safe;
+  updateFlowToolbar();
+  setTimeout(() => { cmFlow.refresh(); cmFlow.focus(); }, 0);
+  // Save immediately so the file exists
+  await saveFlow();
+  loadFlowList();
+}
+
+function showFlowYamlError(msg) {
+  const bar = document.getElementById('yaml-error-bar-flow');
+  if (!bar) return;
+  if (msg) {
+    bar.textContent = '⚠ YAML error: ' + msg;
+    bar.style.display = 'block';
+  } else {
+    bar.textContent = '';
+    bar.style.display = 'none';
+  }
+}
+
+async function saveFlow() {
+  if (!currentFlow || !cmFlow) return;
+  try {
+    const res = await fetch('/api/flow', {
+      method : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body   : JSON.stringify({ name: currentFlow, content: cmFlow.getValue() })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      showFlowYamlError(null);
+      flowDirty = false;
+      updateFlowToolbar();
+      appendLog(`💾 Saved flow: ${currentFlow}`, 'step');
+      loadFlowList();
+    } else if (data.yamlError) {
+      showFlowYamlError(data.yamlError);
+    } else {
+      appendLog('Save failed: ' + (data.error || 'unknown error'), 'error');
+    }
+  } catch (e) { appendLog('Save failed: ' + e.message, 'error'); }
+}
+
+async function deleteFlow() {
+  if (!currentFlow) return;
+  if (!confirm(`Delete flow "${currentFlow}"? This cannot be undone.`)) return;
+  await fetch(`/api/flow?name=${encodeURIComponent(currentFlow)}`, { method: 'DELETE' });
+  cmFlow.setValue('');
+  currentFlow = null;
+  flowDirty   = false;
+  updateFlowToolbar();
+  loadFlowList();
+}
+
+function updateFlowToolbar() {
+  document.getElementById('btn-save-flow').disabled   = !currentFlow;
+  document.getElementById('btn-delete-flow').disabled = !currentFlow;
+  if (currentFlow) {
+    document.getElementById('btn-save-flow').textContent = flowDirty ? 'Save *' : 'Save';
+  }
+}
+
+// ── Action picker — insert tag as step into editor ────────────────────────
+let pickerTag = null;
+
+const STEP_ACTIONS = [
+  // ── Element actions (need an element tag) ──────────────────────────────
+  { label: 'tap',              snippet: (tag) => `  - action: tap\n    element: ${tag}\n` },
+  { label: 'waitFor',          snippet: (tag) => `  - action: waitFor\n    element: ${tag}\n` },
+  { label: 'verifyElement',    snippet: (tag) => `  - action: verifyElement\n    element: ${tag}\n` },
+  { label: 'enterText',        snippet: (tag) => `  - action: enterText\n    element: ${tag}\n    value: ""\n` },
+  { label: 'scrollTo',         snippet: (tag) => `  - action: scrollTo\n    element: ${tag}\n` },
+  { label: 'longPress',        snippet: (tag) => `  - action: longPress\n    element: ${tag}\n` },
+  { label: 'swipeUp',          snippet: (tag) => `  - action: swipeUp\n    element: ${tag}\n` },
+  { label: 'swipeDown',        snippet: (tag) => `  - action: swipeDown\n    element: ${tag}\n` },
+  { label: 'clearText',        snippet: (tag) => `  - action: clearText\n    element: ${tag}\n` },
+  { label: 'tapIfPresent',     snippet: (tag) => `  - action: tapIfPresent\n    element: ${tag}\n` },
+
+  // ── Text capture / assertion ────────────────────────────────────────────
+  { label: 'captureText',      snippet: (tag) => `  - action: captureText\n    element: ${tag}\n    variable: myVar\n` },
+  { label: 'assertText',       snippet: (tag) => `  - action: assertText\n    element: ${tag}\n    value: "\${myVar}"\n` },
+  { label: 'assertStoredText', snippet: (tag) => `  - action: assertStoredText\n    value: myVar\n`, noElement: true },
+
+  // ── Conditional (if element present / absent, run nested steps) ────────
+  { label: 'ifPresent',        snippet: (tag) => `  - action: ifPresent\n    element: ${tag}\n    steps:\n      - action: tap\n        element: ${tag}\n` },
+  { label: 'ifNotPresent',     snippet: (tag) => `  - action: ifNotPresent\n    element: ${tag}\n    steps:\n      - action: tap\n        element: add_new_btn\n` },
+
+  // ── No-element actions ──────────────────────────────────────────────────
+  { label: 'launchApp',        snippet: (_)   => `  - action: launchApp\n`, noElement: true },
+  { label: 'back',             snippet: (_)   => `  - action: back\n`,       noElement: true },
+  { label: 'sleep',            snippet: (_)   => `  - action: sleep\n    value: "2000"\n`, noElement: true },
+  { label: 'hideKeyboard',     snippet: (_)   => `  - action: hideKeyboard\n`, noElement: true },
+  { label: 'screenshot',       snippet: (_)   => `  - action: screenshot\n`,  noElement: true },
+  { label: 'call',             snippet: (_)   => `  - action: call\n    flow: \n    params:\n      key: value\n`, noElement: true },
+];
+
+function openActionPicker(tag, clickable, btnEl) {
+  pickerTag = tag;
+  const picker  = document.getElementById('action-picker');
+  const header  = document.getElementById('picker-header');
+  const actions = document.getElementById('picker-actions');
+
+  header.textContent = tag;
+
+  // Show all element actions — Compose elements often report clickable=false even with .clickable()
+  const elementActions = STEP_ACTIONS.filter(a => !a.noElement);
+  const globalActions  = STEP_ACTIONS.filter(a => a.noElement);
+
+  actions.innerHTML =
+    elementActions.map(a =>
+      `<button class="picker-btn" onclick="insertStep('${a.label}')">${a.label}</button>`
+    ).join('') +
+    `<div style="width:100%;height:1px;background:var(--border);margin:6px 0"></div>` +
+    globalActions.map(a =>
+      `<button class="picker-btn" style="color:var(--muted)" onclick="insertStep('${a.label}')">${a.label}</button>`
+    ).join('');
+
+  // Position near the button
+  const rect   = btnEl.getBoundingClientRect();
+  const panel  = document.querySelector('.steps-panel').getBoundingClientRect();
+  // Show inline action row instead of floating picker
+  picker.style.display = 'none'; // hide the old floating picker
+
+  // Switch to editor tab automatically
+  switchTab('editor');
+  if (!cmEditor) initEditor();
+}
+
+function insertStep(actionLabel) {
+  if (!pickerTag || !cmEditor) return;
+  insertStepWithTag(pickerTag, actionLabel);
+  document.getElementById('action-picker').style.display = 'none';
+  pickerTag = null;
+}
+
+function insertStepWithTag(tag, actionLabel) {
+  switchTab('editor');
+  if (!cmEditor) initEditor();
+
+  const action  = STEP_ACTIONS.find(a => a.label === actionLabel);
+  if (!action) return;
+
+  const snippet = action.snippet(tag);
+  const cursor  = cmEditor.getCursor();
+
+  // Insert at current cursor position (or end of file)
+  const doc    = cmEditor.getDoc();
+  const lastLine = doc.lastLine();
+  const lastCh   = doc.getLine(lastLine).length;
+  const insertPos = cursor.line < lastLine ? cursor : { line: lastLine, ch: lastCh };
+
+  // Make sure we're on a new line
+  const currentLine = doc.getLine(insertPos.line);
+  const prefix = currentLine.trim() ? '\n' : '';
+
+  cmEditor.replaceRange(prefix + snippet, insertPos);
+  cmEditor.focus();
+}
+
+// Close picker on outside click
+document.addEventListener('click', (e) => {
+  const picker = document.getElementById('action-picker');
+  if (picker.style.display !== 'none' && !picker.contains(e.target)) {
+    picker.style.display = 'none';
+  }
+});
+
+// ── Scan Tags — show all qaTestTag elements on screen ─────────────────────
+let allTagElems = [];
+
+document.getElementById('btn-scan').addEventListener('click', async () => {
+  const btn = document.getElementById('btn-scan');
+  btn.textContent = '⏳ Scanning…';
+  btn.disabled    = true;
+
+  // Show modal immediately with spinner
+  document.getElementById('tag-tree-modal').classList.add('visible');
+  document.getElementById('tag-filter').value = '';
+  document.getElementById('tag-tree-rows').innerHTML =
+    `<div class="inspect-loading" style="padding:24px 0"><div class="spinner" style="margin:0 auto"></div></div>`;
+
+  try {
+    const res   = await fetch('/api/tagged-elements');
+    allTagElems = await res.json();
+    document.getElementById('tag-count').textContent = `${allTagElems.length} found`;
+    renderTagRows(allTagElems);
+  } catch (e) {
+    document.getElementById('tag-tree-rows').innerHTML =
+      `<div class="inspect-loading" style="color:var(--red);padding:16px">Scan failed: ${e.message}</div>`;
+  }
+
+  btn.textContent = '📋 Scan Tags';
+  btn.disabled    = false;
+});
+
+function renderTagRows(elems) {
+  if (elems.length === 0) {
+    document.getElementById('tag-tree-rows').innerHTML =
+      `<div class="inspect-loading" style="padding:16px">No matching elements</div>`;
+    return;
+  }
+
+  document.getElementById('tag-tree-rows').innerHTML = elems.map((el) => {
+    const idx = allTagElems.indexOf(el);
+    // Always show all element actions — Compose clickable flag is unreliable in uiautomator dump
+    const elementActions = STEP_ACTIONS.filter(a => !a.noElement);
+    const globalActions  = STEP_ACTIONS.filter(a => a.noElement);
+
+    const actionBtns = [
+      ...elementActions.map(a =>
+        `<button class="inline-action-btn" onclick="insertStepFromModal('${escHtml(el.contentDesc)}','${a.label}')">${a.label}</button>`
+      ),
+      `<span style="color:var(--border);margin:0 2px">|</span>`,
+      ...globalActions.map(a =>
+        `<button class="inline-action-btn muted" onclick="insertStepFromModal('${escHtml(el.contentDesc)}','${a.label}')">${a.label}</button>`
+      )
+    ].join('');
+
+    const textPreview = el.text ? `<span class="tag-text-val">${escHtml(el.text)}</span>` : '';
+    return `<div class="tag-row-wrap" id="tagrow-wrap-${idx}">
+      <div class="tag-row" id="tagrow-${idx}"
+            onclick="highlightTagElement(${idx})"
+            data-x1="${el.x1}" data-y1="${el.y1}"
+            data-x2="${el.x2}" data-y2="${el.y2}"
+            data-tag="${escHtml(el.contentDesc)}"
+            data-clickable="${el.clickable}">
+        <span class="tag-icon">👆</span>
+        <div class="tag-info">
+          <span class="tag-name">${escHtml(el.contentDesc)}</span>
+          ${textPreview}
+        </div>
+        <span class="tag-class">${escHtml(el.className)}</span>
+        <button class="tag-copy" onclick="event.stopPropagation();toggleInlineActions(${idx})" title="Insert into editor">+</button>
+        <button class="tag-copy" onclick="event.stopPropagation();copyTag('${escHtml(el.contentDesc)}',this)">copy</button>
+      </div>
+      <div class="inline-actions" id="inline-actions-${idx}" style="display:none">
+        ${actionBtns}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleInlineActions(idx) {
+  // Close any other open action rows first
+  document.querySelectorAll('.inline-actions').forEach(el => {
+    if (el.id !== `inline-actions-${idx}`) el.style.display = 'none';
+  });
+  const row = document.getElementById(`inline-actions-${idx}`);
+  if (row) row.style.display = row.style.display === 'none' ? 'flex' : 'none';
+}
+
+function insertStepFromModal(tag, actionLabel) {
+  if (buildMode) {
+    addBuildStep(tag, actionLabel);
+  } else {
+    insertStepWithTag(tag, actionLabel);
+  }
+}
+
+function filterTags(query) {
+  const q = query.toLowerCase();
+  const filtered = q ? allTagElems.filter(el => el.contentDesc.toLowerCase().includes(q)) : allTagElems;
+  document.getElementById('tag-count').textContent = `${filtered.length} found`;
+  renderTagRows(filtered);
+}
+
+function closeTagTree() {
+  document.getElementById('tag-tree-modal').classList.remove('visible');
+  document.getElementById('inspect-highlight').style.display = 'none';
+}
+
+// ── Drag to move the floating panel ───────────────────────────────────────
+(function() {
+  const modal  = document.getElementById('tag-tree-modal');
+  const handle = document.getElementById('tag-modal-drag-handle');
+  let dragging = false, ox = 0, oy = 0;
+
+  handle.addEventListener('mousedown', (e) => {
+    dragging = true;
+    const rect = modal.getBoundingClientRect();
+    ox = e.clientX - rect.left;
+    oy = e.clientY - rect.top;
+    modal.style.right = 'auto';
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (!dragging) return;
+    modal.style.left = `${e.clientX - ox}px`;
+    modal.style.top  = `${e.clientY - oy}px`;
+  });
+
+  document.addEventListener('mouseup', () => { dragging = false; });
+})();
+
+function highlightTagElement(index) {
+  // Deselect others
+  document.querySelectorAll('.tag-row').forEach(r => r.classList.remove('selected'));
+  const row = document.getElementById(`tagrow-${index}`);
+  if (!row) return;
+  row.classList.add('selected');
+
+  const x1 = parseInt(row.dataset.x1);
+  const y1 = parseInt(row.dataset.y1);
+  const x2 = parseInt(row.dataset.x2);
+  const y2 = parseInt(row.dataset.y2);
+
+  const css = deviceRectToCSS(x1, y1, x2, y2);
+  const hl  = document.getElementById('inspect-highlight');
+  hl.style.left    = `${css.left}px`;
+  hl.style.top     = `${css.top}px`;
+  hl.style.width   = `${css.width}px`;
+  hl.style.height  = `${css.height}px`;
+  hl.style.display = 'block';
+
+  row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function copyTag(tag, btn) {
+  navigator.clipboard.writeText(tag).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✓';
+    btn.style.color = 'var(--green)';
+    setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 1500);
+  });
+}
+
+function escHtml(str) {
+  return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Tag Sync ──────────────────────────────────────────────────────────────────
+let allUntaggedElems = [];
+
+document.getElementById('btn-tagsync').addEventListener('click', async () => {
+  const btn = document.getElementById('btn-tagsync');
+  btn.textContent = '⏳ Scanning…';
+  btn.disabled    = true;
+
+  document.getElementById('tagsync-modal').classList.add('visible');
+  document.getElementById('tagsync-rows').innerHTML =
+    `<div class="inspect-loading" style="padding:32px 0"><div class="spinner" style="margin:0 auto"></div></div>`;
+  document.getElementById('tagsync-footer').style.display = 'none';
+
+  try {
+    const res  = await fetch('/api/untagged-elements');
+    const data = await res.json();
+    if (!res.ok || data.error) throw new Error(data.error || `HTTP ${res.status}`);
+    allUntaggedElems = data;
+    renderTagSyncRows(allUntaggedElems);
+  } catch (e) {
+    document.getElementById('tagsync-rows').innerHTML =
+      `<div class="inspect-loading" style="color:var(--red);padding:20px">Scan failed: ${e.message}</div>`;
+  }
+
+  btn.textContent = '🏷 Tag Sync';
+  btn.disabled    = false;
+});
+
+function renderTagSyncRows(elems) {
+  const countEl = document.getElementById('tagsync-count');
+
+  if (elems.length === 0) {
+    countEl.textContent = '0 untagged';
+    document.getElementById('tagsync-rows').innerHTML =
+      `<div class="inspect-loading" style="padding:24px;color:var(--green)">✅ All visible elements already have qaTestTag!</div>`;
+    document.getElementById('tagsync-footer').style.display = 'none';
+    return;
+  }
+
+  countEl.textContent = `${elems.length} untagged`;
+
+  document.getElementById('tagsync-rows').innerHTML = elems.map((el, i) => {
+    const cls      = (el.className || '').replace('View','');
+    const ridShort = el.resourceId ? el.resourceId.split('/').pop() : '';
+    const textDisp = el.text
+      ? `<div class="tagsync-text">${escHtml(el.text)}</div>`
+      : `<div class="tagsync-text" style="color:var(--muted);font-style:italic">${escHtml(ridShort || cls)}</div>`;
+    const ridDisp  = (ridShort && el.text)
+      ? `<div class="tagsync-rid">${escHtml(ridShort)}</div>` : '';
+
+    return `<div class="tagsync-row" id="tsrow-${i}"
+          data-x1="${el.x1}" data-y1="${el.y1}" data-x2="${el.x2}" data-y2="${el.y2}"
+          onmouseenter="highlightTagSyncEl(${i})"
+          onmouseleave="clearTagSyncHighlight()">
+      <input type="checkbox" class="tagsync-check" id="ts-chk-${i}" checked
+             onchange="updateTagSyncCount()" onclick="event.stopPropagation()"/>
+      <div class="tagsync-info">
+        ${textDisp}
+        ${ridDisp}
+      </div>
+      <input class="tagsync-tag-input" id="ts-tag-${i}"
+             value="${escHtml(el.suggested)}"
+             placeholder="tag_name"
+             onclick="event.stopPropagation()"
+             oninput="updateTagSyncCount()"/>
+    </div>`;
+  }).join('');
+
+  updateTagSyncCount();
+  document.getElementById('tagsync-footer').style.display = 'block';
+}
+
+function updateTagSyncCount() {
+  const total    = allUntaggedElems.length;
+  const selected = countTagSyncSelected();
+  document.getElementById('tagsync-selected-count').textContent =
+    `${selected} of ${total} selected`;
+  document.getElementById('btn-tagsync-apply').disabled = selected === 0;
+}
+
+function countTagSyncSelected() {
+  let n = 0;
+  allUntaggedElems.forEach((_, i) => {
+    const chk = document.getElementById(`ts-chk-${i}`);
+    const inp = document.getElementById(`ts-tag-${i}`);
+    if (chk?.checked && inp?.value.trim()) n++;
+  });
+  return n;
+}
+
+function filterTagSync(query) {
+  const q = query.toLowerCase();
+  const filtered = q
+    ? allUntaggedElems.filter(el =>
+        (el.text || '').toLowerCase().includes(q) ||
+        (el.resourceId || '').toLowerCase().includes(q) ||
+        (el.suggested  || '').toLowerCase().includes(q))
+    : allUntaggedElems;
+  document.getElementById('tagsync-count').textContent = `${filtered.length} untagged`;
+  renderTagSyncRows(filtered);
+}
+
+function highlightTagSyncEl(index) {
+  const row = document.getElementById(`tsrow-${index}`);
+  if (!row) return;
+
+  const x1  = parseInt(row.dataset.x1);
+  const y1  = parseInt(row.dataset.y1);
+  const x2  = parseInt(row.dataset.x2);
+  const y2  = parseInt(row.dataset.y2);
+  const css = deviceRectToCSS(x1, y1, x2, y2);
+
+  const hl = document.getElementById('inspect-highlight');
+  hl.style.left        = `${css.left}px`;
+  hl.style.top         = `${css.top}px`;
+  hl.style.width       = `${css.width}px`;
+  hl.style.height      = `${css.height}px`;
+  hl.style.borderColor = 'var(--yellow)';
+  hl.style.background  = 'rgba(245,158,11,.15)';
+  hl.style.display     = 'block';
+}
+
+function clearTagSyncHighlight() {
+  const hl = document.getElementById('inspect-highlight');
+  hl.style.display = 'none';
+  hl.style.borderColor = '';
+  hl.style.background  = '';
+}
+
+async function applyTagsToPopdroid() {
+  const elements = [];
+  allUntaggedElems.forEach((el, i) => {
+    const chk = document.getElementById(`ts-chk-${i}`);
+    const inp = document.getElementById(`ts-tag-${i}`);
+    if (!chk?.checked) return;
+    const tagName = inp?.value.trim();
+    if (!tagName) return;
+    elements.push({
+      tagName,
+      text       : el.text        || '',
+      resourceId : el.resourceId  || '',
+      className  : el.className   || '',
+      bounds     : el.bounds      || '',
+    });
+  });
+
+  if (!elements.length) return;
+
+  const btn = document.getElementById('btn-tagsync-apply');
+  btn.textContent = '⏳ Applying…';
+  btn.disabled    = true;
+
+  // Switch to Steps tab so log is visible
+  switchTab('steps');
+  appendLog(`▶ Adding ${elements.length} qaTestTag(s) to popdroid via claude /qa-tags…`, 'step');
+  elements.forEach(e => appendLog(`  • ${e.tagName}${e.text ? `  ("${e.text}")` : ''}`, ''));
+
+  try {
+    const res  = await fetch('/api/apply-missing-tags', {
+      method : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body   : JSON.stringify({ elements })
+    });
+    const data = await res.json();
+    if (!data.ok) appendLog('Error: ' + (data.error || 'unknown'), 'error');
+  } catch (e) {
+    appendLog('Request failed: ' + e.message, 'error');
+    btn.textContent = '⚡ Apply to popdroid';
+    btn.disabled    = false;
+  }
+}
+
+function closeTagSync() {
+  document.getElementById('tagsync-modal').classList.remove('visible');
+  // Reset highlight colour back to accent
+  const hl = document.getElementById('inspect-highlight');
+  hl.style.borderColor = '';
+  hl.style.background  = '';
+  hl.style.display     = 'none';
+}
+
+// Re-enable apply button when qa_tags_done message arrives
+// (handleMessage already listens for it via the 'qa_tags_done' type)
+
+// ── Drag for Tag Sync modal ───────────────────────────────────────────────────
+(function() {
+  const modal  = document.getElementById('tagsync-modal');
+  const handle = document.getElementById('tagsync-drag-handle');
+  if (!modal || !handle) return;
+  let dragging = false, ox = 0, oy = 0;
+
+  handle.addEventListener('mousedown', (e) => {
+    dragging = true;
+    const rect = modal.getBoundingClientRect();
+    ox = e.clientX - rect.left;
+    oy = e.clientY - rect.top;
+    modal.style.right = 'auto';
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', (e) => {
+    if (!dragging) return;
+    modal.style.left = `${e.clientX - ox}px`;
+    modal.style.top  = `${e.clientY - oy}px`;
+  });
+  document.addEventListener('mouseup', () => { dragging = false; });
+})();
+
+// ── Element key list (for autocomplete + validation) ─────────────────────────
+let allElementKeys = [];
+let allFlowNames   = [];
+
+async function loadAllElements() {
+  try {
+    const res = await fetch('/api/all-elements');
+    allElementKeys = await res.json();
+  } catch (_) {}
+}
+
+async function loadAllFlows() {
+  try {
+    const res = await fetch('/api/flows');
+    allFlowNames = await res.json();
+  } catch (_) {}
+}
+
+// ── Failure screenshot lightbox ───────────────────────────────────────────────
+function showFailureShot(url) {
+  const box = document.createElement('div');
+  box.className = 'fail-shot-lightbox';
+  box.onclick   = () => box.remove();
+  const img = document.createElement('img');
+  img.src = url;
+  box.appendChild(img);
+  document.body.appendChild(box);
+}
+
+// ── Build Test (from Scan Tags) ───────────────────────────────────────────────
+let buildMode  = false;
+let buildSteps = [];   // {action, element, value}
+
+function toggleBuildMode() {
+  buildMode = !buildMode;
+  const btn   = document.getElementById('btn-build-test');
+  const panel = document.getElementById('build-panel');
+  if (buildMode) {
+    btn.style.background    = 'rgba(34,197,94,.15)';
+    btn.style.borderColor   = 'var(--green)';
+    btn.style.color         = 'var(--green)';
+    panel.classList.add('open');
+    appendLog('🧪 Build Test mode ON — click actions in Scan Tags to add steps', 'step');
+  } else {
+    btn.style.background  = '';
+    btn.style.borderColor = '';
+    btn.style.color       = '';
+    panel.classList.remove('open');
+  }
+}
+
+function addBuildStep(tag, actionLabel) {
+  let value    = null;
+  let variable = null;
+
+  if (actionLabel === 'captureText') {
+    variable = prompt(`Variable name to store text from "${tag}" into:\n(e.g. productName)`) || 'capturedText';
+    buildSteps.push({ action: actionLabel, element: tag, variable });
+    renderBuildSteps();
+    return;
+  }
+
+  if (actionLabel === 'assertText') {
+    value = prompt(`Expected text for "${tag}":\n(use \${varName} to compare with captured variable)`) || '';
+    buildSteps.push({ action: actionLabel, element: tag, value });
+    renderBuildSteps();
+    return;
+  }
+
+  if (actionLabel === 'assertStoredText') {
+    value = prompt(`Variable name to assert is visible on screen:`) || '';
+    buildSteps.push({ action: actionLabel, element: null, value });
+    renderBuildSteps();
+    return;
+  }
+
+  if (actionLabel === 'ifPresent' || actionLabel === 'ifNotPresent') {
+    buildSteps.push({ action: actionLabel, element: tag, steps: [] });
+    renderBuildSteps();
+    return;
+  }
+
+  if (['enterText', 'sleep'].includes(actionLabel)) {
+    value = prompt(`Value for ${actionLabel}${tag ? ` on "${tag}"` : ''}:`) || null;
+  }
+
+  buildSteps.push({ action: actionLabel, element: tag, value });
+  renderBuildSteps();
+}
+
+function removeBuildStep(i) {
+  buildSteps.splice(i, 1);
+  renderBuildSteps();
+}
+
+function clearBuildSteps() {
+  if (buildSteps.length && !confirm('Clear all build steps?')) return;
+  buildSteps = [];
+  renderBuildSteps();
+}
+
+function renderBuildSteps() {
+  const list  = document.getElementById('build-steps-list');
+  const count = document.getElementById('build-step-count');
+  const genBtn = document.getElementById('btn-build-generate');
+
+  count.textContent   = buildSteps.length ? `(${buildSteps.length} step${buildSteps.length > 1 ? 's' : ''})` : '';
+  genBtn.disabled     = buildSteps.length === 0;
+
+  if (!buildSteps.length) {
+    list.innerHTML = `<div style="padding:12px;text-align:center;color:var(--muted);font-size:11px">
+      Click an action on any element above to add a step</div>`;
+    return;
+  }
+
+  list.innerHTML = buildSteps.map((s, i) => {
+    const detail = s.variable
+      ? ` → <i>${s.element}</i> → <b>\${${s.variable}}</b>`
+      : s.element
+        ? ` → ${s.element}${s.value != null ? ` = "${s.value}"` : ''}`
+        : s.value != null ? ` = "${s.value}"` : '';
+    const nestedInfo = (s.steps && s.steps.length)
+      ? `<span style="color:var(--muted);font-size:10px;margin-left:6px">(${s.steps.length} nested step${s.steps.length > 1 ? 's' : ''})</span>`
+      : (s.action === 'ifPresent' || s.action === 'ifNotPresent')
+        ? `<span style="color:var(--muted);font-size:10px;margin-left:6px">(no nested steps — edit YAML)</span>`
+        : '';
+    return `
+    <div class="build-step-row">
+      <span class="build-step-num">${i + 1}</span>
+      <span class="build-step-text">
+        <span class="build-step-action">${s.action}</span>
+        <span class="build-step-el">${detail}</span>${nestedInfo}
+      </span>
+      <button class="build-step-del" onclick="removeBuildStep(${i})" title="Remove">×</button>
+    </div>`;
+  }).join('');
+}
+
+async function generateTestFromScan() {
+  if (!buildSteps.length) return;
+  const rawName = document.getElementById('build-test-name').value.trim().replace(/\s+/g, '_');
+  const name    = rawName || `scan_test_${Date.now()}`;
+
+  // Build minimal YAML
+  let yaml = `testName: ${name.replace(/_/g, ' ')}\nplatform: android\nnoReset: true\n\nsteps:\n`;
+  function stepToYaml(s, indent) {
+    const pad = ' '.repeat(indent);
+    let out = `${pad}- action: ${s.action}\n`;
+    if (s.element)  out += `${pad}  element: ${s.element}\n`;
+    if (s.variable) out += `${pad}  variable: ${s.variable}\n`;
+    // Quote value if it's a literal; leave ${...} unquoted for readability
+    if (s.value != null) {
+      const v = String(s.value);
+      out += v.startsWith('${') ? `${pad}  value: ${v}\n` : `${pad}  value: "${v}"\n`;
+    }
+    if (s.steps && s.steps.length) {
+      out += `${pad}  steps:\n`;
+      for (const sub of s.steps) out += stepToYaml(sub, indent + 4);
+    }
+    return out;
+  }
+  for (const s of buildSteps) yaml += stepToYaml(s, 2);
+
+  const file = `${name}.yaml`;
+
+  // Save via new-test then fill with our YAML
+  try {
+    await fetch('/api/new-test', {
+      method : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body   : JSON.stringify({ file })
+    });
+    await fetch('/api/save-test', {
+      method : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body   : JSON.stringify({ file, content: `# Generated via Build Test\n\n${yaml}` })
+    });
+
+    // Add to test dropdown and open in editor
+    const sel = document.getElementById('test-select');
+    if (![...sel.options].find(o => o.value === file)) {
+      const opt = document.createElement('option');
+      opt.value = opt.textContent = file;
+      sel.appendChild(opt);
+    }
+    sel.value   = file;
+    editorFile  = file;
+    editorDirty = false;
+    if (!cmEditor) initEditor();
+    cmEditor.setValue(`# Generated via Build Test\n\n${yaml}`);
+    cmEditor.clearHistory();
+    document.getElementById('editor-filename').textContent = file;
+    document.getElementById('editor-filename').classList.remove('unsaved');
+    await loadSteps(file);
+
+    closeTagTree();
+    switchTab('editor');
+    appendLog(`✅ Generated: ${file}  (${buildSteps.length} steps)`, 'pass');
+
+    // Reset build state
+    buildSteps = [];
+    buildMode  = false;
+    renderBuildSteps();
+    const btn = document.getElementById('btn-build-test');
+    if (btn) { btn.style.background = ''; btn.style.borderColor = ''; btn.style.color = ''; }
+    document.getElementById('build-panel').classList.remove('open');
+  } catch (e) {
+    appendLog('Generate failed: ' + e.message, 'error');
+  }
+}
+
+// ── Network capture tab ────────────────────────────────────────────────────
+
+let networkCalls     = [];    // [{method, url, status, ms, reqHeaders, reqBody, resHeaders, resBody}]
+let selectedCallIdx  = -1;
+
+function clearNetworkCalls() {
+  networkCalls = [];
+  selectedCallIdx = -1;
+  renderNetworkList();
+  document.getElementById('net-detail').innerHTML =
+    '<div style="color:var(--muted);font-size:12px;padding-top:24px;text-align:center">Select a call to inspect</div>';
+  const badge = document.getElementById('net-badge');
+  if (badge) badge.style.display = 'none';
+  const cnt = document.getElementById('net-count');
+  if (cnt) cnt.textContent = '0 requests';
+}
+
+function addNetworkCall(call) {
+  networkCalls.push(call);
+  renderNetworkList();
+
+  // Badge on tab if not on network tab
+  const tabActive = document.getElementById('tab-network')?.classList.contains('active');
+  if (!tabActive) {
+    const badge = document.getElementById('net-badge');
+    if (badge) { badge.textContent = networkCalls.length; badge.style.display = 'inline'; }
+  }
+  const cnt = document.getElementById('net-count');
+  if (cnt) cnt.textContent = networkCalls.length + ' request' + (networkCalls.length === 1 ? '' : 's');
+}
+
+function renderNetworkList() {
+  const list  = document.getElementById('net-list');
+  const empty = document.getElementById('net-empty');
+  if (!list) return;
+  if (!networkCalls.length) {
+    if (empty) empty.style.display = 'block';
+    // Remove existing rows
+    [...list.querySelectorAll('.net-row')].forEach(r => r.remove());
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+
+  // Rebuild all rows (list is usually short <200 during a run)
+  [...list.querySelectorAll('.net-row')].forEach(r => r.remove());
+  networkCalls.forEach((c, i) => {
+    const row = document.createElement('div');
+    row.className = 'net-row' + (i === selectedCallIdx ? ' net-selected' : '');
+    row.dataset.idx = i;
+
+    const statusColor = c.status >= 500 ? 'var(--red)' :
+                        c.status >= 400 ? 'var(--yellow)' :
+                        c.status >= 200 ? 'var(--green)' : 'var(--muted)';
+
+    const shortUrl = (() => {
+      try { const u = new URL(c.url); return u.pathname + (u.search || ''); }
+      catch { return c.url; }
+    })();
+
+    row.innerHTML = `
+      <div style="display:flex;align-items:center;gap:6px;padding:7px 12px;cursor:pointer;border-bottom:1px solid var(--border);font-size:12px" onclick="selectNetworkCall(${i})">
+        <span style="font-family:monospace;font-size:10px;font-weight:700;color:var(--accent2);min-width:38px">${c.method}</span>
+        <span style="color:${statusColor};font-family:monospace;font-size:10px;min-width:30px">${c.status}</span>
+        <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)" title="${c.url}">${shortUrl}</span>
+        <span style="color:var(--muted);font-size:10px;white-space:nowrap">${c.ms}ms</span>
+      </div>`;
+    list.appendChild(row);
+  });
+}
+
+function selectNetworkCall(idx) {
+  selectedCallIdx = idx;
+  // Highlight selected row
+  document.querySelectorAll('.net-row').forEach((r, i) => {
+    r.classList.toggle('net-selected', i === idx);
+    r.querySelector('div').style.background = i === idx ? 'rgba(108,99,255,.15)' : '';
+  });
+
+  const call   = networkCalls[idx];
+  const detail = document.getElementById('net-detail');
+  if (!detail || !call) return;
+
+  const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const fmtJson = s => {
+    try { return JSON.stringify(JSON.parse(s), null, 2); }
+    catch { return s; }
+  };
+
+  const statusColor = call.status >= 500 ? 'var(--red)' :
+                      call.status >= 400 ? 'var(--yellow)' : 'var(--green)';
+
+  detail.innerHTML = `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <span style="font-weight:700;font-size:13px;color:var(--accent2)">${esc(call.method)}</span>
+      <span style="color:${statusColor};font-weight:700">${call.status}</span>
+      <span style="font-size:10px;color:var(--muted)">${call.ms}ms</span>
+    </div>
+    <div style="word-break:break-all;color:var(--text);margin-bottom:14px;font-size:11px">${esc(call.url)}</div>
+
+    ${call.reqHeaders ? `
+    <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:4px">Request Headers</div>
+    <pre style="background:var(--surface2);padding:8px 10px;border-radius:6px;font-size:11px;overflow-x:auto;margin-bottom:12px;white-space:pre-wrap;word-break:break-all">${esc(call.reqHeaders)}</pre>` : ''}
+
+    ${call.reqBody ? `
+    <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:4px">Request Body</div>
+    <pre style="background:var(--surface2);padding:8px 10px;border-radius:6px;font-size:11px;overflow-x:auto;margin-bottom:12px;white-space:pre-wrap;word-break:break-all">${esc(fmtJson(call.reqBody))}</pre>` : ''}
+
+    ${call.resHeaders ? `
+    <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:4px">Response Headers</div>
+    <pre style="background:var(--surface2);padding:8px 10px;border-radius:6px;font-size:11px;overflow-x:auto;margin-bottom:12px;white-space:pre-wrap;word-break:break-all">${esc(call.resHeaders)}</pre>` : ''}
+
+    ${call.resBody ? `
+    <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:4px">Response Body</div>
+    <pre style="background:var(--surface2);padding:8px 10px;border-radius:6px;font-size:11px;overflow-x:auto;margin-bottom:12px;white-space:pre-wrap;word-break:break-all">${esc(fmtJson(call.resBody))}</pre>` : ''}
+  `;
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────
+connectWS();
+loadTests();
+checkDevice();
+fetchScreenSize();
+loadAllElements();
+loadAllFlows();
+setInterval(checkDevice, 10000);
+setInterval(loadAllElements, 60000); // refresh element list every minute
+setInterval(loadAllFlows, 30000);    // refresh flow list every 30s
+startScreenPoll();
+</script>
+</body>
+</html>

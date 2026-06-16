@@ -1,8 +1,11 @@
 package com.popclub.listener;
 
+import com.popclub.ai.FailureTagReporter;
+import com.popclub.core.ScreenshotUtil;
 import com.popclub.core.TestContext;
 import com.popclub.core.VideoUtil;
 import com.popclub.mobile.cloud.CloudConfig;
+import com.popclub.mobile.driver.DeviceKeepAlive;
 import com.popclub.mobile.driver.DriverManager;
 import com.popclub.model.TestCase;
 import com.popclub.parser.YamlParser;
@@ -86,32 +89,52 @@ public class TestListener implements ITestListener, ISuiteListener {
 
     @Override
     public void onTestSuccess(ITestResult result) {
-        // TODO: Re-enable TestSigma integration once token is refreshed
-        // updateStatus(result, TestCaseStatus.PASSED);
+        stopVideoQuietly(result.getName() + "_passed");
     }
 
     @Override
     public void onTestFailure(ITestResult result) {
-        // TODO: Re-enable TestSigma integration once token is refreshed
-        // updateStatus(result, TestCaseStatus.FAILED);
+        DeviceKeepAlive.stop();
+        AppiumDriver driver = DriverManager.getDriver();
+        if (driver == null) return;
 
-//        AppiumDriver driver = DriverManager.getDriver();
-//        File video = VideoUtil.stopAndSave(driver, result.getName());
-//        if (video == null) return;
-//        List<String> testCases = TestContext.getTestCaseIds();
-//        for (String id : testCases) {
-//            String uuid = id;
-//            if (id.startsWith("PO-")) {
-//                uuid = TestSigmaClient.getTestCaseIdByHumanId(projectId, id);
-//            }
-//            TestSigmaClient.uploadAttachment(uuid, video);
-//        }
+        // 1. Final screenshot at the exact moment of failure
+        String safeName = result.getName().replaceAll("[^a-zA-Z0-9_-]", "_");
+        File screenshot = ScreenshotUtil.capture("FAIL_" + safeName);
+        System.out.println("[TestListener] 📸 Failure screenshot saved.");
+
+        // 2. Stop and save the full video recorded since launchApp
+        try {
+            File video = VideoUtil.stopAndSave(driver, "FAIL_" + safeName);
+            if (video != null) {
+                System.out.println("[TestListener] 🎥 Failure video saved: " + video.getPath());
+            }
+        } catch (Exception e) {
+            System.out.println("[TestListener] ⚠️  Video save failed: " + e.getMessage());
+        }
+
+        // 3. Analyze screen for missing qaTestTags and write report for popdroid
+        String screenshotPath = screenshot != null ? screenshot.getAbsolutePath() : null;
+        String failingElement = TestContext.getFailingElement();
+        FailureTagReporter.report(driver, failingElement, safeName, screenshotPath);
     }
 
     @Override
     public void onTestSkipped(ITestResult result) {
-        // TODO: Re-enable TestSigma integration once token is refreshed
-        // updateStatus(result, TestCaseStatus.SKIPPED);
+        stopVideoQuietly(result.getName() + "_skipped");
+    }
+
+    /** Stop recording without saving — cleans up the Appium buffer on pass/skip. */
+    private void stopVideoQuietly(String label) {
+        DeviceKeepAlive.stop();
+        try {
+            AppiumDriver driver = DriverManager.getDriver();
+            if (driver != null) {
+                VideoUtil.stopAndSave(driver, label);
+            }
+        } catch (Exception ignored) {
+            // Video may not have been started — safe to swallow
+        }
     }
 
     // ===============================

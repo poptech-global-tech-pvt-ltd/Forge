@@ -21,20 +21,23 @@ import java.util.List;
  *
  * Fields:
  *   value  — required; the storage key set by a prior captureText step
+ *   text   — optional; set to "absent" to assert the text is NOT on screen
  *
  * YAML example:
- *
- *   # After navigating to cart, verify the PDP price is still shown
- *   - action: assertStoredText
- *     value: item0_pdp_price
  *
  *   # Verify the product title is visible in the cart
  *   - action: assertStoredText
  *     value: item0_title
  *
+ *   # Verify the product title is gone after removal
+ *   - action: assertStoredText
+ *     value: item0_title
+ *     text: absent
+ *
  * Fails with a clear message if:
  *   - the key was never stored (captureText not run first), OR
- *   - the stored text is not visible on the current screen after scrolling
+ *   - (default) the stored text is not visible on the current screen after scrolling, OR
+ *   - (absent mode) the stored text IS still visible on screen
  */
 public class AssertStoredTextAction implements Action {
 
@@ -65,21 +68,32 @@ public class AssertStoredTextAction implements Action {
                 "assertStoredText: no value stored for key '" + storeKey
                 + "' — did captureText run first?");
 
+        boolean absentMode = "absent".equalsIgnoreCase(step.text);
         AppiumDriver driver = DriverManager.getDriver();
 
-        // ── Tag presence check via UIAutomator (logs, does not fail) ──────────
-        System.out.printf("  🔍 assertStoredText [%s] = \"%s\"%n", storeKey, captured);
+        System.out.printf("  🔍 assertStoredText [%s] = \"%s\" (mode: %s)%n",
+                storeKey, captured, absentMode ? "absent" : "present");
 
-        // ── Assert text is visible (scroll if needed) ─────────────────────────
         boolean found = findOnScreen(driver, captured);
 
-        if (found) {
-            System.out.printf("  ✅ assertStoredText PASS [%s]: \"%s\" visible on screen%n",
-                    storeKey, captured);
+        if (absentMode) {
+            if (!found) {
+                System.out.printf("  ✅ assertStoredText PASS [%s]: \"%s\" not on screen%n",
+                        storeKey, captured);
+            } else {
+                throw new RuntimeException(
+                    "assertStoredText FAIL [" + storeKey + "]: \""
+                    + captured + "\" still visible on screen after expected removal");
+            }
         } else {
-            throw new RuntimeException(
-                "assertStoredText FAIL [" + storeKey + "]: \""
-                + captured + "\" not found on screen");
+            if (found) {
+                System.out.printf("  ✅ assertStoredText PASS [%s]: \"%s\" visible on screen%n",
+                        storeKey, captured);
+            } else {
+                throw new RuntimeException(
+                    "assertStoredText FAIL [" + storeKey + "]: \""
+                    + captured + "\" not found on screen");
+            }
         }
     }
 

@@ -1,0 +1,83 @@
+testName: Shop — Add to Cart Success Toast
+platform: android
+noReset: true
+loginRequired: false
+
+features:
+  - common
+  - shop
+
+tags:
+  - smoke
+  - shop
+
+retry: 1
+
+steps:
+  # ── 1. Launch and login ───────────────────────────────────────────────────────
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  # ── 2. Navigate to Shop ───────────────────────────────────────────────────────
+  - action: waitFor
+    element: home_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  - action: waitFor
+    element: shop_search_button
+
+  # ── 3. Search for a product ───────────────────────────────────────────────────
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: enterText
+    element: search_products_search_input
+    value: "t-shirt"
+
+  - action: pressKey
+    value: search
+
+  - action: waitFor
+    element: product_list_item_0
+
+  # ── 4. Open product details ───────────────────────────────────────────────────
+  - action: tap
+    element: product_list_item_0
+
+  - action: waitFor
+    element: product_details_title
+
+  # ── 5. Tap Add to Cart CTA to open size selection ─────────────────────────────
+  - action: tap
+    element: product_details_bottom_sticky_bar_button
+
+  - action: waitFor
+    element: size_selection_item_0
+
+  # ── 6. Select size and add to cart ────────────────────────────────────────────
+  - action: tap
+    element: size_selection_item_0
+
+  - action: tap
+    element: size_selection_add_to_cart_button
+
+  - action: scanTags
+
+  # ── 7. Verify "Added to cart" toast appears ───────────────────────────────────
+  - action: waitFor
+    locator: add_to_cart_snackbar   # TODO: add to elements/shop.yaml once QA tag is confirmed
+
+  # ── 8. Verify Go to Cart button appears (durable success signal) ──────────────
+  - action: waitFor
+    element: product_details_go_to_cart_button
+
+  - action: verifyElement
+    element: product_details_go_to_cart_button

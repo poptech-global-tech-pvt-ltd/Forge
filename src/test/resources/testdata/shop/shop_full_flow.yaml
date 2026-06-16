@@ -1,0 +1,116 @@
+testName: Shop — Full Flow (Search → PDP → Add to Cart → Cart Verify)
+platform: android
+noReset: true
+loginRequired: true
+
+testCaseIds:
+  - PO-SHOP-FULL-FLOW
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - smoke
+  - shop
+  - full_flow
+
+retry: 1
+
+steps:
+  # ── 1. Launch app ─────────────────────────────────────────────────────────────
+  - action: launchApp
+
+  # loginIfNeeded: logs in if login screen is visible, no-op if already logged in
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  # ── 2. Verify home loaded and navigate to Shop ────────────────────────────────
+  - action: waitFor
+    element: home_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  - action: scanTags
+
+  # ── 3. Verify Shop CLP loaded ─────────────────────────────────────────────────
+  - action: waitFor
+    element: shop_search_button
+
+  # ── 4. Open search ────────────────────────────────────────────────────────────
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: scanTags
+
+  # ── 5. Search for a product ───────────────────────────────────────────────────
+  - action: enterText
+    element: search_products_search_input
+    value: "t-shirt"
+
+  - action: pressKey
+    value: search
+
+  - action: waitFor
+    element: product_list_item_0
+
+  - action: scanTags
+
+  # ── 6. Open first product ─────────────────────────────────────────────────────
+  - action: tap
+    element: product_list_item_0
+
+  - action: waitFor
+    element: product_details_title
+
+  - action: scanTags
+
+  # ── 7. Add to cart — tap sticky bar to open size selection ────────────────────
+  - action: tap
+    element: product_details_bottom_sticky_bar_button
+
+  - action: waitFor
+    element: size_selection_item_0
+
+  - action: scanTags
+
+  # ── 8. Select size and confirm add to cart ────────────────────────────────────
+  - action: tap
+    element: size_selection_item_0
+
+  - action: tap
+    element: size_selection_add_to_cart_button
+
+  - action: waitFor
+    element: product_details_go_to_cart_button
+
+  - action: scanTags
+
+  # ── 9. Go to cart ─────────────────────────────────────────────────────────────
+  - action: tap
+    element: product_details_go_to_cart_button
+
+  - action: scanTags
+
+  # ── 10. Verify cart contents ──────────────────────────────────────────────────
+  - action: waitFor
+    element: cart_item_row_0
+
+  - action: verifyElement
+    element: cart_delivery_address_card
+
+  - action: verifyElement
+    element: cart_to_pay_row
+
+  # ── 11. Verify Pay CTA is present ─────────────────────────────────────────────
+  - action: verifyElement
+    element: cart_s2_s_payment_button_button
+
+  - action: scanTags

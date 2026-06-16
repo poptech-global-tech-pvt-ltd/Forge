@@ -42,6 +42,22 @@ public class ActionFactory {
             // ── Text capture / assertion primitives ───────────────────────────
             case "captureText":              return new CaptureTextAction();
             case "assertStoredText":         return new AssertStoredTextAction();
+            case "assertText":               return new AssertTextAction();
+
+            // ── API calls ─────────────────────────────────────────────────────
+            case "fetchApi":                 return new FetchApiAction();
+
+            // ── Conditional flow / reusable call ─────────────────────────────
+            // These are intercepted by TestExecutor before ActionFactory is reached.
+            // Registered here only to prevent "Unknown action" errors on lookup.
+            case "ifPresent":                return step -> {}; // no-op sentinel
+            case "ifNotPresent":             return step -> {}; // no-op sentinel
+            case "ifVarEmpty":               return step -> {}; // no-op sentinel
+            case "ifVarNotEmpty":            return step -> {}; // no-op sentinel
+            case "ifVarEquals":              return step -> {}; // no-op sentinel
+            case "ifVarNotEquals":           return step -> {}; // no-op sentinel
+            case "logVar":                   return step -> {}; // no-op sentinel
+            case "call":                     return step -> {}; // no-op sentinel
 
             // ── Search / Cart / Wishlist flows ────────────────────────────────
             case "searchAndVerifyCartPrice": return new SearchCartPriceAction();
