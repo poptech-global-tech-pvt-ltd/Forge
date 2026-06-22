@@ -37,7 +37,9 @@ public class LaunchAppAction implements Action {
 
         // 3. Close and relaunch so every test starts from a clean app state.
         //    When noReset=true: don't force-restart, but DO launch the app if it isn't running.
-        if (TestContext.isNoReset()) {
+        //    Exception: -DforceRestart=true (set by Forge UI on full runs) always restarts.
+        boolean forceRestart = Boolean.parseBoolean(System.getProperty("forceRestart", "false"));
+        if (!forceRestart && TestContext.isNoReset()) {
             ensureAppRunning((AndroidDriver) driver);
         } else {
             forceRestartApp((AndroidDriver) driver);
