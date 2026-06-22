@@ -1276,6 +1276,16 @@
   .chat-bubble.assistant { align-self:flex-start; background:var(--surface); border:1px solid var(--border); border-radius:2px 12px 12px 12px; padding:8px 12px; max-width:100%; }
   .chat-bubble.assistant.streaming { border-color:var(--accent); }
   .chat-bubble.status { align-self:flex-start; background:transparent; border:none; color:var(--muted); font-size:11.5px; padding:2px 4px; font-style:italic; }
+  /* MCP tool activity card */
+  .chat-mcp-card { align-self:flex-start; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:8px 12px; font-size:11.5px; max-width:100%; margin:2px 0; }
+  .chat-mcp-card .mcp-header { color:var(--muted); font-size:10px; letter-spacing:.05em; text-transform:uppercase; margin-bottom:5px; }
+  .chat-mcp-card .mcp-row { display:flex; align-items:center; gap:8px; padding:2px 0; }
+  .chat-mcp-card .mcp-row .mcp-icon { width:18px; text-align:center; flex-shrink:0; }
+  .chat-mcp-card .mcp-row .mcp-label { color:var(--fg); flex:1; }
+  .chat-mcp-card .mcp-row .mcp-time { color:var(--muted); font-size:10px; font-family:monospace; }
+  .chat-mcp-card .mcp-row.active .mcp-label { color:var(--accent2); }
+  .chat-mcp-card .mcp-row.done .mcp-label { color:var(--green); }
+  .chat-mcp-card .mcp-row.done .mcp-icon { filter:none; }
   .chat-cursor { display:inline-block; width:7px; height:13px; background:var(--accent); animation:blink 0.7s step-end infinite; margin-left:2px; vertical-align:text-bottom; }
   @keyframes blink { 50% { opacity:0; } }
 
@@ -5818,6 +5828,8 @@ function sendChat() {
   _chatYaml         = '';
 
   _chatEditorStreaming = false;  // reset live-preview flag for new message
+  _mcpCard    = null;           // reset MCP activity card for new message
+  _mcpLastRow = null;
 
   // Create assistant streaming bubble
   _chatStreamBubble = appendChatBubble('', 'assistant streaming');
@@ -5843,12 +5855,56 @@ function sendChat() {
 // Show a small italic status line while Claude is using a tool
 // Replaces the previous status bubble so only the latest step shows
 let _chatStatusBubble = null;
+let _mcpCard     = null;  // the live MCP activity card element
+let _mcpLastRow  = null;  // the currently-active row
+let _mcpStart    = 0;     // timestamp when current tool started
+
 function handleChatStatus(label) {
-  // Remove previous status bubble
+  const msgs = document.getElementById('chat-messages');
+
+  // Create MCP card on first tool call of this response
+  if (!_mcpCard) {
+    _mcpCard = document.createElement('div');
+    _mcpCard.className = 'chat-mcp-card';
+    const hdr = document.createElement('div');
+    hdr.className = 'mcp-header';
+    hdr.textContent = '⚙ Forge MCP';
+    _mcpCard.appendChild(hdr);
+    msgs.appendChild(_mcpCard);
+  }
+
+  // Mark previous row as done with elapsed time
+  if (_mcpLastRow) {
+    _mcpLastRow.classList.remove('active');
+    _mcpLastRow.classList.add('done');
+    const elapsed = ((Date.now() - _mcpStart) / 1000).toFixed(1);
+    const timeEl = _mcpLastRow.querySelector('.mcp-time');
+    if (timeEl) timeEl.textContent = elapsed + 's';
+    // swap icon to checkmark
+    const iconEl = _mcpLastRow.querySelector('.mcp-icon');
+    if (iconEl) iconEl.textContent = '✓';
+  }
+
+  // Add new active row
+  const row = document.createElement('div');
+  row.className = 'mcp-row active';
+
+  // Extract emoji icon from label (first char if emoji)
+  const iconMatch = label.match(/^(\p{Emoji_Presentation}|\p{Emoji}️)/u);
+  const icon = iconMatch ? iconMatch[0] : '•';
+  const text = iconMatch ? label.slice(icon.length).trim() : label;
+
+  row.innerHTML = `<span class="mcp-icon">${icon}</span><span class="mcp-label">${text}</span><span class="mcp-time"></span>`;
+  _mcpCard.appendChild(row);
+  _mcpLastRow = row;
+  _mcpStart   = Date.now();
+  msgs.scrollTop = msgs.scrollHeight;
+
+  // Remove old plain status bubble if any
   if (_chatStatusBubble && _chatStatusBubble.parentNode) {
     _chatStatusBubble.parentNode.removeChild(_chatStatusBubble);
+    _chatStatusBubble = null;
   }
-  _chatStatusBubble = appendChatBubble(label, 'status');
 }
 
 function newChatSession() {
@@ -6045,6 +6101,17 @@ function handleChatDone(fullResponse, success) {
   if (_chatStatusBubble && _chatStatusBubble.parentNode) {
     _chatStatusBubble.parentNode.removeChild(_chatStatusBubble);
     _chatStatusBubble = null;
+  }
+  // Finalize last MCP row
+  if (_mcpLastRow) {
+    _mcpLastRow.classList.remove('active');
+    _mcpLastRow.classList.add('done');
+    const elapsed = ((Date.now() - _mcpStart) / 1000).toFixed(1);
+    const timeEl = _mcpLastRow.querySelector('.mcp-time');
+    if (timeEl) timeEl.textContent = elapsed + 's';
+    const iconEl = _mcpLastRow.querySelector('.mcp-icon');
+    if (iconEl) iconEl.textContent = '✓';
+    _mcpLastRow = null;
   }
 
   if (_chatStreamBubble) {
