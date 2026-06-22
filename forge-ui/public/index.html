@@ -6074,11 +6074,9 @@ function handleChatDone(fullResponse, success) {
         document.getElementById('editor-filename').textContent = 'chat-generated (unsaved)';
       }
       _chatEditorStreaming = false;
-    } else if (!editorDirty) {
-      // Wasn't streamed (e.g. tool result came back as a block) — load now
-      chatLoadInEditor();
     } else {
-      appendChatBubble('💡 YAML ready — click "Open in Editor" to load (your current edits are unsaved)', 'assistant');
+      // Always auto-open in editor — no button click required
+      chatLoadInEditor();
     }
   }
 
