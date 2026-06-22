@@ -20,12 +20,30 @@ public class Step {
     public int retry;
     public String testCaseId;
 
+    /**
+     * Per-step poll timeout in seconds.
+     * -1 = inherit the test's {@code defaultTimeout} (set in TestCase YAML).
+     * Mirrors Maestro's per-command timeout override.
+     * Example: a slow payment screen step can use {@code timeout: 60}.
+     */
+    public int timeout = -1;
+
+    /**
+     * Maximum number of swipes before giving up (used by scrollUntilVisible).
+     * -1 = use the action default (15).
+     */
+    public int maxScrolls = -1;
+
     // ── Conditional logic (ifPresent / ifNotPresent / ifVarEquals …) ────────────
     /** Nested steps executed when the condition is met (then-branch). */
     public List<Step> steps;
     /** Nested steps executed when the condition is NOT met (else-branch). */
     @JsonProperty("else")
     public List<Step> elseBranch;
+
+    // ── Element existence assertion ───────────────────────────────────────────
+    /** If set, verifyElement checks presence (true) or absence (false) of element. */
+    public Boolean shouldExist;
 
     // ── Variable capture ──────────────────────────────────────────────────────
     /** Key name to store captured text under (used by captureText). */
@@ -38,6 +56,11 @@ public class Step {
     public Map<String, String> params;
 
     // ── API call ──────────────────────────────────────────────────────────────
+    /** Service name for callService (e.g. "search.plp"). Resolved via ServiceRegistry. */
+    public String service;
+    /** Number of times to repeat (used by repeat action). */
+    public int times = -1;
+
     /** Full URL to call (supports ${var} interpolation). */
     public String url;
     /** HTTP method: GET (default), POST, PUT, DELETE, PATCH. */

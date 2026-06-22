@@ -1,0 +1,39 @@
+testName: Shop — CLP API vs UI scroll check
+platform: android
+noReset: true
+loginRequired: true
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - smoke
+  - clp
+  - shop
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  - action: waitFor
+    element: shop_search_icon
+
+  # Fetch shopmerch-30 presentation API, scroll to each section by clp_section_row_{i},
+  # read clp_section_title_{i}, and assert it matches the API section title.
+  # Prints a full API vs UI comparison table.
+  - action: clpScrollAndCheck
+    value: SHOP

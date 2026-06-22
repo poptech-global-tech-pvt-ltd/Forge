@@ -1,0 +1,70 @@
+- generic [ref=e3]:
+  - banner [ref=e56]:
+    - generic [ref=e57]:
+      - generic [ref=e58]:
+        - img [ref=e59] [cursor=pointer]
+        - generic [ref=e61] [cursor=pointer]: Save & exit
+      - generic [ref=e62]: Eligibility
+  - generic [ref=e65]:
+    - generic [ref=e66]:
+      - heading "Check your eligibility" [level=4] [ref=e68]
+      - generic [ref=e69]:
+        - generic [ref=e70]:
+          - generic: First name
+          - textbox [ref=e71]: Deepa
+        - generic [ref=e72]:
+          - generic: Middle name
+          - textbox [ref=e73]: D
+      - generic [ref=e74]:
+        - generic: Last name
+        - textbox [ref=e75]: Hegde
+      - generic [ref=e77]:
+        - generic: Date of birth
+        - textbox [ref=e80] [cursor=pointer]: 06 / 05 / 1997
+      - generic [ref=e81]:
+        - generic: Personal email
+        - textbox [ref=e82]: dhegdetech@gmail.com
+      - generic [ref=e83]:
+        - generic [ref=e84]: Type of Occupation
+        - generic [ref=e85]:
+          - generic [ref=e86]:
+            - radio "Salaried" [checked] [ref=e87] [cursor=pointer]
+            - generic [ref=e88] [cursor=pointer]: Salaried
+          - generic [ref=e89]:
+            - radio "Self Employed" [ref=e90] [cursor=pointer]
+            - generic [ref=e91] [cursor=pointer]: Self Employed
+      - generic [ref=e92]:
+        - generic [ref=e93]: Marital Status
+        - generic [ref=e94]:
+          - generic [ref=e95]:
+            - radio "married" [checked] [active] [ref=e96] [cursor=pointer]
+            - generic [ref=e97] [cursor=pointer]: married
+          - generic [ref=e98]:
+            - radio "single" [ref=e99] [cursor=pointer]
+            - generic [ref=e100] [cursor=pointer]: single
+          - generic [ref=e101]:
+            - radio "divorced" [ref=e102] [cursor=pointer]
+            - generic [ref=e103] [cursor=pointer]: divorced
+          - generic [ref=e104]:
+            - radio "widowed" [ref=e105] [cursor=pointer]
+            - generic [ref=e106] [cursor=pointer]: widowed
+          - generic [ref=e107]:
+            - radio "separated" [ref=e108] [cursor=pointer]
+            - generic [ref=e109] [cursor=pointer]: separated
+          - generic [ref=e110]:
+            - radio "others" [ref=e111] [cursor=pointer]
+            - generic [ref=e112] [cursor=pointer]: others
+      - generic [ref=e113]:
+        - generic [ref=e114]: Gender
+        - generic [ref=e115]:
+          - generic [ref=e116]:
+            - radio "FEMALE" [ref=e117] [cursor=pointer]
+            - generic [ref=e118] [cursor=pointer]: FEMALE
+          - generic [ref=e119]:
+            - radio "MALE" [ref=e120] [cursor=pointer]
+            - generic [ref=e121] [cursor=pointer]: MALE
+          - generic [ref=e122]:
+            - radio "THIRDGENDER" [ref=e123] [cursor=pointer]
+            - generic [ref=e124] [cursor=pointer]: THIRDGENDER
+    - button "Continue" [ref=e128] [cursor=pointer]:
+      - generic [ref=e129]: Continue

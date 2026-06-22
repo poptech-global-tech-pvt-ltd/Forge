@@ -1,0 +1,31 @@
+- generic [ref=e3]:
+  - banner [ref=e557]:
+    - generic [ref=e558]:
+      - generic [ref=e559]:
+        - img [ref=e560] [cursor=pointer]
+        - generic [ref=e562] [cursor=pointer]: Save & exit
+      - generic [ref=e563]: Personal Details
+  - generic [ref=e565]:
+    - heading "Select card delivery address" [level=4] [ref=e567]
+    - generic [ref=e568]:
+      - generic [ref=e569] [cursor=pointer]:
+        - heading "Current Address:" [level=5] [ref=e570]
+        - paragraph [ref=e571]: 317 3rd floor RR residency
+        - paragraph [ref=e572]: Hsr layout sector 2
+        - paragraph
+        - paragraph
+        - paragraph [ref=e573]: Bangalore
+        - paragraph [ref=e574]: Karnataka
+        - paragraph [ref=e575]: "560102"
+      - generic [ref=e576] [cursor=pointer]:
+        - heading "Office Address:" [level=5] [ref=e577]
+        - paragraph [ref=e578]: Madkam centre Mulleria Kerala
+        - paragraph [ref=e579]: 671543 India Kasaragod Kerala
+        - paragraph [ref=e580]: "671543"
+        - paragraph
+        - paragraph [ref=e581]: Kasaragod
+        - paragraph [ref=e582]: Kerala
+        - paragraph [ref=e583]: "671543"
+    - generic [ref=e585]:
+      - button "Continue" [disabled]:
+        - generic: Continue

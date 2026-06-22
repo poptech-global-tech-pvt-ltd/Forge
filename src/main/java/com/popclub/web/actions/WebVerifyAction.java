@@ -4,7 +4,7 @@ import com.microsoft.playwright.ElementHandle;
 import com.microsoft.playwright.Page;
 import com.popclub.core.ElementRepository;
 import com.popclub.core.Locator;
-import com.popclub.mobile.actions.Action;
+import com.popclub.android.actions.Action;
 import com.popclub.model.Step;
 import com.popclub.web.driver.PlaywrightContext;
 import org.slf4j.Logger;

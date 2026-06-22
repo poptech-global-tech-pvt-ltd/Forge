@@ -54,8 +54,10 @@ public class OtpPage {
     }
 
     public OtpPage fillPhone(String phone) {
-        log.info("Filling phone number");
-        page.locator(PHONE_INPUT).fill(phone);
+        // Strip +91 or 91 prefix — the input expects 10-digit number only
+        String digits = phone.replaceAll("^\\+?91", "");
+        log.info("Filling phone number: {}", digits);
+        page.locator(PHONE_INPUT).fill(digits);
         return this;
     }
 

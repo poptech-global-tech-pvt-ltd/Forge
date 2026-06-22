@@ -1,0 +1,27 @@
+- generic [ref=e3]:
+  - banner [ref=e5]:
+    - generic [ref=e6]:
+      - img [ref=e7] [cursor=pointer]
+      - generic [ref=e9]: Eligibility
+  - generic [ref=e12]:
+    - heading "Check your eligibility" [level=4] [ref=e14]
+    - generic [ref=e15]:
+      - generic: Mobile number
+      - textbox [ref=e16]: "1234564890"
+    - generic [ref=e19]:
+      - generic [ref=e21]:
+        - generic [ref=e22] [cursor=pointer]:
+          - heading "Terms & Conditions" [level=2] [ref=e23]
+          - img [ref=e24]
+        - generic [ref=e29]:
+          - generic [ref=e31]:
+            - checkbox [checked] [ref=e32] [cursor=pointer]
+            - paragraph [ref=e34]: I accept the important terms & conditions to apply for the POPcard
+          - generic [ref=e36]:
+            - checkbox [checked] [ref=e37] [cursor=pointer]
+            - paragraph [ref=e39]: I authorise POP to call/SMS/e-mail/send Whatsapp messages to me regarding my applications.
+          - generic [ref=e41]:
+            - checkbox [checked] [ref=e42] [cursor=pointer]
+            - paragraph [ref=e44]: I authorise POP to verify my official details from NSDL using my PAN card.
+      - button "Continue" [ref=e45] [cursor=pointer]:
+        - generic [ref=e46]: Continue

@@ -63,11 +63,16 @@ public class ClpApiClient {
     private final String userId;
 
     /**
-     * @param userId The logged-in user's ID.  Pass "null" (string) to get
-     *               non-personalised data, which still returns the full widget list.
+     * @param userId The logged-in user's ID.  Pass null/blank to auto-resolve
+     *               from TestContext (set during loginIfNeeded).
      */
     public ClpApiClient(String userId) {
-        this.userId = (userId == null || userId.isBlank()) ? "null" : userId;
+        // Prefer: explicit arg → TestContext userId → "null" (unauthenticated fallback)
+        String resolved = (userId != null && !userId.isBlank() && !userId.equals("null"))
+                ? userId
+                : TestContext.getUserId();
+        this.userId = (resolved != null && !resolved.isBlank()) ? resolved : "null";
+        log.info("[ClpApiClient] userId resolved → {}", this.userId);
     }
 
     // ── Convenience single-page shortcuts ─────────────────────────────────────
@@ -95,41 +100,61 @@ public class ClpApiClient {
         return response;
     }
 
-    // ── All-sections fetch (single call, no pagination) ───────────────────────
+    // ── All-sections fetch with pagination ───────────────────────────────────
 
     /**
-     * Fetches all sections for the given CLP page in a single API call.
-     * The CLP API returns all sections at once — no page parameter needed.
+     * Fetches ALL sections for the given CLP page, following pagination.
+     * Calls page=0, page=1, page=2 … until the API signals no more pages
+     * or MAX_PAGES is reached.
      *
-     * @return flat list of every section JsonNode from the response
+     * Matches the real app URL shape:
+     *   GET presentation-layer/{userId}/{pageId}?page=N
+     *
+     * @return flat list of every section JsonNode across all pages
      */
     public List<JsonNode> fetchAllSections(Page page) throws Exception {
         ObjectMapper   mapper = new ObjectMapper();
         List<JsonNode> all    = new ArrayList<>();
 
-        log.info("[ClpApiClient] fetchAllSections({}) …", page.displayName);
+        log.info("[ClpApiClient] fetchAllSections({}) userId={} …", page.displayName, userId);
 
-        Response response = fetch(page, 0);   // pageNum ignored — URL has no ?page param
+        for (int pageNum = 0; pageNum < MAX_PAGES; pageNum++) {
+            Response response = fetch(page, pageNum);
 
-        if (response.statusCode() != 200) {
-            throw new RuntimeException(
-                    "CLP API returned HTTP " + response.statusCode()
-                    + " for " + page.displayName);
+            if (response.statusCode() != 200) {
+                if (pageNum == 0) {
+                    throw new RuntimeException(
+                            "CLP API returned HTTP " + response.statusCode()
+                            + " for " + page.displayName);
+                }
+                // Non-zero page returning error → treat as end of pagination
+                log.warn("[ClpApiClient] page={} returned HTTP {} — stopping pagination",
+                        pageNum, response.statusCode());
+                break;
+            }
+
+            JsonNode root  = mapper.readTree(response.body().asString());
+            int      added = collectDataNodes(root, all);
+
+            log.info("[ClpApiClient] {} page={} → {} sections (total so far: {})",
+                    page.displayName, pageNum, added, all.size());
+
+            // Stop if this page was empty or API signals no more pages
+            if (added == 0 || !hasMorePages(root, pageNum)) break;
         }
 
-        JsonNode root = mapper.readTree(response.body().asString());
-        int added = collectDataNodes(root, all);
-
-        log.info("[ClpApiClient] fetchAllSections({}) → {} sections", page.displayName, added);
+        log.info("[ClpApiClient] fetchAllSections({}) → {} total sections", page.displayName, all.size());
         return all;
     }
 
     // ── Helpers ────────────────────────────────────────────────────────────────
 
     private String buildUrl(Page page, int pageNum) {
-        // No page query parameter — the CLP API returns all sections in one call.
+        // Matches real app network shape:
+        // GET https://presentation.popclub.co.in/api/presentation-layer/{userId}/{pageId}?page=N
         return ApiConstants.PRESENTATION_BASE_URL
-                + "presentation-layer/" + userId + "/" + page.pageId;
+                + "presentation-layer/" + userId + "/" + page.pageId
+                + "?page=" + pageNum;
     }
 
     private Map<String, String> buildHeaders() {

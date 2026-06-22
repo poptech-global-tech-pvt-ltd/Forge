@@ -1,0 +1,184 @@
+- generic [ref=e1]:
+  - generic [ref=e3]:
+    - banner [ref=e56]:
+      - generic [ref=e57]:
+        - generic [ref=e58]:
+          - img [ref=e59] [cursor=pointer]
+          - generic [ref=e61] [cursor=pointer]: Save & exit
+        - generic [ref=e62]: Eligibility
+    - generic [ref=e65]:
+      - generic [ref=e66]:
+        - heading "Check your eligibility" [level=4] [ref=e68]
+        - generic [ref=e69]:
+          - generic [ref=e70]:
+            - generic: First name
+            - textbox [ref=e71]: Deepa
+          - generic [ref=e72]:
+            - generic: Middle name
+            - textbox [ref=e73]: D
+        - generic [ref=e74]:
+          - generic: Last name
+          - textbox [ref=e75]: Hegde
+        - generic [ref=e77]:
+          - generic: Date of birth
+          - textbox [active] [ref=e80] [cursor=pointer]
+        - generic [ref=e81]:
+          - generic: Personal email
+          - textbox [ref=e82]: dhegdetech@gmail.com
+        - generic [ref=e83]:
+          - generic [ref=e84]: Type of Occupation
+          - generic [ref=e85]:
+            - generic [ref=e86]:
+              - radio "Salaried" [ref=e87] [cursor=pointer]
+              - generic [ref=e88] [cursor=pointer]: Salaried
+            - generic [ref=e89]:
+              - radio "Self Employed" [ref=e90] [cursor=pointer]
+              - generic [ref=e91] [cursor=pointer]: Self Employed
+        - generic [ref=e92]:
+          - generic [ref=e93]: Marital Status
+          - generic [ref=e94]:
+            - generic [ref=e95]:
+              - radio "married" [ref=e96] [cursor=pointer]
+              - generic [ref=e97] [cursor=pointer]: married
+            - generic [ref=e98]:
+              - radio "single" [ref=e99] [cursor=pointer]
+              - generic [ref=e100] [cursor=pointer]: single
+            - generic [ref=e101]:
+              - radio "divorced" [ref=e102] [cursor=pointer]
+              - generic [ref=e103] [cursor=pointer]: divorced
+            - generic [ref=e104]:
+              - radio "widowed" [ref=e105] [cursor=pointer]
+              - generic [ref=e106] [cursor=pointer]: widowed
+            - generic [ref=e107]:
+              - radio "separated" [ref=e108] [cursor=pointer]
+              - generic [ref=e109] [cursor=pointer]: separated
+            - generic [ref=e110]:
+              - radio "others" [ref=e111] [cursor=pointer]
+              - generic [ref=e112] [cursor=pointer]: others
+        - generic [ref=e113]:
+          - generic [ref=e114]: Gender
+          - generic [ref=e115]:
+            - generic [ref=e116]:
+              - radio "FEMALE" [ref=e117] [cursor=pointer]
+              - generic [ref=e118] [cursor=pointer]: FEMALE
+            - generic [ref=e119]:
+              - radio "MALE" [ref=e120] [cursor=pointer]
+              - generic [ref=e121] [cursor=pointer]: MALE
+            - generic [ref=e122]:
+              - radio "THIRDGENDER" [ref=e123] [cursor=pointer]
+              - generic [ref=e124] [cursor=pointer]: THIRDGENDER
+      - button "Continue" [ref=e128] [cursor=pointer]:
+        - generic [ref=e129]: Continue
+  - dialog "Choose Date" [ref=e135]:
+    - alert [ref=e136]: May 1997
+    - button "Previous Month" [ref=e137] [cursor=pointer]:
+      - generic: Previous Month
+    - button "Next Month" [ref=e195] [cursor=pointer]:
+      - generic: Next Month
+    - generic [ref=e138]:
+      - generic [ref=e139]:
+        - generic [ref=e140]: May 1997
+        - generic [ref=e141]:
+          - combobox [ref=e143]:
+            - option "January"
+            - option "February"
+            - option "March"
+            - option "April"
+            - option "May" [selected]
+            - option "June"
+            - option "July"
+            - option "August"
+            - option "September"
+            - option "October"
+            - option "November"
+            - option "December"
+          - combobox [ref=e145]:
+            - option "1966"
+            - option "1967"
+            - option "1968"
+            - option "1969"
+            - option "1970"
+            - option "1971"
+            - option "1972"
+            - option "1973"
+            - option "1974"
+            - option "1975"
+            - option "1976"
+            - option "1977"
+            - option "1978"
+            - option "1979"
+            - option "1980"
+            - option "1981"
+            - option "1982"
+            - option "1983"
+            - option "1984"
+            - option "1985"
+            - option "1986"
+            - option "1987"
+            - option "1988"
+            - option "1989"
+            - option "1990"
+            - option "1991"
+            - option "1992"
+            - option "1993"
+            - option "1994"
+            - option "1995"
+            - option "1996"
+            - option "1997" [selected]
+            - option "1998"
+            - option "1999"
+            - option "2000"
+            - option "2001"
+            - option "2002"
+            - option "2003"
+            - option "2004"
+            - option "2005"
+        - generic [ref=e146]:
+          - generic "Sunday" [ref=e147]: Su
+          - generic "Monday" [ref=e148]: Mo
+          - generic "Tuesday" [ref=e149]: Tu
+          - generic "Wednesday" [ref=e150]: We
+          - generic "Thursday" [ref=e151]: Th
+          - generic "Friday" [ref=e152]: Fr
+          - generic "Saturday" [ref=e153]: Sa
+      - listbox "Month May, 1997" [ref=e232]:
+        - generic [ref=e155]:
+          - option "Choose Sunday, April 27th, 1997" [ref=e233] [cursor=pointer]: "27"
+          - option "Choose Monday, April 28th, 1997" [ref=e234] [cursor=pointer]: "28"
+          - option "Choose Tuesday, April 29th, 1997" [ref=e235] [cursor=pointer]: "29"
+          - option "Choose Wednesday, April 30th, 1997" [ref=e236] [cursor=pointer]: "30"
+          - option "Choose Thursday, May 1st, 1997" [ref=e237] [cursor=pointer]: "1"
+          - option "Choose Friday, May 2nd, 1997" [ref=e238] [cursor=pointer]: "2"
+          - option "Choose Saturday, May 3rd, 1997" [ref=e239] [cursor=pointer]: "3"
+        - generic [ref=e163]:
+          - option "Choose Sunday, May 4th, 1997" [ref=e240] [cursor=pointer]: "4"
+          - option "Choose Monday, May 5th, 1997" [ref=e241] [cursor=pointer]: "5"
+          - option "Choose Tuesday, May 6th, 1997" [ref=e242] [cursor=pointer]: "6"
+          - option "Choose Wednesday, May 7th, 1997" [ref=e243] [cursor=pointer]: "7"
+          - option "Choose Thursday, May 8th, 1997" [ref=e244] [cursor=pointer]: "8"
+          - option "Choose Friday, May 9th, 1997" [ref=e245] [cursor=pointer]: "9"
+          - option "Choose Saturday, May 10th, 1997" [ref=e246] [cursor=pointer]: "10"
+        - generic [ref=e171]:
+          - option "Choose Sunday, May 11th, 1997" [ref=e247] [cursor=pointer]: "11"
+          - option "Choose Monday, May 12th, 1997" [ref=e248] [cursor=pointer]: "12"
+          - option "Choose Tuesday, May 13th, 1997" [ref=e249] [cursor=pointer]: "13"
+          - option "Choose Wednesday, May 14th, 1997" [ref=e250] [cursor=pointer]: "14"
+          - option "Choose Thursday, May 15th, 1997" [ref=e251] [cursor=pointer]: "15"
+          - option "Choose Friday, May 16th, 1997" [ref=e252] [cursor=pointer]: "16"
+          - option "Choose Saturday, May 17th, 1997" [ref=e253] [cursor=pointer]: "17"
+        - generic [ref=e179]:
+          - option "Choose Sunday, May 18th, 1997" [ref=e254] [cursor=pointer]: "18"
+          - option "Choose Monday, May 19th, 1997" [ref=e255] [cursor=pointer]: "19"
+          - option "Choose Tuesday, May 20th, 1997" [ref=e256] [cursor=pointer]: "20"
+          - option "Choose Wednesday, May 21st, 1997" [ref=e257] [cursor=pointer]: "21"
+          - option "Choose Thursday, May 22nd, 1997" [ref=e258] [cursor=pointer]: "22"
+          - option "Choose Friday, May 23rd, 1997" [ref=e259] [cursor=pointer]: "23"
+          - option "Choose Saturday, May 24th, 1997" [ref=e260] [cursor=pointer]: "24"
+        - generic [ref=e187]:
+          - option "Choose Sunday, May 25th, 1997" [ref=e261] [cursor=pointer]: "25"
+          - option "Choose Monday, May 26th, 1997" [ref=e262] [cursor=pointer]: "26"
+          - option "Choose Tuesday, May 27th, 1997" [ref=e263] [cursor=pointer]: "27"
+          - option "Choose Wednesday, May 28th, 1997" [ref=e264] [cursor=pointer]: "28"
+          - option "Choose Thursday, May 29th, 1997" [ref=e265] [cursor=pointer]: "29"
+          - option "Choose Friday, May 30th, 1997" [ref=e266] [cursor=pointer]: "30"
+          - option "Choose Saturday, May 31st, 1997" [ref=e267] [cursor=pointer]: "31"

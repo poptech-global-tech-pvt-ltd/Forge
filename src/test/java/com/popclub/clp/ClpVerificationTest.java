@@ -1,11 +1,12 @@
 package com.popclub.clp;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.popclub.api.auth.AuthApiClient;
 import com.popclub.api.util.ApiConstants;
 import com.popclub.core.TestContext;
-import com.popclub.mobile.driver.AppiumDriverManager;
-import com.popclub.mobile.driver.AppiumServerManager;
-import com.popclub.mobile.driver.DriverManager;
+import com.popclub.android.driver.AppiumDriverManager;
+import com.popclub.android.driver.AppiumServerManager;
+import com.popclub.android.driver.DriverManager;
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.AppiumDriver;
 import org.openqa.selenium.By;

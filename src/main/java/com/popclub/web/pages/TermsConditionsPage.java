@@ -16,6 +16,7 @@ public class TermsConditionsPage {
     private static final String CALL_SMS_CHECKBOX = "input[name='call-sms-email']";
     private static final String PAN_CHECKBOX      = "input[name='PAN']";
     private static final String CONSENT_TOGGLE    = "form svg, form img[alt=''], form button[aria-expanded], .consent-toggle, [class*='toggle'], [class*='expand']";
+    // T&C Continue is the last Continue button on the OTP page (phone section also has one)
     private static final String CONTINUE_BUTTON   = "button:has-text('Continue')";
 
     public TermsConditionsPage(Page page) {
@@ -63,8 +64,10 @@ public class TermsConditionsPage {
 
     public void clickContinue() {
         log.info("Clicking Continue on TermsConditionsPage");
-        page.locator(CONTINUE_BUTTON).waitFor(
-                new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
-        page.locator(CONTINUE_BUTTON).click();
+        // Use last() — the T&C Continue is always below the phone Continue on the OTP page
+        Locator btn = page.locator(CONTINUE_BUTTON).last();
+        btn.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        btn.scrollIntoViewIfNeeded();
+        btn.click();
     }
 }

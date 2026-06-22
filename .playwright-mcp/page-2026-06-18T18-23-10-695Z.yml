@@ -1,0 +1,42 @@
+- generic [ref=e3]:
+  - banner [ref=e5]:
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - img [ref=e8] [cursor=pointer]
+        - generic [ref=e10] [cursor=pointer]: Save & exit
+      - generic [ref=e11]: Eligibility
+  - generic:
+    - generic:
+      - generic:
+        - generic:
+          - heading "Check your eligibility" [level=4]
+        - generic:
+          - generic:
+            - generic: First name
+            - textbox
+          - generic:
+            - generic: Middle name
+            - textbox
+        - generic:
+          - generic: Last name
+          - textbox
+        - generic:
+          - generic:
+            - generic: Date of birth
+            - generic:
+              - generic:
+                - textbox
+        - generic:
+          - generic: Personal email
+          - textbox
+        - generic:
+          - generic: Type of Occupation
+        - generic:
+          - generic: Marital Status
+        - generic:
+          - generic: Gender
+      - generic:
+        - generic:
+          - generic:
+            - button "Continue" [disabled]:
+              - generic: Continue

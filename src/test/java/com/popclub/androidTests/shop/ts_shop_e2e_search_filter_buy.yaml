@@ -1,0 +1,176 @@
+testName: Shop E2E — Search with Filter then Buy
+platform: android
+noReset: true
+loginRequired: true
+
+# Flow: Search → Verify filter button present → Apply category filter
+#        → Verify results updated → PDP → Add to Cart → Proceed to payment
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - shop
+  - plp
+  - filter
+  - e2e
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  # ── API: get product data for later price validation ──────────────────────
+  - action: call
+    flow: plp_search_and_capture
+    params:
+      search_query:   "the souled store"
+      search_pincode: "560102"
+
+  # ── Open filter panel ─────────────────────────────────────────────────────
+  - action: verifyElement
+    element: product_list_filter_button
+    shouldExist: true
+
+  - action: tap
+    element: product_list_filter_button
+
+  # ── Select first category filter item ─────────────────────────────────────
+  - action: waitFor
+    element: product_filter_category_item_0
+
+  - action: captureText
+    element: product_filter_category_item_0
+    variable: filter_category_name
+
+  - action: logVar
+    variable: filter_category_name
+    value: "Applying filter category: ${filter_category_name}"
+
+  - action: tap
+    element: product_filter_category_item_0
+
+  # Select first sub-item if visible
+  - action: tapIfPresent
+    element: product_filter_sub_item_0
+
+  - action: tap
+    element: product_filter_apply_button
+
+  # ── Verify filtered results loaded ────────────────────────────────────────
+  - action: waitFor
+    element: product_list_item_0
+
+  - action: logVar
+    variable: filter_category_name
+    value: "Filter applied: ${filter_category_name} — results loaded"
+
+  # ── Tap first result → PDP ────────────────────────────────────────────────
+  - action: tap
+    element: product_list_item_0
+
+  - action: waitFor
+    element: product_details_title
+
+  - action: captureText
+    element: product_details_title
+    variable: filtered_product_title
+
+  - action: captureText
+    element: product_details_price
+    variable: filtered_product_price
+
+  - action: captureText
+    element: product_details_strikethrough_price
+    variable: filtered_product_strikethrough_price
+
+  - action: logVar
+    variable: filtered_product_title
+    value: |
+      ── Filtered product PDP ──
+      title        - ${filtered_product_title}
+      price        - ${filtered_product_price}
+      strikethrough- ${filtered_product_strikethrough_price}
+
+  - action: verifyElement
+    element: product_details_bottom_sticky_bar_button
+    shouldExist: true
+
+  # ── Add to Cart ───────────────────────────────────────────────────────────
+  - action: tap
+    element: product_details_bottom_sticky_bar_button
+
+  - action: waitFor
+    element: size_selection_item_0
+
+  - action: tap
+    element: size_selection_item_0
+
+  - action: tap
+    element: size_selection_add_to_cart_button
+
+  - action: waitFor
+    element: product_details_go_to_cart_button
+
+  - action: tap
+    element: product_details_go_to_cart_button
+
+  # ── Mini-cart bottomsheet ─────────────────────────────────────────────────
+  - action: captureText
+    element: cart_s2_s_payment_button_button
+    variable: cart_bottomsheet_cta
+
+  - action: ifVarEquals
+    variable: cart_bottomsheet_cta
+    value: "Add address"
+    steps:
+      - action: tap
+        element: cart_s2_s_payment_button_button_2
+      - action: call
+        flow: add_address
+        params:
+          addressLine1: "123 MG Road"
+          first_name: "Deepa"
+          last_name: "Hegde"
+          address_mobile_number: "6361463451"
+
+  - action: tap
+    element: cart_s2_s_payment_button_button_2
+
+  - action: waitFor
+    element: cart_item_row_0
+
+  # ── Verify filtered product is in cart ────────────────────────────────────
+  - action: findCartItemIndex
+    value: "${filtered_product_title}"
+    variable: cart_item_index
+
+  - action: scrollTo
+    element: cart_item_row_${cart_item_index}
+
+  - action: assertText
+    element: cart_item_title_${cart_item_index}
+    value: "${filtered_product_title}"
+
+  - action: assertText
+    element: cart_item_price_${cart_item_index}
+    value: "${filtered_product_price}"
+
+  # ── Proceed to payment ────────────────────────────────────────────────────
+  - action: tap
+    element: cart_link_and_pay_button
+
+  - action: waitFor
+    element: shop_payment_screen_row

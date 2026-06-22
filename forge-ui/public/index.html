@@ -180,7 +180,90 @@
   .logo { font-size: 18px; font-weight: 700; color: var(--accent2); letter-spacing: -.02em; flex-shrink: 0; }
   .logo span { color: var(--muted); font-weight: 400; }
 
-  .select-wrap { position: relative; flex: 1; min-width: 200px; }
+  .select-wrap { position: relative; flex: 1; min-width: 200px; display: flex; align-items: center; gap: 4px; }
+  .select-wrap-inner { position: relative; flex: 1; }
+  .test-picker { display: flex; align-items: center; gap: 4px; min-width: 0; overflow: hidden; }
+  .test-picker .select-wrap-inner { min-width: 120px; max-width: 260px; flex: 1; }
+  .picker-arrow { color: var(--muted); font-size: 16px; flex-shrink: 0; line-height: 1; }
+  .btn-delete-test {
+    flex-shrink: 0;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    color: var(--red);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 5px 10px;
+    line-height: 1;
+    transition: color .15s, border-color .15s, background .15s;
+  }
+  .btn-delete-test:hover:not(:disabled) { color: #fff; border-color: rgba(239,68,68,.8); background: var(--red); }
+  .btn-delete-test:disabled { opacity: .25; cursor: default; }
+  /* ── Test search combobox ── */
+  .test-search-wrap { position: relative; flex: 0 1 220px; min-width: 120px; display: flex; align-items: center; }
+  .test-search-input {
+    width: 100%; background: var(--surface2); color: var(--text);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 5px 26px 5px 8px; font-size: 12px; outline: none; box-sizing: border-box; min-width: 0;
+  }
+  .test-search-input:focus { border-color: var(--accent); }
+  .test-search-input::placeholder { color: var(--muted); }
+  .test-search-clear {
+    position: absolute; right: 6px; background: none; border: none; color: var(--muted);
+    cursor: pointer; font-size: 12px; line-height: 1; padding: 0; display: none;
+  }
+  .test-search-clear:hover { color: var(--text); }
+  .test-search-panel {
+    position: fixed; top: auto; left: auto; right: auto; display: none;
+    background: var(--surface2); border: 1px solid var(--accent); border-radius: 8px;
+    max-height: 320px; overflow-y: auto; z-index: 9999;
+    box-shadow: 0 8px 28px rgba(0,0,0,.55);
+    min-width: 320px;
+  }
+  .tsp-item {
+    display: flex; align-items: center; gap: 7px; padding: 8px 12px; cursor: pointer;
+    font-size: 12px; border-bottom: 1px solid var(--border);
+  }
+  .tsp-item:last-child { border-bottom: none; }
+  .tsp-item:hover, .tsp-item.tsp-active { background: rgba(108,99,255,.12); }
+  .tsp-folder { font-size: 10px; color: var(--muted); flex-shrink: 0; background: var(--surface);
+    padding: 1px 5px; border-radius: 4px; border: 1px solid var(--border); }
+  .tsp-name { flex: 1; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tsp-tag { font-size: 9px; color: var(--accent2); background: rgba(108,99,255,.15);
+    padding: 1px 5px; border-radius: 3px; flex-shrink: 0; }
+  /* ── Test management icon buttons ── */
+  .btn-icon {
+    flex-shrink: 0; background: var(--surface2); border: 1px solid var(--border); border-radius: 7px;
+    color: var(--accent2); font-size: 18px; cursor: pointer; padding: 5px 10px; line-height: 1;
+    transition: color .15s, border-color .15s, background .15s;
+  }
+  .btn-icon:hover:not(:disabled) { color: #fff; border-color: var(--accent); background: var(--accent); }
+  .btn-icon:disabled { opacity: .25; cursor: default; }
+  /* ── Run history panel ── */
+  .run-history-wrap { position: relative; flex-shrink: 0; }
+  .run-history-panel {
+    position: absolute; top: calc(100% + 4px); right: 0;
+    width: 380px; max-height: 340px; overflow-y: auto;
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 10px;
+    z-index: 300; box-shadow: 0 8px 28px rgba(0,0,0,.45); display: none;
+  }
+  .rh-row {
+    display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+    border-bottom: 1px solid var(--border); cursor: pointer; font-size: 11px;
+  }
+  .rh-row:last-child { border-bottom: none; }
+  .rh-row:hover { background: var(--surface); }
+  .rh-badge { font-size: 10px; padding: 2px 7px; border-radius: 8px; flex-shrink: 0; font-weight: 700; }
+  .rh-badge.rh-pass { background: rgba(34,197,94,.15); color: var(--green); }
+  .rh-badge.rh-fail { background: rgba(239,68,68,.15); color: var(--red); }
+  .rh-name { flex: 1; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .rh-meta { color: var(--muted); font-size: 10px; flex-shrink: 0; }
+  /* ── Batch progress badge ── */
+  .batch-badge {
+    display: none; font-size: 10px; color: var(--accent2); padding: 2px 8px;
+    background: rgba(108,99,255,.12); border: 1px solid rgba(108,99,255,.3);
+    border-radius: 6px; white-space: nowrap;
+  }
   .select-wrap select {
     width: 100%;
     background: var(--surface2);
@@ -196,7 +279,7 @@
     transition: border-color .15s;
   }
   .select-wrap select:focus { border-color: var(--accent); }
-  .select-wrap::after {
+  .select-wrap::after, .select-wrap-inner::after {
     content: '▾';
     position: absolute;
     right: 10px; top: 50%;
@@ -205,6 +288,7 @@
     pointer-events: none;
     font-size: 12px;
   }
+  .select-wrap::after { display: none; } /* chevron moves to inner wrapper */
 
   .btn {
     padding: 8px 18px;
@@ -572,6 +656,21 @@
   }
   .result-badge.success { background: rgba(34,197,94,.15); color: var(--green); display: block; }
   .result-badge.failure { background: rgba(239,68,68,.15); color: var(--red);   display: block; }
+  /* Fix with Claude button — shown inline next to result badge on failure */
+  .btn-fix-claude {
+    display: none; flex-shrink: 0; background: rgba(108,99,255,.15);
+    border: 1px solid rgba(108,99,255,.4); border-radius: 6px;
+    color: var(--accent2); font-size: 11px; font-weight: 600;
+    cursor: pointer; padding: 3px 10px; line-height: 1.6;
+    transition: background .15s; white-space: nowrap;
+  }
+  .btn-fix-claude:hover { background: rgba(108,99,255,.28); }
+  /* Chat context chip — shown below textarea when context is attached */
+  .chat-ctx-chip {
+    font-size: 10px; padding: 2px 8px; background: rgba(108,99,255,.12);
+    border: 1px solid rgba(108,99,255,.3); border-radius: 10px;
+    color: var(--accent2); flex-shrink: 0; white-space: nowrap;
+  }
 
   /* ── Run-from-step button ── */
   .step-run-from {
@@ -589,6 +688,13 @@
   }
   .step-item:hover .step-run-from { opacity: 1; border-color: var(--border); }
   .step-run-from:hover { background: var(--accent); border-color: var(--accent); color: #fff; opacity: 1; }
+  .step-drag-handle { cursor: grab; color: var(--border); font-size: 14px; line-height: 1; padding: 0 4px 0 0; opacity: 0; transition: opacity .15s; flex-shrink: 0; user-select: none; align-self: center; }
+  .step-item:hover .step-drag-handle { opacity: 1; }
+  .step-dup-btn { background: none; border: 1px solid transparent; color: var(--muted); font-size: 10px; padding: 2px 6px; border-radius: 4px; cursor: pointer; opacity: 0; transition: all .15s; flex-shrink: 0; white-space: nowrap; }
+  .step-item:hover .step-dup-btn { opacity: 1; border-color: var(--border); }
+  .step-dup-btn:hover { background: var(--surface2); color: var(--text); opacity: 1; }
+  .step-item.si-drag-over { border-top: 2px solid var(--accent); }
+  .step-item.si-dragging  { opacity: .35; }
 
   /* ── Empty state ── */
   .empty-state {
@@ -697,10 +803,12 @@
     word-break: break-all;
     flex: 1;
   }
-  .inspector-val.highlight { color: var(--accent2); }
-  .inspector-val.empty     { color: var(--muted); font-style: italic; }
-  .inspector-val.badge-true  { color: var(--green); }
-  .inspector-val.badge-false { color: var(--muted); }
+  .inspector-val.highlight    { color: var(--accent2); }
+  .inspector-val.empty        { color: var(--muted); font-style: italic; }
+  .inspector-val.badge-true   { color: var(--green); }
+  .inspector-val.badge-false  { color: var(--muted); }
+  .inspector-val.matched-key  { color: var(--green); font-weight: 600; }
+  .inspector-val.unmatched-key { color: var(--yellow); font-style: italic; }
 
   .copy-tag-btn {
     background: var(--accent);
@@ -1154,9 +1262,303 @@
   .tagsync-apply-btn:hover { opacity: .85; }
   .tagsync-apply-btn:disabled { opacity: .4; cursor: not-allowed; }
 
+  /* ── Recorder ── */
+  .rec-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  /* ── Chat tab ── */
+  .chat-bubble { max-width:100%; line-height:1.55; font-size:13px; white-space:pre-wrap; word-break:break-word; }
+  .chat-bubble.user { align-self:flex-end; background:var(--accent); color:#fff; border-radius:12px 12px 2px 12px; padding:8px 12px; max-width:80%; }
+  .chat-bubble.assistant { align-self:flex-start; background:var(--surface); border:1px solid var(--border); border-radius:2px 12px 12px 12px; padding:8px 12px; max-width:100%; }
+  .chat-bubble.assistant.streaming { border-color:var(--accent); }
+  .chat-bubble.status { align-self:flex-start; background:transparent; border:none; color:var(--muted); font-size:11.5px; padding:2px 4px; font-style:italic; }
+  .chat-cursor { display:inline-block; width:7px; height:13px; background:var(--accent); animation:blink 0.7s step-end infinite; margin-left:2px; vertical-align:text-bottom; }
+  @keyframes blink { 50% { opacity:0; } }
+
+  .rec-dot {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: var(--muted);
+    flex-shrink: 0;
+  }
+  .rec-dot.recording {
+    background: var(--red);
+    box-shadow: 0 0 8px var(--red);
+    animation: recblink 1s ease-in-out infinite;
+  }
+  @keyframes recblink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: .4; }
+  }
+  .rec-step-feed {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .rec-step-feed::-webkit-scrollbar { width: 4px; }
+  .rec-step-feed::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .rec-step-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 12px;
+    animation: chipIn .2s ease-out;
+  }
+  @keyframes chipIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: none; }
+  }
+  .rec-step-num   { font-size: 11px; color: var(--muted); min-width: 22px; }
+  .rec-step-action {
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    color: var(--accent2);
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 9px;
+    border-radius: 5px;
+    flex-shrink: 0;
+  }
+  .rec-step-detail { color: var(--muted); font-family: monospace; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+  .rec-step-del { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 13px; padding: 0 2px; line-height: 1; flex-shrink: 0; opacity: 0; transition: opacity .15s; }
+  .rec-step-chip:hover .rec-step-del { opacity: 1; }
+  .rec-step-del:hover { color: #e05; }
+  .rec-step-drag { cursor: grab; color: var(--border); font-size: 14px; line-height: 1; flex-shrink: 0; opacity: 0; transition: opacity .15s; user-select: none; }
+  .rec-step-chip:hover .rec-step-drag { opacity: 1; }
+  .rec-step-chip.drag-over { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, var(--surface2)); }
+  .rec-step-chip.dragging { opacity: .35; }
+  .rec-yaml-panel {
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+    max-height: 260px;
+    display: flex;
+    flex-direction: column;
+  }
+  .rec-yaml-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--green);
+    flex-shrink: 0;
+  }
+  .rec-yaml-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px 14px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 11px;
+    line-height: 1.6;
+    color: #94a3b8;
+    white-space: pre;
+  }
+  .rec-yaml-body::-webkit-scrollbar { width: 4px; }
+  .rec-yaml-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* ── Recorder action picker (shown on device-screen click while recording) ── */
+  #rec-action-picker {
+    position: fixed;
+    background: var(--surface2);
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    padding: 10px;
+    z-index: 9999;
+    box-shadow: 0 8px 32px rgba(0,0,0,.55);
+    min-width: 240px;
+    max-width: 300px;
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+  }
+  #rec-action-picker .rap-header {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  #rec-action-picker .rap-el-name {
+    font-size: 11px;
+    font-family: 'SF Mono','Fira Code',monospace;
+    color: var(--accent2);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 4px 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  #rec-action-picker .rap-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  #rec-action-picker .rap-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 11px;
+    font-family: 'SF Mono','Fira Code',monospace;
+    padding: 5px 11px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all .12s;
+  }
+  #rec-action-picker .rap-btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+  #rec-action-picker .rap-cancel {
+    font-size: 10px;
+    color: var(--muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    align-self: flex-end;
+    padding: 0 2px;
+    text-decoration: underline;
+  }
+  #rec-action-picker .rap-cancel:hover { color: var(--text); }
+  #rec-action-picker .rap-divider {
+    width: 100%;
+    font-size: 10px;
+    color: var(--muted);
+    text-align: center;
+    padding: 4px 0 2px;
+    border-top: 1px solid var(--border);
+    margin-top: 4px;
+  }
+  /* red recording border on device screen while recording */
+  .rec-recording-ring #device-screen-wrap {
+    outline: 2px solid var(--red);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  /* ── Save modal ─────────────────────────────────────────────────────────── */
+  .save-modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 9000;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .save-modal {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 24px; width: 380px; display: flex; flex-direction: column; gap: 16px;
+    box-shadow: 0 8px 40px rgba(0,0,0,.5);
+  }
+  .save-modal h3 { margin: 0; font-size: 15px; color: var(--text); }
+  .save-modal label { font-size: 11px; color: var(--muted); margin-bottom: 4px; display: block; }
+  .save-modal select, .save-modal input[type=text] {
+    width: 100%; box-sizing: border-box; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 6px; color: var(--text); font-size: 13px; padding: 7px 10px; outline: none;
+  }
+  .save-modal select:focus, .save-modal input[type=text]:focus { border-color: var(--accent); }
+  .save-modal-row { display: flex; gap: 8px; }
+  .save-modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px; }
+  .save-modal-ext { color: var(--muted); font-size: 12px; align-self: center; flex-shrink: 0; }
+
+  /* ── Element Repository ── */
+  .el-repo-toolbar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 14px; border-bottom: 1px solid var(--border); flex-shrink: 0; flex-wrap: wrap;
+  }
+  .el-repo-search {
+    flex: 1; min-width: 120px; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 6px; color: var(--text); font-size: 12px; padding: 5px 9px; outline: none; font-family: var(--font);
+  }
+  .el-repo-search:focus { border-color: var(--accent); }
+  .el-repo-file-pills { display: flex; gap: 6px; flex-wrap: wrap; padding: 6px 14px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+  .el-file-pill {
+    font-size: 11px; padding: 2px 10px; border-radius: 10px; cursor: pointer; border: 1px solid var(--border);
+    background: var(--surface2); color: var(--muted); transition: all .15s; user-select: none;
+  }
+  .el-file-pill:hover  { border-color: var(--accent); color: var(--accent2); }
+  .el-file-pill.active { border-color: var(--accent); background: rgba(108,99,255,.15); color: var(--accent2); font-weight: 600; }
+  .el-repo-table-wrap { flex: 1; overflow: auto; }
+  .el-repo-table { width: 100%; min-width: 600px; border-collapse: collapse; font-size: 12px; }
+  .el-repo-table th {
+    position: sticky; top: 0; background: var(--surface); color: var(--muted);
+    font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    padding: 6px 10px; text-align: left; border-bottom: 1px solid var(--border); z-index: 1;
+  }
+  .el-repo-table td { padding: 5px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .el-repo-table tr:hover td { background: rgba(108,99,255,.05); }
+  .el-key-cell { font-family: 'SF Mono','Fira Code',monospace; color: var(--accent2); font-weight: 600; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .el-loc-cell { font-family: 'SF Mono','Fira Code',monospace; font-size: 11px; color: var(--text); max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .el-file-cell { font-size: 11px; color: var(--muted); }
+  .el-action-cell { display: flex; gap: 4px; justify-content: flex-end; }
+  .el-btn { background: none; border: 1px solid transparent; border-radius: 4px; cursor: pointer; font-size: 11px; color: var(--muted); padding: 2px 6px; transition: all .15s; }
+  .el-btn:hover { border-color: var(--border); color: var(--text); background: var(--surface2); }
+  .el-btn.danger:hover { border-color: var(--red); color: var(--red); background: rgba(239,68,68,.08); }
+  .el-repo-section { padding: 10px 14px 4px; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border); background: var(--bg); }
+  .el-report-section { padding: 12px 14px; border-bottom: 1px solid var(--border); }
+  .el-report-title { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+  .el-report-badge { font-size: 10px; padding: 2px 7px; border-radius: 8px; font-weight: 700; }
+  .el-report-badge.warn { background: rgba(245,158,11,.15); color: var(--yellow); }
+  .el-report-badge.ok   { background: rgba(34,197,94,.15); color: var(--green); }
+  .el-report-badge.err  { background: rgba(239,68,68,.15); color: var(--red); }
+  .el-report-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; max-height: 160px; overflow-y: auto; }
+  .el-report-item { display: flex; align-items: flex-start; gap: 8px; font-size: 11px; padding: 4px 0; border-bottom: 1px solid var(--border); }
+  .el-report-item:last-child { border-bottom: none; }
+  .el-report-key { font-family: 'SF Mono','Fira Code',monospace; color: var(--accent2); min-width: 120px; flex-shrink: 0; }
+  .el-report-meta { color: var(--muted); font-size: 10px; flex: 1; }
+  /* Add element inline form */
+  .el-add-form { display: none; flex-direction: column; gap: 8px; padding: 10px 14px; border-bottom: 2px solid var(--accent); background: rgba(108,99,255,.05); flex-shrink: 0; }
+  .el-add-form.open { display: flex; }
+  .el-add-form label { font-size: 10px; color: var(--muted); margin-bottom: 2px; }
+  .el-add-row { display: flex; gap: 8px; align-items: flex-start; flex-wrap: wrap; }
+  .el-add-input {
+    flex: 1; min-width: 100px; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 6px; color: var(--text); font-size: 12px; padding: 5px 9px; outline: none; font-family: var(--font);
+  }
+  .el-add-input:focus { border-color: var(--accent); }
+
 </style>
 </head>
 <body>
+
+<!-- ── Save / New file modal ──────────────────────────────────────────────── -->
+<div class="save-modal-overlay" id="save-modal-overlay" style="display:none" onclick="if(event.target===this)_saveModalCancel()">
+  <div class="save-modal">
+    <h3 id="save-modal-title">Save Test</h3>
+    <div>
+      <label>Folder</label>
+      <select id="save-modal-folder" onchange="_saveModalFolderChange(this.value)"></select>
+    </div>
+    <div id="save-modal-newfolder-wrap" style="display:none">
+      <label>New folder name</label>
+      <input type="text" id="save-modal-newfolder" placeholder="e.g. shop" />
+    </div>
+    <div>
+      <label>File name</label>
+      <div class="save-modal-row">
+        <input type="text" id="save-modal-filename" placeholder="e.g. ts_add_to_cart" style="flex:1" />
+        <span class="save-modal-ext">.yaml</span>
+      </div>
+    </div>
+    <div class="save-modal-actions">
+      <button class="btn-editor" onclick="_saveModalCancel()">Cancel</button>
+      <button class="btn-editor primary" onclick="_saveModalConfirm()">Save</button>
+    </div>
+  </div>
+</div>
 
 <div class="layout">
 
@@ -1234,6 +1636,9 @@
       <button class="copy-tag-btn" id="copy-text-btn" style="display:none;margin-top:6px;background:var(--surface2);border:1px solid var(--border);color:var(--text)">
         Copy text
       </button>
+      <button class="copy-tag-btn" id="btn-add-to-elements" style="display:none;margin-top:6px;background:rgba(108,99,255,.15);border:1px solid rgba(108,99,255,.4);color:var(--accent2)" onclick="addInspectedToElements()">
+        ➕ Add to elements.yaml
+      </button>
     </div>
 
   </div>
@@ -1310,6 +1715,11 @@
         <button class="tagsync-apply-btn" id="btn-tagsync-apply" onclick="applyTagsToPopdroid()">
           ⚡ Apply to popdroid
         </button>
+        <button class="tagsync-apply-btn" id="btn-tagsync-cancel"
+                style="display:none;background:var(--red);margin-left:6px"
+                onclick="cancelTagSync()">
+          ✕ Cancel
+        </button>
       </div>
     </div>
   </div>
@@ -1321,20 +1731,44 @@
     <div class="header">
       <div class="logo">Forge <span>UI</span></div>
 
-      <div class="select-wrap">
-        <select id="test-select">
-          <option value="">— select a test —</option>
-        </select>
+      <div class="test-picker">
+        <!-- Unified search combobox -->
+        <div class="test-search-wrap">
+          <input id="test-search" type="text" class="test-search-input" placeholder="🔍 search tests…"
+                 oninput="filterTestSearch()" onfocus="openTestSearch()" autocomplete="off" spellcheck="false">
+          <button class="test-search-clear" id="test-search-clear" onclick="clearTestSearch()" tabindex="-1">✕</button>
+          <div id="test-search-panel" class="test-search-panel"></div>
+        </div>
+        <!-- Folder dropdown — visible, filters the search results -->
+        <div class="select-wrap-inner">
+          <select id="folder-select" onchange="onFolderChange()">
+            <option value="">📁 all folders</option>
+          </select>
+        </div>
+        <!-- Hidden test select — still used internally by selectTest() -->
+        <span class="picker-arrow" id="picker-arrow" style="display:none">›</span>
+        <div class="select-wrap-inner" id="test-select-wrap" style="display:none">
+          <select id="test-select">
+            <option value="">— test —</option>
+          </select>
+        </div>
       </div>
 
-      <button class="btn btn-run" id="btn-run" disabled>
-        ▶ Run
-      </button>
-      <button class="btn btn-stop" id="btn-stop">
-        ■ Stop
-      </button>
+      <!-- Test management buttons — outside picker so they never get clipped -->
+      <button id="btn-rename-test" class="btn-icon" onclick="renameTest()" disabled title="Rename test" style="flex-shrink:0">✏</button>
+      <button id="btn-dup-test"    class="btn-icon" onclick="duplicateTestFile()" disabled title="Duplicate test" style="flex-shrink:0">⎘</button>
+      <button id="btn-delete-test" class="btn-delete-test" onclick="deleteSelectedTest()" disabled title="Delete this test file" style="flex-shrink:0">🗑</button>
 
+      <button class="btn btn-run" id="btn-run-folder" style="display:none" onclick="runFolder()" title="Run all tests in the selected folder">▶ Folder</button>
+      <button class="btn btn-run" id="btn-run" disabled>▶ Run</button>
+      <button class="btn btn-stop" id="btn-stop">■ Stop</button>
+      <span class="batch-badge" id="batch-badge"></span>
       <span id="timer"></span>
+      <!-- Run history -->
+      <div class="run-history-wrap">
+        <button class="btn-icon" id="btn-history" onclick="toggleHistory()" title="Run history">📊</button>
+        <div id="run-history-panel" class="run-history-panel"></div>
+      </div>
     </div>
 
     <!-- Body -->
@@ -1349,6 +1783,9 @@
           <div class="tab"        id="tab-editor"   onclick="switchTab('editor')">✏ Editor</div>
           <div class="tab"        id="tab-flows"    onclick="switchTab('flows')">♻ Flows</div>
           <div class="tab"        id="tab-network"  onclick="switchTab('network')">🌐 Network <span id="net-badge" style="display:none;background:var(--accent);color:#fff;font-size:9px;padding:1px 5px;border-radius:8px;margin-left:3px;vertical-align:middle">0</span></div>
+          <div class="tab"        id="tab-recorder" onclick="switchTab('recorder')">⏺ Record</div>
+          <div class="tab"        id="tab-elements" onclick="switchTab('elements')">🗂 Elements</div>
+          <div class="tab"        id="tab-chat"     onclick="switchTab('chat')">💬 Chat</div>
           <span id="test-name" style="font-size:12px;font-weight:600;color:var(--text);margin:auto 18px auto auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
         </div>
 
@@ -1372,6 +1809,7 @@
               <span>✗ Failed</span><span class="val" id="stat-failed">0</span>
             </div>
             <div class="result-badge" id="result-badge"></div>
+            <button id="btn-fix-claude" class="btn-fix-claude" onclick="fixFailingTest()" title="Ask Claude to diagnose and fix this failure">🔧 Fix with Claude</button>
           </div>
         </div>
 
@@ -1383,6 +1821,10 @@
             <button class="btn-editor primary" id="btn-save-test" onclick="saveTest()">Save</button>
           </div>
           <div id="yaml-error-bar" style="display:none;background:#fef2f2;color:#b91c1c;border-bottom:1px solid #fca5a5;padding:6px 12px;font-size:12px;font-family:monospace;white-space:pre-wrap;"></div>
+          <div id="editor-pick-banner" style="display:none;align-items:center;gap:8px;padding:6px 14px;background:#1e293b;border-bottom:1px solid var(--accent);font-size:12px;color:var(--accent)">
+            <span>👆 Tap device screen to fill element key</span>
+            <button onclick="editorPickMode=false;document.getElementById('editor-pick-banner').style.display='none'" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--muted);font-size:13px">✕</button>
+          </div>
           <div class="cm-host" id="cm-host"></div>
         </div>
 
@@ -1430,15 +1872,170 @@
           </div>
         </div>
 
+        <!-- Recorder view -->
+        <div id="view-recorder" style="display:none;flex-direction:column;flex:1;overflow:hidden">
+          <!-- Toolbar -->
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--surface)">
+            <div class="rec-status">
+              <div class="rec-dot" id="rec-dot"></div>
+              <span id="rec-status-label">Not recording</span>
+            </div>
+            <div style="flex:1"></div>
+            <span id="rec-step-count" style="font-size:11px;color:var(--muted)"></span>
+            <button id="btn-rec-start" class="btn btn-run" style="padding:6px 16px;font-size:12px" onclick="startRecording()">
+              ⏺ Start Recording
+            </button>
+            <button id="btn-rec-pause" class="btn btn-stop" style="display:none;padding:6px 16px;font-size:12px" onclick="pauseRecording()">
+              ⏸ Pause
+            </button>
+            <button id="btn-rec-resume" class="btn btn-run" style="display:none;padding:6px 16px;font-size:12px" onclick="resumeRecording()">
+              ▶ Resume
+            </button>
+            <button id="btn-rec-scan" class="btn-editor" style="display:none;padding:6px 14px;font-size:12px" onclick="toggleAutoRead()" title="Toggle auto-read: when ON, taps record without showing the action picker">
+              👁 Auto-read
+            </button>
+            <button id="btn-rec-stop" class="btn btn-stop" style="display:none;padding:6px 16px;font-size:12px" onclick="stopRecording()">
+              ⏹ Stop
+            </button>
+            <button id="btn-rec-save" class="btn-editor primary" style="display:none" onclick="saveRecording()">
+              💾 Save as Test
+            </button>
+            <button class="btn-editor" onclick="clearRecording()" style="color:var(--muted)">Clear</button>
+          </div>
+          <!-- Live step feed -->
+          <div class="rec-step-feed" id="rec-step-feed">
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);gap:8px;padding:40px;text-align:center">
+              <div style="font-size:36px;opacity:.35">⏺</div>
+              <div style="font-size:13px">Press <b>Start Recording</b> then use the app on your device</div>
+              <div style="font-size:12px;opacity:.6">Taps, swipes and text input are captured as YAML steps automatically</div>
+            </div>
+          </div>
+          <!-- YAML output panel (hidden until recording stopped) -->
+          <div class="rec-yaml-panel" id="rec-yaml-panel" style="display:none">
+            <div class="rec-yaml-header">
+              <span>📄 Generated YAML  <span id="rec-yaml-filename" style="color:var(--muted);font-weight:400;font-size:10px"></span></span>
+              <div style="display:flex;gap:8px">
+                <button class="btn-editor" onclick="copyRecordedYaml()">Copy</button>
+                <button class="btn-editor" onclick="loadRecordedYamlInEditor()">Open in Editor</button>
+              </div>
+            </div>
+            <div class="rec-yaml-body" id="rec-yaml-body"></div>
+          </div>
+        </div>
+
+        <!-- Elements Repository view -->
+        <div id="view-elements" style="display:none;flex-direction:column;flex:1;overflow:hidden">
+          <!-- Toolbar -->
+          <div class="el-repo-toolbar">
+            <input id="el-search" class="el-repo-search" placeholder="🔍 search elements…" oninput="filterElements()"/>
+            <button class="btn-editor primary" onclick="openAddElementForm()">+ Add Element</button>
+            <button class="btn-editor" onclick="checkElementUsage()" title="Find missing/unused elements">📊 Usage Report</button>
+            <button class="btn-editor" onclick="checkUntaggedElements()" title="Find screen elements with no element key">🔍 Untagged Check</button>
+          </div>
+          <!-- File pills -->
+          <div class="el-repo-file-pills" id="el-file-pills"></div>
+          <!-- Add element form -->
+          <div class="el-add-form" id="el-add-form">
+            <div style="font-size:12px;font-weight:600;color:var(--text)" id="el-add-form-title">Add Element</div>
+            <div class="el-add-row">
+              <div style="flex:1;min-width:120px">
+                <label>Key name</label>
+                <input id="el-add-key" class="el-add-input" placeholder="e.g. home_cart_icon" style="width:100%"/>
+              </div>
+              <div style="flex:1;min-width:120px">
+                <label>Android locator value</label>
+                <input id="el-add-android" class="el-add-input" placeholder="accessibility id or resource-id" style="width:100%"/>
+              </div>
+              <div style="flex:1;min-width:120px">
+                <label>iOS locator value (optional)</label>
+                <input id="el-add-ios" class="el-add-input" placeholder="same or different" style="width:100%"/>
+              </div>
+              <div style="flex:1;min-width:100px">
+                <label>File</label>
+                <select id="el-add-file" class="el-add-input"></select>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <button class="btn-editor primary" onclick="saveElementEntry()">Save</button>
+              <button class="btn-editor" onclick="closeAddElementForm()">Cancel</button>
+              <span id="el-add-status" style="font-size:11px;color:var(--muted)"></span>
+            </div>
+          </div>
+          <!-- Table -->
+          <div class="el-repo-table-wrap" id="el-repo-table-wrap">
+            <div style="padding:32px;text-align:center;color:var(--muted);font-size:12px" id="el-loading">Loading elements…</div>
+          </div>
+          <!-- Reports section -->
+          <div id="el-reports" style="flex-shrink:0;border-top:1px solid var(--border);max-height:280px;overflow-y:auto;display:none">
+          </div>
+        </div>
+
         <!-- Floating action picker -->
         <div class="action-picker" id="action-picker" style="display:none">
           <div class="picker-header" id="picker-header">Insert tag as…</div>
           <div class="picker-actions" id="picker-actions"></div>
         </div>
 
+        <!-- Recorder interactive action picker (shown on device-screen click while recording) -->
+        <div id="rec-action-picker">
+          <div class="rap-header">What do you want to do?</div>
+          <div class="rap-el-name" id="rap-el-name">—</div>
+          <div class="rap-actions" id="rap-actions"></div>
+          <button class="rap-cancel" onclick="closeRecActionPicker()">cancel</button>
+        </div>
+
       </div>
 
-      <!-- Log resize handle -->
+        <!-- ── Chat tab ── -->
+        <div id="view-chat" style="display:none;flex-direction:column;flex:1;overflow:hidden;min-height:0">
+          <div style="display:flex;align-items:center;padding:6px 12px 0;flex-shrink:0">
+            <span style="font-size:11px;color:var(--muted);flex:1">Claude</span>
+            <button onclick="switchTab('steps')" title="Close chat" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;line-height:1;padding:2px 6px;border-radius:4px" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">✕</button>
+          </div>
+          <div id="chat-messages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;min-height:0"></div>
+          <!-- YAML preview card (hidden until Claude produces YAML) -->
+          <div id="chat-yaml-card" style="display:none;margin:0 16px 8px;border:1px solid var(--border);border-radius:8px;background:var(--surface);overflow:hidden;flex-shrink:0">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid var(--border);background:var(--bg)">
+              <span style="font-size:12px;font-weight:600;color:var(--text)">📄 Generated Test YAML</span>
+              <div style="display:flex;gap:6px">
+                <button class="btn-editor" onclick="chatLoadInEditor()" style="font-size:11px;padding:3px 10px">Open in Editor</button>
+                <button class="btn-editor primary" onclick="chatSaveYaml()" style="font-size:11px;padding:3px 10px">💾 Save…</button>
+              </div>
+            </div>
+            <pre id="chat-yaml-body" style="margin:0;padding:12px;font-size:11px;line-height:1.5;overflow-x:auto;max-height:220px;overflow-y:auto;color:var(--text)"></pre>
+          </div>
+          <!-- Session bar -->
+          <div id="chat-session-bar" style="display:none;padding:3px 16px;background:rgba(99,102,241,.08);border-top:1px solid var(--border);font-size:11px;color:var(--muted);display:flex;align-items:center;gap:8px;flex-shrink:0">
+            <span>💬 Active:</span><span class="active-test-label" style="color:var(--accent2);font-weight:600">—</span>
+            <button onclick="newChatSession()" style="margin-left:auto;background:none;border:1px solid var(--border);border-radius:4px;padding:2px 8px;font-size:11px;color:var(--muted);cursor:pointer">+ New chat</button>
+          </div>
+          <!-- Input bar -->
+          <div style="padding:10px 16px;border-top:2px solid var(--border);background:var(--surface);display:flex;flex-direction:column;gap:6px;flex-shrink:0">
+            <!-- Context chips row (active test + screen) -->
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+              <span id="chat-ctx-test" class="chat-ctx-chip" style="display:none"></span>
+              <span id="chat-ctx-screen" class="chat-ctx-chip" style="display:none">📋 screen attached</span>
+              <button onclick="generateTestFromScreen()" title="Capture current device screen as test context"
+                style="background:none;border:1px solid var(--border);border-radius:5px;color:var(--muted);font-size:11px;padding:2px 8px;cursor:pointer;margin-left:auto"
+                onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">
+                📋 From screen
+              </button>
+            </div>
+            <div style="display:flex;gap:8px;align-items:flex-end">
+              <textarea id="chat-input" rows="2"
+                placeholder="Describe a test — e.g. &quot;verify cart item price matches PDP price&quot;"
+                style="flex:1;resize:vertical;min-height:40px;max-height:120px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px;font-size:13px;color:var(--text);font-family:var(--font);outline:none"
+                onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"
+              ></textarea>
+              <div style="display:flex;flex-direction:column;gap:4px">
+                <button id="btn-chat-send" class="btn btn-run" style="padding:6px 16px;font-size:12px" onclick="sendChat()">Send ↵</button>
+                <button id="btn-chat-cancel" class="btn" style="display:none;padding:4px 10px;font-size:11px;background:var(--red);color:#fff" onclick="cancelChat()">✕ Stop</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      <!-- Log resize handle (hidden in chat tab) -->
       <div class="log-resize-handle" id="log-resize-handle"></div>
 
       <!-- Log -->
@@ -1564,7 +2161,7 @@ function handleMessage(msg) {
       break;
     }
 
-    case 'done':
+    case 'done': {
       running = false;
       showBtnRun();
       stopTimer();
@@ -1573,12 +2170,29 @@ function handleMessage(msg) {
       showResult(msg.success);
       appendLog(msg.success ? '✅ BUILD SUCCESS' : '❌ BUILD FAILURE',
                 msg.success ? 'pass' : 'fail');
+      // Save to run history
+      const doneFile = document.getElementById('test-select').value;
+      const doneStates = Object.values(stepStates);
+      saveRunHistory({
+        file    : doneFile,
+        testName: document.getElementById('test-name').textContent || doneFile,
+        success : msg.success,
+        passed  : doneStates.filter(s => s.status === 'passed').length,
+        failed  : doneStates.filter(s => s.status === 'failed').length,
+        ts      : Date.now(),
+      });
+      // Advance batch queue if active
+      advanceBatch(msg.success);
       break;
+    }
 
     case 'stopped':
       running = false;
       showBtnRun();
       stopTimer();
+      stopScreenPoll();
+      startScreenPoll();  // one final refresh
+      appendLog('⏹ Test stopped by user', 'step');
       break;
 
     case 'apk_install_done':
@@ -1587,8 +2201,9 @@ function handleMessage(msg) {
       break;
 
     case 'qa_tags_done': {
-      // Re-enable apply button and close tag sync modal after claude finishes
-      const applyBtn = document.getElementById('btn-tagsync-apply');
+      const applyBtn  = document.getElementById('btn-tagsync-apply');
+      const cancelBtn = document.getElementById('btn-tagsync-cancel');
+      if (cancelBtn) cancelBtn.style.display = 'none';
       if (applyBtn) {
         applyBtn.textContent = msg.success ? '✅ Done!' : '⚡ Apply to popdroid';
         applyBtn.disabled    = false;
@@ -1598,6 +2213,40 @@ function handleMessage(msg) {
       }
       break;
     }
+
+    case 'recorder_log':
+    case 'recorder_step':
+    case 'recorder_stopped':
+      handleRecorderMessage(msg);
+      break;
+
+    case 'chat_thinking':
+      handleChatThinking(msg.message);
+      break;
+    case 'chat_session':
+      document.getElementById('chat-session-bar').style.display = 'flex';
+      break;
+    case 'chat_active_test':
+      // Server tells us which test is currently active — show it in the bar
+      if (msg.testFile) {
+        const bar = document.getElementById('chat-session-bar');
+        bar.style.display = 'flex';
+        const label = bar.querySelector('.active-test-label');
+        if (label) label.textContent = msg.testFile.split('/').pop();
+      }
+      break;
+    case 'chat_file_saved':
+      handleChatFileSaved(msg.filePath, msg.content);
+      break;
+    case 'chat_status':
+      handleChatStatus(msg.label);
+      break;
+    case 'chat_token':
+      handleChatToken(msg.token);
+      break;
+    case 'chat_done':
+      handleChatDone(msg.response, msg.success);
+      break;
   }
 }
 
@@ -1611,22 +2260,177 @@ function classForLog(line, level) {
   return '';
 }
 
-// ── Tests list ────────────────────────────────────────────────────────────
-async function loadTests() {
-  const res  = await fetch('/api/tests');
-  const list = await res.json();
-  const sel  = document.getElementById('test-select');
-  for (const f of list) {
-    const opt = document.createElement('option');
-    opt.value = f;
-    opt.textContent = f;
-    sel.appendChild(opt);
+// ── Tests list — folder → test cascade ───────────────────────────────────
+let _testTree = {}; // { folderLabel: [ {value, label} ] }
+
+// ── Save / New modal ──────────────────────────────────────────────────────────
+let _saveModalResolve = null;
+
+function showSaveModal({ title = 'Save Test', defaultFolder = '', defaultFile = '' } = {}) {
+  return new Promise(resolve => {
+    _saveModalResolve = resolve;
+
+    document.getElementById('save-modal-title').textContent = title;
+
+    // Populate folder dropdown from current test tree
+    const sel = document.getElementById('save-modal-folder');
+    sel.innerHTML = '';
+    const folders = Object.keys(_testTree).filter(f => f !== '(root)').sort();
+    for (const f of folders) {
+      const o = document.createElement('option');
+      o.value = f; o.textContent = f;
+      sel.appendChild(o);
+    }
+    // Add "New folder…" option at end
+    const newOpt = document.createElement('option');
+    newOpt.value = '__new__'; newOpt.textContent = '＋ New folder…';
+    sel.appendChild(newOpt);
+
+    // Pre-select default folder
+    if (defaultFolder && folders.includes(defaultFolder)) sel.value = defaultFolder;
+    else if (folders.length) sel.value = folders[0];
+
+    _saveModalFolderChange(sel.value);
+
+    document.getElementById('save-modal-filename').value = defaultFile;
+    document.getElementById('save-modal-overlay').style.display = 'flex';
+    setTimeout(() => document.getElementById('save-modal-filename').focus(), 50);
+  });
+}
+
+function _saveModalFolderChange(val) {
+  const wrap = document.getElementById('save-modal-newfolder-wrap');
+  wrap.style.display = val === '__new__' ? 'block' : 'none';
+  if (val === '__new__') setTimeout(() => document.getElementById('save-modal-newfolder').focus(), 50);
+}
+
+function _saveModalCancel() {
+  document.getElementById('save-modal-overlay').style.display = 'none';
+  if (_saveModalResolve) { _saveModalResolve(null); _saveModalResolve = null; }
+}
+
+function _saveModalConfirm() {
+  const folderSel = document.getElementById('save-modal-folder').value;
+  const folder = folderSel === '__new__'
+    ? document.getElementById('save-modal-newfolder').value.trim()
+    : folderSel;
+  const filename = document.getElementById('save-modal-filename').value.trim();
+
+  if (!folder) { document.getElementById('save-modal-newfolder').focus(); return; }
+  if (!filename) { document.getElementById('save-modal-filename').focus(); return; }
+
+  const file = folder + '/' + filename.replace(/\.ya?ml$/i, '') + '.yaml';
+  document.getElementById('save-modal-overlay').style.display = 'none';
+  if (_saveModalResolve) { _saveModalResolve(file); _saveModalResolve = null; }
+}
+
+// Allow Enter key to confirm
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('save-modal-overlay').style.display !== 'none') {
+    e.preventDefault(); _saveModalConfirm();
   }
+  if (e.key === 'Escape' && document.getElementById('save-modal-overlay').style.display !== 'none') {
+    _saveModalCancel();
+  }
+});
+
+let _allTestsMeta = []; // [{ file, testName, tags[] }]
+
+// Global HTML escape helper used by filterTestSearch and others
+function esc(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+async function loadTests() {
+  const [listRes, metaRes] = await Promise.all([
+    fetch('/api/tests'),
+    fetch('/api/tests-meta').catch(() => null),
+  ]);
+  const list = await listRes.json();
+  _allTestsMeta = metaRes ? await metaRes.json() : list.map(f => ({ file: f, testName: f, tags: [] }));
+
+  // Build tree: group by top-level folder
+  _testTree = {};
+  for (const f of list) {
+    const parts  = f.split('/');
+    const folder = parts.length > 1 ? parts[0] : '(root)';
+    if (!_testTree[folder]) _testTree[folder] = [];
+    _testTree[folder].push({ value: f, label: parts[parts.length - 1].replace(/\.ya?ml$/, '') });
+  }
+
+  // Populate folder dropdown (kept hidden, used by selectTest())
+  const folderSel = document.getElementById('folder-select');
+  folderSel.innerHTML = '<option value="">— folder —</option>';
+  for (const folder of Object.keys(_testTree).sort()) {
+    const opt = document.createElement('option');
+    opt.value = folder;
+    opt.textContent = folder + '  (' + _testTree[folder].length + ')';
+    folderSel.appendChild(opt);
+  }
+}
+
+function onFolderChange() {
+  const folder    = document.getElementById('folder-select').value;
+  const testWrap  = document.getElementById('test-select-wrap');
+  const arrow     = document.getElementById('picker-arrow');
+  const testSel   = document.getElementById('test-select');
+
+  // Reset test picker state
+  testSel.innerHTML = '<option value="">— test —</option>';
+  document.getElementById('btn-run').disabled             = true;
+  document.getElementById('btn-delete-test').disabled     = true;
+  document.getElementById('btn-rename-test').disabled     = true;
+  document.getElementById('btn-dup-test').disabled        = true;
+  document.getElementById('btn-run-folder').style.display = folder ? 'flex' : 'none';
+  steps = [];
+  renderSteps();
+  document.getElementById('test-name').textContent = '';
+
+  // Refresh search panel to show only tests in the selected folder
+  document.getElementById('test-search').value = '';
+  document.getElementById('test-search-clear').style.display = 'none';
+  document.getElementById('test-search').placeholder = '🔍 search tests…';
+  closeTestSearch();
+
+  if (!folder) {
+    testWrap.style.display = 'none';
+    arrow.style.display    = 'none';
+    return;
+  }
+
+  // Populate test dropdown for this folder
+  const files = _testTree[folder] || [];
+  for (const f of files) {
+    const opt = document.createElement('option');
+    opt.value = f.value;
+    opt.textContent = f.label;
+    testSel.appendChild(opt);
+  }
+
+  // Show the native test select — reliable, shows all tests
+  testWrap.style.display = 'block';
+  arrow.style.display    = 'inline';
+
+  // Also update search placeholder for cross-folder fallback
+  document.getElementById('test-search').placeholder = `🔍 search in ${folder}…`;
+}
+
+// Select a test by full path (e.g. "shop/ts_shop_clp.yaml") — drives folder then test dropdowns
+function selectTest(file) {
+  if (!file) return;
+  const parts  = file.split('/');
+  const folder = parts.length > 1 ? parts[0] : '(root)';
+  const folderSel = document.getElementById('folder-select');
+  folderSel.value = folder;
+  onFolderChange();
+  document.getElementById('test-select').value = file;
+  document.getElementById('test-select').dispatchEvent(new Event('change'));
 }
 
 document.getElementById('test-select').addEventListener('change', async (e) => {
   const file = e.target.value;
-  document.getElementById('btn-run').disabled = !file;
+  document.getElementById('btn-run').disabled         = !file;
+  document.getElementById('btn-delete-test').disabled  = !file;
+  document.getElementById('btn-rename-test').disabled  = !file;
+  document.getElementById('btn-dup-test').disabled     = !file;
   if (!file) {
     steps = [];
     renderSteps();
@@ -1634,7 +2438,57 @@ document.getElementById('test-select').addEventListener('change', async (e) => {
   }
   await loadSteps(file);
   await loadEditorFile(file);   // keep editor in sync
+  updateChatCtxChip();
 });
+
+async function deleteSelectedTest() {
+  const sel  = document.getElementById('test-select');
+  const file = sel.value;
+  if (!file) return;
+
+  const label = file.split('/').pop().replace(/\.ya?ml$/, '');
+  if (!confirm(`Delete "${label}"?\n\nThis cannot be undone.`)) return;
+
+  const res = await fetch('/api/delete-test', {
+    method : 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body   : JSON.stringify({ file })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: 'Unknown error' }));
+    alert('Delete failed: ' + (err.error || res.status));
+    return;
+  }
+
+  // Remove from in-memory tree and refresh the test dropdown
+  const folder = document.getElementById('folder-select').value;
+  if (folder && _testTree[folder]) {
+    _testTree[folder] = _testTree[folder].filter(f => f.value !== file);
+    // If folder is now empty, remove it from the folder dropdown too
+    if (_testTree[folder].length === 0) {
+      delete _testTree[folder];
+      const folderSel = document.getElementById('folder-select');
+      [...folderSel.options].forEach(o => { if (o.value === folder) o.remove(); });
+      document.getElementById('test-select-wrap').style.display = 'none';
+      document.getElementById('picker-arrow').style.display    = 'none';
+      folderSel.value = '';
+    } else {
+      // Refresh test dropdown for this folder (updates count label too)
+      onFolderChange();
+      // Also update the count label in the folder option
+      const folderSel = document.getElementById('folder-select');
+      [...folderSel.options].forEach(o => {
+        if (o.value === folder) o.textContent = folder + '  (' + _testTree[folder].length + ')';
+      });
+    }
+  }
+  document.getElementById('btn-run').disabled         = true;
+  document.getElementById('btn-delete-test').disabled  = true;
+  steps = [];
+  renderSteps();
+  document.getElementById('test-name').textContent = '';
+  if (cmEditor) cmEditor.setValue('');
+}
 
 async function loadSteps(file) {
   const res  = await fetch(`/api/test-steps?file=${encodeURIComponent(file)}`);
@@ -1692,8 +2546,10 @@ function stepHTML(s) {
 
   return `
     <div class="step-item ${status}${state.warn ? ' invalid' : ''}" id="step-${s.index}" data-index="${s.index}"
+         draggable="true"
          onmouseenter="highlightStepLogs(${s.index})" onmouseleave="unhighlightStepLogs()"
          onclick="pinStepLogs(${s.index})">
+      <span class="step-drag-handle" title="Drag to reorder">⠿</span>
       <div class="step-num">${s.index + 1}</div>
       <div class="step-icon">${icon}</div>
       <div class="step-body">
@@ -1706,6 +2562,7 @@ function stepHTML(s) {
         ${retryHTML}${warnHTML}${errorHTML}
         ${shotHTML}
       </div>
+      <button class="step-dup-btn" onclick="event.stopPropagation();duplicateStep(${s.index})" title="Duplicate step">⎘ dup</button>
       ${status !== 'skipped' ? `<button class="step-run-from" onclick="event.stopPropagation();runFromStep(${s.index})" title="Run from step ${s.index + 1}">▶ from here</button>` : ''}
     </div>`;
 }
@@ -1858,9 +2715,11 @@ function updateStats() {
 }
 
 function showResult(success) {
-  const badge = document.getElementById('result-badge');
-  badge.className = 'result-badge ' + (success ? 'success' : 'failure');
+  const badge   = document.getElementById('result-badge');
+  badge.className   = 'result-badge ' + (success ? 'success' : 'failure');
   badge.textContent = success ? '✓ Passed' : '✗ Failed';
+  // Show "Fix with Claude" only on failure
+  document.getElementById('btn-fix-claude').style.display = success ? 'none' : 'inline-block';
 }
 
 // ── Run / Stop ────────────────────────────────────────────────────────────
@@ -1898,9 +2757,39 @@ document.getElementById('btn-run').addEventListener('click', async () => {
 });
 
 document.getElementById('btn-stop').addEventListener('click', () => {
-  if (ws) ws.send(JSON.stringify({ type: 'stop' }));
   stopScreenPoll();
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ type: 'stop' }));
+  } else {
+    // WS not open (reconnecting) — use HTTP fallback so stop always works
+    fetch('/api/stop', { method: 'POST' })
+      .then(() => handleMessage({ type: 'stopped' }))
+      .catch(() => handleMessage({ type: 'stopped' }));
+  }
 });
+
+async function duplicateStep(index) {
+  const file = document.getElementById('test-select').value;
+  if (!file) return;
+  try {
+    const r = await fetch('/api/step-op', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ op: 'duplicate', file, index }),
+    });
+    const d = await r.json();
+    if (d.ok) {
+      await loadSteps(file);
+      // Sync editor if open on same file
+      if (editorFile === file && cmEditor) loadEditorFile(file);
+      appendLog(`⎘ Duplicated step ${index + 1}`, 'step');
+    } else {
+      appendLog('Duplicate failed: ' + (d.error || 'unknown'), 'error');
+    }
+  } catch (e) {
+    appendLog('Duplicate failed: ' + e.message, 'error');
+  }
+}
 
 function runFromStep(index) {
   const file = document.getElementById('test-select').value;
@@ -1915,13 +2804,13 @@ function runFromStep(index) {
 }
 
 function showBtnRun() {
-  document.getElementById('btn-run').style.display  = '';
+  document.getElementById('btn-run').style.display  = 'flex';
   document.getElementById('btn-stop').style.display = 'none';
 }
 
 function showBtnStop() {
   document.getElementById('btn-run').style.display  = 'none';
-  document.getElementById('btn-stop').style.display = '';
+  document.getElementById('btn-stop').style.display = 'flex';
 }
 
 // ── Log ───────────────────────────────────────────────────────────────────
@@ -2182,7 +3071,8 @@ function showInspectResult(el, imgRect, ratioX, ratioY) {
   document.getElementById('inspect-status').textContent = '';
 
   const rows = [
-    { key: 'accessibilityId', val: el.contentDesc, highlight: true },
+    { key: 'element key',     val: el.elementKey,  highlight: true, matched: true },
+    { key: 'accessibilityId', val: el.contentDesc, highlight: !!el.contentDesc && !el.elementKey },
     { key: 'resource-id',     val: el.resourceId },
     { key: 'text',            val: el.text },
     { key: 'class',           val: el.className ? el.className.split('.').pop() : '' },
@@ -2197,11 +3087,14 @@ function showInspectResult(el, imgRect, ratioX, ratioY) {
     if (r.badge) {
       valClass = r.val ? 'badge-true' : 'badge-false';
       display  = r.val ? 'true' : 'false';
+    } else if (r.matched && r.val) {
+      valClass = 'matched-key';
+      display  = r.val;
     } else if (r.highlight && r.val) {
       valClass = 'highlight';
     } else if (!r.val && r.val !== false) {
-      valClass = 'empty';
-      display  = '—';
+      valClass = r.matched ? 'unmatched-key empty' : 'empty';
+      display  = r.matched ? '⚠ not in elements YAML' : '—';
     }
     const copyable = !r.badge && r.val;
     return `<div class="inspector-row ${copyable ? 'inspector-row-copyable' : ''}"
@@ -2224,14 +3117,26 @@ function showInspectResult(el, imgRect, ratioX, ratioY) {
     hl.style.display = 'block';
   }
 
-  // Copy buttons — accessibilityId and text value separately
+  // Copy buttons — prefer element key (YAML name) over raw accessibilityId
   const copyBtn  = document.getElementById('copy-tag-btn');
   const copyText = document.getElementById('copy-text-btn');
   const tagVal   = el.contentDesc || el.resourceId;
   const textVal  = el.text;
 
-  copyBtn.disabled    = !tagVal;
-  copyBtn.textContent = tagVal ? `Copy accessibilityId  "${tagVal}"` : 'No accessibilityId found';
+  if (el.elementKey) {
+    copyBtn.disabled    = false;
+    copyBtn.textContent = `✅ Copy element key  "${el.elementKey}"`;
+    copyBtn.onclick = () => {
+      navigator.clipboard.writeText(el.elementKey).then(() => {
+        copyBtn.textContent = '✓ Copied!';
+        setTimeout(() => { copyBtn.textContent = `✅ Copy element key  "${el.elementKey}"`; }, 1500);
+      });
+    };
+  } else {
+    copyBtn.disabled    = !tagVal;
+    copyBtn.textContent = tagVal ? `Copy accessibilityId  "${tagVal}"` : 'No accessibilityId found';
+    copyBtn.onclick = null; // reset to default handler
+  }
 
   if (copyText) {
     copyText.style.display = textVal ? 'block' : 'none';
@@ -2246,6 +3151,13 @@ function showInspectResult(el, imgRect, ratioX, ratioY) {
         }, 1500);
       });
     };
+  }
+
+  // Show "Add to elements" only when element has no key but has a locator value
+  const addBtn = document.getElementById('btn-add-to-elements');
+  if (addBtn) {
+    const hasLocator = !!(el.contentDesc || el.resourceId);
+    addBtn.style.display = (!el.elementKey && hasLocator) ? 'block' : 'none';
   }
 }
 
@@ -2322,6 +3234,17 @@ async function sendText() {
   const text  = input.value;
   if (!text) return;
   await deviceAction({ type: 'text', text });
+  // Record enterText step when recorder is running
+  if (recIsRecording) {
+    const yaml = `  - action: enterText\n    value: "${text}"\n`;
+    recSnapshot();
+    recRecordedSteps.push({ action: 'enterText', detail: text, yaml });
+    rebuildManualYaml();
+    renderRecSteps();
+    updateStepCount();
+    appendLog('⌨ recorded enterText: ' + text, 'step');
+    saveRecordingState();
+  }
   input.value = '';
 }
 
@@ -2381,15 +3304,97 @@ document.addEventListener('DOMContentLoaded', () => {
   overlay.style.display = 'block'; // always on
 
   overlay.addEventListener('mousedown', (e) => {
-    if (interactMode === 'swipe') {
+    if (interactMode === 'swipe' || recIsRecording) {
       const { devX, devY } = toDeviceCoords(e);
       swipeStart = { clientX: e.clientX, clientY: e.clientY, devX, devY };
-      e.preventDefault();
+      // Don't preventDefault when recording so mouseup still fires for taps
     }
   });
 
   overlay.addEventListener('mouseup', async (e) => {
     const { devX, devY } = toDeviceCoords(e);
+
+    // ── Editor element-pick mode: tap fills element: line ────────────────────
+    if (editorPickMode && cmEditor) {
+      showRipple(e.clientX, e.clientY);
+      try {
+        const res  = await fetch(`/api/inspect?x=${devX}&y=${devY}`);
+        const data = await res.json();
+        const key  = data.elementKey || data.contentDesc || data.resourceId || data.text || null;
+        if (key) {
+          const cursor = cmEditor.getCursor();
+          const line   = cmEditor.getLine(cursor.line);
+          const indent = line.match(/^(\s*)/)[1];
+          cmEditor.replaceRange(
+            `${indent}element: ${key}\n`,
+            { line: cursor.line, ch: 0 },
+            { line: cursor.line, ch: line.length }
+          );
+          appendLog(`✏ Filled element: ${key}`, 'step');
+        } else {
+          appendLog('No element key found at tap position', 'warn');
+        }
+      } catch (err) {
+        appendLog('Inspect failed: ' + err.message, 'error');
+      }
+      editorPickMode = false;
+      document.getElementById('editor-pick-banner').style.display = 'none';
+      return;
+    }
+
+    // ── Recorder interactive mode: intercept clicks ──────────────────────────
+    if (recIsRecording) {
+      // Detect swipe gesture: >30px drag in any direction
+      const wasDrag = swipeStart &&
+        (Math.abs(devX - swipeStart.devX) > 30 || Math.abs(devY - swipeStart.devY) > 30);
+      if (wasDrag) {
+        const sx = swipeStart.devX, sy = swipeStart.devY;
+        const dy = devY - sy;
+        const dx = devX - sx;
+        // Vertical dominant → scrollDown/scrollUp; horizontal → swipeLeft/swipeRight
+        let dir;
+        if (Math.abs(dy) >= Math.abs(dx)) {
+          dir = dy < 0 ? 'scrollDown' : 'scrollUp';  // swipe up = see content below = scrollDown
+        } else {
+          dir = dx < 0 ? 'swipeLeft' : 'swipeRight';
+        }
+        const swipeYaml = `  - action: ${dir}\n`;
+        recSnapshot();
+        recRecordedSteps.push({ action: dir, detail: dir, yaml: swipeYaml });
+        rebuildManualYaml();
+        renderRecSteps();
+        updateStepCount();
+        appendLog(`↕ recorded ${dir}`, 'step');
+        saveRecordingState();
+        await deviceAction({ type: 'swipe', x: sx, y: sy, x2: devX, y2: devY, duration: 400 });
+        swipeStart = null;
+        return;
+      }
+      swipeStart = null;
+
+      showRipple(e.clientX, e.clientY);
+      try {
+        const img  = document.getElementById('screen-img');
+        const rect = img.getBoundingClientRect();
+        const res  = await fetch(`/api/inspect?x=${devX}&y=${devY}`);
+        const data = await res.json();
+        showInspectResult(data, rect, screenSize.width / rect.width, screenSize.height / rect.height);
+        if (recAutoRead) {
+          autoRecordTap(data, devX, devY);
+          // Clear highlight after brief visual feedback
+          setTimeout(() => { document.getElementById('inspect-highlight').style.display = 'none'; }, 600);
+        } else {
+          openRecActionPicker(data, devX, devY, e.clientX, e.clientY);
+        }
+      } catch (err) {
+        if (recAutoRead) {
+          autoRecordTap(null, devX, devY);
+        } else {
+          openRecActionPicker(null, devX, devY, e.clientX, e.clientY);
+        }
+      }
+      return;
+    }
 
     if (interactMode === 'tap') {
       showRipple(e.clientX, e.clientY);
@@ -2427,32 +3432,73 @@ document.addEventListener('DOMContentLoaded', () => {
     e.preventDefault();
     e.stopPropagation();
     const { devX, devY } = toDeviceCoords(e);
+    const scrollDir = e.deltaY > 0 ? 'scrollDown' : 'scrollUp';
     await deviceAction({ type: 'scroll', x: devX, y: devY, x2: e.deltaY > 0 ? 1 : -1 });
+    // Record scroll step when recorder is running
+    if (recIsRecording) {
+      const wheelYaml = `  - action: ${scrollDir}\n`;
+      recSnapshot();
+      recRecordedSteps.push({ action: scrollDir, detail: scrollDir, yaml: wheelYaml });
+      rebuildManualYaml();
+      renderRecSteps();
+      updateStepCount();
+      appendLog(`${scrollDir === 'scrollDown' ? '↓' : '↑'} recorded ${scrollDir}`, 'step');
+      saveRecordingState();
+    }
   }, { passive: false });
 });
 
 // ── Tab switching ─────────────────────────────────────────────────────────
 function switchTab(tab) {
-  ['steps','editor','flows','network'].forEach(t => {
+  ['steps','editor','flows','network','recorder','elements','chat'].forEach(t => {
     document.getElementById(`tab-${t}`)?.classList.toggle('active', t === tab);
     const v = document.getElementById(`view-${t}`);
     if (v) v.style.display = t === tab ? 'flex' : 'none';
   });
-  if (tab === 'editor') { if (!cmEditor) initEditor(); else setTimeout(() => cmEditor.refresh(), 0); }
-  if (tab === 'flows')  { loadFlowList(); if (!cmFlow) initFlowEditor(); else setTimeout(() => cmFlow.refresh(), 0); }
-  if (tab === 'network') { document.getElementById('net-badge')?.style.setProperty('display','none'); }
+  if (tab === 'editor')   { if (!cmEditor) initEditor(); else setTimeout(() => cmEditor.refresh(), 0); }
+  if (tab === 'flows')    { loadFlowList(); if (!cmFlow) initFlowEditor(); else setTimeout(() => cmFlow.refresh(), 0); }
+  if (tab === 'network')  { document.getElementById('net-badge')?.style.setProperty('display','none'); }
+  if (tab === 'recorder') { document.getElementById('test-name').textContent = ''; }
+  if (tab === 'elements') { loadElementRepo(); }
+  if (tab === 'chat') {
+    document.getElementById('chat-input')?.focus();
+    // Hide log panel + resize handle — chat has its own full-height layout
+    document.getElementById('log-panel').style.display       = 'none';
+    document.getElementById('log-resize-handle').style.display = 'none';
+  } else {
+    document.getElementById('log-panel').style.display       = '';
+    document.getElementById('log-resize-handle').style.display = '';
+  }
 }
 
 // ── CodeMirror editor ─────────────────────────────────────────────────────
 let cmEditor    = null;
-let editorFile  = null;
-let editorDirty = false;
+let editorFile    = null;
+let editorDirty   = false;
+let editorPickMode = false; // when true, next device tap fills element: line
 
 function initEditor() {
   // Register element-name autocomplete for YAML files
+  const ACTION_NAMES = [
+    'tap','waitFor','verifyElement','enterText','scrollTo','longPress',
+    'swipeUp','swipeDown','clearText','tapIfPresent','captureText','assertText',
+    'assertStoredText','ifPresent','ifNotPresent','launchApp','back','sleep',
+    'hideKeyboard','screenshot','call','scanTags','pullToRefresh','pressKey',
+    'scrollDown','scrollUp','tapByText','loginIfNeeded',
+  ];
+
   CodeMirror.registerHelper('hint', 'forge-yaml', (cm) => {
     const cursor = cm.getCursor();
     const line   = cm.getLine(cursor.line);
+
+    // action: <partial>  →  action name autocomplete
+    const mAct = line.match(/^(\s*action:\s*)(\S*)$/);
+    if (mAct) {
+      const typed = mAct[2];
+      const list  = ACTION_NAMES.filter(a => a.toLowerCase().startsWith(typed.toLowerCase()));
+      if (!list.length) return null;
+      return { list, from: CodeMirror.Pos(cursor.line, mAct[1].length), to: cursor };
+    }
 
     // element: <partial>  →  element autocomplete
     const mEl = line.match(/^(\s*element:\s*)(\S*)$/);
@@ -2485,11 +3531,25 @@ function initEditor() {
     lineWrapping  : false,
     autofocus     : true,
     extraKeys     : {
-      'Tab'       : (cm) => cm.replaceSelection('  '),
-      'Ctrl-S'    : saveTest,
-      'Cmd-S'     : saveTest,
-      'Ctrl-Space': (cm) => CodeMirror.showHint(cm, CodeMirror.hint['forge-yaml'],
-                             { completeSingle: false }),
+      'Tab'        : (cm) => cm.replaceSelection('  '),
+      'Ctrl-S'     : saveTest,
+      'Cmd-S'      : saveTest,
+      'Ctrl-Space' : (cm) => CodeMirror.showHint(cm, CodeMirror.hint['forge-yaml'], { completeSingle: false }),
+      'Ctrl-Enter' : () => runEditorStepAtCursor(),
+      'Cmd-Enter'  : () => runEditorStepAtCursor(),
+    }
+  });
+
+  // Detect when cursor lands on element: line → show "click device to fill" banner
+  cmEditor.on('cursorActivity', (cm) => {
+    const line = cm.getLine(cm.getCursor().line) || '';
+    const banner = document.getElementById('editor-pick-banner');
+    if (/^\s*element:\s*$/.test(line) || /^\s*element:\s+$/.test(line)) {
+      editorPickMode = true;
+      if (banner) banner.style.display = 'flex';
+    } else {
+      editorPickMode = false;
+      if (banner) banner.style.display = 'none';
     }
   });
 
@@ -2497,7 +3557,7 @@ function initEditor() {
   cmEditor.on('inputRead', (cm, change) => {
     if (change.origin === '+input') {
       const line = cm.getLine(cm.getCursor().line);
-      if ((/^\s*element:\s*\S*$/.test(line) || /^\s*flow:\s*\S*$/.test(line))
+      if ((/^\s*action:\s*\S*$/.test(line) || /^\s*element:\s*\S*$/.test(line) || /^\s*flow:\s*\S*$/.test(line))
           && !cm.state.completionActive) {
         CodeMirror.showHint(cm, CodeMirror.hint['forge-yaml'], { completeSingle: false });
       }
@@ -2551,7 +3611,13 @@ function showYamlError(msg) {
 }
 
 async function saveTest() {
-  if (!editorFile || !cmEditor) return;
+  if (!cmEditor) return;
+  if (!editorFile) {
+    const file = await showSaveModal({ title: 'Save As', defaultFolder: 'recorded', defaultFile: 'ts_recording' });
+    if (!file) return;
+    editorFile = file;
+    document.getElementById('editor-filename').textContent = editorFile;
+  }
   const content = cmEditor.getValue();
   const btn = document.getElementById('btn-save-test');
   btn.textContent = 'Saving…';
@@ -2590,10 +3656,63 @@ async function saveTest() {
   }
 }
 
+// ── Run step at cursor (Ctrl+Enter) ──────────────────────────────────────────
+
+function runEditorStepAtCursor() {
+  if (!cmEditor) return;
+  const cursor = cmEditor.getCursor();
+  const total  = cmEditor.lineCount();
+
+  // Walk backward to find the enclosing `- action:` line
+  let start = -1;
+  for (let i = cursor.line; i >= 0; i--) {
+    if (/^\s*-\s+action:/.test(cmEditor.getLine(i))) { start = i; break; }
+  }
+  if (start === -1) { appendLog('[Editor] No step at cursor', 'warn'); return; }
+
+  // Collect all indented lines belonging to this step
+  const lines = [cmEditor.getLine(start)];
+  for (let i = start + 1; i < total; i++) {
+    const l = cmEditor.getLine(i);
+    if (/^\s*-\s+action:/.test(l)) break;
+    lines.push(l);
+  }
+
+  // Parse key:value pairs from the step lines
+  const step = {};
+  for (const l of lines) {
+    const m = l.match(/^\s*-?\s*(\w+):\s*(.*)$/);
+    if (m) step[m[1].trim()] = m[2].trim().replace(/^["']|["']$/g, '');
+  }
+
+  const action = step.action;
+  if (!action) { appendLog('[Editor] Could not parse action', 'warn'); return; }
+
+  appendLog(`▶ Run: ${action}${step.element ? ' ' + step.element : step.value ? ' "' + step.value + '"' : ''}`, 'step');
+
+  (async () => {
+    try {
+      const body = { action };
+      if (step.element) body.element = step.element;
+      if (step.value)   body.value   = step.value;
+      if (step.x)       body.x       = +step.x;
+      if (step.y)       body.y       = +step.y;
+
+      const r = await fetch('/api/run-step', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const d = await r.json();
+      if (d.ok)    appendLog(`✓ ${d.message || action}`, 'pass');
+      else         appendLog(`✗ ${d.error}`, 'error');
+    } catch (e) { appendLog('[Editor] Run failed: ' + e.message, 'error'); }
+  })();
+}
+
 async function newTest() {
-  const name = prompt('Test file name (e.g. shop/my_test.yaml):');
-  if (!name) return;
-  const file = name.endsWith('.yaml') ? name : name + '.yaml';
+  const file = await showSaveModal({ title: 'New Test', defaultFolder: 'shop', defaultFile: 'ts_new_test' });
+  if (!file) return;
 
   try {
     const res  = await fetch('/api/new-test', {
@@ -2603,13 +3722,9 @@ async function newTest() {
     });
     const data = await res.json();
     if (data.ok) {
-      // Add to dropdown
-      const sel = document.getElementById('test-select');
-      const opt = document.createElement('option');
-      opt.value = file;
-      opt.textContent = file;
-      sel.appendChild(opt);
-      sel.value = file;
+      // Refresh test tree and select the new file
+      await loadTests();
+      selectTest(file);
 
       editorFile  = file;
       editorDirty = false;
@@ -3178,9 +4293,11 @@ async function applyTagsToPopdroid() {
 
   if (!elements.length) return;
 
-  const btn = document.getElementById('btn-tagsync-apply');
-  btn.textContent = '⏳ Applying…';
-  btn.disabled    = true;
+  const btn    = document.getElementById('btn-tagsync-apply');
+  const cancel = document.getElementById('btn-tagsync-cancel');
+  btn.textContent    = '⏳ Applying…';
+  btn.disabled       = true;
+  if (cancel) cancel.style.display = 'inline-block';
 
   // Switch to Steps tab so log is visible
   switchTab('steps');
@@ -3200,6 +4317,17 @@ async function applyTagsToPopdroid() {
     btn.textContent = '⚡ Apply to popdroid';
     btn.disabled    = false;
   }
+}
+
+async function cancelTagSync() {
+  try { await fetch('/api/cancel-tags', { method: 'POST' }); } catch (_) {}
+  // UI reset will arrive via the qa_tags_done broadcast from server
+  // but reset immediately too in case WS is lagging
+  const applyBtn  = document.getElementById('btn-tagsync-apply');
+  const cancelBtn = document.getElementById('btn-tagsync-cancel');
+  if (cancelBtn) cancelBtn.style.display = 'none';
+  if (applyBtn)  { applyBtn.textContent = '⚡ Apply to popdroid'; applyBtn.disabled = false; }
+  appendLog('⏹ Tag sync cancelled', 'step');
 }
 
 function closeTagSync() {
@@ -3415,14 +4543,9 @@ async function generateTestFromScan() {
       body   : JSON.stringify({ file, content: `# Generated via Build Test\n\n${yaml}` })
     });
 
-    // Add to test dropdown and open in editor
-    const sel = document.getElementById('test-select');
-    if (![...sel.options].find(o => o.value === file)) {
-      const opt = document.createElement('option');
-      opt.value = opt.textContent = file;
-      sel.appendChild(opt);
-    }
-    sel.value   = file;
+    // Refresh test tree and select the new/saved file
+    await loadTests();
+    selectTest(file);
     editorFile  = file;
     editorDirty = false;
     if (!cmEditor) initEditor();
@@ -3502,16 +4625,25 @@ function renderNetworkList() {
                         c.status >= 400 ? 'var(--yellow)' :
                         c.status >= 200 ? 'var(--green)' : 'var(--muted)';
 
-    const shortUrl = (() => {
-      try { const u = new URL(c.url); return u.pathname + (u.search || ''); }
-      catch { return c.url; }
+    // If URL is redacted (***), show the inferred label or a styled placeholder
+    const isRedacted = !c.url || /^\*+$/.test(c.url.trim());
+    const displayUrl = (() => {
+      if (!isRedacted) {
+        try { const u = new URL(c.url); return u.pathname + (u.search || ''); }
+        catch { return c.url; }
+      }
+      if (c.label) return c.label;
+      return '<span style="color:var(--muted);font-style:italic">URL redacted</span>';
     })();
+    const labelStyle = (isRedacted && c.label)
+      ? 'color:var(--text);font-style:italic;'
+      : 'color:var(--text);';
 
     row.innerHTML = `
       <div style="display:flex;align-items:center;gap:6px;padding:7px 12px;cursor:pointer;border-bottom:1px solid var(--border);font-size:12px" onclick="selectNetworkCall(${i})">
         <span style="font-family:monospace;font-size:10px;font-weight:700;color:var(--accent2);min-width:38px">${c.method}</span>
         <span style="color:${statusColor};font-family:monospace;font-size:10px;min-width:30px">${c.status}</span>
-        <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)" title="${c.url}">${shortUrl}</span>
+        <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;${labelStyle}" title="${c.url || ''}">${displayUrl}</span>
         <span style="color:var(--muted);font-size:10px;white-space:nowrap">${c.ms}ms</span>
       </div>`;
     list.appendChild(row);
@@ -3539,13 +4671,15 @@ function selectNetworkCall(idx) {
   const statusColor = call.status >= 500 ? 'var(--red)' :
                       call.status >= 400 ? 'var(--yellow)' : 'var(--green)';
 
+  const urlIsRedacted = !call.url || /^\*+$/.test(call.url.trim());
   detail.innerHTML = `
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
       <span style="font-weight:700;font-size:13px;color:var(--accent2)">${esc(call.method)}</span>
       <span style="color:${statusColor};font-weight:700">${call.status}</span>
       <span style="font-size:10px;color:var(--muted)">${call.ms}ms</span>
+      ${call.label ? `<span style="font-size:11px;color:var(--text);background:var(--surface2);padding:2px 8px;border-radius:10px;border:1px solid var(--border)">${esc(call.label)}</span>` : ''}
     </div>
-    <div style="word-break:break-all;color:var(--text);margin-bottom:14px;font-size:11px">${esc(call.url)}</div>
+    <div style="word-break:break-all;color:${urlIsRedacted ? 'var(--muted)' : 'var(--text)'};margin-bottom:14px;font-size:11px;font-style:${urlIsRedacted ? 'italic' : 'normal'}">${esc(call.url)}</div>
 
     ${call.reqHeaders ? `
     <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:4px">Request Headers</div>
@@ -3565,6 +4699,927 @@ function selectNetworkCall(idx) {
   `;
 }
 
+// ── Recorder ──────────────────────────────────────────────────────────────────
+let recRecordedSteps = [];
+let recYaml          = '';
+let recIsRecording   = false;
+let recManualYaml    = '';  // YAML built step-by-step in interactive mode
+
+function startRecording() {
+  recRecordedSteps = [];
+  recYaml          = '';
+  recManualYaml    = '';
+  recUndoStack     = [];
+  recRedoStack     = [];
+  recIsPaused      = false;
+  renderRecSteps();
+  document.getElementById('rec-yaml-panel').style.display = 'none';
+  document.getElementById('btn-rec-save').style.display   = 'none';
+  localStorage.removeItem('forge_rec_state');
+
+  // ── Optimistic UI: enter recording state immediately ──────────────────
+  // Don't wait for the server — show Stop right away so the user can always stop.
+  recIsRecording = true;
+  document.body.classList.add('rec-recording-ring');
+  document.getElementById('rec-dot').classList.add('recording');
+  document.getElementById('rec-status-label').textContent = 'Starting recorder…';
+  document.getElementById('btn-rec-start').style.display  = 'none';
+  document.getElementById('btn-rec-stop').style.display   = 'flex';
+  document.getElementById('btn-rec-pause').style.display  = 'flex';
+  document.getElementById('btn-rec-resume').style.display = 'none';
+  document.getElementById('btn-rec-scan').style.display   = 'flex';
+
+  fetch('/api/recorder/start', { method: 'POST' })
+    .then(r => r.json())
+    .then(d => {
+      if (d.error) {
+        // Server recorder failed (e.g. Maven not found) — stay in interactive-only mode
+        appendLog('⚠️ Server recorder: ' + d.error + ' — continuing in interactive mode', 'warn');
+        document.getElementById('rec-status-label').textContent = 'Recording… (interactive mode)';
+      } else {
+        document.getElementById('rec-status-label').textContent = 'Recording… (click device screen to add steps)';
+        appendLog('⏺ Recorder started — click the device screen to pick elements & actions', 'step');
+      }
+    })
+    .catch(() => {
+      // Network error — still stay in interactive-only mode
+      appendLog('⏺ Recorder started (interactive mode — server unreachable)', 'step');
+      document.getElementById('rec-status-label').textContent = 'Recording… (interactive mode)';
+    });
+}
+
+function stopRecording() {
+  document.body.classList.remove('rec-recording-ring');
+  closeRecActionPicker();
+
+  // Stop recording immediately — don't wait for server or WS event
+  recIsRecording = false;
+  document.getElementById('rec-dot').classList.remove('recording');
+  document.getElementById('rec-status-label').textContent = 'Recording stopped';
+  document.getElementById('btn-rec-start').style.display  = 'flex';
+  document.getElementById('btn-rec-stop').style.display   = 'none';
+  document.getElementById('btn-rec-pause').style.display  = 'none';
+  document.getElementById('btn-rec-resume').style.display = 'none';
+  document.getElementById('btn-rec-scan').style.display   = 'none';
+  recAutoRead = false;
+  recIsPaused = false;
+  const scanBtn = document.getElementById('btn-rec-scan');
+  scanBtn.style.background = ''; scanBtn.style.color = ''; scanBtn.style.borderColor = '';
+  scanBtn.textContent = '👁 Auto-read';
+  appendLog('⏹ Recorder stopped', 'step');
+  localStorage.removeItem('forge_rec_state');
+
+  fetch('/api/recorder/stop', { method: 'POST' })
+    .then(r => r.json())
+    .then(() => {
+      // recorder_stopped WS event drives the real fetch; this is just a 6s fallback
+      setTimeout(fetchRecorderOutput, 6000);
+    })
+    .catch(() => {
+      // Interactive-only mode (no Java process) — fetch whatever manual YAML we have
+      setTimeout(fetchRecorderOutput, 500);
+    });
+}
+
+function pauseRecording() {
+  fetch('/api/recorder/pause', { method: 'POST' }).catch(() => {});
+  recIsPaused = true;
+  recIsRecording = false; // block new taps being added while paused
+  document.getElementById('btn-rec-pause').style.display  = 'none';
+  document.getElementById('btn-rec-resume').style.display = 'flex';
+  document.getElementById('btn-rec-scan').style.display   = 'none';
+  document.getElementById('rec-status-label').textContent = 'Paused';
+  document.getElementById('rec-dot').classList.remove('recording');
+  appendLog('⏸ Recording paused', 'step');
+  saveRecordingState();
+}
+
+function resumeRecording() {
+  fetch('/api/recorder/resume', { method: 'POST' }).catch(() => {});
+  recIsPaused    = false;
+  recIsRecording = true;
+  document.getElementById('btn-rec-pause').style.display  = 'flex';
+  document.getElementById('btn-rec-resume').style.display = 'none';
+  document.getElementById('btn-rec-scan').style.display   = 'flex';
+  document.getElementById('rec-status-label').textContent = 'Recording…';
+  document.getElementById('rec-dot').classList.add('recording');
+  appendLog('▶ Recording resumed', 'step');
+  saveRecordingState();
+}
+
+function toggleAutoRead() {
+  recAutoRead = !recAutoRead;
+  const btn = document.getElementById('btn-rec-scan');
+  if (recAutoRead) {
+    btn.style.background    = 'var(--accent)';
+    btn.style.color         = '#fff';
+    btn.style.borderColor   = 'var(--accent)';
+    btn.textContent         = '👁 Auto-read: ON';
+    appendLog('👁 Auto-read ON — taps will auto-record without picker', 'step');
+  } else {
+    btn.style.background  = '';
+    btn.style.color       = '';
+    btn.style.borderColor = '';
+    btn.textContent       = '👁 Auto-read';
+    appendLog('👁 Auto-read OFF — tap to pick action', 'step');
+  }
+}
+
+function clearRecording() {
+  recRecordedSteps = [];
+  recYaml          = '';
+  recManualYaml    = '';
+  recUndoStack     = [];
+  recRedoStack     = [];
+  renderRecSteps();
+  document.getElementById('rec-yaml-panel').style.display = 'none';
+  document.getElementById('btn-rec-save').style.display   = 'none';
+  document.getElementById('rec-step-count').textContent   = '';
+  document.getElementById('rec-action-picker').style.display = 'none';
+  localStorage.removeItem('forge_rec_state');
+}
+
+function renderRecSteps() {
+  const feed = document.getElementById('rec-step-feed');
+  if (!recRecordedSteps.length) {
+    feed.innerHTML = `
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);gap:8px;padding:40px;text-align:center">
+        <div style="font-size:36px;opacity:.35">⏺</div>
+        <div style="font-size:13px">Press <b>Start Recording</b> then use the app on your device</div>
+        <div style="font-size:12px;opacity:.6">Taps, swipes and text input are captured as YAML steps automatically</div>
+      </div>`;
+    updateLiveYamlPreview();
+    return;
+  }
+  feed.innerHTML = recRecordedSteps.map((s, i) => `
+    <div class="rec-step-chip" draggable="true" data-idx="${i}">
+      <span class="rec-step-drag" title="Drag to reorder">⠿</span>
+      <span class="rec-step-num">${i + 1}</span>
+      <span class="rec-step-action">${s.action}</span>
+      <span class="rec-step-detail">${s.detail || ''}</span>
+      <button class="rec-step-del" onclick="deleteRecStep(${i})" title="Delete step">✕</button>
+    </div>`).join('');
+  // Scroll to bottom to show latest step
+  feed.scrollTop = feed.scrollHeight;
+  updateLiveYamlPreview();
+}
+
+function deleteRecStep(index) {
+  recSnapshot();
+  recRecordedSteps.splice(index, 1);
+  rebuildManualYaml();
+  renderRecSteps();
+  updateStepCount();
+  saveRecordingState();
+}
+
+function copyRecordedYaml() {
+  if (!recYaml) return;
+  navigator.clipboard.writeText(recYaml).then(() => {
+    const btn = document.querySelector('#rec-yaml-header button');
+    // brief visual feedback handled inline
+  }).catch(() => {});
+}
+
+function loadRecordedYamlInEditor() {
+  if (!recYaml) return;
+  switchTab('editor');
+  // switchTab initialises cmEditor if not already done; give it a tick to finish
+  setTimeout(() => {
+    if (cmEditor) {
+      cmEditor.setValue(recYaml);
+      cmEditor.clearHistory();
+      editorFile  = null;
+      editorDirty = true;
+      document.getElementById('editor-filename').textContent = 'recorded (unsaved)';
+      document.getElementById('editor-filename').classList.add('unsaved');
+      cmEditor.focus();
+    }
+  }, 50);
+}
+
+async function saveRecording() {
+  const file = await showSaveModal({ title: 'Save Recording', defaultFolder: 'recorded', defaultFile: 'ts_recording' });
+  if (!file) return;
+  const res  = await fetch('/api/save-test', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ file, content: recYaml }),
+  });
+  const d = await res.json();
+  if (d.ok) {
+    appendLog('✅ Saved as ' + file, 'pass');
+    await loadTests();
+    selectTest(file);
+    // Switch to Steps so the loaded test is immediately visible
+    switchTab('steps');
+  } else {
+    appendLog('Save failed: ' + (d.error || d.yamlError), 'error');
+  }
+}
+
+// Called from handleMessage when WS events arrive
+function handleRecorderMessage(msg) {
+  switch (msg.type) {
+    case 'recorder_log':
+      // Show recorder output in main log panel so user can see what's happening
+      appendLog(msg.line, msg.level || '');
+      break;
+
+    case 'recorder_step': {
+      const rsYaml = msg.yaml || `  - action: ${msg.action}\n`;
+      recSnapshot();
+      recRecordedSteps.push({ action: msg.action, detail: msg.detail, yaml: rsYaml });
+      rebuildManualYaml();
+      renderRecSteps();
+      updateStepCount();
+      saveRecordingState();
+      break;
+    }
+
+    case 'recorder_stopped':
+      // UI already reset by stopRecording(); just fetch the generated YAML
+      recIsRecording = false;
+      document.getElementById('rec-dot').classList.remove('recording');
+      document.getElementById('rec-status-label').textContent = 'Recording stopped';
+      document.getElementById('btn-rec-start').style.display  = 'flex';
+      document.getElementById('btn-rec-stop').style.display   = 'none';
+      document.getElementById('btn-rec-pause').style.display  = 'none';
+      document.getElementById('btn-rec-resume').style.display = 'none';
+      document.getElementById('btn-rec-scan').style.display   = 'none';
+      // Fetch generated YAML (1.5s gives recorder time to write the file)
+      setTimeout(fetchRecorderOutput, 1500);
+      break;
+  }
+}
+
+
+// ── Recorder interactive action picker ────────────────────────────────────
+
+// Holds the element info and coordinates for the pending recorder action
+let _recPickerEl   = null;  // inspect API result
+let _recPickerDevX = 0;
+let _recPickerDevY = 0;
+let recAutoRead    = false; // when true, taps auto-add step without showing picker
+let recIsPaused    = false; // true while paused
+let recUndoStack   = [];    // snapshots of recRecordedSteps for undo
+let recRedoStack   = [];    // snapshots for redo
+
+// ── Recorder utility helpers ───────────────────────────────────────────────
+
+function updateStepCount() {
+  const n = recRecordedSteps.length;
+  document.getElementById('rec-step-count').textContent = n ? n + ' step' + (n !== 1 ? 's' : '') : '';
+}
+
+function rebuildManualYaml() {
+  if (!recRecordedSteps.length) { recManualYaml = ''; return; }
+  recManualYaml = 'steps:\n' + recRecordedSteps.map(s => s.yaml || '').join('');
+}
+
+function updateLiveYamlPreview() {
+  const panel = document.getElementById('rec-yaml-panel');
+  if (!recRecordedSteps.length) {
+    if (!recYaml) panel.style.display = 'none';
+    return;
+  }
+  const yaml = buildClientYaml();
+  document.getElementById('rec-yaml-body').textContent = yaml;
+  document.getElementById('rec-yaml-filename').textContent = recIsRecording ? '(recording…)' : '(recorded)';
+  panel.style.display = 'flex';
+  if (!recIsRecording) {
+    document.getElementById('btn-rec-save').style.display = 'inline-block';
+  }
+}
+
+// Undo / redo
+function recSnapshot() {
+  recUndoStack.push(JSON.stringify(recRecordedSteps));
+  recRedoStack = [];
+  if (recUndoStack.length > 50) recUndoStack.shift();
+}
+
+function recUndo() {
+  if (!recUndoStack.length) return;
+  recRedoStack.push(JSON.stringify(recRecordedSteps));
+  recRecordedSteps = JSON.parse(recUndoStack.pop());
+  rebuildManualYaml();
+  renderRecSteps();
+  updateStepCount();
+  saveRecordingState();
+  appendLog('↩ undo', 'step');
+}
+
+function recRedo() {
+  if (!recRedoStack.length) return;
+  recUndoStack.push(JSON.stringify(recRecordedSteps));
+  recRecordedSteps = JSON.parse(recRedoStack.pop());
+  rebuildManualYaml();
+  renderRecSteps();
+  updateStepCount();
+  saveRecordingState();
+  appendLog('↪ redo', 'step');
+}
+
+// LocalStorage persistence
+function saveRecordingState() {
+  if (!recIsRecording && !recIsPaused) { localStorage.removeItem('forge_rec_state'); return; }
+  try {
+    localStorage.setItem('forge_rec_state', JSON.stringify({
+      isRecording: recIsRecording,
+      isPaused: recIsPaused,
+      steps: recRecordedSteps,
+      manualYaml: recManualYaml,
+    }));
+  } catch (_) {}
+}
+
+function restoreRecordingState() {
+  try {
+    const raw = localStorage.getItem('forge_rec_state');
+    if (!raw) return;
+    const state = JSON.parse(raw);
+    if (!state.isRecording || !state.steps?.length) { localStorage.removeItem('forge_rec_state'); return; }
+    recRecordedSteps = state.steps;
+    recManualYaml    = state.manualYaml || '';
+    renderRecSteps();
+    updateStepCount();
+    // Show recovered steps + save button — Java recorder is gone after reload
+    recYaml = buildClientYaml();
+    document.getElementById('rec-yaml-body').textContent = recYaml;
+    document.getElementById('rec-yaml-panel').style.display = 'flex';
+    document.getElementById('btn-rec-save').style.display   = 'inline-block';
+    document.getElementById('rec-status-label').textContent = '⚠️ Recording interrupted — ' + state.steps.length + ' steps recovered';
+    appendLog('⚠️ Recording was interrupted by page reload — ' + state.steps.length + ' steps recovered. Save them before starting a new recording.', 'warn');
+    localStorage.removeItem('forge_rec_state');
+    // Switch to recorder tab so user sees the recovery
+    switchTab('recorder');
+  } catch (_) {}
+}
+
+// Icons for the recorder action picker — mirrors STEP_ACTIONS labels
+const REC_ACTION_ICONS = {
+  tap:              '👆',
+  waitFor:          '⏳',
+  verifyElement:    '👁',
+  enterText:        '⌨️',
+  scrollTo:         '📜',
+  longPress:        '🖐',
+  swipeUp:          '⬆️',
+  swipeDown:        '⬇️',
+  clearText:        '🗑',
+  tapIfPresent:     '👆?',
+  captureText:      '📋',
+  assertText:       '✅',
+  assertStoredText: '🔍',
+  ifPresent:        '❓',
+  ifNotPresent:     '❓✗',
+  launchApp:        '🚀',
+  back:             '⬅️',
+  sleep:            '💤',
+  hideKeyboard:     '⌨️✗',
+  screenshot:       '📸',
+  call:             '📞',
+};
+
+function autoRecordTap(elData, devX, devY) {
+  const el   = elData ? (elData.elementKey || elData.contentDesc || elData.resourceId || elData.text) : null;
+  const yaml = el
+    ? `  - action: tap\n    element: ${el}\n`
+    : `  - action: tap\n    x: ${devX}\n    y: ${devY}\n`;
+  const step = el
+    ? { action: 'tap', detail: el, yaml }
+    : { action: 'tap', detail: `(${devX},${devY})`, yaml };
+  recSnapshot();
+  recRecordedSteps.push(step);
+  rebuildManualYaml();
+  renderRecSteps();
+  updateStepCount();
+  appendLog('👆 auto-tap: ' + step.detail, 'step');
+  saveRecordingState();
+  // Also execute the tap on the device so the user sees real-time interaction
+  deviceAction({ type: 'tap', x: devX, y: devY }).catch(() => {});
+}
+
+function openRecActionPicker(elData, devX, devY, clientX, clientY) {
+  _recPickerEl   = elData;
+  _recPickerDevX = devX;
+  _recPickerDevY = devY;
+
+  const picker  = document.getElementById('rec-action-picker');
+  const elName  = document.getElementById('rap-el-name');
+  const actions = document.getElementById('rap-actions');
+
+  // Show element name: prefer accessibilityId, then resourceId, then "(x,y)"
+  const tag = elData
+    ? (elData.contentDesc || elData.resourceId || elData.text || `(${devX},${devY})`)
+    : `(${devX},${devY})`;
+  elName.textContent = tag;
+  elName.title       = tag;
+
+  // Show element-based actions + all global (no-element) actions
+  // Split into two groups with a divider so they're easy to scan
+  const elementActions = STEP_ACTIONS.filter(a => !a.noElement);
+  const globalActions  = STEP_ACTIONS.filter(a =>  a.noElement);
+
+  const makeBtn = (a) => {
+    const icon = REC_ACTION_ICONS[a.label] || '▶';
+    return `<button class="rap-btn" onclick="pickRecAction('${a.label}')">${icon} ${a.label}</button>`;
+  };
+
+  actions.innerHTML =
+    elementActions.map(makeBtn).join('') +
+    `<div class="rap-divider">— no element —</div>` +
+    globalActions.map(makeBtn).join('');
+
+  // Position picker near the click, but keep within viewport
+  picker.style.display = 'flex';
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const pw = 270, ph = 420; // approximate picker size (all STEP_ACTIONS)
+  const left = Math.min(clientX + 12, vw - pw - 10);
+  const top  = Math.min(clientY - 10, vh - ph - 10);
+  picker.style.left = `${Math.max(10, left)}px`;
+  picker.style.top  = `${Math.max(10, top)}px`;
+}
+
+function closeRecActionPicker() {
+  document.getElementById('rec-action-picker').style.display = 'none';
+  document.getElementById('inspect-highlight').style.display = 'none';
+}
+
+async function pickRecAction(action) {
+  closeRecActionPicker();
+
+  const elData   = _recPickerEl;
+  const devX     = _recPickerDevX;
+  const devY     = _recPickerDevY;
+
+  // Use the same snippet generator as STEP_ACTIONS for consistent YAML
+  const stepDef  = STEP_ACTIONS.find(a => a.label === action);
+  const elementKey = elData
+    ? (elData.contentDesc || elData.resourceId || elData.text || null)
+    : null;
+
+  let stepYaml = '';
+  let detail   = elementKey || `(${devX},${devY})`;
+  let extraVal = null;
+
+  // ── Actions that need extra user input ─────────────────────────────────
+  if (action === 'enterText') {
+    extraVal = prompt('Enter the text to type:', '');
+    if (extraVal === null) return;
+    detail   = `"${extraVal}" → ${elementKey || `(${devX},${devY})`}`;
+  } else if (action === 'assertText') {
+    extraVal = prompt('Expected text:', elData ? (elData.text || '') : '');
+    if (extraVal === null) return;
+    detail   = `"${extraVal}" on ${elementKey || `(${devX},${devY})`}`;
+  } else if (action === 'captureText') {
+    extraVal = prompt('Variable name to store into:', 'captured_text');
+    if (extraVal === null) return;
+    detail   = `→ ${extraVal} from ${elementKey || `(${devX},${devY})`}`;
+  } else if (action === 'assertStoredText') {
+    extraVal = prompt('Variable key to assert (must have been captured earlier):', '');
+    if (extraVal === null) return;
+    detail   = `stored: ${extraVal}`;
+  } else if (action === 'sleep') {
+    extraVal = prompt('Sleep duration (ms):', '2000');
+    if (extraVal === null) return;
+    detail   = `${extraVal}ms`;
+  } else if (action === 'call') {
+    extraVal = prompt('Flow name to call:', '');
+    if (extraVal === null) return;
+    detail   = `flow: ${extraVal}`;
+  } else if (action === 'ifPresent' || action === 'ifNotPresent') {
+    detail = `element: ${elementKey || `(${devX},${devY})`}`;
+  } else if (action === 'launchApp' || action === 'back' || action === 'hideKeyboard' ||
+             action === 'screenshot') {
+    detail = action;
+  }
+
+  // ── Build YAML step ─────────────────────────────────────────────────────
+  const noElement = stepDef && stepDef.noElement;
+
+  if (!noElement && elementKey) {
+    // Element-based step — use snippet generator from STEP_ACTIONS
+    stepYaml = '\n' + stepDef.snippet(elementKey);
+    // Override snippet defaults for actions with captured user input
+    if (action === 'enterText')
+      stepYaml = `\n  - action: enterText\n    element: ${elementKey}\n    value: "${extraVal}"\n`;
+    if (action === 'assertText')
+      stepYaml = `\n  - action: assertText\n    element: ${elementKey}\n    value: "${extraVal}"\n`;
+    if (action === 'captureText')
+      stepYaml = `\n  - action: captureText\n    element: ${elementKey}\n    variable: ${extraVal}\n`;
+  } else if (!noElement && !elementKey) {
+    // Element action but no tag found — fall back to coordinates
+    if (action === 'enterText')
+      stepYaml = `\n  - action: enterText\n    x: ${devX}\n    y: ${devY}\n    value: "${extraVal}"\n`;
+    else if (action === 'tap' || action === 'longPress' || action === 'tapIfPresent')
+      stepYaml = `\n  - action: ${action}\n    x: ${devX}\n    y: ${devY}\n`;
+    else
+      stepYaml = `\n  - action: ${action}\n    x: ${devX}\n    y: ${devY}\n`;
+  } else {
+    // No-element action — use snippet, patch in user input where needed
+    stepYaml = '\n' + stepDef.snippet('');
+    if (action === 'assertStoredText')
+      stepYaml = `\n  - action: assertStoredText\n    value: ${extraVal}\n`;
+    if (action === 'sleep')
+      stepYaml = `\n  - action: sleep\n    value: "${extraVal}"\n`;
+    if (action === 'call')
+      stepYaml = `\n  - action: call\n    flow: ${extraVal}\n    params:\n      key: value\n`;
+  }
+
+  // ── Add chip to recorder feed ───────────────────────────────────────────
+  recSnapshot();
+  recRecordedSteps.push({ action, detail, yaml: stepYaml.replace(/^\n/, '') });
+  rebuildManualYaml();
+  renderRecSteps();
+  updateStepCount();
+  saveRecordingState();
+
+  // ── Execute on device for real-time feedback ──────────────────────────
+  try {
+    if (action === 'tap' || action === 'tapIfPresent') {
+      await deviceAction({ type: 'tap', x: devX, y: devY });
+    } else if (action === 'longPress') {
+      await deviceAction({ type: 'longpress', x: devX, y: devY });
+    } else if (action === 'enterText') {
+      await deviceAction({ type: 'tap', x: devX, y: devY });
+      if (extraVal) setTimeout(async () => { await deviceAction({ type: 'text', value: extraVal }); }, 400);
+    } else if (action === 'clearText') {
+      await deviceAction({ type: 'clearText', x: devX, y: devY });
+    } else if (action === 'swipeUp') {
+      await deviceAction({ type: 'swipe', x: devX, y: devY, x2: devX, y2: Math.max(0, devY - 400), duration: 400 });
+    } else if (action === 'swipeDown') {
+      await deviceAction({ type: 'swipe', x: devX, y: devY, x2: devX, y2: devY + 400, duration: 400 });
+    } else if (action === 'scrollTo') {
+      // Scroll down toward the element's approximate position
+      await deviceAction({ type: 'swipe', x: devX, y: devY, x2: devX, y2: Math.max(0, devY - 500), duration: 500 });
+    } else if (action === 'back') {
+      await deviceAction({ type: 'back' });
+    } else if (action === 'hideKeyboard') {
+      await deviceAction({ type: 'hideKeyboard' });
+    } else if (action === 'sleep') {
+      await deviceAction({ type: 'sleep', value: extraVal || '2000' });
+    }
+    // waitFor, verifyElement, captureText, assertText, assertStoredText,
+    // ifPresent, ifNotPresent, screenshot, call, launchApp — no device-side action
+  } catch (e) { /* step is still recorded even if device action fails */ }
+}
+
+function buildClientYaml() {
+  // Build a full YAML from the client-side recorded steps
+  const now = new Date();
+  const pad = n => String(n).padStart(2, '0');
+  const ts  = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  let yaml = `testName: Recorded — ${ts}\nplatform: android\nnoReset: true\nloginRequired: true\nretry: 1\n\nfeatures:\n  - common\n  - login\n  - home\n  - shop\n\ntags:\n  - smoke\n\nsteps:\n  - action: launchApp\n\n  - action: loginIfNeeded\n    value: "1234561122"\n    text: "560102"\n\n`;
+  yaml += recManualYaml ? recManualYaml.replace(/^steps:\n?/, '') : '';
+  return yaml;
+}
+
+async function fetchRecorderOutput() {
+  // Prefer client-side steps when they exist — Java recorder may have empty steps
+  // if taps came via Forge UI (deviceAction) rather than physical touch on the device
+  if (recManualYaml && recRecordedSteps.length > 0) {
+    recYaml = buildClientYaml();
+    document.getElementById('rec-yaml-filename').textContent = '(recorded)';
+    document.getElementById('rec-yaml-body').textContent     = recYaml;
+    document.getElementById('rec-yaml-panel').style.display  = 'flex';
+    document.getElementById('btn-rec-save').style.display    = 'inline-block';
+    appendLog('📄 Recorded YAML ready (' + recRecordedSteps.length + ' steps)', 'pass');
+    return;
+  }
+
+  // Fall back to Java-written YAML (physical device recording via getevent)
+  try {
+    const res = await fetch('/api/recorder/output');
+    if (res.ok) {
+      const d = await res.json();
+      // Only use Java YAML if it has actual recorded steps (not just the header)
+      const hasSteps = d.content && /^\s+-\s+action:/m.test(d.content.split('loginIfNeeded')[1] || '');
+      if (hasSteps) {
+        recYaml = d.content;
+        document.getElementById('rec-yaml-filename').textContent = d.filename || '';
+        document.getElementById('rec-yaml-body').textContent     = recYaml;
+        document.getElementById('rec-yaml-panel').style.display  = 'flex';
+        document.getElementById('btn-rec-save').style.display    = 'inline-block';
+        appendLog('📄 Recorded YAML ready (' + recYaml.split('\n').length + ' lines)', 'pass');
+        return;
+      }
+    }
+  } catch (_) {}
+
+  appendLog('[Recorder] No steps recorded yet', 'warn');
+}
+
+// Close picker on outside click
+document.addEventListener('click', (e) => {
+  const picker = document.getElementById('rec-action-picker');
+  if (picker && picker.style.display !== 'none' && !picker.contains(e.target)) {
+    // Don't close if click originated on the overlay (that's handled by openRecActionPicker)
+    if (!document.getElementById('inspect-overlay').contains(e.target)) {
+      closeRecActionPicker();
+    }
+  }
+});
+
+// ── Test search ───────────────────────────────────────────────────────────
+let _searchOpen      = false;
+let _searchActiveIdx = -1;
+
+function filterTestSearch() {
+  const q            = document.getElementById('test-search').value.trim().toLowerCase();
+  const activeFolder = document.getElementById('folder-select').value;
+  const clear        = document.getElementById('test-search-clear');
+  clear.style.display = q ? 'block' : 'none';
+
+  // If folder is selected and no query — test-select handles it; close search panel
+  if (activeFolder && !q) { closeTestSearch(); return; }
+  if (!q)                  { closeTestSearch(); return; }
+
+  // Search across all tests (cross-folder when no folder, or within folder)
+  let pool = _allTestsMeta;
+  if (activeFolder) {
+    pool = pool.filter(t => t.file.startsWith(activeFolder + '/'));
+  }
+
+  const matches = pool.filter(t =>
+    t.file.toLowerCase().includes(q) ||
+    (t.testName || '').toLowerCase().includes(q) ||
+    (t.tags || []).some(tag => tag.toLowerCase().includes(q))
+  ).slice(0, 50);
+
+  const panel = document.getElementById('test-search-panel');
+  if (!matches.length) {
+    panel.innerHTML = '<div style="padding:10px 12px;color:var(--muted);font-size:12px">No tests found</div>';
+  } else {
+    panel.innerHTML = matches.map((t, i) => {
+      const parts   = t.file.split('/');
+      const folder  = parts.length > 1 ? parts[0] : '';
+      const label   = parts[parts.length - 1].replace(/\.ya?ml$/, '');
+      const tagHtml = (t.tags || []).slice(0, 3).map(tag =>
+        `<span class="tsp-tag">${esc(tag)}</span>`).join('');
+      return `<div class="tsp-item" data-file="${esc(t.file)}" data-idx="${i}">
+        ${folder && !activeFolder ? `<span class="tsp-folder">${esc(folder)}</span>` : ''}
+        <span class="tsp-name">${esc(label)}</span>
+        ${tagHtml}
+      </div>`;
+    }).join('');
+    panel.querySelectorAll('.tsp-item').forEach(el =>
+      el.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        selectTestFromSearch(el.dataset.file);
+      })
+    );
+  }
+
+  // Position fixed below input (escapes overflow clipping)
+  const input = document.getElementById('test-search');
+  const rect  = input.getBoundingClientRect();
+  panel.style.top     = (rect.bottom + 4) + 'px';
+  panel.style.left    = rect.left + 'px';
+  panel.style.width   = Math.max(rect.width, 320) + 'px';
+  panel.style.display = 'block';
+  _searchOpen         = true;
+  _searchActiveIdx    = -1;
+}
+
+function openTestSearch() {
+  const q = document.getElementById('test-search').value.trim();
+  if (q) filterTestSearch(); // only reopen if already has a query
+}
+
+function closeTestSearch() {
+  document.getElementById('test-search-panel').style.display = 'none';
+  _searchOpen      = false;
+  _searchActiveIdx = -1;
+}
+
+function clearTestSearch() {
+  document.getElementById('test-search').value = '';
+  document.getElementById('test-search-clear').style.display = 'none';
+  closeTestSearch();
+}
+
+function selectTestFromSearch(file) {
+  const parts = file.split('/');
+  const label = parts[parts.length - 1].replace(/\.ya?ml$/, '');
+  document.getElementById('test-search').value = (parts.length > 1 ? parts[0] + '/' : '') + label;
+  document.getElementById('test-search-clear').style.display = 'block';
+  closeTestSearch();
+  selectTest(file); // drives hidden selects + loadSteps
+}
+
+// Keyboard nav inside search dropdown
+document.addEventListener('keydown', (e) => {
+  if (!_searchOpen) return;
+  const items = document.querySelectorAll('#test-search-panel .tsp-item');
+  if (!items.length) return;
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    _searchActiveIdx = Math.min(_searchActiveIdx + 1, items.length - 1);
+    items.forEach((el, i) => el.classList.toggle('tsp-active', i === _searchActiveIdx));
+    items[_searchActiveIdx]?.scrollIntoView({ block: 'nearest' });
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    _searchActiveIdx = Math.max(_searchActiveIdx - 1, 0);
+    items.forEach((el, i) => el.classList.toggle('tsp-active', i === _searchActiveIdx));
+    items[_searchActiveIdx]?.scrollIntoView({ block: 'nearest' });
+  } else if (e.key === 'Enter' && _searchActiveIdx >= 0) {
+    e.preventDefault();
+    const file = items[_searchActiveIdx]?.dataset.file;
+    if (file) selectTestFromSearch(file);
+  } else if (e.key === 'Escape') {
+    closeTestSearch();
+    document.getElementById('test-search').blur();
+  }
+});
+
+// Close search panel on outside click
+document.addEventListener('click', (e) => {
+  const wrap = document.querySelector('.test-search-wrap');
+  if (wrap && !wrap.contains(e.target)) closeTestSearch();
+});
+
+// ── Rename / Duplicate test ────────────────────────────────────────────────
+async function renameTest() {
+  const file = document.getElementById('test-select').value;
+  if (!file) return;
+  const parts  = file.split('/');
+  const folder = parts.length > 1 ? parts[0] : '';
+  const name   = parts[parts.length - 1].replace(/\.ya?ml$/, '');
+  const newFile = await showSaveModal({ title: 'Rename Test', defaultFolder: folder, defaultFile: name });
+  if (!newFile || newFile === file) return;
+  const r = await fetch('/api/rename-test', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ file, newFile }),
+  });
+  const d = await r.json();
+  if (d.ok) {
+    appendLog(`✏ Renamed → ${newFile}`, 'pass');
+    clearTestSearch();
+    await loadTests();
+    selectTest(newFile);
+  } else {
+    appendLog('Rename failed: ' + (d.error || 'unknown'), 'error');
+  }
+}
+
+async function duplicateTestFile() {
+  const file = document.getElementById('test-select').value;
+  if (!file) return;
+  const parts  = file.split('/');
+  const folder = parts.length > 1 ? parts[0] : '';
+  const name   = parts[parts.length - 1].replace(/\.ya?ml$/, '');
+  const newFile = await showSaveModal({ title: 'Duplicate Test As', defaultFolder: folder, defaultFile: name + '_copy' });
+  if (!newFile) return;
+  const r = await fetch('/api/duplicate-test', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ file, newFile }),
+  });
+  const d = await r.json();
+  if (d.ok) {
+    appendLog(`⎘ Duplicated → ${newFile}`, 'pass');
+    clearTestSearch();
+    await loadTests();
+    selectTest(newFile);
+  } else {
+    appendLog('Duplicate failed: ' + (d.error || 'unknown'), 'error');
+  }
+}
+
+// ── Run History ────────────────────────────────────────────────────────────
+const RH_KEY = 'forge_run_history';
+const RH_MAX = 60;
+
+function saveRunHistory(entry) {
+  try {
+    const h = JSON.parse(localStorage.getItem(RH_KEY) || '[]');
+    h.unshift(entry);
+    if (h.length > RH_MAX) h.splice(RH_MAX);
+    localStorage.setItem(RH_KEY, JSON.stringify(h));
+  } catch (_) {}
+}
+
+function toggleHistory() {
+  const panel = document.getElementById('run-history-panel');
+  if (panel.style.display === 'block') { panel.style.display = 'none'; return; }
+  renderRunHistory();
+  panel.style.display = 'block';
+}
+
+function renderRunHistory() {
+  const panel = document.getElementById('run-history-panel');
+  let h = [];
+  try { h = JSON.parse(localStorage.getItem(RH_KEY) || '[]'); } catch (_) {}
+  if (!h.length) {
+    panel.innerHTML = '<div style="padding:16px;color:var(--muted);font-size:12px;text-align:center">No run history yet</div>';
+    return;
+  }
+  const headerRow = `<div style="padding:6px 12px;font-size:10px;color:var(--muted);border-bottom:1px solid var(--border);
+    font-weight:700;display:flex;justify-content:space-between;align-items:center">
+    <span>RECENT RUNS</span>
+    <button onclick="clearRunHistory()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:11px">Clear</button>
+  </div>`;
+  panel.innerHTML = headerRow + h.map(entry => {
+    const d       = new Date(entry.ts);
+    const dateStr = d.toLocaleString('en-IN', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+    const parts   = (entry.file || '').split('/');
+    const folder  = parts.length > 1 ? parts[0] + '/' : '';
+    const label   = parts[parts.length - 1]?.replace(/\.ya?ml$/, '') || entry.file;
+    const total   = (entry.passed || 0) + (entry.failed || 0);
+    const cls     = entry.success ? 'rh-pass' : 'rh-fail';
+    const badge   = entry.success ? 'PASS' : 'FAIL';
+    return `<div class="rh-row" onclick="selectTestFromSearch('${esc(entry.file)}');document.getElementById('run-history-panel').style.display='none'">
+      <span class="rh-badge ${cls}">${badge}</span>
+      <span class="rh-name" title="${esc(entry.file)}">${esc(folder)}${esc(label)}</span>
+      <span class="rh-meta">${entry.passed||0}/${total} · ${dateStr}</span>
+    </div>`;
+  }).join('');
+}
+
+function clearRunHistory() {
+  localStorage.removeItem(RH_KEY);
+  document.getElementById('run-history-panel').style.display = 'none';
+}
+
+// Close history on outside click
+document.addEventListener('click', (e) => {
+  const panel = document.getElementById('run-history-panel');
+  const btn   = document.getElementById('btn-history');
+  if (panel && panel.style.display === 'block' && !panel.contains(e.target) && e.target !== btn) {
+    panel.style.display = 'none';
+  }
+});
+
+// ── Batch run (folder / tag) ───────────────────────────────────────────────
+let _batchQueue   = [];
+let _batchIdx     = 0;
+let _batchResults = [];
+
+function runFolder() {
+  const folder = document.getElementById('folder-select').value;
+  if (!folder) return;
+  const files = (_testTree[folder] || []).map(t => t.value);
+  if (!files.length) { appendLog('No tests in this folder', 'warn'); return; }
+  if (!confirm(`Run all ${files.length} test(s) in "${folder}"?`)) return;
+  startBatch(files, `folder: ${folder}`);
+}
+
+function startBatch(files, label) {
+  _batchQueue   = [...files];
+  _batchIdx     = 0;
+  _batchResults = [];
+  appendLog(`▶ Batch (${label}): ${files.length} test(s) queued`, 'step');
+  updateBatchBadge();
+  runNextInBatch();
+}
+
+function runNextInBatch() {
+  if (_batchIdx >= _batchQueue.length) { finishBatch(); return; }
+  const file = _batchQueue[_batchIdx];
+  selectTestFromSearch(file);
+  setTimeout(() => {
+    if (!ws || ws.readyState !== WebSocket.OPEN) { advanceBatch(false); return; }
+    stepStates = {};
+    renderSteps();
+    updateStats();
+    document.getElementById('result-badge').className = 'result-badge';
+    ws.send(JSON.stringify({ type: 'run', file }));
+    startScreenPoll();
+    updateBatchBadge();
+  }, 600);
+}
+
+function advanceBatch(success) {
+  if (!_batchQueue.length) return;
+  _batchResults.push({ file: _batchQueue[_batchIdx], success });
+  _batchIdx++;
+  if (_batchIdx < _batchQueue.length) {
+    setTimeout(runNextInBatch, 1000); // brief gap between tests
+  } else {
+    finishBatch();
+  }
+}
+
+function finishBatch() {
+  if (!_batchResults.length) return;
+  const passed = _batchResults.filter(r => r.success).length;
+  const total  = _batchResults.length;
+  appendLog(`✅ Batch done: ${passed}/${total} passed`, passed === total ? 'pass' : 'fail');
+  _batchQueue = [];
+  updateBatchBadge();
+}
+
+function updateBatchBadge() {
+  const badge = document.getElementById('batch-badge');
+  if (_batchQueue.length && _batchIdx < _batchQueue.length) {
+    badge.textContent  = `Batch ${_batchIdx + 1}/${_batchQueue.length}`;
+    badge.style.display = 'inline-block';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────
 connectWS();
 loadTests();
@@ -3576,6 +5631,826 @@ setInterval(checkDevice, 10000);
 setInterval(loadAllElements, 60000); // refresh element list every minute
 setInterval(loadAllFlows, 30000);    // refresh flow list every 30s
 startScreenPoll();
+restoreRecordingState();
+
+// ── Recorder: drag-to-reorder step chips ──────────────────────────────────
+(function () {
+  let dragSrcIdx = null;
+  const feed = document.getElementById('rec-step-feed');
+
+  feed.addEventListener('dragstart', (e) => {
+    const chip = e.target.closest('.rec-step-chip');
+    if (!chip) return;
+    dragSrcIdx = Number(chip.dataset.idx);
+    chip.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+  });
+
+  feed.addEventListener('dragend', (e) => {
+    const chip = e.target.closest('.rec-step-chip');
+    if (chip) chip.classList.remove('dragging');
+    feed.querySelectorAll('.drag-over').forEach(c => c.classList.remove('drag-over'));
+  });
+
+  feed.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    const chip = e.target.closest('.rec-step-chip');
+    if (!chip || Number(chip.dataset.idx) === dragSrcIdx) return;
+    feed.querySelectorAll('.drag-over').forEach(c => c.classList.remove('drag-over'));
+    chip.classList.add('drag-over');
+  });
+
+  feed.addEventListener('drop', (e) => {
+    e.preventDefault();
+    const chip = e.target.closest('.rec-step-chip');
+    if (!chip) return;
+    const dropIdx = Number(chip.dataset.idx);
+    if (dropIdx === dragSrcIdx) return;
+    recSnapshot();
+    const [moved] = recRecordedSteps.splice(dragSrcIdx, 1);
+    recRecordedSteps.splice(dropIdx, 0, moved);
+    rebuildManualYaml();
+    renderRecSteps();
+    updateStepCount();
+    saveRecordingState();
+    dragSrcIdx = null;
+  });
+})();
+
+// ── Steps panel: drag-to-reorder ──────────────────────────────────────────
+(function () {
+  let siDragIdx = null;
+  const list = document.getElementById('steps-list');
+
+  list.addEventListener('dragstart', (e) => {
+    const item = e.target.closest('.step-item[data-index]');
+    if (!item) return;
+    siDragIdx = Number(item.dataset.index);
+    item.classList.add('si-dragging');
+    e.dataTransfer.effectAllowed = 'move';
+  });
+
+  list.addEventListener('dragend', () => {
+    list.querySelectorAll('.si-dragging,.si-drag-over').forEach(el => {
+      el.classList.remove('si-dragging', 'si-drag-over');
+    });
+  });
+
+  list.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    const item = e.target.closest('.step-item[data-index]');
+    if (!item || Number(item.dataset.index) === siDragIdx) return;
+    list.querySelectorAll('.si-drag-over').forEach(el => el.classList.remove('si-drag-over'));
+    item.classList.add('si-drag-over');
+  });
+
+  list.addEventListener('drop', async (e) => {
+    e.preventDefault();
+    const item = e.target.closest('.step-item[data-index]');
+    if (!item) return;
+    const dropIdx = Number(item.dataset.index);
+    if (dropIdx === siDragIdx) return;
+    const file = document.getElementById('test-select').value;
+    if (!file) return;
+    try {
+      const r = await fetch('/api/step-op', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ op: 'reorder', file, from: siDragIdx, to: dropIdx }),
+      });
+      const d = await r.json();
+      if (d.ok && !d.noop) {
+        await loadSteps(file);
+        if (editorFile === file && cmEditor) loadEditorFile(file);
+        appendLog(`↕ Moved step ${siDragIdx + 1} → position ${dropIdx + 1}`, 'step');
+      }
+    } catch (e2) {
+      appendLog('Reorder failed: ' + e2.message, 'error');
+    }
+    siDragIdx = null;
+  });
+})();
+
+// ── Recorder: keyboard shortcuts (Ctrl+Z undo, Ctrl+Y / Ctrl+Shift+Z redo) ─
+document.addEventListener('keydown', (e) => {
+  // Only fire when recorder view is active and no input is focused
+  const recView = document.getElementById('view-recorder');
+  if (!recView || recView.style.display === 'none') return;
+  if (['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)) return;
+  if (e.ctrlKey && !e.shiftKey && e.key === 'z') { e.preventDefault(); recUndo(); }
+  if (e.ctrlKey && (e.key === 'y' || (e.shiftKey && e.key === 'z'))) { e.preventDefault(); recRedo(); }
+});
+
+// ── Chat ──────────────────────────────────────────────────────────────────
+let _chatStreamBubble  = null;   // the assistant bubble being streamed into
+let _chatFullResponse  = '';     // accumulated text for current response
+let _chatYaml          = '';     // last extracted YAML block
+
+// Build structured context object attached to every outgoing chat message
+let _pendingScreenElements = null; // set by generateTestFromScreen(), consumed once
+
+function buildChatContext() {
+  const ctx = {};
+
+  // Active test (from steps panel)
+  const file = document.getElementById('test-select').value;
+  if (file) {
+    ctx.activeTest = file;
+    ctx.testName   = document.getElementById('test-name').textContent || '';
+  }
+
+  // Last run result
+  const badge = document.getElementById('result-badge');
+  if (badge.classList.contains('success'))  ctx.lastResult = 'pass';
+  else if (badge.classList.contains('failure')) ctx.lastResult = 'fail';
+
+  // Failed steps (only when test failed)
+  if (ctx.lastResult === 'fail') {
+    ctx.failedSteps = Object.entries(stepStates)
+      .filter(([, s]) => s.status === 'failed')
+      .map(([idx, s]) => ({
+        index  : +idx,
+        action : steps[+idx]?.action   || '',
+        element: steps[+idx]?.element  || '',
+        error  : s.error || s.warn     || '',
+      }));
+  }
+
+  // Screen elements captured by "From screen" button
+  if (_pendingScreenElements) {
+    ctx.screenElements     = _pendingScreenElements;
+    _pendingScreenElements = null; // consume once
+    document.getElementById('chat-ctx-screen').style.display = 'none';
+  }
+
+  return (ctx.activeTest || ctx.failedSteps?.length || ctx.screenElements) ? ctx : null;
+}
+
+// Update the context chip in the chat toolbar to show active test
+function updateChatCtxChip() {
+  const file  = document.getElementById('test-select').value;
+  const chip  = document.getElementById('chat-ctx-test');
+  if (file) {
+    const label = file.split('/').pop().replace(/\.ya?ml$/, '');
+    chip.textContent = `📋 ${label}`;
+    chip.style.display = 'inline-block';
+  } else {
+    chip.style.display = 'none';
+  }
+}
+
+function sendChat() {
+  const input = document.getElementById('chat-input');
+  const msg   = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+
+  // Show user bubble
+  appendChatBubble(msg, 'user');
+
+  // Optimistically disable send, show stop
+  document.getElementById('btn-chat-send').disabled        = true;
+  document.getElementById('btn-chat-cancel').style.display = 'inline-block';
+
+  // Hide stale YAML card
+  document.getElementById('chat-yaml-card').style.display = 'none';
+  _chatFullResponse = '';
+  _chatYaml         = '';
+
+  _chatEditorStreaming = false;  // reset live-preview flag for new message
+
+  // Create assistant streaming bubble
+  _chatStreamBubble = appendChatBubble('', 'assistant streaming');
+  _chatStreamBubble.dataset.thinking = '1';
+  _chatStreamBubble.textContent = '⏳ Working on it…';
+  const _thinkCursor = document.createElement('span');
+  _thinkCursor.className = 'chat-cursor';
+  _chatStreamBubble.appendChild(_thinkCursor);
+
+  const context = buildChatContext();
+
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ type: 'chat', message: msg, context }));
+  } else {
+    fetch('/api/chat', {
+      method : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body   : JSON.stringify({ message: msg, context })
+    }).catch(e => handleChatDone('', false, 'Network error: ' + e.message));
+  }
+}
+
+// Show a small italic status line while Claude is using a tool
+// Replaces the previous status bubble so only the latest step shows
+let _chatStatusBubble = null;
+function handleChatStatus(label) {
+  // Remove previous status bubble
+  if (_chatStatusBubble && _chatStatusBubble.parentNode) {
+    _chatStatusBubble.parentNode.removeChild(_chatStatusBubble);
+  }
+  _chatStatusBubble = appendChatBubble(label, 'status');
+}
+
+function newChatSession() {
+  // Tell server to forget the session_id so next message starts fresh
+  fetch('/api/chat-reset', { method: 'POST' }).catch(() => {});
+  // Clear UI
+  document.getElementById('chat-messages').innerHTML = '';
+  document.getElementById('chat-yaml-card').style.display = 'none';
+  document.getElementById('chat-session-bar').style.display = 'none';
+  _chatFullResponse = '';
+  _chatYaml = '';
+  _chatEditorStreaming = false;
+}
+
+function cancelChat() {
+  fetch('/api/cancel-chat', { method: 'POST' }).catch(() => {});
+  if (_chatStreamBubble) {
+    _chatStreamBubble.classList.remove('streaming');
+    const cur = _chatStreamBubble.querySelector('.chat-cursor');
+    if (cur) cur.remove();
+    _chatStreamBubble = null;
+  }
+  document.getElementById('btn-chat-send').disabled        = false;
+  document.getElementById('btn-chat-cancel').style.display = 'none';
+}
+
+// ── Fix failing test with Claude ──────────────────────────────────────────
+function fixFailingTest() {
+  const file = document.getElementById('test-select').value;
+  if (!file) return;
+
+  const failed = Object.entries(stepStates).filter(([, s]) => s.status === 'failed');
+  if (!failed.length) { switchTab('chat'); return; }
+
+  // Build a concise failure description
+  const lines = failed.map(([idx, s]) => {
+    const step = steps[+idx];
+    return `Step ${+idx + 1} (${step?.action || '?'}${step?.element ? ' → ' + step.element : ''}): ${s.error || s.warn || 'failed'}`;
+  });
+
+  const msg = `Fix the failing test.\n\nFailures:\n${lines.map(l => '  • ' + l).join('\n')}\n\nDiagnose why each step failed and update the YAML to fix it.`;
+
+  switchTab('chat');
+  document.getElementById('chat-input').value = msg;
+  sendChat();
+}
+
+// ── Generate test from current device screen ──────────────────────────────
+async function generateTestFromScreen() {
+  switchTab('chat');
+  appendLog('📋 Capturing screen elements for test generation…', 'step');
+
+  try {
+    const res      = await fetch('/api/tagged-elements');
+    const elements = await res.json();
+
+    if (!elements.length) {
+      appendLog('⚠ No tagged elements on current screen — run Tag Sync first', 'warn');
+      document.getElementById('chat-input').value =
+        'Generate a test for the current screen (no qaTestTag elements detected — app may need tagging first)';
+      document.getElementById('chat-input').focus();
+      return;
+    }
+
+    // Store for context injection on next sendChat()
+    _pendingScreenElements = elements.map(e => ({
+      contentDesc: e.contentDesc,
+      text       : e.text,
+      resourceId : e.resourceId?.split('/').pop() || '',
+      className  : e.className,
+      bounds     : e.bounds,
+      clickable  : e.clickable,
+    }));
+
+    // Show "screen attached" chip
+    document.getElementById('chat-ctx-screen').style.display = 'inline-block';
+
+    const names = elements.slice(0, 6)
+      .map(e => e.contentDesc || e.text || e.resourceId)
+      .filter(Boolean).join(', ');
+    appendLog(`✓ ${elements.length} element(s) captured: ${names}`, 'step');
+
+    // Pre-fill with a generation prompt
+    const input  = document.getElementById('chat-input');
+    input.value  = 'Generate a Forge YAML test for this screen.';
+    input.focus();
+    input.select();
+  } catch (e) {
+    appendLog('Screen capture failed: ' + e.message, 'error');
+  }
+}
+
+function handleChatThinking(originalMessage) {
+  if (!_chatStreamBubble) return;
+  // Show a "thinking" placeholder so the bubble isn't blank during Claude's startup phase.
+  // This placeholder text is replaced the moment real tokens arrive.
+  _chatStreamBubble.dataset.thinking = '1';
+  _chatStreamBubble.textContent = '⏳ Working on it…';
+  const cursor = document.createElement('span');
+  cursor.className = 'chat-cursor';
+  _chatStreamBubble.appendChild(cursor);
+  const msgs = document.getElementById('chat-messages');
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+// Track whether we've already opened the editor for live streaming this session
+let _chatEditorStreaming = false;
+
+// Called when forge_save_test completes — loads the actual saved file into editor
+function handleChatFileSaved(filePath, content) {
+  _chatEditorStreaming = false; // stop live token streaming to editor
+  if (!cmEditor) { switchTab('editor'); initEditor(); }
+  else switchTab('editor');
+  setTimeout(() => {
+    if (cmEditor) {
+      cmEditor.setValue(content);
+      cmEditor.clearHistory();
+      editorFile  = filePath;
+      editorDirty = false;
+      document.getElementById('editor-filename').textContent = filePath.split('/').pop();
+      document.getElementById('editor-filename').classList.remove('unsaved');
+    }
+  }, 50);
+}
+
+function handleChatToken(token) {
+  if (!_chatStreamBubble) return;
+  // First real token — clear the thinking placeholder
+  if (_chatStreamBubble.dataset.thinking) {
+    delete _chatStreamBubble.dataset.thinking;
+    _chatStreamBubble.textContent = '';
+  }
+  _chatFullResponse += token;
+  // Remove cursor, set text, re-add cursor
+  const cur = _chatStreamBubble.querySelector('.chat-cursor');
+  if (cur) cur.remove();
+  _chatStreamBubble.textContent = _chatFullResponse;
+  const cursor = document.createElement('span');
+  cursor.className = 'chat-cursor';
+  _chatStreamBubble.appendChild(cursor);
+  // Scroll to bottom
+  const msgs = document.getElementById('chat-messages');
+  msgs.scrollTop = msgs.scrollHeight;
+
+  // ── Live YAML preview in editor ──────────────────────────────────────────
+  // Extract partial YAML from the growing response and push it to the editor
+  // in real time so the user sees steps appear as they stream.
+  const partialYaml = extractPartialYamlBlock(_chatFullResponse);
+  if (partialYaml && cmEditor) {
+    if (!_chatEditorStreaming) {
+      // First YAML token — switch to editor tab and mark as streaming
+      _chatEditorStreaming = true;
+      if (!editorDirty) {
+        switchTab('editor');
+        if (!cmEditor) initEditor();
+        editorFile  = null;
+        editorDirty = false;
+        document.getElementById('editor-filename').textContent = '✍ Generating… (unsaved)';
+        document.getElementById('editor-filename').classList.add('unsaved');
+      }
+    }
+    // Only update editor if we own it (not if user has unsaved changes from before)
+    if (_chatEditorStreaming) {
+      const scroll = cmEditor.getScrollInfo();
+      cmEditor.setValue(partialYaml);
+      cmEditor.scrollTo(null, cmEditor.getScrollInfo().height); // follow bottom
+    }
+  }
+}
+
+// Extract YAML from inside the first ```yaml ... ``` block (partial — no closing fence needed)
+function extractPartialYamlBlock(text) {
+  const start = text.indexOf('```yaml');
+  if (start === -1) {
+    // Also accept plain ``` if it looks like YAML (starts with testName/steps)
+    const plain = text.indexOf('```\n');
+    if (plain === -1) return null;
+    const after = text.slice(plain + 4);
+    if (!after.startsWith('testName') && !after.startsWith('steps')) return null;
+    const end = after.indexOf('\n```');
+    return end === -1 ? after.trim() : after.slice(0, end).trim();
+  }
+  const after = text.slice(start + 7); // skip ```yaml
+  const newline = after.indexOf('\n');
+  const content = newline === -1 ? after : after.slice(newline + 1);
+  const end = content.indexOf('\n```');
+  return (end === -1 ? content : content.slice(0, end)).trim();
+}
+
+function handleChatDone(fullResponse, success) {
+  document.getElementById('btn-chat-send').disabled        = false;
+  document.getElementById('btn-chat-cancel').style.display = 'none';
+  // Remove the last status bubble — the final response replaces it
+  if (_chatStatusBubble && _chatStatusBubble.parentNode) {
+    _chatStatusBubble.parentNode.removeChild(_chatStatusBubble);
+    _chatStatusBubble = null;
+  }
+
+  if (_chatStreamBubble) {
+    const cur = _chatStreamBubble.querySelector('.chat-cursor');
+    if (cur) cur.remove();
+    _chatStreamBubble.classList.remove('streaming');
+    // Use the full response if server sent it; otherwise keep what we streamed
+    if (fullResponse) {
+      _chatStreamBubble.textContent = fullResponse;
+      _chatFullResponse = fullResponse;
+    }
+    _chatStreamBubble = null;
+  }
+
+  // Extract first YAML fenced block from response
+  const yaml = extractYamlBlock(_chatFullResponse);
+  if (yaml) {
+    _chatYaml = yaml;
+    document.getElementById('chat-yaml-body').textContent = yaml;
+    document.getElementById('chat-yaml-card').style.display = 'block';
+
+    if (_chatEditorStreaming) {
+      // Already streamed into editor live — just finalize the content and filename
+      if (cmEditor) {
+        cmEditor.setValue(yaml);
+        cmEditor.clearHistory();
+        document.getElementById('editor-filename').textContent = 'chat-generated (unsaved)';
+      }
+      _chatEditorStreaming = false;
+    } else if (!editorDirty) {
+      // Wasn't streamed (e.g. tool result came back as a block) — load now
+      chatLoadInEditor();
+    } else {
+      appendChatBubble('💡 YAML ready — click "Open in Editor" to load (your current edits are unsaved)', 'assistant');
+    }
+  }
+
+  const msgs = document.getElementById('chat-messages');
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function appendChatBubble(text, cls) {
+  const msgs = document.getElementById('chat-messages');
+  const div  = document.createElement('div');
+  div.className = 'chat-bubble ' + cls;
+  div.textContent = text;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
+function extractYamlBlock(text) {
+  // Prefer ```yaml ... ``` block; fall back to ``` ... ```
+  const m = text.match(/```(?:yaml)?\s*\n([\s\S]*?)```/);
+  return m ? m[1].trim() : null;
+}
+
+// ── Chat: load generated YAML into editor ─────────────────────────────────
+function chatLoadInEditor() {
+  if (!_chatYaml) return;
+  switchTab('editor');
+  setTimeout(() => {
+    if (cmEditor) {
+      cmEditor.setValue(_chatYaml);
+      cmEditor.clearHistory();
+      editorFile  = null;
+      editorDirty = true;
+      document.getElementById('editor-filename').textContent = 'chat-generated (unsaved)';
+      document.getElementById('editor-filename').classList.add('unsaved');
+      cmEditor.focus();
+    }
+  }, 50);
+}
+
+// ── Chat: save with smart path suggestion ─────────────────────────────────
+const CHAT_FOLDER_MAP = [
+  { keywords: ['cart','checkout','add to cart','payment','pay'],     folder: 'shop' },
+  { keywords: ['login','otp','sign in','logout','auth'],             folder: 'auth' },
+  { keywords: ['pdp','product detail','product page'],               folder: 'shop' },
+  { keywords: ['home','clp','landing','banner'],                     folder: 'home' },
+  { keywords: ['profile','account','settings','kyc','aadhaar','pan'],folder: 'profile' },
+  { keywords: ['reward','coin','popstar','offer'],                    folder: 'rewards' },
+  { keywords: ['upi','payment method','wallet'],                     folder: 'payments' },
+  { keywords: ['wishlist','saved','favourite'],                       folder: 'wishlist' },
+];
+
+function chatSuggestFolder(message) {
+  const lower = (message || _chatFullResponse || '').toLowerCase();
+  for (const rule of CHAT_FOLDER_MAP) {
+    if (rule.keywords.some(k => lower.includes(k))) return rule.folder;
+  }
+  return null;
+}
+
+function chatSlugify(msg) {
+  return msg.toLowerCase()
+    .replace(/[^a-z0-9 ]/g, '')
+    .trim()
+    .replace(/\s+/g, '_')
+    .substring(0, 40);
+}
+
+async function chatSaveYaml() {
+  if (!_chatYaml) return;
+
+  // Build smart suggestion
+  const lastUserBubble = [...document.querySelectorAll('.chat-bubble.user')].pop();
+  const userMsg  = lastUserBubble?.textContent || '';
+  const folder   = chatSuggestFolder(userMsg);
+  const slug     = chatSlugify(userMsg) || 'generated_test';
+  const suggested = folder
+    ? `${folder}/ts_${slug}`
+    : `ts_${slug}`;
+
+  const raw = prompt(
+    'Save test as (path relative to androidTests/, .yaml added automatically):\n\n' +
+    'Smart suggestion based on your message:',
+    suggested
+  );
+  if (!raw) return;
+
+  const filePath = (raw.endsWith('.yaml') || raw.endsWith('.yml')) ? raw : raw + '.yaml';
+
+  try {
+    const res  = await fetch('/api/save-test', {
+      method : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body   : JSON.stringify({ file: filePath, content: _chatYaml })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      appendChatBubble(`✅ Saved as ${data.path}`, 'assistant');
+      // Also load into editor so user can continue editing
+      chatLoadInEditor();
+    } else {
+      appendChatBubble(`❌ Save failed: ${data.error || 'unknown'}`, 'assistant');
+    }
+  } catch (e) {
+    appendChatBubble('❌ Save request failed: ' + e.message, 'assistant');
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ── Element Repository ────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+
+let _elRepoData      = [];   // [{file, key, android, ios}]
+let _elRepoFiles     = [];   // ['shop.yaml', 'common.yaml', ...]
+let _elActiveFile    = null; // currently selected file pill
+let _elEditingKey    = null; // key currently being edited (null = new)
+
+async function loadElementRepo() {
+  const wrap = document.getElementById('el-repo-table-wrap');
+  wrap.innerHTML = '<div style="padding:32px;text-align:center;color:var(--muted);font-size:12px">Loading elements…</div>';
+  document.getElementById('el-reports').style.display = 'none';
+
+  try {
+    const res  = await fetch('/api/elements-full');
+    const data = await res.json();
+    if (!data.ok) { wrap.innerHTML = `<div style="padding:24px;color:var(--red);font-size:12px">Error: ${data.error}</div>`; return; }
+
+    _elRepoData  = data.elements;      // [{file, key, android, ios}]
+    _elRepoFiles = data.files;         // ['shop.yaml', ...]
+
+    renderFilePills();
+    renderElementTable();
+    populateAddFileSelect();
+  } catch (e) {
+    wrap.innerHTML = `<div style="padding:24px;color:var(--red);font-size:12px">Failed to load: ${e.message}</div>`;
+  }
+}
+
+function renderFilePills() {
+  const pills = document.getElementById('el-file-pills');
+  pills.innerHTML =
+    `<span class="el-file-pill ${_elActiveFile === null ? 'active' : ''}" onclick="setElActiveFile(null)">All</span>` +
+    _elRepoFiles.map(f =>
+      `<span class="el-file-pill ${_elActiveFile === f ? 'active' : ''}" onclick="setElActiveFile('${f}')">${f}</span>`
+    ).join('');
+}
+
+function setElActiveFile(file) {
+  _elActiveFile = file;
+  renderFilePills();
+  renderElementTable();
+}
+
+function filterElements() {
+  renderElementTable();
+}
+
+function renderElementTable() {
+  const q    = (document.getElementById('el-search')?.value || '').toLowerCase().trim();
+  const wrap = document.getElementById('el-repo-table-wrap');
+  let items  = _elRepoData;
+  if (_elActiveFile) items = items.filter(e => e.file === _elActiveFile);
+  if (q) items = items.filter(e => e.key.toLowerCase().includes(q) || (e.android||'').toLowerCase().includes(q) || (e.ios||'').toLowerCase().includes(q));
+
+  if (!items.length) {
+    wrap.innerHTML = '<div style="padding:32px;text-align:center;color:var(--muted);font-size:12px">No elements found</div>';
+    return;
+  }
+
+  wrap.innerHTML = `<table class="el-repo-table">
+    <thead><tr>
+      <th>Key</th>
+      <th>Android locator</th>
+      <th>iOS locator</th>
+      <th>File</th>
+      <th style="text-align:right">Actions</th>
+    </tr></thead>
+    <tbody>
+      ${items.map(e => `
+        <tr>
+          <td class="el-key-cell">${e.key}</td>
+          <td class="el-loc-cell" title="${escHtml(e.android||'')}">${escHtml(e.android||'—')}</td>
+          <td class="el-loc-cell" title="${escHtml(e.ios||'')}">${escHtml(e.ios||'—')}</td>
+          <td class="el-file-cell">${escHtml(e.file)}</td>
+          <td><div class="el-action-cell">
+            <button class="el-btn" onclick="editElementEntry('${escHtml(e.key)}','${escHtml(e.file)}')">✏ Edit</button>
+            <button class="el-btn danger" onclick="deleteElementEntry('${escHtml(e.key)}','${escHtml(e.file)}')">🗑</button>
+          </div></td>
+        </tr>`).join('')}
+    </tbody>
+  </table>`;
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function populateAddFileSelect() {
+  const sel = document.getElementById('el-add-file');
+  if (!sel) return;
+  sel.innerHTML = _elRepoFiles.map(f => `<option value="${f}">${f}</option>`).join('');
+}
+
+function openAddElementForm(prefillKey, prefillAndroid) {
+  _elEditingKey = null;
+  document.getElementById('el-add-form-title').textContent = 'Add Element';
+  document.getElementById('el-add-key').value     = prefillKey    || '';
+  document.getElementById('el-add-android').value = prefillAndroid || '';
+  document.getElementById('el-add-ios').value     = '';
+  document.getElementById('el-add-status').textContent = '';
+  document.getElementById('el-add-form').classList.add('open');
+  document.getElementById('el-add-key').focus();
+}
+
+function editElementEntry(key, file) {
+  _elEditingKey = key;
+  const entry = _elRepoData.find(e => e.key === key && e.file === file);
+  if (!entry) return;
+  document.getElementById('el-add-form-title').textContent = `Edit: ${key}`;
+  document.getElementById('el-add-key').value     = key;
+  document.getElementById('el-add-android').value = entry.android || '';
+  document.getElementById('el-add-ios').value     = entry.ios     || '';
+  const sel = document.getElementById('el-add-file');
+  if (sel) { for (const opt of sel.options) { if (opt.value === file) { opt.selected = true; break; } } }
+  document.getElementById('el-add-status').textContent = '';
+  document.getElementById('el-add-form').classList.add('open');
+  document.getElementById('el-add-key').focus();
+}
+
+function closeAddElementForm() {
+  document.getElementById('el-add-form').classList.remove('open');
+  _elEditingKey = null;
+}
+
+async function saveElementEntry() {
+  const key     = document.getElementById('el-add-key').value.trim();
+  const android = document.getElementById('el-add-android').value.trim();
+  const ios     = document.getElementById('el-add-ios').value.trim();
+  const file    = document.getElementById('el-add-file').value;
+  const status  = document.getElementById('el-add-status');
+
+  if (!key)     { status.textContent = '⚠ Key name is required'; status.style.color = 'var(--yellow)'; return; }
+  if (!android) { status.textContent = '⚠ Android locator is required'; status.style.color = 'var(--yellow)'; return; }
+  if (!file)    { status.textContent = '⚠ Select a target file'; status.style.color = 'var(--yellow)'; return; }
+
+  status.textContent = 'Saving…'; status.style.color = 'var(--muted)';
+  try {
+    const res  = await fetch('/api/save-element', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ file, key, android, ios: ios || undefined, oldKey: _elEditingKey || undefined })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      status.textContent = '✅ Saved'; status.style.color = 'var(--green)';
+      setTimeout(closeAddElementForm, 800);
+      loadElementRepo();
+    } else {
+      status.textContent = `❌ ${data.error}`; status.style.color = 'var(--red)';
+    }
+  } catch (e) {
+    status.textContent = `❌ ${e.message}`; status.style.color = 'var(--red)';
+  }
+}
+
+async function deleteElementEntry(key, file) {
+  if (!confirm(`Delete element key "${key}" from ${file}?`)) return;
+  try {
+    const res  = await fetch('/api/delete-element', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ file, key })
+    });
+    const data = await res.json();
+    if (data.ok) { loadElementRepo(); }
+    else { alert('Delete failed: ' + (data.error || 'unknown')); }
+  } catch (e) { alert('Delete failed: ' + e.message); }
+}
+
+async function checkElementUsage() {
+  const reports = document.getElementById('el-reports');
+  reports.innerHTML = '<div style="padding:16px;color:var(--muted);font-size:12px">Scanning usage…</div>';
+  reports.style.display = 'block';
+  try {
+    const res  = await fetch('/api/elements-usage');
+    const data = await res.json();
+    if (!data.ok) { reports.innerHTML = `<div style="padding:12px;color:var(--red);font-size:12px">${data.error}</div>`; return; }
+
+    let html = '';
+
+    // Missing elements (used in tests but not defined)
+    if (data.missing?.length) {
+      html += `<div class="el-report-section">
+        <div class="el-report-title">Missing elements (used in tests but not defined)
+          <span class="el-report-badge err">${data.missing.length}</span>
+        </div>
+        <ul class="el-report-list">
+          ${data.missing.map(m => `
+            <li class="el-report-item">
+              <span class="el-report-key">${escHtml(m.key)}</span>
+              <span class="el-report-meta">used in: ${(m.usedIn||[]).map(f => escHtml(f)).join(', ')}</span>
+              <button class="el-btn" onclick="openAddElementForm('${escHtml(m.key)}','')">+ Add</button>
+            </li>`).join('')}
+        </ul>
+      </div>`;
+    } else {
+      html += `<div class="el-report-section"><div class="el-report-title">Missing elements <span class="el-report-badge ok">None</span></div></div>`;
+    }
+
+    // Unused elements (defined but never used)
+    if (data.unused?.length) {
+      html += `<div class="el-report-section">
+        <div class="el-report-title">Unused elements (defined but never referenced)
+          <span class="el-report-badge warn">${data.unused.length}</span>
+        </div>
+        <ul class="el-report-list">
+          ${data.unused.map(u => `
+            <li class="el-report-item">
+              <span class="el-report-key">${escHtml(u.key)}</span>
+              <span class="el-report-meta">defined in: ${escHtml(u.definedIn)}</span>
+              <button class="el-btn danger" onclick="deleteElementEntry('${escHtml(u.key)}','${escHtml(u.definedIn)}')">🗑 Delete</button>
+            </li>`).join('')}
+        </ul>
+      </div>`;
+    } else {
+      html += `<div class="el-report-section"><div class="el-report-title">Unused elements <span class="el-report-badge ok">None</span></div></div>`;
+    }
+
+    reports.innerHTML = html;
+  } catch (e) {
+    reports.innerHTML = `<div style="padding:12px;color:var(--red);font-size:12px">Failed: ${e.message}</div>`;
+  }
+}
+
+async function checkUntaggedElements() {
+  const reports = document.getElementById('el-reports');
+  reports.innerHTML = '<div style="padding:16px;color:var(--muted);font-size:12px">Scanning device screen for untagged elements…</div>';
+  reports.style.display = 'block';
+  try {
+    const res  = await fetch('/api/untagged-check');
+    const data = await res.json();
+    if (!data.ok) { reports.innerHTML = `<div style="padding:12px;color:var(--red);font-size:12px">${data.error}</div>`; return; }
+
+    const { untagged, found, total } = data;
+    let html = `<div class="el-report-section">
+      <div class="el-report-title">Untagged elements on current screen
+        <span class="el-report-badge ${untagged.length ? 'warn' : 'ok'}">${untagged.length} untagged / ${total} total</span>
+      </div>`;
+    if (untagged.length) {
+      html += `<ul class="el-report-list">
+        ${untagged.map(u => `
+          <li class="el-report-item">
+            <span class="el-report-key">${escHtml(u.locatorVal)}</span>
+            <button class="el-btn" onclick="openAddElementForm('',${JSON.stringify(u.locatorVal)})">+ Add key</button>
+          </li>`).join('')}
+      </ul>`;
+    } else {
+      html += `<div style="padding:8px 0;font-size:12px;color:var(--green)">✅ All elements on screen are tagged</div>`;
+    }
+    html += '</div>';
+    reports.innerHTML = html;
+  } catch (e) {
+    reports.innerHTML = `<div style="padding:12px;color:var(--red);font-size:12px">Failed: ${e.message}</div>`;
+  }
+}
+
+// Called from inspector "Add to elements.yaml" button
+function addInspectedToElements() {
+  if (!lastInspected) return;
+  const locatorVal = lastInspected.contentDesc || lastInspected.resourceId || '';
+  switchTab('elements');
+  // Give loadElementRepo a chance to run (switchTab calls it), then open form
+  setTimeout(() => openAddElementForm('', locatorVal), 400);
+}
 </script>
 </body>
 </html>

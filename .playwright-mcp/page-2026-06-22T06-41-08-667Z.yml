@@ -1,0 +1,20 @@
+- generic [ref=e3]:
+  - banner [ref=e57]:
+    - generic [ref=e58]:
+      - generic [ref=e59]:
+        - img [ref=e60] [cursor=pointer]
+        - generic [ref=e62] [cursor=pointer]: Save & exit
+      - generic [ref=e63]: Eligibility
+  - generic [ref=e65]:
+    - heading "Check your eligibility" [level=4] [ref=e67]
+    - generic [ref=e68]:
+      - generic [ref=e69]:
+        - generic: PAN card
+        - textbox [ref=e70]
+        - generic [ref=e76]: This is a required field
+      - generic [ref=e71]:
+        - generic: Residential Pincode
+        - textbox [ref=e72]
+        - generic [ref=e77]: This is a required field
+      - button "Continue" [active] [ref=e74] [cursor=pointer]:
+        - generic [ref=e75]: Continue

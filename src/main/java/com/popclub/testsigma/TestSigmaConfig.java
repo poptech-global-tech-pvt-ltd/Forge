@@ -10,7 +10,7 @@ public class TestSigmaConfig {
 
     static {
         try (InputStream in = TestSigmaConfig.class.getClassLoader()
-                .getResourceAsStream("testsigma.properties")) {
+                .getResourceAsStream("config/testsigma.properties")) {
             if (in == null) throw new RuntimeException("testsigma.properties not found on classpath");
             props.load(in);
         } catch (IOException e) {

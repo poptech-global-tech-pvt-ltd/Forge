@@ -19,7 +19,7 @@ public class ApiConfig {
 
     private static Properties load() {
         String env  = System.getProperty("ENV", "local");
-        String file = env + ".properties";
+        String file = "config/" + env + ".properties";
         Properties p = new Properties();
         try (InputStream is = ApiConfig.class.getClassLoader().getResourceAsStream(file)) {
             if (is != null) {

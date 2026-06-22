@@ -1,0 +1,20 @@
+- generic [ref=e3]:
+  - banner [ref=e5]:
+    - generic [ref=e6]:
+      - img [ref=e7] [cursor=pointer]
+      - generic [ref=e9]: Eligibility
+  - generic [ref=e12]:
+    - heading "Check your eligibility" [level=4] [ref=e14]
+    - generic [ref=e15]:
+      - generic: Mobile number
+      - textbox [ref=e16]: "1234560035"
+      - img "edit-phone-number" [ref=e47] [cursor=pointer]
+    - generic [ref=e48]:
+      - generic: OTP Verification
+      - textbox [ref=e49]
+      - link "Resend OTP" [ref=e51] [cursor=pointer]:
+        - /url: ""
+    - button "Continue" [ref=e53] [cursor=pointer]:
+      - generic [ref=e54]: Continue
+    - button "Submit otp" [ref=e56] [cursor=pointer]:
+      - generic [ref=e57]: Submit otp

@@ -23,9 +23,8 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 const FORGE_ROOT     = path.join(__dirname, '..');
-const TESTDATA_ROOT  = path.join(FORGE_ROOT, 'src/test/resources/testdata');
-const FLOWS_ROOT     = path.join(FORGE_ROOT, 'src/test/resources/flows');
-const TESTNG_ROOT    = path.join(FORGE_ROOT, 'src/test/resources/testNg');
+const TESTDATA_ROOT  = path.join(FORGE_ROOT, 'src/test/java/com/popclub/androidTests');
+const FLOWS_ROOT     = path.join(FORGE_ROOT, 'src/test/java/com/popclub/androidFlows');
 const APK_DIR        = path.join(FORGE_ROOT, 'src/main/resources');
 const APP_PACKAGE    = 'com.popclub.android';
 
@@ -47,7 +46,9 @@ function walkYaml(dir, base = '') {
 
 function suiteFor(testFile) {
   // Pick the most appropriate testng suite based on file path
-  if (testFile.includes('shop')) return 'testng-shop.xml';
+  if (testFile.includes('shop') || testFile.includes('home') ||
+      testFile.includes('login') || testFile.includes('profile') ||
+      testFile.includes('card')) return 'testng-shop.xml';
   return 'testng.xml';
 }
 
@@ -146,6 +147,58 @@ app.get('/api/tests', (req, res) => {
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
+});
+
+// GET /api/tests-meta — file list with testName + tags extracted from each YAML
+app.get('/api/tests-meta', (req, res) => {
+  try {
+    const files = walkYaml(TESTDATA_ROOT);
+    const meta  = files.map(file => {
+      try {
+        const parsed = yaml.load(fs.readFileSync(path.join(TESTDATA_ROOT, file), 'utf8'));
+        return { file, testName: parsed.testName || file, tags: Array.isArray(parsed.tags) ? parsed.tags : [] };
+      } catch (_) {
+        return { file, testName: file, tags: [] };
+      }
+    });
+    res.json(meta);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// POST /api/rename-test
+app.post('/api/rename-test', (req, res) => {
+  const { file, newFile } = req.body;
+  if (!file || !newFile) return res.status(400).json({ error: 'file and newFile required' });
+  const from = path.join(TESTDATA_ROOT, file);
+  const to   = path.join(TESTDATA_ROOT, newFile);
+  if (!from.startsWith(TESTDATA_ROOT) || !to.startsWith(TESTDATA_ROOT))
+    return res.status(403).json({ error: 'Forbidden' });
+  if (!fs.existsSync(from)) return res.status(404).json({ error: 'Source not found' });
+  if (fs.existsSync(to))    return res.status(409).json({ error: 'Target already exists' });
+  try {
+    fs.mkdirSync(path.dirname(to), { recursive: true });
+    fs.renameSync(from, to);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// POST /api/duplicate-test
+app.post('/api/duplicate-test', (req, res) => {
+  const { file, newFile } = req.body;
+  if (!file || !newFile) return res.status(400).json({ error: 'file and newFile required' });
+  const from = path.join(TESTDATA_ROOT, file);
+  const to   = path.join(TESTDATA_ROOT, newFile);
+  if (!from.startsWith(TESTDATA_ROOT) || !to.startsWith(TESTDATA_ROOT))
+    return res.status(403).json({ error: 'Forbidden' });
+  if (!fs.existsSync(from)) return res.status(404).json({ error: 'Source not found' });
+  if (fs.existsSync(to))    return res.status(409).json({ error: 'Target already exists' });
+  try {
+    fs.mkdirSync(path.dirname(to), { recursive: true });
+    fs.copyFileSync(from, to);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // Parse YAML and return test name + steps
@@ -311,6 +364,24 @@ async function dumpXml() {
   return run(adbShell('cat /sdcard/ui_dump.xml'), 5000);
 }
 
+// Reverse map: accessibilityId/locatorValue → element key name in YAMLs
+// Built lazily and cached for 10 s so file changes are picked up quickly during development.
+let _reverseMapCache   = null;
+let _reverseMapBuiltAt = 0;
+
+function getReverseElementMap() {
+  const now = Date.now();
+  if (_reverseMapCache && now - _reverseMapBuiltAt < 10_000) return _reverseMapCache;
+  const map = {};
+  const locatorMap = loadElementLocatorMap(); // { key → locatorValue }
+  for (const [key, val] of Object.entries(locatorMap)) {
+    if (val) map[val.toLowerCase()] = key;  // case-insensitive lookup
+  }
+  _reverseMapCache   = map;
+  _reverseMapBuiltAt = now;
+  return map;
+}
+
 // GET /api/inspect?x=&y=  — find element at device coords, prefer one with contentDesc
 app.get('/api/inspect', async (req, res) => {
   const x = parseInt(req.query.x);
@@ -331,9 +402,14 @@ app.get('/api/inspect', async (req, res) => {
     const best    = withTag || hits[0] || null;
 
     if (best) {
-      res.json(best);
+      // Reverse-lookup: find the element key from the YAMLs that maps to this contentDesc
+      const reverseMap = getReverseElementMap();
+      const elementKey = best.contentDesc
+        ? (reverseMap[best.contentDesc.toLowerCase()] || null)
+        : null;
+      res.json({ ...best, elementKey });
     } else {
-      res.json({ contentDesc: '', resourceId: '', text: '', className: '', bounds: '', clickable: false });
+      res.json({ contentDesc: '', resourceId: '', text: '', className: '', bounds: '', clickable: false, elementKey: null });
     }
   } catch (e) {
     res.status(500).json({ error: 'Inspect failed: ' + e.message });
@@ -342,7 +418,7 @@ app.get('/api/inspect', async (req, res) => {
 
 // POST /api/device-action — perform ADB input actions on the device (async)
 app.post('/api/device-action', async (req, res) => {
-  const { type, x, y, x2, y2, text, key, duration } = req.body;
+  const { type, x, y, x2, y2, text, key, duration, value } = req.body;
   try {
     switch (type) {
       case 'tap':
@@ -369,9 +445,193 @@ app.post('/api/device-action', async (req, res) => {
         await run(adbShell(`input swipe ${cx} ${cy} ${cx} ${cy + dy} 400`), 4000);
         break;
       }
+      case 'back':
+        await run(adbShell('input keyevent 4'), 3000);
+        break;
+      case 'hideKeyboard':
+        await run(adbShell('input keyevent 111'), 3000);
+        break;
+      case 'clearText':
+        // Tap → select all → delete
+        await run(adbShell(`input tap ${Math.round(x)} ${Math.round(y)}`), 3000);
+        await new Promise(r => setTimeout(r, 300));
+        await run(adbShell('input keyevent --longpress 29'), 2000);  // Ctrl+A
+        await run(adbShell('input keyevent 67'), 2000);              // DEL
+        break;
+      case 'sleep':
+        await new Promise(r => setTimeout(r, parseInt(value) || 1000));
+        break;
       default:
         return res.status(400).json({ error: 'Unknown action: ' + type });
     }
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// POST /api/run-step — resolve element key → UI dump → coords → execute action
+// Used by editor Ctrl+Enter to run element-based steps on the device.
+app.post('/api/run-step', async (req, res) => {
+  const { action, element, value, x, y } = req.body;
+  try {
+    let tapX = x != null ? +x : null;
+    let tapY = y != null ? +y : null;
+    let resolvedLocator = element || null;
+
+    // Resolve element key → coordinates via UI dump
+    if (element) {
+      const locatorMap   = loadElementLocatorMap();
+      const locatorValue = locatorMap[element] || element;  // fallback: key itself
+      resolvedLocator    = locatorValue;
+
+      const xml   = await dumpXml();
+      const nodes = parseNodes(xml);
+
+      const found = nodes.find(n =>
+        n.contentDesc === locatorValue ||
+        n.resourceId  === locatorValue ||
+        n.resourceId.split('/').pop() === locatorValue ||
+        n.text        === locatorValue
+      );
+
+      if (!found) {
+        return res.json({ ok: false, error: `Element "${element}" (locator: "${locatorValue}") not found on current screen` });
+      }
+      tapX = Math.round((found.x1 + found.x2) / 2);
+      tapY = Math.round((found.y1 + found.y2) / 2);
+    }
+
+    switch (action) {
+      case 'tap':
+      case 'tapIfPresent':
+        if (tapX === null) return res.json({ ok: false, error: 'tap requires element or x/y coords' });
+        await run(adbShell(`input tap ${tapX} ${tapY}`), 3000);
+        break;
+      case 'longPress':
+        if (tapX === null) return res.json({ ok: false, error: 'longPress requires element or x/y' });
+        await run(adbShell(`input swipe ${tapX} ${tapY} ${tapX} ${tapY} 800`), 4000);
+        break;
+      case 'enterText':
+        if (tapX !== null) {
+          await run(adbShell(`input tap ${tapX} ${tapY}`), 3000);
+          await new Promise(r => setTimeout(r, 400));
+        }
+        if (value) {
+          const esc = value.replace(/(['"\\$`!#&*?|<>(){};])/g, '\\$1').replace(/ /g, '%s');
+          await run(adbShell(`input text "${esc}"`), 4000);
+        }
+        break;
+      case 'clearText':
+        if (tapX !== null) await run(adbShell(`input tap ${tapX} ${tapY}`), 3000);
+        await new Promise(r => setTimeout(r, 300));
+        await run(adbShell('input keyevent --longpress 29'), 2000);
+        await run(adbShell('input keyevent 67'), 2000);
+        break;
+      case 'scrollDown': case 'swipeDown':
+        await run(adbShell('input swipe 540 1400 540 400 400'), 4000);
+        break;
+      case 'scrollUp': case 'swipeUp':
+        await run(adbShell('input swipe 540 400 540 1400 400'), 4000);
+        break;
+      case 'back':
+        await run(adbShell('input keyevent 4'), 3000);
+        break;
+      case 'hideKeyboard':
+        await run(adbShell('input keyevent 111'), 3000);
+        break;
+      case 'sleep':
+        await new Promise(r => setTimeout(r, parseInt(value) || 1000));
+        break;
+      case 'waitFor':
+      case 'verifyElement':
+        // Just dump and verify presence — don't tap
+        if (!element) return res.json({ ok: false, error: 'waitFor/verifyElement requires element' });
+        return res.json({
+          ok: tapX !== null,
+          message: tapX !== null
+            ? `"${resolvedLocator}" found on screen @ (${tapX},${tapY})`
+            : `"${resolvedLocator}" NOT found on screen`
+        });
+      case 'scrollTo':
+        // Try scrolling down up to 3 times looking for element
+        if (!element) return res.json({ ok: false, error: 'scrollTo requires element' });
+        for (let attempt = 0; attempt < 3; attempt++) {
+          const xmlCheck = await dumpXml();
+          const found2 = parseNodes(xmlCheck).find(n =>
+            n.contentDesc === resolvedLocator || n.resourceId.split('/').pop() === resolvedLocator || n.text === resolvedLocator
+          );
+          if (found2) return res.json({ ok: true, message: `Found "${resolvedLocator}" after ${attempt} scroll(s)` });
+          await run(adbShell('input swipe 540 1400 540 400 400'), 4000);
+          await new Promise(r => setTimeout(r, 800));
+        }
+        return res.json({ ok: false, error: `"${resolvedLocator}" not found after 3 scrolls` });
+      default:
+        return res.json({ ok: false, error: `No device preview for: ${action}` });
+    }
+
+    const msg = `${action}${resolvedLocator ? ' → ' + resolvedLocator : ''}${tapX !== null ? ` @ (${tapX},${tapY})` : ''}`;
+    res.json({ ok: true, message: msg });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+// POST /api/step-op — duplicate or reorder steps in a YAML test file
+app.post('/api/step-op', (req, res) => {
+  const { op, file, index, from, to } = req.body;
+  if (!file) return res.status(400).json({ error: 'file required' });
+  const fullPath = path.join(TESTDATA_ROOT, file);
+  if (!fullPath.startsWith(TESTDATA_ROOT)) return res.status(403).json({ error: 'Forbidden' });
+
+  try {
+    const content = fs.readFileSync(fullPath, 'utf8');
+    const lines   = content.split('\n');
+
+    // Find 'steps:' line
+    const stepsLineIdx = lines.findIndex(l => /^steps:\s*$/.test(l));
+    if (stepsLineIdx === -1) return res.status(422).json({ error: 'No steps: section found' });
+
+    // Split step body into blocks (each starts with '  - action:')
+    const header     = lines.slice(0, stepsLineIdx + 1).join('\n');
+    const stepLines  = lines.slice(stepsLineIdx + 1);
+    const blocks     = [];   // array of string[] (lines for each step)
+    let   cur        = null;
+
+    for (const l of stepLines) {
+      if (/^  - action:/.test(l)) {
+        if (cur !== null) blocks.push(cur);
+        cur = [l];
+      } else if (cur !== null) {
+        cur.push(l);
+      }
+    }
+    if (cur !== null) blocks.push(cur);
+
+    if (op === 'duplicate') {
+      if (index == null || index < 0 || index >= blocks.length)
+        return res.status(400).json({ error: 'invalid index' });
+      blocks.splice(index + 1, 0, [...blocks[index]]);
+    } else if (op === 'reorder') {
+      if (from == null || to == null || from === to)
+        return res.json({ ok: true, noop: true });
+      if (from < 0 || to < 0 || from >= blocks.length || to >= blocks.length)
+        return res.status(400).json({ error: 'index out of range' });
+      const [moved] = blocks.splice(from, 1);
+      blocks.splice(to, 0, moved);
+    } else {
+      return res.status(400).json({ error: 'op must be duplicate or reorder' });
+    }
+
+    // Reconstruct: join blocks with single blank line between them for readability
+    const newContent = header + '\n' + blocks.map(b => b.join('\n')).join('\n\n') + '\n';
+
+    // Validate YAML before writing
+    try { yaml.load(newContent); } catch (yamlErr) {
+      return res.status(422).json({ error: 'YAML validation failed: ' + yamlErr.message });
+    }
+
+    fs.writeFileSync(fullPath, newContent, 'utf8');
     res.json({ ok: true });
   } catch (e) {
     res.status(500).json({ error: e.message });
@@ -435,8 +695,9 @@ app.post('/api/save-test', (req, res) => {
   }
 
   try {
+    fs.mkdirSync(path.dirname(fullPath), { recursive: true });
     fs.writeFileSync(fullPath, content, 'utf8');
-    res.json({ ok: true });
+    res.json({ ok: true, path: file });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
@@ -453,15 +714,19 @@ app.post('/api/new-test', (req, res) => {
   const template =
 `testName: ${name}
 platform: android
-noReset: false
+noReset: true
+loginRequired: true
+retry: 1
 
 features:
   - common
   - login
+  - home
+  - shop
 
 tags:
   - smoke
-retry: 1
+
 steps:
   - action: launchApp
 
@@ -469,7 +734,9 @@ steps:
     value: "1234561122"
     text: "560102"
 
-  # Add steps below
+  - action: waitFor
+    element: home_tab
+
 `;
   try {
     fs.mkdirSync(path.dirname(fullPath), { recursive: true });
@@ -480,10 +747,37 @@ steps:
   }
 });
 
+// POST /api/delete-test — permanently delete a test YAML file
+app.post('/api/delete-test', (req, res) => {
+  const { file } = req.body;
+  if (!file) return res.status(400).json({ error: 'file required' });
+
+  // Resolve to absolute path and ensure it's inside TESTDATA_ROOT (no path traversal)
+  const fullPath = path.resolve(TESTDATA_ROOT, file);
+  if (!fullPath.startsWith(TESTDATA_ROOT + path.sep) && fullPath !== TESTDATA_ROOT) {
+    return res.status(403).json({ error: 'Forbidden: path outside test data root' });
+  }
+  if (!fs.existsSync(fullPath)) return res.status(404).json({ error: 'File not found' });
+
+  try {
+    fs.unlinkSync(fullPath);
+    console.log('[delete-test]', file);
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // Connected device info
 app.get('/api/device', (req, res) => {
   const device = getConnectedDevice();
   res.json({ device });
+});
+
+// POST /api/stop — HTTP fallback for stopping a test run when WS is unavailable
+app.post('/api/stop', (req, res) => {
+  stopTest(null); // broadcast handles notifying all WS clients
+  res.json({ ok: true, hadRun: !!currentRun });
 });
 
 // ── APK management ────────────────────────────────────────────────────────────
@@ -547,7 +841,8 @@ app.post('/api/apk/install', (req, res) => {
 
 // ─── WebSocket — test runner ──────────────────────────────────────────────────
 
-let currentRun = null;
+let currentRun    = null;
+let runWasStopped = false;   // true when user clicked Stop — suppresses 'done' event
 
 wss.on('connection', (ws) => {
   console.log('UI client connected');
@@ -560,6 +855,8 @@ wss.on('connection', (ws) => {
       startTest(msg.file, msg.device, ws, msg.fromStep);
     } else if (msg.type === 'stop') {
       stopTest(ws);
+    } else if (msg.type === 'chat') {
+      handleChatMessage(msg.message, msg.context || null, ws);
     }
   });
 
@@ -567,25 +864,48 @@ wss.on('connection', (ws) => {
 });
 
 function send(ws, data) {
-  if (ws.readyState === WebSocket.OPEN) {
+  if (ws && ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify(data));
+  }
+}
+
+function broadcast(data) {
+  const payload = JSON.stringify(data);
+  for (const client of wss.clients) {
+    if (client.readyState === WebSocket.OPEN) client.send(payload);
   }
 }
 
 function stopTest(ws) {
   stopNetworkCapture();
-  if (currentRun) {
-    currentRun.kill('SIGTERM');
-    currentRun = null;
-    send(ws, { type: 'stopped' });
+  if (!currentRun) {
+    // Nothing running — still ack so the client can reset its UI
+    if (ws) send(ws, { type: 'stopped' });
+    return;
   }
+  runWasStopped = true;
+  const pid = currentRun.pid;
+  currentRun = null;
+
+  // SIGTERM first — gives Maven/Surefire a chance to clean up
+  try { process.kill(-pid, 'SIGTERM'); } catch (_) {}
+
+  // SIGKILL after 3 s in case SIGTERM is ignored (Surefire fork sometimes is)
+  setTimeout(() => {
+    try { process.kill(-pid, 'SIGKILL'); } catch (_) {}
+  }, 3000);
+
+  if (ws) send(ws, { type: 'stopped' });
+  // Also broadcast to all connected clients so other tabs update
+  broadcast({ type: 'stopped' });
 }
 
 function startTest(file, deviceOverride, ws, fromStep) {
   if (currentRun) {
-    currentRun.kill('SIGTERM');
+    try { process.kill(-currentRun.pid, 'SIGTERM'); } catch (_) {}
     currentRun = null;
   }
+  runWasStopped = false;
 
   const suite  = suiteFor(file);
   const device = deviceOverride || getConnectedDevice() || '10BDCM0YJZ00043';
@@ -602,7 +922,7 @@ function startTest(file, deviceOverride, ws, fromStep) {
 
   const args = [
     'test',
-    `-Dsurefire.suiteXmlFiles=src/test/resources/testNg/${suite}`,
+    `-Dsurefire.suiteXmlFiles=src/test/resources/suites/${suite}`,
     `-DtestFile=${fileName}`,
     `-DdeviceSerial=${device}`,
     '--no-transfer-progress',
@@ -615,10 +935,12 @@ function startTest(file, deviceOverride, ws, fromStep) {
   console.log(`Running: mvn ${args.join(' ')}`);
 
   const mvn = spawn('mvn', args, {
-    cwd  : FORGE_ROOT,
-    shell: true,
-    env  : { ...process.env }
+    cwd     : FORGE_ROOT,
+    shell   : true,
+    detached: true,          // creates a new process group so kill(-pid) kills mvn + forked JVM
+    env     : { ...process.env }
   });
+  mvn.unref();               // don't keep the Node event loop alive for this child
 
   currentRun = mvn;
 
@@ -642,8 +964,13 @@ function startTest(file, deviceOverride, ws, fromStep) {
   mvn.on('close', (code) => {
     if (buffer.trim()) processLine(buffer.trim(), ws);
     stopNetworkCapture();
-    send(ws, { type: 'done', success: code === 0, code });
     currentRun = null;
+    if (runWasStopped) {
+      // User clicked Stop — already sent 'stopped'; don't show BUILD FAILURE
+      runWasStopped = false;
+      return;
+    }
+    send(ws, { type: 'done', success: code === 0, code });
   });
 
   mvn.on('error', (err) => {
@@ -668,9 +995,13 @@ function startNetworkCapture(ws) {
   currentResponse = null;
 
   const device = getConnectedDevice();
-  const args   = device
-    ? ['-s', device, 'logcat', '-s', 'OkHttp:D', '-v', 'brief']
-    : ['logcat', '-s', 'OkHttp:D', '-v', 'brief'];
+  // okhttp.OkHttpClient logs at INFO (survives MediaTek DEBUG suppression).
+  // OkHttp:D is the HttpLoggingInterceptor tag — kept as fallback for non-MediaTek devices.
+  const tagFilters = ['OkHttp:D', 'okhttp.OkHttpClient:I'];
+  const args = [
+    ...(device ? ['-s', device] : []),
+    'logcat', '-s', ...tagFilters, '-v', 'brief',
+  ];
 
   networkLogcat = spawn('adb', args);
 
@@ -679,8 +1010,9 @@ function startNetworkCapture(ws) {
     const lines = networkBuffer.split('\n');
     networkBuffer = lines.pop();
     for (const raw of lines) {
-      // logcat brief format: "D/OkHttp(12345): message"
-      const m = raw.match(/^[DVIWE]\/OkHttp\s*\(\s*\d+\):\s*(.*)/);
+      // logcat brief format: "PRIORITY/TAG(PID): message"
+      // matches both OkHttp and okhttp.OkHttpClient tags
+      const m = raw.match(/^[DVIWE]\/(?:OkHttp|okhttp\.OkHttpClient)\s*\(\s*\d+\):\s*(.*)/);
       if (!m) continue;
       processOkHttpLine(m[1], ws);
     }
@@ -697,14 +1029,48 @@ function stopNetworkCapture() {
   }
 }
 
+/**
+ * Infer a human-readable endpoint label from request/response bodies.
+ * URLs are redacted (***) by the app's logging interceptor, so we pattern-match
+ * on body content to identify what the call actually is.
+ */
+function inferEndpointLabel(method, reqBody, resBody, status) {
+  // ── Response body patterns ────────────────────────────────────────────────
+  if (resBody.includes('jwt_access_token'))                        return 'Login / OTP verify';
+  if (resBody.includes('"otp_sent"') || resBody.includes('OTP sent')) return 'OTP send';
+  if (resBody.includes('"Events processed successfully"'))         return 'Analytics events';
+  if (resBody.includes('talsec') || resBody.includes('security_threat')) return 'Talsec security';
+  if (resBody.includes('"cart_id"') || resBody.includes('"cart":{')) return 'Cart';
+  if (resBody.includes('"order_summary"') || resBody.includes('Continue to checkout')) return 'Checkout';
+  if (resBody.includes('"order_id"') || resBody.includes('"order_status"')) return 'Order';
+  if (resBody.includes('"results"') && resBody.includes('"name"') && resBody.includes('"price"')) return 'Search PLP';
+  if (resBody.includes('"product_id"') || resBody.includes('"pdp"')) return 'Product (PDP)';
+  if (resBody.includes('"wishlist"'))                              return 'Wishlist';
+  if (resBody.includes('"address"') && method === 'POST')         return 'Add address';
+  if (resBody.includes('"profile"') || resBody.includes('"user_name"')) return 'User profile';
+  if (resBody.includes('"token"') && !resBody.includes('jwt'))    return 'Auth token';
+  if (resBody.includes('Signature verification failed'))          return 'Payment auth (401)';
+  if (resBody.includes('"payment"') || resBody.includes('"razorpay"')) return 'Payment';
+
+  // ── Request body patterns (fallback) ─────────────────────────────────────
+  if (reqBody.includes('"query"'))                                 return 'Search';
+  if (reqBody.includes('merchantId') || reqBody.includes('merchantChannelId')) return 'Payment SDK';
+  if (reqBody.includes('"mobile_number"') || reqBody.includes('"otp"')) return 'Login / OTP';
+  if (reqBody.includes('"event_name"'))                           return 'Analytics';
+  if (reqBody.includes('"cart_item"') || reqBody.includes('"item_id"')) return 'Cart action';
+
+  return null;  // no label — UI will show *** as-is
+}
+
 function processOkHttpLine(msg, ws) {
-  // ── Request start: "--> METHOD URL" or "--> METHOD URL (N-byte body)"
+  // ── Request start: "--> METHOD URL"
+  // URL may be a real https:// URL or redacted as *** by the app's logging interceptor
   if (msg.startsWith('--> ') && !msg.startsWith('--> END')) {
-    const m = msg.match(/^--> (\w+) (https?:\/\/\S+)(.*)/);
+    const m = msg.match(/^--> (\w+) (\S+)(.*)/);
     if (m) {
       currentRequest = {
         method   : m[1],
-        url      : m[2],
+        url      : m[2],   // may be *** if app redacts URLs
         headers  : [],
         body     : [],
         bodyNote : m[3].trim() || null,
@@ -714,19 +1080,23 @@ function processOkHttpLine(msg, ws) {
     return;
   }
 
-  // ── Request end: "--> END METHOD" or "--> END METHOD (N-byte body)"
+  // ── Request end: "--> END METHOD (N-byte body)"
   if (msg.startsWith('--> END ')) {
-    // request fully accumulated; wait for response
     return;
   }
 
-  // ── Response start: "<-- STATUS URL (Nms)" or "<-- HTTP/1.1 STATUS URL (Nms)"
+  // ── Response start: "<-- STATUS URL (Nms)"
+  // URL may be *** — match any non-space token
   if (msg.startsWith('<-- ') && !msg.startsWith('<-- END')) {
-    const m = msg.match(/^<-- (\d+)(?: \S+)? (https?:\/\/\S+) \((\d+)ms\)/);
+    const m = msg.match(/^<-- (\d+) (\S+) \((\d+)ms\)/);
     if (m && currentRequest) {
+      // Prefer the real URL captured at request time if it looks like a URL
+      const url = (currentRequest.url && currentRequest.url.startsWith('http'))
+        ? currentRequest.url
+        : m[2];
       currentResponse = {
         status  : parseInt(m[1], 10),
-        url     : m[2],
+        url,
         ms      : parseInt(m[3], 10),
         headers : [],
         body    : [],
@@ -738,16 +1108,19 @@ function processOkHttpLine(msg, ws) {
   // ── Response end: "<-- END HTTP (N-byte body)" or "<-- END HTTP"
   if (msg.startsWith('<-- END HTTP') || msg === '<-- END HTTP') {
     if (currentRequest && currentResponse) {
+      const reqBody = currentRequest.body.join('\n').trim();
+      const resBody = currentResponse.body.join('\n').trim();
       const call = {
-        type    : 'network_call',
-        method  : currentRequest.method,
-        url     : currentRequest.url,
-        status  : currentResponse.status,
-        ms      : currentResponse.ms,
+        type        : 'network_call',
+        method      : currentRequest.method,
+        url         : currentRequest.url,
+        label       : inferEndpointLabel(currentRequest.method, reqBody, resBody, currentResponse.status),
+        status      : currentResponse.status,
+        ms          : currentResponse.ms,
         reqHeaders  : currentRequest.headers.join('\n'),
-        reqBody     : currentRequest.body.join('\n').trim(),
+        reqBody,
         resHeaders  : currentResponse.headers.join('\n'),
-        resBody     : currentResponse.body.join('\n').trim(),
+        resBody,
       };
       send(ws, call);
     }
@@ -758,7 +1131,6 @@ function processOkHttpLine(msg, ws) {
 
   // ── Accumulate headers / body
   if (currentResponse) {
-    // After blank line it's body; before blank line it's headers
     if (msg === '') { currentResponse._bodyStarted = true; return; }
     if (currentResponse._bodyStarted) {
       currentResponse.body.push(msg);
@@ -770,6 +1142,11 @@ function processOkHttpLine(msg, ws) {
     if (currentRequest._bodyStarted) {
       currentRequest.body.push(msg);
     } else {
+      // Grab Host header to reconstruct URL when it was redacted
+      if (currentRequest.url && !currentRequest.url.startsWith('http')) {
+        const hostMatch = msg.match(/^[Hh]ost:\s*(\S+)/);
+        if (hostMatch) currentRequest.url = 'https://' + hostMatch[1];
+      }
       currentRequest.headers.push(msg);
     }
   }
@@ -877,7 +1254,7 @@ function processLine(line, ws) {
 }
 
 const REPORTS_ROOT   = path.join(FORGE_ROOT, 'reports');
-const ELEMENTS_ROOT  = path.join(FORGE_ROOT, 'src/test/resources/elements');
+const ELEMENTS_ROOT  = path.join(FORGE_ROOT, 'src/test/resources/testdata/elements');
 const FAILURE_DIR    = path.join(REPORTS_ROOT, 'failures');
 
 // ── Element helpers ───────────────────────────────────────────────────────────
@@ -923,6 +1300,155 @@ app.get('/api/all-elements', (req, res) => {
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
+});
+
+// GET /api/elements-full — all elements across every YAML file, flat + annotated
+app.get('/api/elements-full', (req, res) => {
+  try {
+    if (!fs.existsSync(ELEMENTS_ROOT)) return res.json({ ok: true, elements: [], files: [] });
+    const files = fs.readdirSync(ELEMENTS_ROOT)
+      .filter(f => f.endsWith('.yaml') || f.endsWith('.yml')).sort();
+    const result = [];
+    for (const filename of files) {
+      try {
+        const parsed = yaml.load(fs.readFileSync(path.join(ELEMENTS_ROOT, filename), 'utf8'));
+        if (!parsed || typeof parsed !== 'object') continue;
+        for (const [key, def] of Object.entries(parsed)) {
+          if (!def) continue;
+          const al = Array.isArray(def.android) ? def.android : (def.android ? [def.android] : []);
+          const il = Array.isArray(def.ios)     ? def.ios     : (def.ios     ? [def.ios]     : []);
+          result.push({
+            file        : filename,
+            key,
+            android     : al[0]?.value     || null,
+            androidType : al[0]?.type      || 'accessibilityId',
+            ios         : il[0]?.value     || null,
+            iosType     : il[0]?.type      || 'accessibilityId',
+          });
+        }
+      } catch (_) {}
+    }
+    result.sort((a, b) => a.key.localeCompare(b.key));
+    res.json({ ok: true, elements: result, files });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
+// POST /api/save-element — add or update one element in an elements YAML file
+app.post('/api/save-element', (req, res) => {
+  const { file, key, android, androidType = 'accessibilityId', ios, iosType = 'accessibilityId', oldKey } = req.body;
+  if (!file || !key) return res.status(400).json({ ok: false, error: 'file and key required' });
+  if (!/^[a-zA-Z0-9_]+$/.test(key)) return res.status(400).json({ ok: false, error: 'key must be alphanumeric/underscore only' });
+  if (!android && !ios)  return res.status(400).json({ ok: false, error: 'at least one locator (android or ios) required' });
+
+  const fullPath = path.join(ELEMENTS_ROOT, file);
+  if (!fullPath.startsWith(ELEMENTS_ROOT)) return res.status(403).json({ ok: false, error: 'Forbidden' });
+  try {
+    let parsed = {};
+    if (fs.existsSync(fullPath)) {
+      try { parsed = yaml.load(fs.readFileSync(fullPath, 'utf8')) || {}; } catch (_) {}
+    }
+    // If renaming (oldKey != key), remove old entry
+    if (oldKey && oldKey !== key && parsed[oldKey] !== undefined) {
+      delete parsed[oldKey];
+    }
+    const def = {};
+    if (android) def.android = [{ type: androidType, value: android }];
+    if (ios)     def.ios     = [{ type: iosType,     value: ios }];
+    parsed[key] = def;
+    const sorted     = Object.fromEntries(Object.entries(parsed).sort(([a], [b]) => a.localeCompare(b)));
+    const newContent = yaml.dump(sorted, { lineWidth: -1, quotingType: '"' });
+    fs.mkdirSync(path.dirname(fullPath), { recursive: true });
+    fs.writeFileSync(fullPath, newContent, 'utf8');
+    _reverseMapCache = null;   // bust cache
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
+// POST /api/delete-element — remove one element key from an elements YAML file
+app.post('/api/delete-element', (req, res) => {
+  const { file, key } = req.body;
+  if (!file || !key) return res.status(400).json({ error: 'file and key required' });
+  const fullPath = path.join(ELEMENTS_ROOT, file);
+  if (!fullPath.startsWith(ELEMENTS_ROOT)) return res.status(403).json({ error: 'Forbidden' });
+  if (!fs.existsSync(fullPath)) return res.status(404).json({ error: 'File not found' });
+  try {
+    const parsed = yaml.load(fs.readFileSync(fullPath, 'utf8')) || {};
+    if (!parsed[key]) return res.json({ ok: true, noop: true });
+    delete parsed[key];
+    fs.writeFileSync(fullPath, yaml.dump(parsed, { lineWidth: -1, quotingType: '"' }), 'utf8');
+    _reverseMapCache = null;
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// GET /api/elements-usage — missing (used in tests, not defined) + unused (defined, never used)
+app.get('/api/elements-usage', (req, res) => {
+  try {
+    const knownKeys = loadAllElementKeys();
+    const testFiles = walkYaml(TESTDATA_ROOT);
+    const usageMap  = {};   // key → [file, ...]
+    for (const file of testFiles) {
+      try {
+        const parsed = yaml.load(fs.readFileSync(path.join(TESTDATA_ROOT, file), 'utf8'));
+        for (const s of (parsed.steps || [])) {
+          if (s.element) {
+            if (!usageMap[s.element]) usageMap[s.element] = [];
+            if (!usageMap[s.element].includes(file)) usageMap[s.element].push(file);
+          }
+        }
+      } catch (_) {}
+    }
+    const missing = Object.entries(usageMap)
+      .filter(([k]) => !knownKeys.has(k))
+      .map(([key, usedIn]) => ({ key, usedIn }))
+      .sort((a, b) => a.key.localeCompare(b.key));
+
+    const elementFiles = fs.existsSync(ELEMENTS_ROOT)
+      ? fs.readdirSync(ELEMENTS_ROOT).filter(f => f.endsWith('.yaml') || f.endsWith('.yml')) : [];
+    const unused = [...knownKeys]
+      .filter(k => !usageMap[k])
+      .map(key => {
+        let definedIn = '';
+        for (const f of elementFiles) {
+          try {
+            const p = yaml.load(fs.readFileSync(path.join(ELEMENTS_ROOT, f), 'utf8'));
+            if (p && p[key]) { definedIn = f; break; }
+          } catch (_) {}
+        }
+        return { key, definedIn };
+      })
+      .sort((a, b) => a.key.localeCompare(b.key));
+
+    res.json({ ok: true, missing, unused, usageMap });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
+// GET /api/untagged-check — screen elements (contentDesc/resourceId) with NO registered element key
+app.get('/api/untagged-check', async (req, res) => {
+  try {
+    // Build a set of all known locator values from elements YAMLs
+    const locatorMap = loadElementLocatorMap();   // key → locatorValue
+    const registeredLocators = new Set(Object.values(locatorMap));
+
+    const xml   = await dumpXml();
+    const nodes = parseNodes(xml);
+
+    // Collect unique locator values from the screen that have no registered element key
+    const seen    = new Set();
+    const untagged = [];
+    for (const n of nodes) {
+      const locatorVal = n.contentDesc || (n.resourceId ? n.resourceId.split('/').pop() : '');
+      if (!locatorVal || seen.has(locatorVal)) continue;
+      seen.add(locatorVal);
+      if (!registeredLocators.has(locatorVal)) {
+        untagged.push({ locatorVal });
+      }
+    }
+    untagged.sort((a, b) => a.locatorVal.localeCompare(b.locatorVal));
+
+    res.json({ ok: true, untagged, found: seen.size - untagged.length,
+               total: seen.size, screenNodes: nodes.length });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
 });
 
 // GET /api/validate-test?file= — check each element: value exists in element YAMLs
@@ -1078,14 +1604,13 @@ app.get('/api/untagged-elements', async (req, res) => {
 });
 
 // POST /api/apply-missing-tags — write rich YAML context + run `claude /qa-tags` in popdroid
+let tagSyncProc = null; // track so we can cancel
+
 app.post('/api/apply-missing-tags', (req, res) => {
   const { elements } = req.body;  // [{tagName, text, resourceId, className, bounds}]
   if (!Array.isArray(elements) || !elements.length) {
     return res.status(400).json({ error: 'elements[] required' });
   }
-
-  const ws = [...wss.clients].find(c => c.readyState === WebSocket.OPEN);
-  if (!ws) return res.status(400).json({ error: 'No UI client connected' });
 
   // Write a rich YAML file with all the context Claude needs
   const ts       = Date.now();
@@ -1116,35 +1641,420 @@ app.post('/api/apply-missing-tags', (req, res) => {
   const popdroid = path.join(FORGE_ROOT, '..', 'popdroid');
   const args     = ['/qa-tags', missingFile];
 
-  send(ws, { type: 'log', level: 'step', line: `▶ claude /qa-tags — adding ${elements.length} tag(s) in popdroid…` });
-  send(ws, { type: 'log', line:  `📄 context: ${relFile}` });
+  broadcast({ type: 'log', level: 'step', line: `▶ claude /qa-tags — adding ${elements.length} tag(s) in popdroid…` });
+  broadcast({ type: 'log', line: `📄 context: ${relFile}` });
+
+  // Kill any previous tag sync that might still be running
+  if (tagSyncProc) { try { tagSyncProc.kill('SIGTERM'); } catch (_) {} tagSyncProc = null; }
 
   const proc = spawn('claude', args, {
     cwd  : popdroid,
     shell: true,
     env  : { ...process.env }
   });
+  tagSyncProc = proc;
+
+  // 10-minute hard timeout — prevents infinite stuck state
+  const timeout = setTimeout(() => {
+    if (tagSyncProc === proc) {
+      try { proc.kill('SIGTERM'); } catch (_) {}
+      tagSyncProc = null;
+      broadcast({ type: 'log', level: 'error', line: '⏱ qa-tags timed out after 10 minutes — killed' });
+      broadcast({ type: 'qa_tags_done', success: false });
+    }
+  }, 10 * 60 * 1000);
 
   proc.stdout.on('data', chunk => {
     chunk.toString().split('\n').filter(Boolean).forEach(line =>
-      send(ws, { type: 'log', line })
+      broadcast({ type: 'log', line })
     );
   });
   proc.stderr.on('data', chunk => {
     chunk.toString().split('\n').filter(Boolean).forEach(line =>
-      send(ws, { type: 'log', level: 'error', line })
+      broadcast({ type: 'log', level: 'error', line })
     );
   });
   proc.on('close', code => {
+    clearTimeout(timeout);
+    tagSyncProc = null;
     const ok = code === 0;
-    send(ws, { type: 'log', line: ok ? '✅ Tags applied in popdroid' : `❌ claude exited ${code}` });
-    send(ws, { type: 'qa_tags_done', success: ok });
+    broadcast({ type: 'log', line: ok ? '✅ Tags applied in popdroid' : `❌ claude exited ${code}` });
+    broadcast({ type: 'qa_tags_done', success: ok });
   });
-  proc.on('error', e =>
-    send(ws, { type: 'log', level: 'error', line: 'Failed to start claude: ' + e.message })
-  );
+  proc.on('error', e => {
+    clearTimeout(timeout);
+    tagSyncProc = null;
+    broadcast({ type: 'log', level: 'error', line: 'Failed to start claude: ' + e.message });
+    broadcast({ type: 'qa_tags_done', success: false });
+  });
 
   res.json({ ok: true, missingFile: relFile, count: elements.length });
+});
+
+// POST /api/cancel-tags — kill a stuck tag sync
+app.post('/api/cancel-tags', (req, res) => {
+  if (tagSyncProc) {
+    try { tagSyncProc.kill('SIGTERM'); } catch (_) {}
+    tagSyncProc = null;
+    broadcast({ type: 'log', level: 'error', line: '⏹ Tag sync cancelled by user' });
+    broadcast({ type: 'qa_tags_done', success: false });
+    res.json({ ok: true });
+  } else {
+    res.json({ ok: false, message: 'No tag sync running' });
+  }
+});
+
+// ── Chat (claude --output-format stream-json) ────────────────────────────────
+// Uses structured JSON streaming so we can detect MCP tool calls and show
+// live status steps in the UI — same idea as Maestro's streaming feedback.
+// Session continuity: captures session_id from each run and uses --resume on
+// follow-up messages so Claude remembers the full conversation context.
+let chatProc         = null;
+let chatSessionId    = null;   // persists across messages in the same UI session
+let chatLastTestFile = null;   // last test file mentioned in this session
+
+// Human-readable labels for MCP tool calls
+const TOOL_LABELS = {
+  forge_get_hierarchy      : '🔍 Scanning device screen…',
+  forge_run_test           : '▶ Running test on device…',
+  forge_heal_step          : '🔧 Healing broken step…',
+  forge_save_test          : '💾 Saving test to androidTests…',
+  forge_read_test          : '📄 Reading existing test…',
+  forge_device_screenshot  : '📸 Taking screenshot…',
+  forge_device_tap         : '👆 Tapping element…',
+  forge_device_type        : '⌨️  Typing text…',
+  forge_device_key         : '🔑 Pressing key…',
+  forge_device_swipe       : '👆 Swiping…',
+  forge_device_launch      : '🚀 Launching app…',
+  forge_list_tests         : '📋 Listing tests…',
+  forge_validate_test      : '✅ Validating elements…',
+};
+
+// Build a structured context preamble injected into every chat prompt
+function buildContextPreamble(context) {
+  if (!context) return '';
+  const lines = [];
+
+  // Active test + YAML content
+  if (context.activeTest) {
+    lines.push(`ACTIVE TEST: "${context.activeTest}"${context.testName ? ` — "${context.testName}"` : ''}`);
+    try {
+      const fullPath = path.join(TESTDATA_ROOT, context.activeTest);
+      const content  = fs.readFileSync(fullPath, 'utf8');
+      lines.push(`\nTEST YAML:\n\`\`\`yaml\n${content}\n\`\`\``);
+    } catch (_) { /* file not found — skip */ }
+  }
+
+  // Last run result + failed steps
+  if (context.lastResult) {
+    lines.push(`\nLAST RUN: ${context.lastResult === 'pass' ? '✅ PASSED' : '❌ FAILED'}`);
+  }
+  if (context.failedSteps?.length) {
+    lines.push('FAILED STEPS:');
+    for (const s of context.failedSteps) {
+      lines.push(`  Step ${s.index + 1} — action: ${s.action}${s.element ? `, element: ${s.element}` : ''}${s.error ? `\n    Error: ${s.error}` : ''}`);
+    }
+  }
+
+  // Current screen elements (captured live via uiautomator dump)
+  if (context.screenElements?.length) {
+    lines.push(`\nCURRENT SCREEN (${context.screenElements.length} elements from uiautomator):`);
+    for (const el of context.screenElements) {
+      const name = el.contentDesc || el.text || el.resourceId || '—';
+      const cls  = (el.className || '').split('.').pop();
+      lines.push(`  • ${name}  [${cls}]  bounds=${el.bounds}${el.clickable ? '  clickable' : ''}`);
+    }
+  }
+
+  return lines.length
+    ? `=== FORGE CONTEXT ===\n${lines.join('\n')}\n=== END CONTEXT ===\n\n`
+    : '';
+}
+
+// WS message handler for chat (called from WS message handler)
+function handleChatMessage(message, context, ws) {
+  if (chatProc) { try { chatProc.kill('SIGTERM'); } catch (_) {} chatProc = null; }
+
+  // Resolve claude binary — use absolute path so it works regardless of server PATH
+  const claudeBin = process.env.CLAUDE_BIN || 'claude';
+
+  // PATH: ensure Homebrew bin is included (claude is installed there on macOS)
+  const env = {
+    ...process.env,
+    FORCE_COLOR: '0',
+    PATH: `${process.env.PATH}:/opt/homebrew/bin:/usr/local/bin`
+  };
+
+  const mcpConfig = path.join(FORGE_ROOT, '.claude', 'settings.json');
+  const mcpArgs   = fs.existsSync(mcpConfig) ? ['--mcp-config', mcpConfig] : [];
+
+  // Build the prompt — inject active test + UI context so Claude always knows the situation
+  const ctxPreamble = buildContextPreamble(context);
+  let prompt;
+  if (chatSessionId) {
+    // Follow-up: resume session + inject context prefix so Claude never asks "which test?"
+    const sessionCtx = chatLastTestFile
+      ? `CONTEXT: The test we are working on is "${chatLastTestFile}". ` +
+        `Any edit/run/fix request refers to THIS file unless explicitly stated otherwise.\n\n`
+      : '';
+    prompt = sessionCtx + ctxPreamble + message;
+    console.log('[chat] resume', chatSessionId, '| active:', chatLastTestFile,
+                ctxPreamble ? '| +context' : '');
+  } else {
+    // New session: if we have structured context (fix flow, from-screen flow) use it directly;
+    // otherwise prefix with /generate-test skill so Claude knows to write a test
+    if (ctxPreamble) {
+      prompt = ctxPreamble + message;
+    } else {
+      prompt = `/generate-test ${message}`;
+    }
+    console.log('[chat] new session:', prompt.substring(0, 100));
+  }
+
+  const sessionArgs = chatSessionId
+    ? ['--resume', chatSessionId]
+    : [];
+
+  const spawnArgs = [...sessionArgs, '-p', prompt,
+                     '--dangerously-skip-permissions', ...mcpArgs];
+
+  const proc = spawn(claudeBin, spawnArgs, { cwd: FORGE_ROOT, shell: false, env });
+  chatProc = proc;
+
+  // Immediate acknowledgment so the UI shows activity during Claude's startup
+  broadcast({ type: 'chat_thinking', message });
+
+  let full      = '';
+  let stderrBuf = '';
+
+  // ── Silence detector — shows "using tools" when Claude stops typing ───────
+  // Claude goes quiet on stdout while MCP tools run. We detect this and show
+  // a status indicator rather than leaving the UI frozen.
+  let silenceTimer = null;
+  let toolActive   = false;
+
+  function resetSilenceTimer() {
+    if (silenceTimer) clearTimeout(silenceTimer);
+    if (toolActive) { toolActive = false; }
+    silenceTimer = setTimeout(() => {
+      if (chatProc) {   // still running — Claude is using a tool
+        toolActive = true;
+        broadcast({ type: 'chat_status', label: '🔧 Using tools…' });
+      }
+    }, 2000);  // 2 s silence → tool in progress
+  }
+
+  proc.stdout.on('data', chunk => {
+    const text = chunk.toString();
+    full += text;
+    resetSilenceTimer();
+
+    // Stream tokens to chat bubble immediately (true per-character streaming)
+    broadcast({ type: 'chat_token', token: text });
+
+    // ── Detect tool call labels from stderr-style lines claude prints ─────
+    // claude -p prints tool names to stderr; we check stdout too for any
+    // embedded markers. Primary detection is via stderr below.
+
+    // ── Detect forge_save_test completion — push file to editor ──────────
+    const savedMatch = text.match(/✅ Saved: ([\w/.-]+\.ya?ml)/);
+    if (savedMatch) {
+      const relPath = savedMatch[1].trim();
+      const absPath = path.join(FORGE_ROOT, relPath);
+      try {
+        const yaml = fs.readFileSync(absPath, 'utf8');
+        broadcast({ type: 'chat_file_saved', filePath: relPath, content: yaml });
+      } catch (_) {}
+    }
+
+    // Track last mentioned .yaml — update immediately so next follow-up has context
+    const yamlMentions = (text.match(/[\w/.-]+\.yaml/g) || [])
+      .filter(f => !f.includes('element') && !f.includes('testng') && !f.includes('suite'));
+    if (yamlMentions.length) {
+      const prev = chatLastTestFile;
+      chatLastTestFile = yamlMentions[yamlMentions.length - 1];
+      if (chatLastTestFile !== prev) {
+        broadcast({ type: 'chat_active_test', testFile: chatLastTestFile });
+      }
+    }
+  });
+
+  proc.stderr.on('data', chunk => {
+    const text = chunk.toString().replace(/\x1b\[[0-9;]*m/g, '').replace(/\r/g, '');
+    stderrBuf += text;
+    if (text.trim()) console.log('[chat stderr]', text.trim());
+
+    // claude prints tool use info to stderr — detect and show status labels
+    for (const line of text.split('\n')) {
+      for (const [toolName, label] of Object.entries(TOOL_LABELS)) {
+        if (line.includes(toolName)) {
+          broadcast({ type: 'chat_status', label });
+          resetSilenceTimer(); // reset so silence timer doesn't double-fire
+        }
+      }
+      // Session ID — claude prints it to stderr on start
+      const sidMatch = line.match(/session[_\s]?id[:\s]+([a-f0-9-]{20,})/i);
+      if (sidMatch && !chatSessionId) {
+        chatSessionId = sidMatch[1].trim();
+        console.log('[chat] session from stderr:', chatSessionId);
+        broadcast({ type: 'chat_session', sessionId: chatSessionId });
+      }
+    }
+  });
+  proc.on('close', code => {
+    chatProc = null;
+    if (silenceTimer) clearTimeout(silenceTimer);
+    console.log('[chat] claude exited', code, '| response length:', full.length);
+    if (!full && code !== 0) {
+      const detail = stderrBuf.trim() ? `\n\nDetails:\n${stderrBuf.trim()}` : '';
+      full = `❌ claude exited with code ${code}.${detail}`;
+    }
+    // Track last yaml mention across full response
+    const allYaml = full.match(/[\w/]+\.yaml/g);
+    if (allYaml) chatLastTestFile = allYaml[allYaml.length - 1];
+    broadcast({ type: 'chat_done', response: full, success: code === 0 });
+  });
+  proc.on('error', e => {
+    chatProc = null;
+    console.error('[chat] spawn error:', e.message);
+    broadcast({ type: 'chat_done', response: `❌ Failed to start claude: ${e.message}\n\nMake sure claude CLI is installed: https://claude.ai/download`, success: false });
+  });
+}
+
+// HTTP fallback (when WS isn't open yet)
+app.post('/api/chat', (req, res) => {
+  const { message, context } = req.body;
+  if (!message) return res.status(400).json({ error: 'message required' });
+  handleChatMessage(message, context || null, null);
+  res.json({ ok: true });
+});
+
+// Reset session — next message starts a fresh Claude conversation
+app.post('/api/chat-reset', (req, res) => {
+  chatSessionId    = null;
+  chatLastTestFile = null;
+  res.json({ ok: true });
+});
+
+app.post('/api/cancel-chat', (req, res) => {
+  if (chatProc) {
+    try { chatProc.kill('SIGTERM'); } catch (_) {}
+    chatProc = null;
+    broadcast({ type: 'chat_done', response: '', success: false });
+    res.json({ ok: true });
+  } else {
+    res.json({ ok: false });
+  }
+});
+
+// ── Recorder ─────────────────────────────────────────────────────────────────
+let recorderProcess    = null;
+let recorderSessionDir = null;
+
+app.post('/api/recorder/start', (req, res) => {
+  if (recorderProcess) return res.status(400).json({ error: 'Already recording' });
+  recorderSessionDir = null; // clear stale session from previous recording
+
+  const device = getConnectedDevice();
+  const ws     = [...wss.clients].find(c => c.readyState === WebSocket.OPEN);
+  const rlog   = (line, level = '') => ws && send(ws, { type: 'recorder_log', line, level });
+
+  rlog('▶ Starting recorder…', 'step');
+
+  // Run ForgeRecorder.java directly via java — avoids Maven exec:java which swallows stdin
+  const javaArgs = ['-cp', 'target/classes', 'com.popclub.ai.app.ForgeRecorder'];
+  if (device) javaArgs.push(device);
+
+  recorderProcess = spawn('java', javaArgs, { cwd: FORGE_ROOT, shell: false });
+
+  let buf = '';
+  recorderProcess.stdout.on('data', chunk => {
+    buf += chunk.toString();
+    const lines = buf.split('\n');
+    buf = lines.pop();
+    for (const raw of lines) {
+      const line = raw.trim();
+      if (!line) continue;
+      rlog(line);
+      // Detect session directory — Recorder prints "SESSION_DIR: /absolute/path"
+      const sdirM = line.match(/^SESSION_DIR:\s*(.+)/);
+      if (sdirM) {
+        recorderSessionDir = sdirM[1].trim();
+        console.log('[recorder] session dir:', recorderSessionDir);
+      }
+      // Parse recorded step lines — forward as recorder_step events so UI can show live feed
+      // Recorder prints lines like:  [REC] tap  some_element  →  {"action":"tap","element":"some_element",...}
+      const recM = line.match(/^\[REC\]\s+(\w+)\s+(.*)/);
+      if (recM) {
+        ws && send(ws, { type: 'recorder_step', action: recM[1], detail: recM[2].trim() });
+      }
+    }
+  });
+  recorderProcess.stderr.on('data', chunk => {
+    chunk.toString().split('\n').filter(Boolean).forEach(l => {
+      // Filter Maven noise — only forward meaningful lines
+      rlog(l, 'error');
+    });
+  });
+  recorderProcess.on('close', code => {
+    recorderProcess = null;
+    ws && send(ws, { type: 'recorder_stopped', sessionDir: recorderSessionDir });
+  });
+  recorderProcess.on('error', e => rlog('Failed to start recorder: ' + e.message, 'error'));
+
+  res.json({ ok: true, device: device || 'default' });
+});
+
+app.post('/api/recorder/stop', (req, res) => {
+  if (!recorderProcess) return res.status(400).json({ error: 'Not recording' });
+  const proc = recorderProcess;
+  // Primary: send exit via stdin (Recorder reads it, drains tap executor, then saves YAML)
+  try { proc.stdin.write('exit\n'); proc.stdin.end(); } catch (_) {}
+  // Backup: if stdin doesn't complete save within 5s, SIGTERM triggers the shutdown hook (also saves)
+  setTimeout(() => { try { proc.kill('SIGTERM'); } catch (_) {} }, 5000);
+  res.json({ ok: true });
+});
+
+app.post('/api/recorder/pause', (req, res) => {
+  if (!recorderProcess) return res.status(400).json({ error: 'Not recording' });
+  try { recorderProcess.stdin.write('pause\n'); } catch (_) {}
+  res.json({ ok: true });
+});
+
+app.post('/api/recorder/resume', (req, res) => {
+  if (!recorderProcess) return res.status(400).json({ error: 'Not recording' });
+  try { recorderProcess.stdin.write('resume\n'); } catch (_) {}
+  res.json({ ok: true });
+});
+
+app.post('/api/recorder/scan', (req, res) => {
+  if (!recorderProcess) return res.status(400).json({ error: 'Not recording' });
+  try { recorderProcess.stdin.write('scan\n'); } catch (_) {}
+  res.json({ ok: true });
+});
+
+app.get('/api/recorder/output', (req, res) => {
+  // Use the session dir captured from SESSION_DIR: output; fall back to most recently created dir
+  let dir = recorderSessionDir;
+  if (!dir || !fs.existsSync(dir) || !fs.statSync(dir).isDirectory()) {
+    const base = path.join(FORGE_ROOT, 'reports/recorded');
+    if (fs.existsSync(base)) {
+      const dirs = fs.readdirSync(base)
+        .map(d => path.join(base, d))
+        .filter(p => fs.statSync(p).isDirectory())
+        .sort((a, b) => fs.statSync(b).birthtimeMs - fs.statSync(a).birthtimeMs); // newest first by creation time
+      if (dirs.length) dir = dirs[0];
+    }
+  }
+  if (!dir) return res.status(404).json({ error: 'No recording found' });
+  try {
+    const files = fs.readdirSync(dir).filter(f => f.endsWith('.yaml') || f.endsWith('.yml'));
+    if (!files.length) return res.status(404).json({ error: 'No YAML generated yet — recording may still be in progress' });
+    const content = fs.readFileSync(path.join(dir, files[0]), 'utf8');
+    res.json({ content, filename: path.basename(files[0]), dir });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 // ─── Start ───────────────────────────────────────────────────────────────────

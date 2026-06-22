@@ -20,7 +20,7 @@ public class ElementRepository {
 
             for (String feature : features) {
 
-                String path = "src/test/resources/elements/" + feature + ".yaml";
+                String path = "src/test/resources/testdata/elements/" + feature + ".yaml";
 
                 Map<String, Map<String, Object>> featureElements =
                         mapper.readValue(new File(path), Map.class);

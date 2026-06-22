@@ -2,12 +2,12 @@ package com.popclub.runner;
 
 import com.popclub.core.*;
 import com.popclub.heal.SelfHealingEngine;
-import com.popclub.mobile.driver.DeviceKeepAlive;
-import com.popclub.mobile.driver.DriverManager;
+import com.popclub.android.driver.DeviceKeepAlive;
+import com.popclub.android.driver.DriverManager;
 import com.popclub.model.Step;
 import com.popclub.model.TestCase;
-import com.popclub.mobile.actions.Action;
-import com.popclub.mobile.actions.ActionFactory;
+import com.popclub.android.actions.Action;
+import com.popclub.android.actions.ActionFactory;
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.AppiumDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -16,8 +16,12 @@ import com.popclub.core.LocatorUtil;
 
 import java.io.File;
 import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,6 +51,13 @@ public class TestExecutor {
         TestContext.setNoReset(testCase.noReset || resumeMode);
         TestContext.setLoginRequired(testCase.loginRequired);
         TestContext.setTestSourceFile(testCase.sourceFile);
+
+        // Zero-wait intelligence: publish the test-level default timeout so every
+        // action's poll loop knows how long to wait.  Individual steps may override
+        // this with their own `timeout:` field in YAML.
+        int resolvedDefault = testCase.defaultTimeout > 0 ? testCase.defaultTimeout : 30;
+        TestContext.setDefaultTimeout(resolvedDefault);
+        System.out.println("Poll timeout : " + resolvedDefault + "s (defaultTimeout)");
 
         // Seed well-known API base URLs as interpolation variables so YAML steps
         // can use ${APP_API_URL}, ${UAT_API_URL}, ${BACKEND_API_URL} without hardcoding
@@ -90,15 +101,38 @@ public class TestExecutor {
             ElementRepository.loadMultiple(testCase.features);
         }
 
+        // Run onFlowStart steps
+        if (testCase.onFlowStart != null && !testCase.onFlowStart.isEmpty()) {
+            System.out.println("[onFlowStart] Running " + testCase.onFlowStart.size() + " hook steps");
+            resolveAndRunSteps(testCase.onFlowStart, maxRetry);
+        }
+
         for (Step step : testCase.steps) {
 
             // Resolve locators — priority: element → locator → resourceId → text → bounds/xy
             if (step.element != null) {
 
-                step.locators = ElementRepository.getLocators(
-                        step.element,
-                        TestContext.getPlatform()
-                );
+                // Interpolate ${varName} in element name before repository lookup
+                if (step.element.contains("${")) {
+                    step.element = interpolate(step.element);
+                }
+
+                // Try ElementRepository first; fall back to treating the value as a direct
+                // accessibilityId for dynamic names (e.g. product_list_item_3) that are not
+                // registered in elements.yaml because they are generated at runtime.
+                try {
+                    step.locators = ElementRepository.getLocators(
+                            step.element,
+                            TestContext.getPlatform()
+                    );
+                } catch (RuntimeException notFound) {
+                    System.out.println("[locator] '" + step.element
+                            + "' not in elements.yaml — using as direct accessibilityId");
+                    Locator loc = new Locator();
+                    loc.type  = "accessibilityId";
+                    loc.value = step.element;
+                    step.locators = List.of(loc);
+                }
 
             } else if (step.locator != null) {
 
@@ -110,6 +144,11 @@ public class TestExecutor {
 
             } else if (step.text != null) {
 
+                // Interpolate ${varName} in text before building the locator so that
+                // scrollUntilVisible / tapByText / verifyElement with text: "${var}" work correctly.
+                if (step.text.contains("${")) {
+                    step.text = interpolate(step.text);
+                }
                 // visible text fallback
                 Locator locator = new Locator();
                 locator.type  = "text";
@@ -127,9 +166,15 @@ public class TestExecutor {
             }
             // x/y fallback is handled directly in TapAction when locators is null
 
-            // ── Variable interpolation — expand ${varName} in value field ────────
+            // ── Variable interpolation — expand ${varName} in value, text, variable fields ──
             if (step.value != null && step.value.contains("${")) {
                 step.value = interpolate(step.value);
+            }
+            if (step.text != null && step.text.contains("${")) {
+                step.text = interpolate(step.text);
+            }
+            if (step.variable != null && step.variable.contains("${")) {
+                step.variable = interpolate(step.variable);
             }
             // Also support captureText using `variable:` field as alias for `value:`
             if ("captureText".equalsIgnoreCase(step.action) && step.variable != null && step.value == null) {
@@ -233,14 +278,39 @@ public class TestExecutor {
                 continue;
             }
 
+            // ── repeat ─────────────────────────────────────────────────────────
+            if ("repeat".equalsIgnoreCase(step.action)) {
+                int times = step.times > 0 ? step.times
+                        : (step.value != null && step.value.matches("\\d+") ? Integer.parseInt(step.value.trim()) : 1);
+                System.out.println("[repeat] " + times + " times");
+                for (int r = 0; r < times; r++) {
+                    System.out.println("[repeat] iteration " + (r+1) + "/" + times);
+                    if (step.steps != null && !step.steps.isEmpty()) {
+                        resolveAndRunSteps(new ArrayList<>(step.steps), maxRetry);
+                    }
+                }
+                stepIndex++;
+                continue;
+            }
+
             // ── logVar: print a variable's current value to the test log ─────
             if ("logVar".equalsIgnoreCase(step.action)) {
                 String varName = step.variable != null ? step.variable : step.element;
                 String varVal  = varName != null ? TestContext.getScalarData(varName) : null;
                 String label   = step.value != null ? step.value : varName;
-                String msg     = String.format("[logVar] %s = \"%s\"", label, varVal != null ? varVal : "(not set)");
-                System.out.println(msg);
-                LoggerUtil.step(msg);
+                String msg;
+                if (label != null && label.contains("\n")) {
+                    // Multiline template — each line needs its own [STEP] prefix
+                    // so the Forge UI colours all lines (not just the first one).
+                    LoggerUtil.step("[logVar] " + varName + " =");
+                    for (String logLine : label.stripTrailing().split("\n")) {
+                        LoggerUtil.step("  " + logLine.stripLeading());
+                    }
+                } else {
+                    msg = String.format("[logVar] %s = \"%s\"", label, varVal != null ? varVal : "(not set)");
+                    System.out.println(msg);
+                    LoggerUtil.step(msg);
+                }
                 stepIndex++;
                 continue;
             }
@@ -302,12 +372,8 @@ public class TestExecutor {
 
                     LoggerUtil.pass("Step " + stepIndex + " passed");
 
-                    // STEP MODE ONLY
-                    if ("STEP".equals(TestContext.getExecutionMode())) {
-
-                        if (step.testCaseId != null) {
-                            TestContext.markPassed(step.testCaseId);
-                        }
+                    if (step.testCaseId != null) {
+                        TestContext.markPassed(step.testCaseId);
                     }
 
                 } catch (Exception e) {
@@ -338,8 +404,9 @@ public class TestExecutor {
                         }
 
                         if (!success) {
+                            String tcSuffix = step.testCaseId != null ? " (" + step.testCaseId + ")" : "";
                             LoggerUtil.fail(
-                                    "Step " + stepIndex +
+                                    "Step " + stepIndex + tcSuffix +
                                             " failed: " + e.getMessage()
                             );
 
@@ -349,10 +416,8 @@ public class TestExecutor {
 
                             ScreenshotUtil.capture("step_" + stepIndex);
 
-                            if ("STEP".equals(TestContext.getExecutionMode())) {
-                                if (step.testCaseId != null) {
-                                    TestContext.markFailed(step.testCaseId);
-                                }
+                            if (step.testCaseId != null) {
+                                TestContext.markFailed(step.testCaseId);
                             }
 
                             throw new RuntimeException(e);
@@ -385,6 +450,16 @@ public class TestExecutor {
         TestContext.markBlockedIfMissing(allTestCaseIds);
 
         System.out.println("Test Execution Completed");
+
+        // Run onFlowComplete steps (success path)
+        if (testCase.onFlowComplete != null && !testCase.onFlowComplete.isEmpty()) {
+            System.out.println("[onFlowComplete] Running " + testCase.onFlowComplete.size() + " hook steps");
+            try {
+                resolveAndRunSteps(testCase.onFlowComplete, 0);
+            } catch (Exception e) {
+                System.out.println("[onFlowComplete] Hook step failed (ignored): " + e.getMessage());
+            }
+        }
     }
 
     // ── Variable interpolation ────────────────────────────────────────────────
@@ -396,11 +471,49 @@ public class TestExecutor {
      * value stored under {@code varName} in {@link TestContext#getScalarData}.
      * Unknown variables are left as-is so typos surface as test failures.
      */
+    private static final Random RAND = new Random();
+    private static final String[] RANDOM_WORDS = {"alpha","beta","gamma","delta","sigma","orbit","forge","blaze","nova","pixel"};
+    private static final DateTimeFormatter TS_FMT = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+
+    private static String resolveBuiltIn(String key) {
+        switch (key) {
+            case "randomEmail": {
+                String chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+                StringBuilder s = new StringBuilder("test_");
+                for (int i = 0; i < 4; i++) s.append(chars.charAt(RAND.nextInt(chars.length())));
+                s.append("@popclub.com");
+                return s.toString();
+            }
+            case "randomPhone": {
+                StringBuilder s = new StringBuilder("9");
+                for (int i = 0; i < 9; i++) s.append(RAND.nextInt(10));
+                return s.toString();
+            }
+            case "timestamp":
+                return LocalDateTime.now().format(TS_FMT);
+            case "randomWord":
+                return RANDOM_WORDS[RAND.nextInt(RANDOM_WORDS.length)];
+            case "randomInt":
+                return String.valueOf(1000 + RAND.nextInt(9000));
+            case "uuid":
+                return UUID.randomUUID().toString().substring(0, 8);
+            default:
+                return null;
+        }
+    }
+
     private static String interpolate(String text) {
         Matcher m = VAR_PATTERN.matcher(text);
         StringBuilder sb = new StringBuilder();
         while (m.find()) {
             String key = m.group(1).trim();
+            // Check built-in dynamic variables first
+            String builtIn = resolveBuiltIn(key);
+            if (builtIn != null) {
+                m.appendReplacement(sb, Matcher.quoteReplacement(builtIn));
+                System.out.printf("  ↩  interpolate: ${%s} = \"%s\" (built-in)%n", key, builtIn);
+                continue;
+            }
             String val = TestContext.getScalarData(key);
             if (val.isEmpty()) {
                 System.out.printf("  ⚠️  interpolate: variable '${%s}' not set — leaving as-is%n", key);
@@ -458,12 +571,21 @@ public class TestExecutor {
             // Wrap in try-catch so a missing element key surfaces with a clear message
             // instead of an untrapped RuntimeException that kills the session silently.
             if (step.element != null) {
+                // Interpolate ${varName} in element name before repository lookup
+                if (step.element.contains("${")) {
+                    step.element = interpolate(step.element);
+                }
                 try {
                     step.locators = ElementRepository.getLocators(step.element, TestContext.getPlatform());
-                } catch (RuntimeException e) {
-                    throw new RuntimeException(
-                        "Step " + idx + " (" + step.action + "): " + e.getMessage()
-                        + " — add it to src/test/resources/elements/*.yaml", e);
+                } catch (RuntimeException notFound) {
+                    // Dynamic element names (e.g. product_list_item_3) are not registered in
+                    // elements.yaml — treat the value directly as an accessibilityId.
+                    System.out.println("[locator] '" + step.element
+                            + "' not in elements.yaml — using as direct accessibilityId");
+                    com.popclub.core.Locator loc = new com.popclub.core.Locator();
+                    loc.type  = "accessibilityId";
+                    loc.value = step.element;
+                    step.locators = List.of(loc);
                 }
             } else if (step.locator != null) {
                 com.popclub.core.Locator loc = new com.popclub.core.Locator();
@@ -471,6 +593,9 @@ public class TestExecutor {
                 loc.value = step.locator;
                 step.locators = List.of(loc);
             } else if (step.text != null) {
+                if (step.text.contains("${")) {
+                    step.text = interpolate(step.text);
+                }
                 com.popclub.core.Locator loc = new com.popclub.core.Locator();
                 loc.type  = "text";
                 loc.value = step.text;
@@ -479,6 +604,12 @@ public class TestExecutor {
             // Variable interpolation
             if (step.value != null && step.value.contains("${")) {
                 step.value = interpolate(step.value);
+            }
+            if (step.text != null && step.text.contains("${")) {
+                step.text = interpolate(step.text);
+            }
+            if (step.variable != null && step.variable.contains("${")) {
+                step.variable = interpolate(step.variable);
             }
             if ("captureText".equalsIgnoreCase(step.action) && step.variable != null && step.value == null) {
                 step.value = step.variable;
@@ -547,14 +678,39 @@ public class TestExecutor {
                 continue;
             }
 
+            // ── repeat ───────────────────────────────────────────────────────
+            if ("repeat".equalsIgnoreCase(step.action)) {
+                int times = step.times > 0 ? step.times
+                        : (step.value != null && step.value.matches("\\d+") ? Integer.parseInt(step.value.trim()) : 1);
+                System.out.println("[repeat] " + times + " times");
+                for (int r = 0; r < times; r++) {
+                    System.out.println("[repeat] iteration " + (r+1) + "/" + times);
+                    if (step.steps != null && !step.steps.isEmpty()) {
+                        resolveAndRunSteps(new ArrayList<>(step.steps), maxRetry, isFlow);
+                    }
+                }
+                idx++;
+                continue;
+            }
+
             // ── logVar ────────────────────────────────────────────────────────
             if ("logVar".equalsIgnoreCase(step.action)) {
                 String varName = step.variable != null ? step.variable : step.element;
                 String varVal  = varName != null ? TestContext.getScalarData(varName) : null;
                 String label   = step.value != null ? step.value : varName;
-                String msg     = String.format("[logVar] %s = \"%s\"", label, varVal != null ? varVal : "(not set)");
-                System.out.println(msg);
-                LoggerUtil.step(msg);
+                String msg;
+                if (label != null && label.contains("\n")) {
+                    // Multiline template — each line needs its own [STEP] prefix
+                    // so the Forge UI colours all lines (not just the first one).
+                    LoggerUtil.step("[logVar] " + varName + " =");
+                    for (String logLine : label.stripTrailing().split("\n")) {
+                        LoggerUtil.step("  " + logLine.stripLeading());
+                    }
+                } else {
+                    msg = String.format("[logVar] %s = \"%s\"", label, varVal != null ? varVal : "(not set)");
+                    System.out.println(msg);
+                    LoggerUtil.step(msg);
+                }
                 idx++;
                 continue;
             }

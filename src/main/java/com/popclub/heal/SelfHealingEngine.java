@@ -3,7 +3,7 @@ package com.popclub.heal;
 import com.popclub.core.ElementRepository;
 import com.popclub.core.Locator;
 import com.popclub.core.TestContext;
-import com.popclub.mobile.driver.DriverManager;
+import com.popclub.android.driver.DriverManager;
 import com.popclub.model.Step;
 import com.popclub.parser.XmlElementParser;
 import io.appium.java_client.AppiumDriver;

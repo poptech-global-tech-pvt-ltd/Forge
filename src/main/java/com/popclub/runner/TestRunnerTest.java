@@ -1,8 +1,8 @@
 package com.popclub.runner;
 
 import com.popclub.core.TestContext;
-import com.popclub.mobile.driver.AppiumDriverManager;
-import com.popclub.mobile.driver.AppiumServerManager;
+import com.popclub.android.driver.AppiumDriverManager;
+import com.popclub.android.driver.AppiumServerManager;
 import com.popclub.model.TestCase;
 import com.popclub.parser.YamlParser;
 import com.popclub.testsigma.TestSigmaClient;
@@ -30,14 +30,14 @@ public class TestRunnerTest {
     @DataProvider(name = "testData", parallel = false)
     public Object[][] getTestData(ITestContext context) {
 
-        File root = new File("src/test/resources/testdata");
+        File root = new File("src/test/java/com/popclub/androidTests");
 
         // Collect all .yaml files recursively (root + all subfolders)
         List<File> allFiles = new ArrayList<>();
         collectYamlFiles(root, allFiles);
 
         if (allFiles.isEmpty()) {
-            throw new RuntimeException("No YAML files found in testdata folder (including subfolders)");
+            throw new RuntimeException("No YAML files found in androidTests folder (including subfolders)");
         }
 
         String tagParam      = System.getProperty("tag",
@@ -69,7 +69,7 @@ public class TestRunnerTest {
                 if (f != null) {
                     orderedFiles.add(f);
                 } else {
-                    System.out.println("Warning: testFile '" + name + "' not found in testdata folder");
+                    System.out.println("Warning: testFile '" + name + "' not found in androidTests folder");
                 }
             }
         } else {

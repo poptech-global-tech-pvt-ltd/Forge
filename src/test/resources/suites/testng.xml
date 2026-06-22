@@ -1,0 +1,43 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<suite name="PopClub Suite" parallel="false" thread-count="1">
+
+    <listeners>
+        <listener class-name="com.popclub.listener.TestListener"/>
+        <listener class-name="com.popclub.testsigma.TestSigmaYamlListener"/>
+    </listeners>
+
+    <!-- Default file to run when -DtestFile is not passed on the mvn command line.
+         When -DtestFile=shop_clp_full.yaml is passed, that value wins (TestRunnerTest
+         checks System.getProperty first). To run ALL files, remove the value here
+         or pass -DtestFile="" -->
+    <parameter name="testFile" value="login.yaml"/>
+    <parameter name="deviceSerial" value="emulator-5554"/>
+    <parameter name="runTitle" value="POP Android Automation"/>
+    <parameter name="projectId" value="d8f4a221-bc6d-47d8-9448-0834f5d012ec"/>
+
+    <test name="Mobile Tests">
+
+        <classes>
+            <class name="com.popclub.runner.TestRunnerTest"/>
+        </classes>
+
+    </test>
+
+    <!--
+        ClpVerificationTest is a standalone diagnostic tool — run it explicitly:
+            mvn test -Dtest=ClpVerificationTest                    # all pages
+            mvn test -Dtest=ClpVerificationTest -DpageId=SHOP      # one page
+        It is intentionally NOT included in this suite so it does not trigger
+        on every -DtestFile run.
+    -->
+    <!--
+    <test name="CLP Verification">
+        <classes>
+            <class name="com.popclub.clp.ClpVerificationTest"/>
+        </classes>
+    </test>
+    -->
+
+</suite>
+

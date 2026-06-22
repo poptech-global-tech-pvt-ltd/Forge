@@ -1,0 +1,88 @@
+- generic [ref=e3]:
+  - banner [ref=e447]:
+    - generic [ref=e448]:
+      - generic [ref=e449]:
+        - img [ref=e450] [cursor=pointer]
+        - generic [ref=e452] [cursor=pointer]: Save & exit
+      - generic [ref=e453]: Personal details
+  - generic [ref=e455]:
+    - heading "Office address" [level=4] [ref=e457]
+    - generic [ref=e458]:
+      - generic [ref=e570] [cursor=pointer]:
+        - heading "Added from maps" [level=5] [ref=e571]
+        - paragraph [ref=e572]: Madkam centre, Mulleria, Kerala 671543, India
+        - paragraph [ref=e573]: Kasaragod
+        - paragraph [ref=e574]: Kerala
+        - paragraph [ref=e575]: "671543"
+        - img "Edit location" [ref=e576]
+      - generic [ref=e462]: OR
+      - button "+ Add New Address" [ref=e463] [cursor=pointer]:
+        - generic [ref=e464]: +
+        - text: Add New Address
+    - button "Continue" [ref=e578] [cursor=pointer]:
+      - generic [ref=e579]: Continue
+  - generic [ref=e582]:
+    - img "Close" [ref=e583] [cursor=pointer]
+    - generic [ref=e584]:
+      - generic [ref=e585]:
+        - generic [ref=e586]:
+          - heading "Add office address" [level=5] [ref=e587]
+          - text: 91% of our applicants get approved if they share a detailed office address
+        - generic [ref=e588]:
+          - paragraph [ref=e589]: Madkam centre, Mulleria, Kerala 671543, India
+          - img "Edit on map" [ref=e590] [cursor=pointer]
+        - generic [ref=e592]:
+          - generic: Flat, floor and building
+          - textbox [ref=e593]: Madkam centre, Mulleria, Kerala 671543,
+        - generic [ref=e594]:
+          - generic: Locality / Road / Area
+          - textbox [ref=e595]: India
+        - generic [ref=e596]:
+          - generic: Address line 3 (optional)
+          - textbox [ref=e597]
+        - generic [ref=e598]:
+          - generic: Landmark (optional)
+          - textbox [ref=e599]
+        - generic [ref=e600]:
+          - generic: Pincode
+          - textbox [ref=e601]: "671543"
+        - generic [ref=e602]:
+          - generic: City
+          - textbox [ref=e603]: Kasaragod
+      - button "Add Address" [ref=e605] [cursor=pointer]:
+        - generic [ref=e606]: Add Address
+  - generic [ref=e466]:
+    - banner [ref=e467]:
+      - img [ref=e469] [cursor=pointer]
+    - generic [ref=e471]:
+      - generic [ref=e472]:
+        - textbox "Search for area, building, street name" [ref=e473]
+        - generic [ref=e475]:
+          - generic:
+            - button "Keyboard shortcuts"
+          - region "Map" [ref=e476]
+          - generic [ref=e477]:
+            - iframe [ref=e499]:
+              
+            - link "Open this area in Google Maps (opens a new window)" [ref=e501] [cursor=pointer]:
+              - /url: https://maps.google.com/maps?ll=12.54937,75.164641&z=18&t=m&hl=en&gl=US&mapclient=apiv3
+              - img "Google" [ref=e503]
+            - generic [ref=e504]:
+              - button "Keyboard shortcuts" [ref=e510] [cursor=pointer]
+              - generic [ref=e515]: Map data ©2026
+              - link "Terms (opens in new tab)" [ref=e520] [cursor=pointer]:
+                - /url: https://www.google.com/intl/en_US/help/terms_maps.html
+                - text: Terms
+              - link "Report a map error (opens in new tab)" [ref=e525] [cursor=pointer]:
+                - /url: https://www.google.com/maps/@12.5493703,75.1646414,18z/data=!10m1!1e1!12b1?source=apiv3&rapsrc=apiv3
+                - text: Report a map error
+        - img
+        - button "locate" [ref=e526]:
+          - img "locate" [ref=e527]
+      - generic [ref=e528]:
+        - heading "Office address" [level=3] [ref=e529]
+        - generic [ref=e530]:
+          - img [ref=e531]
+          - paragraph [ref=e533]: Madkam centre, Mulleria, Kerala 671543, India
+        - button "Yes, this is my location" [active] [ref=e534] [cursor=pointer]:
+          - generic [ref=e535]: Yes, this is my location

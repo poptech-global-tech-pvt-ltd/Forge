@@ -1,0 +1,25 @@
+- generic [ref=e3]:
+  - banner [ref=e5]:
+    - generic [ref=e6]:
+      - img [ref=e7] [cursor=pointer]
+      - generic [ref=e9]: Eligibility
+  - generic:
+    - generic:
+      - generic:
+        - heading "Check your eligibility" [level=4]
+      - generic:
+        - generic: Mobile number
+        - textbox
+      - generic:
+        - button "Continue" [disabled]:
+          - generic: Continue
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - generic:
+                - heading "Terms & Conditions" [level=2]
+                - img
+          - generic:
+            - button "Continue" [disabled]:
+              - generic: Continue

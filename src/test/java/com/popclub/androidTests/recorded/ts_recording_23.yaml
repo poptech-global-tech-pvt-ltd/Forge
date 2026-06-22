@@ -1,0 +1,35 @@
+testName: Recorded — 2026-06-22 14:10
+platform: android
+noReset: true
+loginRequired: true
+retry: 1
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - smoke
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: tap
+    element: shop_tab
+  - action: tap
+    element: shop_search_button
+  - action: tap
+    element: search_trending_item_3
+  - action: tap
+    element: Men Classic Black Bubbles Slippers
+  - action: assertText
+    element: product_details_title
+    value: "Men Classic Black Bubbles Slippers"
+  - action: tap
+    element: Left Icon

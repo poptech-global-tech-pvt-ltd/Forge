@@ -15,9 +15,9 @@ public class AadhaarPage {
     private final Page page;
     private static final Logger log = LoggerFactory.getLogger(AadhaarPage.class);
 
-    private static final String HEADING          = "[role='heading']:has-text('Aadhaar verification')";
-    private static final String YES_BANK_INFO    = "text=This is required by YES Bank";
-    private static final String CONTINUE_BTN     = "button:has-text('Continue')";
+    private static final String HEADING          = "[role='heading']:has-text('Complete your KYC')";
+    private static final String YES_BANK_INFO    = "text=Keep your Aadhaar details handy";
+    private static final String CONTINUE_BTN     = "button:has-text('Start'), button:has-text('Continue')";
 
     public AadhaarPage(Page page) {
         this.page = page;

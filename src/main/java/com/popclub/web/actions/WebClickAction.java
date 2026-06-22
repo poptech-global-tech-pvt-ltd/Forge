@@ -5,9 +5,10 @@ import com.microsoft.playwright.Page;
 import com.microsoft.playwright.PlaywrightException;
 import com.popclub.core.ElementRepository;
 import com.popclub.core.Locator;
-import com.popclub.mobile.actions.Action;
+import com.popclub.android.actions.Action;
 import com.popclub.model.Step;
 import com.popclub.web.driver.PlaywrightContext;
+import com.popclub.web.heal.WebSelfHealingEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,9 +22,19 @@ public class WebClickAction implements Action {
     public void perform(Step step) {
         Page page = PlaywrightContext.getPage();
         String selector = resolveSelector(step);
-        ElementHandle el = page.waitForSelector(selector,
-                new Page.WaitForSelectorOptions()
-                        .setState(com.microsoft.playwright.options.WaitForSelectorState.VISIBLE));
+        ElementHandle el;
+        try {
+            el = page.waitForSelector(selector,
+                    new Page.WaitForSelectorOptions()
+                            .setState(com.microsoft.playwright.options.WaitForSelectorState.VISIBLE));
+        } catch (PlaywrightException e) {
+            String healed = WebSelfHealingEngine.tryHeal(page, selector, e);
+            if (healed == null) throw e;
+            el = page.waitForSelector(healed,
+                    new Page.WaitForSelectorOptions()
+                            .setState(com.microsoft.playwright.options.WaitForSelectorState.VISIBLE));
+            selector = healed;
+        }
         try {
             el.scrollIntoViewIfNeeded();
             el.click();

@@ -1,0 +1,17 @@
+- generic [ref=e3]:
+  - banner [ref=e300]:
+    - generic [ref=e301]:
+      - generic [ref=e302]:
+        - img [ref=e303] [cursor=pointer]
+        - generic [ref=e305] [cursor=pointer]: Save & exit
+      - generic [ref=e306]: Personal Details
+  - generic [ref=e308]:
+    - heading "Additional details" [level=4] [ref=e310]
+    - generic [ref=e312]:
+      - generic: Name on Card
+      - generic [ref=e314]: Deepa D Hegde
+    - generic [ref=e315]:
+      - generic: Father’s Name (as per PAN card)
+      - textbox [ref=e316]
+    - button "Continue" [ref=e318] [cursor=pointer]:
+      - generic [ref=e319]: Continue

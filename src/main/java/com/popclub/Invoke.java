@@ -17,9 +17,9 @@ import java.util.Map;
 public class Invoke {
 
     private static final Map<String, String> MODE_TO_SUITE = Map.of(
-            "api",    "src/test/resources/testNg/testng-api.xml",
-            "mobile", "src/test/resources/testNg/testng.xml",
-            "web",    "src/test/resources/testNg/testng-web.xml"
+            "api",    "src/test/resources/suites/testng-api.xml",
+            "mobile", "src/test/resources/suites/testng.xml",
+            "web",    "src/test/resources/suites/testng-web.xml"
     );
 
     public static void main(String[] args) {

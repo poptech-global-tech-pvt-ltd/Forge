@@ -19,9 +19,6 @@ public class WebOnboardingSetup {
     public String prepare() {
         log.info("[WebOnboardingSetup] Preparing phone for onboarding");
 
-        String resumed = PhoneNumberManager.nextOnboardingStarted();
-        if (resumed != null) { log.info("[WebOnboardingSetup] Resuming ONBOARDING_STARTED with {}", resumed); return resumed; }
-
         String pending = PhoneNumberManager.nextFirstTimeFound();
         if (pending != null) { log.info("[WebOnboardingSetup] Resuming FIRST_TIME_FOUND with {} — OTP was not completed last run", pending); return pending; }
 

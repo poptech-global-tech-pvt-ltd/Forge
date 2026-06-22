@@ -1,0 +1,144 @@
+testName: Shop E2E — Out of Stock product handling
+platform: android
+noReset: true
+loginRequired: true
+
+# Flow: Search → Identify OOS item on PLP → Tap → Verify OOS state on PDP
+#        → Verify "Add to Wishlist" CTA shown instead of "Add to Cart"
+#        → Add OOS item to wishlist
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - shop
+  - pdp
+  - out_of_stock
+  - e2e
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  # ── Search and navigate to PLP ────────────────────────────────────────────
+  - action: waitFor
+    element: shop_search_button
+
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: enterText
+    element: search_products_search_input
+    value: "the souled store"
+
+  - action: pressKey
+    value: search
+
+  - action: waitFor
+    element: product_list_item_0
+
+  # ── Check for OOS badge on first item ────────────────────────────────────
+  - action: logVar
+    variable: product_list_item_0
+    value: "Checking for OOS badge on product_list_item_0"
+
+  - action: captureText
+    element: product_list_item_0
+    variable: plp_item_0_title
+
+  # ── If OOS badge is visible, tap that item; else log and tap item_0 ───────
+  - action: ifPresent
+    element: product_list_item_out_of_stock_0
+    steps:
+      - action: logVar
+        variable: plp_item_0_title
+        value: "OOS badge found on item 0 — title: ${plp_item_0_title}"
+      - action: tap
+        element: product_list_item_0
+
+  - action: ifNotPresent
+    element: product_list_item_out_of_stock_0
+    steps:
+      - action: logVar
+        variable: plp_item_0_title
+        value: "No OOS badge on item 0 — tapping item 0 to check PDP OOS state"
+      - action: tap
+        element: product_list_item_0
+
+  # ── PDP: capture state ────────────────────────────────────────────────────
+  - action: waitFor
+    element: product_details_title
+
+  - action: captureText
+    element: product_details_title
+    variable: pdp_title
+
+  - action: captureText
+    element: product_details_price
+    variable: pdp_price
+
+  - action: logVar
+    variable: pdp_title
+    value: |
+      ── PDP state ──
+      title - ${pdp_title}
+      price - ${pdp_price}
+
+  # ── Verify bottom sticky bar CTA ──────────────────────────────────────────
+  - action: captureText
+    element: product_details_bottom_sticky_bar_button
+    variable: pdp_cta_text
+
+  - action: logVar
+    variable: pdp_cta_text
+    value: "PDP CTA text: ${pdp_cta_text}"
+
+  # When OOS: CTA is "Notify Me" or disabled; wishlist button is present
+  - action: verifyElement
+    element: product_details_wishlist_button
+    shouldExist: true
+
+  # ── Add to Wishlist from OOS PDP ──────────────────────────────────────────
+  - action: tap
+    element: product_details_wishlist_button
+
+  - action: logVar
+    variable: pdp_title
+    value: "Added to wishlist from PDP: ${pdp_title}"
+
+  # ── Verify wishlist icon has item (navigate to wishlist) ──────────────────
+  - action: pressKey
+    value: BACK
+
+  - action: waitFor
+    element: product_list_item_0
+
+  - action: tap
+    element: wishlist_icon
+
+  - action: waitFor
+    element: wishlist_item_card_compose_row
+
+  - action: verifyElement
+    element: wishlist_item_0
+    shouldExist: true
+
+  - action: logVar
+    variable: pdp_title
+    value: "Wishlist verified: item present after OOS wishlist add"

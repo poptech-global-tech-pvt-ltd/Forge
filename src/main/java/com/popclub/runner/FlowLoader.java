@@ -32,7 +32,7 @@ import java.util.Map;
 public class FlowLoader {
 
     private static final String FLOWS_DIR =
-            "src/test/resources/flows/";
+            "src/test/java/com/popclub/androidFlows/";
 
     /** Wrapper so the YAML mapper can deserialise the top-level {@code steps:} list. */
     private static class FlowFile {

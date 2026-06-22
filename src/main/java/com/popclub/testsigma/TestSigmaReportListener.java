@@ -11,7 +11,7 @@ import com.popclub.api.dto.*;
 
 public class TestSigmaReportListener implements ISuiteListener, ITestListener {
 
-    private static final String MAPPING_FILE = "testsigma-mapping.json";
+    private static final String MAPPING_FILE = "config/testsigma-mapping.json";
     private static final int MAX_CREATE_RETRIES = 20;
 
     private String runId;

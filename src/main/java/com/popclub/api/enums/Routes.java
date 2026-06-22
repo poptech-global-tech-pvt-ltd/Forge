@@ -4,8 +4,11 @@ import com.popclub.api.util.ApiConstants;
 
 public enum Routes {
 
-    // app.popclub.co.in
+    // ── app.popclub.co.in — auth ──────────────────────────────────────────────
     LOGIN             ("/api/v2/login/"),
+
+    // ── app.popclub.co.in — search ───────────────────────────────────────────
+    SEARCH_PLP_V2     ("search/v2/plp/"),
 
     // hashira.popclub.co.in
     SIGNUP            ("/api/v1/signup"),

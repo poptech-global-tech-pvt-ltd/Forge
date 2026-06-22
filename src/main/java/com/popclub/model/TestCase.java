@@ -29,6 +29,19 @@ public class TestCase {
 
     public String mapping = "TEST";
 
+    /**
+     * Default poll timeout (seconds) for every step in this test.
+     * Individual steps can override with their own {@code timeout:} field.
+     * Mirrors Maestro's per-flow timeout setting (Maestro default = 60s).
+     * Forge default = 30s — matches current WaitUtil hardcoded value.
+     */
+    public int defaultTimeout = 30;
+
+    /** Steps executed before the main test body. */
+    public List<Step> onFlowStart;
+    /** Steps executed after the main test body (success path). */
+    public List<Step> onFlowComplete;
+
     /** Set at load time by TestRunnerTest — not in YAML, used for self-healing write-back. */
     public transient String sourceFile;
 }

@@ -1,0 +1,109 @@
+testName: Shop — PLP → PDP price consistency
+platform: android
+noReset: true
+loginRequired: true
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - shop
+  - plp
+  - pdp
+  - price
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  # Navigate to PLP and capture UI + API prices
+  - action: call
+    flow: plp_search_and_capture
+    params:
+      search_query:   "the souled store"
+      search_pincode: "560102"
+
+  # ── Tap product → PDP ─────────────────────────────────────────────────────
+  - action: tap
+    element: product_list_item_${product_index}
+
+  - action: waitFor
+    element: product_details_title
+
+  # ── Capture PDP UI values ─────────────────────────────────────────────────
+  - action: captureText
+    element: product_details_title
+    variable: pdp_product_title
+
+  - action: captureText
+    element: product_details_price
+    variable: pdp_product_price
+
+  - action: captureText
+    element: product_details_strikethrough_price
+    variable: pdp_product_strikethrough_price
+
+  - action: logVar
+    variable: pdp_product_title
+    value: |
+      ── PDP captured ──
+      pdp_product_title               - ${pdp_product_title}
+      pdp_product_price               - ${pdp_product_price}
+      pdp_product_strikethrough_price - ${pdp_product_strikethrough_price}
+
+  # ── Assert: PDP title == API title ────────────────────────────────────────
+  - action: assertText
+    element: product_details_title
+    value: "${product_title}"
+
+  # ── Assert: PDP price == PLP UI price ────────────────────────────────────
+  - action: assertText
+    element: product_details_price
+    value: "${product_list_item_price}"
+
+  # ── Assert: PDP strikethrough == PLP UI strikethrough ────────────────────
+  - action: assertText
+    element: product_details_strikethrough_price
+    value: "${product_list_item_strikethrough_price}"
+
+  # ── Soft mismatch log (surfaces value if assert ever relaxed) ─────────────
+  - action: ifVarNotEquals
+    variable: product_list_item_price
+    value: "${pdp_product_price}"
+    steps:
+      - action: logVar
+        variable: product_list_item_price
+        value: "MISMATCH price — PLP UI: ${product_list_item_price} | PDP UI: ${pdp_product_price}"
+
+  - action: ifVarNotEquals
+    variable: product_list_item_strikethrough_price
+    value: "${pdp_product_strikethrough_price}"
+    steps:
+      - action: logVar
+        variable: product_list_item_strikethrough_price
+        value: "MISMATCH strikethrough — PLP UI: ${product_list_item_strikethrough_price} | PDP UI: ${pdp_product_strikethrough_price}"
+
+  # ── Summary log ───────────────────────────────────────────────────────────
+  - action: logVar
+    variable: product_list_item_price
+    value: |
+      ── PLP vs PDP price summary ──
+      PLP UI price         - ${product_list_item_price}
+      PDP UI price         - ${pdp_product_price}
+      PLP UI strikethrough - ${product_list_item_strikethrough_price}
+      PDP UI strikethrough - ${pdp_product_strikethrough_price}
+      API price            - ₹${api_product_list_item_price}
+      API strikethrough    - ₹${api_product_list_item_strikethrough_price}

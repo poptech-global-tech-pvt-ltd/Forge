@@ -7,19 +7,19 @@
 !-->
   <test name="Card Onboarding E2E">
         <classes>
-            <class name="com.popclub.tests.CardOnboardingTest"/>
+            <class name="com.popclub.apiTests.card.CardOnboardingTest"/>
         </classes>
     </test>
     <!--
     <test name="Card Onboarding Negative">
         <classes>
-            <class name="com.popclub.tests.CardOnboardingNegativeTest"/>
+            <class name="com.popclub.apiTests.card.CardOnboardingNegativeTest"/>
         </classes>
     </test>
    !-->
    <!-- <test name="Fake PAN Rejection">
         <classes>
-            <class name="com.popclub.tests.FakePanTest"/>
+            <class name="com.popclub.apiTests.card.FakePanTest"/>
         </classes>
     </test> !-->
 

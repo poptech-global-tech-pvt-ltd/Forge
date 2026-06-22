@@ -59,7 +59,25 @@ testsigma-ai.yaml
 .m2/
 allure-results/
 node_modules/
+forge-ui/node_modules/
+forge-mcp/node_modules/
 ai/
 .gitignore.save
 screenshots/
 test-output/
+
+### Java compiled ###
+*.class
+
+### Environment / secrets ###
+.env
+.env.*
+*.env
+
+### Playwright MCP runtime logs ###
+.playwright_mcp/
+
+### Editor temp files ###
+*.swp
+*.swo
+*~

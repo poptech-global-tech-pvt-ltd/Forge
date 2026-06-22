@@ -1,0 +1,55 @@
+- generic [ref=e3]:
+  - banner [ref=e390]:
+    - generic [ref=e391]:
+      - generic [ref=e392]:
+        - img [ref=e393] [cursor=pointer]
+        - generic [ref=e395] [cursor=pointer]: Save & exit
+      - generic [ref=e396]: Personal details
+  - generic [ref=e398]:
+    - heading "Office address" [level=4] [ref=e400]
+    - generic [ref=e401]:
+      - button "Select location on maps" [ref=e402] [cursor=pointer]:
+        - img [ref=e403]
+        - text: Select location on maps
+      - generic [ref=e405]: OR
+      - button "+ Add New Address" [ref=e406] [cursor=pointer]:
+        - generic [ref=e407]: +
+        - text: Add New Address
+    - generic [ref=e408]:
+      - button "Continue" [disabled]:
+        - generic: Continue
+  - generic [ref=e409]:
+    - banner [ref=e410]:
+      - img [ref=e412] [cursor=pointer]
+    - generic [ref=e414]:
+      - generic [ref=e415]:
+        - textbox "Search for area, building, street name" [ref=e416]
+        - generic [ref=e418]:
+          - generic:
+            - button "Keyboard shortcuts"
+          - region "Map" [ref=e419]
+          - generic [ref=e420]:
+            - iframe [ref=e448]:
+              
+            - link "Open this area in Google Maps (opens a new window)" [ref=e450] [cursor=pointer]:
+              - /url: https://maps.google.com/maps?ll=12.54937,75.164641&z=18&t=m&hl=en&gl=US&mapclient=apiv3
+              - img "Google" [ref=e452]
+            - generic [ref=e453]:
+              - button "Keyboard shortcuts" [ref=e459] [cursor=pointer]
+              - generic [ref=e464]: Map data ©2026
+              - link "Terms (opens in new tab)" [ref=e469] [cursor=pointer]:
+                - /url: https://www.google.com/intl/en_US/help/terms_maps.html
+                - text: Terms
+              - link "Report a map error (opens in new tab)" [ref=e474] [cursor=pointer]:
+                - /url: https://www.google.com/maps/@12.5493703,75.1646414,18z/data=!10m1!1e1!12b1?source=apiv3&rapsrc=apiv3
+                - text: Report a map error
+        - img
+        - button "locate" [ref=e475]:
+          - img "locate" [ref=e476]
+      - generic [ref=e477]:
+        - heading "Office address" [level=3] [ref=e478]
+        - generic [ref=e479]:
+          - img [ref=e480]
+          - paragraph [ref=e482]: Madkam centre, Mulleria, Kerala 671543, India
+        - button "Yes, this is my location" [ref=e483] [cursor=pointer]:
+          - generic [ref=e484]: Yes, this is my location

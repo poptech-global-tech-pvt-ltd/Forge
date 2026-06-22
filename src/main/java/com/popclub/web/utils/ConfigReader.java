@@ -17,7 +17,7 @@ public class ConfigReader {
         if (props != null) return props;
         props = new Properties();
         try (InputStream is = ConfigReader.class.getClassLoader()
-                .getResourceAsStream("web-config.properties")) {
+                .getResourceAsStream("config/web-config.properties")) {
             if (is != null) {
                 props.load(is);
                 log.info("[ConfigReader] Loaded web-config.properties");

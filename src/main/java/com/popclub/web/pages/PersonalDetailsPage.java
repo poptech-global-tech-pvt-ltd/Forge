@@ -25,10 +25,10 @@ public class PersonalDetailsPage {
     // Option labels rendered as plain text nodes
     private static final String OPT_SALARIED      = "text=Salaried";
     private static final String OPT_SELF_EMPLOYED = "text=Self Employed";
-    private static final String OPT_MARRIED       = "text=married";
-    private static final String OPT_SINGLE        = "text=single";
-    private static final String OPT_DIVORCED      = "text=divorced";
-    private static final String OPT_WIDOWED       = "text=widowed";
+    private static final String OPT_MARRIED       = "input[value='MARRIED']";
+    private static final String OPT_SINGLE        = "input[value='SINGLE']";
+    private static final String OPT_DIVORCED      = "input[value='DIVORCED']";
+    private static final String OPT_WIDOWED       = "input[value='WIDOWED']";
     private static final String OPT_FEMALE        = "text=FEMALE";
     private static final String OPT_MALE          = "text=MALE";
     private static final String OPT_THIRD_GENDER  = "text=THIRDGENDER";
@@ -51,7 +51,7 @@ public class PersonalDetailsPage {
     public boolean isEmailVisible()       { boolean v = page.locator(EMAIL).isVisible(); log.debug("PersonalDetailsPage isEmailVisible: {}", v); return v; }
     public boolean isSalariedVisible()    { boolean v = page.getByText("Salaried").isVisible(); log.debug("PersonalDetailsPage isSalariedVisible: {}", v); return v; }
     public boolean isSelfEmployedVisible(){ boolean v = page.getByText("Self Employed").isVisible(); log.debug("PersonalDetailsPage isSelfEmployedVisible: {}", v); return v; }
-    public boolean isMarriedVisible()     { boolean v = page.getByText("married").isVisible(); log.debug("PersonalDetailsPage isMarriedVisible: {}", v); return v; }
+    public boolean isMarriedVisible()     { boolean v = page.locator("input[value='MARRIED']").isVisible(); log.debug("PersonalDetailsPage isMarriedVisible: {}", v); return v; }
     public boolean isFemaleVisible()      { boolean v = page.getByText("FEMALE").isVisible(); log.debug("PersonalDetailsPage isFemaleVisible: {}", v); return v; }
     public boolean isMaleVisible()        { boolean v = page.getByText("MALE", new Page.GetByTextOptions().setExact(true)).isVisible(); log.debug("PersonalDetailsPage isMaleVisible: {}", v); return v; }
     public boolean isThirdGenderVisible() { boolean v = page.getByText("THIRDGENDER").isVisible(); log.debug("PersonalDetailsPage isThirdGenderVisible: {}", v); return v; }
@@ -75,17 +75,19 @@ public class PersonalDetailsPage {
     }
 
     /**
-     * Opens the date-picker (4th textbox on the page), selects the year
-     * from the year combobox, then clicks the specific day option.
+     * Opens the date-picker (4th textbox on the page), selects the year and month
+     * from their comboboxes, then clicks the specific day option.
      *
      * @param year           e.g. "1997"
+     * @param month          e.g. "May"
      * @param dateOptionText partial label shown on the calendar day cell,
      *                       e.g. "Choose Tuesday, May 6th,"
      */
-    public PersonalDetailsPage selectDateOfBirth(String year, String dateOptionText) {
-        log.info("Selecting date of birth: year={}, option='{}'", year, dateOptionText);
+    public PersonalDetailsPage selectDateOfBirth(String year, String month, String dateOptionText) {
+        log.info("Selecting date of birth: year={}, month={}, option='{}'", year, month, dateOptionText);
         page.getByRole(AriaRole.TEXTBOX).nth(3).click();
         page.getByRole(AriaRole.COMBOBOX).nth(1).selectOption(year);
+        page.getByRole(AriaRole.COMBOBOX).nth(0).selectOption(month);
         page.getByRole(AriaRole.OPTION,
                 new Page.GetByRoleOptions().setName(dateOptionText)).click();
         return this;
@@ -110,26 +112,27 @@ public class PersonalDetailsPage {
     }
 
     public PersonalDetailsPage selectMarried() {
-        log.info("Selecting marital status: married");
-        page.locator(OPT_MARRIED).click();
+        log.info("Selecting marital status: MARRIED");
+        page.locator(OPT_MARRIED).dispatchEvent("click");
         return this;
     }
 
     public PersonalDetailsPage selectSingle() {
-        log.info("Selecting marital status: single");
-        page.locator(OPT_SINGLE).click();
+        log.info("Selecting marital status: SINGLE");
+        page.locator(OPT_SINGLE).dispatchEvent("click");
         return this;
     }
 
     public PersonalDetailsPage selectFemale() {
         log.info("Selecting gender: FEMALE");
-        page.locator(OPT_FEMALE).click();
+        // Use dispatchEvent to bypass sticky-footer overlay intercepting the click
+        page.locator("input[value='FEMALE']").dispatchEvent("click");
         return this;
     }
 
     public PersonalDetailsPage selectMale() {
         log.info("Selecting gender: MALE");
-        page.locator(OPT_MALE).click();
+        page.locator("input[value='MALE']").dispatchEvent("click");
         return this;
     }
 

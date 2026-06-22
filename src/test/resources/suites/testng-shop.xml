@@ -1,0 +1,83 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<!--
+    Shop Regression Suite — runs all shop tests in order.
+
+    Override individual files on the command line:
+        mvn test -Dtest=TestRunnerTest -DtestFile=ts_shop_checkout.yaml
+        mvn test -Dtest=TestRunnerTest -Dtag=price
+        mvn test -Dtest=TestRunnerTest -Dtag=e2e
+
+    Targeted suites:
+        testng-shop-price.xml   — PLP/PDP/Cart price validation only
+        testng-shop-e2e.xml     — full E2E flows only
+-->
+
+<suite name="Shop Regression" parallel="false" thread-count="1">
+
+    <listeners>
+        <listener class-name="com.popclub.listener.TestListener"/>
+    </listeners>
+
+    <parameter name="deviceSerial"  value="10BDCM0YJZ00043"/>
+    <parameter name="projectId"     value="d8f4a221-bc6d-47d8-9448-0834f5d012ec"/>
+    <parameter name="runTitle"      value="Shop Regression"/>
+
+    <!-- ── Smoke: CLP + search + wishlist + cart remove ────────────────── -->
+    <test name="Smoke">
+        <parameter name="testFile" value="
+            shop_clp.yaml,
+            shop_clp_full.yaml,
+            shop_clp_filters.yaml,
+            shop_clp_grid_items.yaml,
+            shop_clp_redirects.yaml,
+            shop_search_api_driven.yaml,
+            shop_search_yogabar_cart_price.yaml,
+            shop_wishlist.yaml,
+            shop_cart_remove.yaml
+        "/>
+        <classes>
+            <class name="com.popclub.runner.TestRunnerTest"/>
+        </classes>
+    </test>
+
+    <!-- ── Price validation: PLP vs API, PLP vs PDP, popcoin tag ───────── -->
+    <test name="Price Validation">
+        <parameter name="testFile" value="
+            ts_shop_plp_api_price_match.yaml,
+            ts_shop_plp_pdp_price_match.yaml,
+            ts_shop_pdp_popcoin.yaml
+        "/>
+        <classes>
+            <class name="com.popclub.runner.TestRunnerTest"/>
+        </classes>
+    </test>
+
+    <!-- ── Cart: price verify + stepper ────────────────────────────────── -->
+    <test name="Cart">
+        <parameter name="testFile" value="
+            ts_shop_cart_price_verify.yaml
+        "/>
+        <classes>
+            <class name="com.popclub.runner.TestRunnerTest"/>
+        </classes>
+    </test>
+
+    <!-- ── E2E flows ─────────────────────────────────────────────────────── -->
+    <test name="E2E">
+        <parameter name="testFile" value="
+            ts_shop_checkout.yaml,
+            ts_shop_e2e_wishlist_to_cart.yaml,
+            ts_shop_e2e_cart_remove_item.yaml,
+            ts_shop_e2e_search_filter_buy.yaml,
+            ts_shop_e2e_out_of_stock.yaml,
+            ts_shop_e2e_payment_methods.yaml,
+            ts_shop_e2e_similar_products.yaml,
+            ts_shop_e2e_multi_item_cart.yaml
+        "/>
+        <classes>
+            <class name="com.popclub.runner.TestRunnerTest"/>
+        </classes>
+    </test>
+
+</suite>

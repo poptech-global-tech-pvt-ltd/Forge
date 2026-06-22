@@ -28,19 +28,64 @@ Parse what the user wants to test. Identify:
 - **Happy path or edge case**: full flow, error state, empty state, etc.
 - **Scope**: which screens are involved
 
+**If the description is vague** (e.g. "test now", "test this", "test screen", "test it") —
+do NOT ask for clarification. Instead call `forge_get_hierarchy` immediately to scan
+the live device screen, then generate a test for whatever flow is visible on screen.
+Let the screen tell you what to test.
+
+**If the user is asking to edit/change an existing test** (e.g. "change X to Y",
+"update the search term", "add a step after", "replace X with Y") —
+NEVER describe the change in text. NEVER create a new file. ALWAYS:
+1. Call `forge_read_test` — get the EXACT current file content (do not reconstruct from memory)
+2. Apply ONLY the requested change to that content — every other line stays identical
+3. Call `forge_save_test` with:
+   - The COMPLETE modified YAML (not just the changed lines)
+   - The EXACT SAME `filename` as the original file
+   - The EXACT SAME `subfolder` as the original file
+4. Then go to **Step 5** (run → heal → verify)
+
+If you are unsure of the original filename or subfolder, call `forge_read_test` with
+your best guess — it will search all subfolders automatically.
+
+## ⛔ Hard rules (never break these)
+
+- **NEVER use the Write or Edit tool to save test files** — always use `forge_save_test`
+- **NEVER generate a test that already exists** — check first (Step 1.5)
+- The correct test root is `src/test/java/com/popclub/androidTests/` — NOT `src/test/resources/testdata/`
+- **NEVER ask which test the user means if one was already mentioned in this conversation** — use that test
+- **NEVER ask for clarification you can infer from conversation history** — act on context, ask only when genuinely ambiguous
+- **NEVER describe a file change in text** — always call `forge_read_test` then `forge_save_test`
+- **NEVER save an edited test under a new filename** — always use the original filename
+- **ALWAYS run the test after saving** — call `forge_run_test` every time, no exceptions
+
+## Step 1.5 — check for existing tests first
+
+Before generating anything, search for existing tests that cover the same scenario:
+
+```bash
+# Search by keyword in test names + content
+find src/test/java/com/popclub/androidTests -name "*.yaml" | xargs grep -li "<keyword>" 2>/dev/null
+ls src/test/java/com/popclub/androidTests/<feature>/
+```
+
+If a matching test already exists:
+- Show its path and a summary of what it covers
+- Ask the user if they want to (a) run it, (b) extend it, or (c) create a new separate test
+- Do NOT generate a duplicate
+
 ## Step 2 — load context (run ALL of these)
 
 ```bash
 # All available element keys for the relevant feature(s)
-cat src/test/resources/elements/<feature>.yaml
-cat src/test/resources/elements/common.yaml
+cat src/test/resources/testdata/elements/<feature>.yaml
+cat src/test/resources/testdata/elements/common.yaml
 
 # Existing tests for patterns and proven step sequences
-ls src/test/resources/testdata/<feature>/
-cat src/test/resources/testdata/<feature>/<most_relevant_test>.yaml
+ls src/test/java/com/popclub/androidTests/<feature>/
+cat src/test/java/com/popclub/androidTests/<feature>/<most_relevant_test>.yaml
 
 # All available actions
-grep -E "case \"" src/main/java/com/popclub/mobile/actions/ActionFactory.java
+grep -E "case \"" src/main/java/com/popclub/android/actions/ActionFactory.java
 ```
 
 Read at minimum: the feature elements YAML + common.yaml + one existing test
@@ -180,37 +225,69 @@ Every screen transition follows this pattern:
   element: cart_s2_s_payment_button_button   # the Pay CTA
 ```
 
-## Step 4 — write the file
+## Step 4 — save the file
 
-Determine the output path:
-- Shop/cart tests → `src/test/resources/testdata/shop/<name>.yaml`
-- Login tests → `src/test/resources/testdata/login.yaml`
-- Home tests → `src/test/resources/testdata/home/<name>.yaml`
-- Use snake_case for file names
+Use the `forge_save_test` MCP tool — NEVER write the file directly.
 
-Write the file, then print:
 ```
-✅ Generated: src/test/resources/testdata/shop/<name>.yaml
-   Steps: <N>
-   Elements used: <list of unique element keys>
-
-To run:
-   mvn test -DtestFile=<name>.yaml
+forge_save_test(
+  filename  = "ts_<snake_case_name>.yaml",
+  content   = <full YAML string>,
+  subfolder = "<feature>"   # shop | login | home | profile | rewards | upi — omit if unsure
+)
 ```
 
-## Step 5 — validate
+Subfolder mapping:
+- shop / cart / checkout / pdp tests → `shop`
+- login / otp / auth tests           → `login`
+- home / clp / banner tests          → `home`
+- profile / account tests            → `profile`
+- rewards / cashback tests           → `rewards`
+- upi / payment tests                → `upi`
+- cross-feature or unsure            → omit subfolder (saves to androidTests root)
 
-After writing, grep the elements YAMLs to confirm every `element:` key
-you used actually exists:
+The tool returns the saved path. Show it to the user.
 
-```bash
-# Quick validation — any element key that isn't found will show 0 matches
-grep -c "^<element_key>:" src/test/resources/elements/*.yaml
+## Step 5 — run the test
+
+After saving, immediately run it using `forge_run_test`:
+
+```
+forge_run_test(testFile = "<filename>.yaml")
 ```
 
-For any key that returns 0 matches, either:
-- Replace with a real key from the YAML, or
-- Change to `locator: <raw_tag>` with a TODO comment
+## Step 6 — heal failing steps (repeat until pass or 3 attempts)
+
+If `forge_run_test` reports a failed step:
+
+1. Call `forge_heal_step` with the broken element and action:
+   ```
+   forge_heal_step(
+     brokenElement = "<element key that failed>",
+     action        = "<action>",
+     stepYaml      = "<the raw YAML of the failing step>"
+   )
+   ```
+
+2. Apply the fixed step returned by `forge_heal_step` into the YAML.
+
+3. Call `forge_save_test` again with the updated content (same filename + subfolder).
+
+4. Call `forge_run_test` again.
+
+5. Repeat up to **3 heal attempts**. If still failing after 3, stop and tell the
+   user which step is broken and what `forge_heal_step` suggested — they may need
+   to navigate the app to the right screen first.
+
+## Step 7 — done
+
+Once the test passes, summarise:
+```
+✅ Test passing: <filename>.yaml
+   Saved: src/test/java/com/popclub/androidTests/<subfolder>/<filename>.yaml
+   Steps: <N>  |  Healed: <M> steps
+   Run: mvn test -DtestFile=<filename>.yaml
+```
 
 ## Maestro → Forge converter (when user pastes Maestro YAML)
 

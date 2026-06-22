@@ -44,7 +44,7 @@ public class PlaywrightFactory {
         browser.set(b);
 
         BrowserContext ctx = b.newContext(new Browser.NewContextOptions()
-                .setPermissions(java.util.List.of("geolocation"))
+                .setPermissions(java.util.List.of("geolocation", "camera", "microphone"))
                 .setGeolocation(new Geolocation(12.9716, 77.5946)));
         context.set(ctx);
 

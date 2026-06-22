@@ -1,0 +1,293 @@
+testName: Shop — Add to cart and checkout (E2E)
+platform: android
+noReset: true
+loginRequired: true
+
+testCaseIds:
+  - PO-15308
+  - PO-15310
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - smoke
+  - shop
+  - checkout
+retry: 1
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  # ── PLP: navigate, capture API + UI prices ────────────────────────────────
+  - action: call
+    flow: plp_search_and_capture
+    params:
+      search_query:   "the souled store"
+      search_pincode: "560102"
+
+  # ── PDP: tap product, assert prices match PLP ─────────────────────────────
+  - action: tap
+    element: product_list_item_${product_index}
+
+  - action: waitFor
+    element: product_details_title
+
+  - action: captureText
+    element: product_details_title
+    variable: pdp_product_title
+
+  - action: captureText
+    element: product_details_price
+    variable: pdp_product_price
+
+  - action: captureText
+    element: product_details_strikethrough_price
+    variable: pdp_product_strikethrough_price
+
+  - action: logVar
+    variable: pdp_product_title
+    value: |
+      ── PDP captured ──
+      pdp_product_title               - ${pdp_product_title}
+      pdp_product_price               - ${pdp_product_price}
+      pdp_product_strikethrough_price - ${pdp_product_strikethrough_price}
+
+  - action: assertText
+    element: product_details_title
+    value: "${product_title}"
+    testCaseId: PO-15310
+
+  - action: assertText
+    element: product_details_price
+    value: "${product_list_item_price}"
+    testCaseId: PO-15310
+
+  - action: assertText
+    element: product_details_strikethrough_price
+    value: "${product_list_item_strikethrough_price}"
+
+  # Popcoin tag visibility
+  - action: ifVarEquals
+    variable: api_product_list_item_special_pricing
+    value: "true"
+    steps:
+      - action: verifyElement
+        element: product_details_popcoin
+        shouldExist: true
+
+  - action: ifVarEquals
+    variable: api_product_list_item_coin_burn_limit_default
+    value: "0"
+    steps:
+      - action: verifyElement
+        element: product_details_popcoin
+        shouldExist: false
+
+  # Soft mismatch logs (PLP vs PDP)
+  - action: ifVarNotEquals
+    variable: product_list_item_price
+    value: "${pdp_product_price}"
+    steps:
+      - action: logVar
+        variable: product_list_item_price
+        value: "MISMATCH price — PLP UI: ${product_list_item_price} | PDP UI: ${pdp_product_price}"
+
+  - action: ifVarNotEquals
+    variable: product_list_item_strikethrough_price
+    value: "${pdp_product_strikethrough_price}"
+    steps:
+      - action: logVar
+        variable: product_list_item_strikethrough_price
+        value: "MISMATCH strikethrough — PLP UI: ${product_list_item_strikethrough_price} | PDP UI: ${pdp_product_strikethrough_price}"
+
+  # ── Add to cart ───────────────────────────────────────────────────────────
+  - action: verifyElement
+    element: product_details_bottom_sticky_bar_button
+
+  - action: tap
+    element: product_details_bottom_sticky_bar_button
+
+  - action: waitFor
+    element: size_selection_item_0
+
+  - action: tap
+    element: size_selection_item_0
+
+  - action: tap
+    element: size_selection_add_to_cart_button
+
+  - action: waitFor
+    element: product_details_go_to_cart_button
+
+  - action: tap
+    element: product_details_go_to_cart_button
+
+  # ── Mini-cart bottomsheet: handle address if not set ─────────────────────
+  - action: captureText
+    element: cart_s2_s_payment_button_button
+    variable: cart_bottomsheet_cta
+
+  - action: logVar
+    variable: cart_bottomsheet_cta
+    value: "cart bottomsheet CTA - ${cart_bottomsheet_cta}"
+
+  - action: ifVarEquals
+    variable: cart_bottomsheet_cta
+    value: "Add address"
+    steps:
+      - action: tap
+        element: cart_s2_s_payment_button_button_2
+      - action: call
+        flow: add_address
+        params:
+          addressLine1: "123 MG Road"
+          first_name: "Deepa"
+          last_name: "Hegde"
+          address_mobile_number: "6361463451"
+
+  # ── Proceed to cart screen ────────────────────────────────────────────────
+  - action: tap
+    element: cart_s2_s_payment_button_button_2
+
+  - action: waitFor
+    element: cart_item_row_0
+
+  - action: verifyElement
+    element: cart_delivery_address_card
+
+  - action: verifyElement
+    element: cart_to_pay_row
+
+  - action: verifyElement
+    element: cart_link_and_pay_button
+
+  # ── Cart: find and scroll to the item we added ────────────────────────────
+  - action: findCartItemIndex
+    value: "${product_title}"
+    variable: cart_item_index
+
+  - action: scrollTo
+    element: cart_item_row_${cart_item_index}
+
+  # ── Cart: Capture item details ────────────────────────────────────────────
+  - action: captureText
+    element: cart_item_title_${cart_item_index}
+    variable: cart_item_title
+
+  - action: captureText
+    element: cart_item_price_${cart_item_index}
+    variable: cart_item_price
+
+  - action: captureText
+    element: cart_item_strikethrough_price_${cart_item_index}
+    variable: cart_item_strikethrough_price
+
+  - action: captureText
+    element: cart_item_discount_${cart_item_index}
+    variable: cart_item_discount
+
+  - action: captureText
+    element: cart_item_size_${cart_item_index}
+    variable: cart_item_size
+
+  - action: logVar
+    variable: cart_item_title
+    value: |
+      ── Cart item captured ──
+      cart_item_index               - ${cart_item_index}
+      cart_item_title               - ${cart_item_title}
+      cart_item_price               - ${cart_item_price}
+      cart_item_strikethrough_price - ${cart_item_strikethrough_price}
+      cart_item_discount            - ${cart_item_discount}
+      cart_item_size                - ${cart_item_size}
+      expected_title                - ${product_title}
+      expected_price (PLP UI)       - ${product_list_item_price}
+      expected_strikethrough (PLP)  - ${product_list_item_strikethrough_price}
+      expected_size (API)           - ${product_size}
+
+  # ── Cart: Assert item title, price, strikethrough, size ──────────────────
+  - action: assertText
+    element: cart_item_title_${cart_item_index}
+    value: "${product_title}"
+
+  - action: assertText
+    element: cart_item_price_${cart_item_index}
+    value: "${product_list_item_price}"
+
+  - action: assertText
+    element: cart_item_strikethrough_price_${cart_item_index}
+    value: "${product_list_item_strikethrough_price}"
+
+  - action: assertText
+    element: cart_item_size_${cart_item_index}
+    value: "${product_size}"
+
+  # ── Cart: Quantity stepper ────────────────────────────────────────────────
+  - action: captureText
+    element: cart_item_quantity_${cart_item_index}
+    variable: cart_item_quantity_initial
+
+  - action: logVar
+    variable: cart_item_quantity_initial
+    value: "cart_item_quantity (initial) - ${cart_item_quantity_initial}"
+
+  # Increase and decrease buttons must be present for this item
+  - action: verifyElement
+    element: cart_item_increase_button_${cart_item_index}
+    shouldExist: true
+
+  - action: verifyElement
+    element: cart_item_decrease_button_${cart_item_index}
+    shouldExist: true
+
+  # Tap increase → quantity should go from 1 → 2
+  - action: tap
+    element: cart_item_increase_button_${cart_item_index}
+
+  - action: captureText
+    element: cart_item_quantity_${cart_item_index}
+    variable: cart_item_quantity_after_increase
+
+  - action: logVar
+    variable: cart_item_quantity_after_increase
+    value: "cart_item_quantity (after increase) - ${cart_item_quantity_after_increase}"
+
+  - action: assertText
+    element: cart_item_quantity_${cart_item_index}
+    value: "2"
+
+  # Tap decrease → quantity should go back to 1
+  - action: tap
+    element: cart_item_decrease_button_${cart_item_index}
+
+  - action: captureText
+    element: cart_item_quantity_${cart_item_index}
+    variable: cart_item_quantity_after_decrease
+
+  - action: logVar
+    variable: cart_item_quantity_after_decrease
+    value: "cart_item_quantity (after decrease) - ${cart_item_quantity_after_decrease}"
+
+  - action: assertText
+    element: cart_item_quantity_${cart_item_index}
+    value: "1"
+
+  # ── Tap Pay → verify payment screen loaded ────────────────────────────────
+  - action: tap
+    element: cart_link_and_pay_button
+
+  - action: waitFor
+    element: shop_payment_screen_row

@@ -1,6 +1,6 @@
 package com.popclub.core;
 
-import com.popclub.mobile.driver.DriverManager;
+import com.popclub.android.driver.DriverManager;
 import io.appium.java_client.AppiumDriver;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;

@@ -34,6 +34,14 @@ public class TestContext {
     public static void setFailingElement(String element) { failingElement.set(element); }
     public static String getFailingElement()             { return failingElement.get(); }
 
+    // ---------------- DEFAULT TIMEOUT (zero-wait intelligence) ----------------
+
+    /** Effective poll timeout for all steps in the current test. Default = 30s. */
+    private static ThreadLocal<Integer> defaultTimeout = ThreadLocal.withInitial(() -> 30);
+
+    public static void setDefaultTimeout(int seconds) { defaultTimeout.set(seconds); }
+    public static int  getDefaultTimeout()             { return defaultTimeout.get(); }
+
     public static void setCurrentTestCase(String id) {
         currentTestCase.set(id);
     }
@@ -175,9 +183,49 @@ public class TestContext {
 
     // ---------------- USER TOKEN (captured after login) ----------------
 
-    public static void setUserToken(String token) { userToken.set(token); }
+    public static void setUserToken(String token) {
+        userToken.set(token);
+        // Auto-extract userId from JWT payload when token is set
+        String id = extractUserIdFromJwt(token);
+        if (id != null) userId.set(id);
+    }
 
     public static String getUserToken() { return userToken.get(); }
+
+    // ---------------- USER ID (extracted from JWT payload) ----------------
+
+    private static ThreadLocal<String> userId = new ThreadLocal<>();
+
+    public static void setUserId(String id) { userId.set(id); }
+
+    public static String getUserId() { return userId.get(); }
+
+    /**
+     * Decodes the JWT payload (middle segment, Base64url) and extracts
+     * the user_id / sub / id field — no external library needed.
+     */
+    private static String extractUserIdFromJwt(String token) {
+        try {
+            if (token == null || !token.startsWith("eyJ")) return null;
+            String[] parts = token.split("\\.");
+            if (parts.length < 2) return null;
+            String payload = new String(java.util.Base64.getUrlDecoder().decode(
+                    parts[1].replaceAll("=+$", "")));
+            // Try common field names: user_id, userId, sub, id
+            for (String field : new String[]{"user_id", "userId", "sub", "id"}) {
+                java.util.regex.Matcher m = java.util.regex.Pattern
+                        .compile("\"" + field + "\"\\s*:\\s*\"([^\"]+)\"")
+                        .matcher(payload);
+                if (m.find()) return m.group(1);
+                // numeric id
+                m = java.util.regex.Pattern
+                        .compile("\"" + field + "\"\\s*:\\s*([0-9]+)")
+                        .matcher(payload);
+                if (m.find()) return m.group(1);
+            }
+        } catch (Exception ignored) {}
+        return null;
+    }
 
     // ---------------- CLP DATA (fetched by verifyCLP, reusable by tapByText) ----------------
 
@@ -256,6 +304,7 @@ public class TestContext {
         clpData.remove();
         clpBanners.remove();
         scalarStore.remove();
+        defaultTimeout.remove();
     }
 
 

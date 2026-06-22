@@ -1,0 +1,54 @@
+- generic [ref=e3]:
+  - banner [ref=e321]:
+    - generic [ref=e322]:
+      - generic [ref=e323]:
+        - img [ref=e324] [cursor=pointer]
+        - generic [ref=e326] [cursor=pointer]: Save & exit
+      - generic [ref=e327]: Personal Details
+  - generic [ref=e329]:
+    - heading "Office details" [level=4] [ref=e331]
+    - generic [ref=e333]:
+      - generic: Company / Office Name
+      - textbox [ref=e334]: Popclub
+    - generic [ref=e336]:
+      - generic: Select Company
+      - generic [ref=e338]: Public Ltd Company
+    - generic [ref=e340]:
+      - generic: Designation
+      - textbox [ref=e341]: SDE
+    - generic [ref=e343]:
+      - generic: Select Nature of Profession
+      - generic [ref=e362]:
+        - textbox "Search..." [ref=e363]
+        - generic [ref=e364] [cursor=pointer]: ACCOUNTANT
+        - generic [ref=e365] [cursor=pointer]: AGRIBUSINESS
+        - generic [ref=e366] [cursor=pointer]: AUTOMOBILE SHOWROOM
+        - generic [ref=e367] [cursor=pointer]: BANKING AND FINANCIAL SERVICES
+        - generic [ref=e368] [cursor=pointer]: CONSULTANCY FIRM
+        - generic [ref=e369] [cursor=pointer]: DOCTOR
+        - generic [ref=e370] [cursor=pointer]: E-COMMERCE/ONLINE
+        - generic [ref=e371] [cursor=pointer]: EDUCATION INSTITUTE
+        - generic [ref=e372] [cursor=pointer]: ENGINEER
+        - generic [ref=e373] [cursor=pointer]: EXPORT/IMPORT
+        - generic [ref=e374] [cursor=pointer]: GOVT
+        - generic [ref=e375] [cursor=pointer]: HEALTH CARE CENTRE
+        - generic [ref=e376] [cursor=pointer]: HOSPITALITY
+        - generic [ref=e377] [cursor=pointer]: IT / ITES
+        - generic [ref=e378] [cursor=pointer]: LOGISTIC
+        - generic [ref=e379] [cursor=pointer]: MANUFACTURING
+        - generic [ref=e380] [cursor=pointer]: MEDIA/LIFESTYLE/SPORTS/ADVTMT/ENTERTMT
+        - generic [ref=e381] [cursor=pointer]: OTHERS
+        - generic [ref=e382] [cursor=pointer]: PHARMACIST
+        - generic [ref=e383] [cursor=pointer]: REAL ESTATE AGENTS /CONSTRUCTION
+        - generic [ref=e384] [cursor=pointer]: RETAILER
+        - generic [ref=e385] [cursor=pointer]: SALES AGENT
+        - generic [ref=e386] [cursor=pointer]: SERVICES
+        - generic [ref=e387] [cursor=pointer]: TELECOM
+        - generic [ref=e388] [cursor=pointer]: TOUR AND TRAVELS
+    - generic [ref=e346]:
+      - generic: Annual income
+      - textbox [ref=e347]: 13,00,000
+      - generic [ref=e348]: ₹
+      - generic [ref=e352]: thirteen lakh
+    - button "Continue" [ref=e350] [cursor=pointer]:
+      - generic [ref=e351]: Continue

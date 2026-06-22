@@ -17,6 +17,17 @@ public class EligibilityPage {
     private static final String RELATIONSHIP_YES   = "text=yes";
     private static final String RELATIONSHIP_NO    = "text=no";
     private static final String YESBANK_CONSENT    = "input[name='yesbank_authorize_consent']";
+    // All required YES Bank consent checkboxes on /level-0.1
+    private static final String[] ALL_REQUIRED_CONSENTS = {
+        "yesbank_authorize_consent",
+        "promo_consent",
+        "cibil_consent",
+        "term_condition_consent",
+        "user_comm_consent",
+        "kfs_consent",
+        "yesbank_gogreen_consent",
+        "digit_app_consent"
+    };
     private static final String BANK_OFFICER_INPUT = "input[name='bank_officer_name']";
     private static final String SELECTED_OPTION    = ".selected-option";
     private static final String CONTINUE_BUTTON    = "form button:has-text('Continue')";
@@ -63,8 +74,12 @@ public class EligibilityPage {
     }
 
     public EligibilityPage checkYesBankConsent() {
-        log.info("Checking YES Bank consent checkbox");
-        page.locator(YESBANK_CONSENT).check();
+        log.info("Checking all required YES Bank consent checkboxes");
+        for (String name : ALL_REQUIRED_CONSENTS) {
+            Locator cb = page.locator("input[name='" + name + "']");
+            cb.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+            if (!cb.isChecked()) cb.check();
+        }
         return this;
     }
 

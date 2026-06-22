@@ -21,9 +21,10 @@ mvn test-compile  # compile including test sources
 ## Key directories
 | Path | Purpose |
 |---|---|
-| `src/test/resources/testdata/` | YAML test files |
-| `src/test/resources/elements/` | Element key → accessibilityId mappings |
-| `src/main/java/com/popclub/mobile/actions/` | Action implementations |
+| `src/test/java/com/popclub/androidTests/` | YAML test scripts (organised by feature subfolder) |
+| `src/test/resources/testdata/` | Test data & fixtures (NOT test scripts) |
+| `src/test/resources/testdata/elements/` | Element key → accessibilityId mappings |
+| `src/main/java/com/popclub/android/actions/` | Action implementations |
 | `src/main/java/com/popclub/heal/` | Self-healing engine |
 | `src/main/java/com/popclub/ai/` | Tag analysis, test generation helpers |
 | `reports/` | Screenshots, videos, qa-tag-report |
@@ -64,7 +65,7 @@ steps:
 `verifyCLPRedirects` `verifyCLPFilters`
 
 ## Element keys
-Element keys live in `src/test/resources/elements/*.yaml`.
+Element keys live in `src/test/resources/testdata/elements/*.yaml`.
 Use the **key name** (left side) in test steps, never the raw accessibilityId.
 
 ```yaml

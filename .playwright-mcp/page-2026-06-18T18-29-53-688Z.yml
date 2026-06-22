@@ -1,0 +1,25 @@
+- generic [ref=e3]:
+  - banner [ref=e378]:
+    - generic [ref=e379]:
+      - generic [ref=e380]:
+        - img [ref=e381] [cursor=pointer]
+        - generic [ref=e383] [cursor=pointer]: Save & exit
+      - generic [ref=e384]: Personal Details
+  - generic [ref=e386]:
+    - heading "Office details" [level=4] [ref=e388]
+    - generic [ref=e390]:
+      - generic: Company / Office Name
+      - textbox [ref=e391]
+    - generic [ref=e393]:
+      - generic: Select Company
+    - generic [ref=e397]:
+      - generic: Designation
+      - textbox [ref=e398]
+    - generic [ref=e400]:
+      - generic: Select Nature of Profession
+    - generic [ref=e403]:
+      - generic: Annual income
+      - textbox [ref=e404]
+      - generic [ref=e405]: ₹
+    - button "Continue" [ref=e407] [cursor=pointer]:
+      - generic [ref=e408]: Continue

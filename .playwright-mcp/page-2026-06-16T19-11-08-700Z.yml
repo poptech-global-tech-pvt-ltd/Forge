@@ -1,0 +1,182 @@
+- generic [ref=e1]:
+  - generic [ref=e3]:
+    - banner [ref=e56]:
+      - generic [ref=e57]:
+        - generic [ref=e58]:
+          - img [ref=e59] [cursor=pointer]
+          - generic [ref=e61] [cursor=pointer]: Save & exit
+        - generic [ref=e62]: Eligibility
+    - generic [ref=e65]:
+      - generic [ref=e66]:
+        - heading "Check your eligibility" [level=4] [ref=e68]
+        - generic [ref=e69]:
+          - generic [ref=e70]:
+            - generic: First name
+            - textbox [ref=e71]: Deepa
+          - generic [ref=e72]:
+            - generic: Middle name
+            - textbox [ref=e73]: D
+        - generic [ref=e74]:
+          - generic: Last name
+          - textbox [ref=e75]: Hegde
+        - generic [ref=e77]:
+          - generic: Date of birth
+          - textbox [active] [ref=e80] [cursor=pointer]
+        - generic [ref=e81]:
+          - generic: Personal email
+          - textbox [ref=e82]: dhegdetech@gmail.com
+        - generic [ref=e83]:
+          - generic [ref=e84]: Type of Occupation
+          - generic [ref=e85]:
+            - generic [ref=e86]:
+              - radio "Salaried" [ref=e87] [cursor=pointer]
+              - generic [ref=e88] [cursor=pointer]: Salaried
+            - generic [ref=e89]:
+              - radio "Self Employed" [ref=e90] [cursor=pointer]
+              - generic [ref=e91] [cursor=pointer]: Self Employed
+        - generic [ref=e92]:
+          - generic [ref=e93]: Marital Status
+          - generic [ref=e94]:
+            - generic [ref=e95]:
+              - radio "married" [ref=e96] [cursor=pointer]
+              - generic [ref=e97] [cursor=pointer]: married
+            - generic [ref=e98]:
+              - radio "single" [ref=e99] [cursor=pointer]
+              - generic [ref=e100] [cursor=pointer]: single
+            - generic [ref=e101]:
+              - radio "divorced" [ref=e102] [cursor=pointer]
+              - generic [ref=e103] [cursor=pointer]: divorced
+            - generic [ref=e104]:
+              - radio "widowed" [ref=e105] [cursor=pointer]
+              - generic [ref=e106] [cursor=pointer]: widowed
+            - generic [ref=e107]:
+              - radio "separated" [ref=e108] [cursor=pointer]
+              - generic [ref=e109] [cursor=pointer]: separated
+            - generic [ref=e110]:
+              - radio "others" [ref=e111] [cursor=pointer]
+              - generic [ref=e112] [cursor=pointer]: others
+        - generic [ref=e113]:
+          - generic [ref=e114]: Gender
+          - generic [ref=e115]:
+            - generic [ref=e116]:
+              - radio "FEMALE" [ref=e117] [cursor=pointer]
+              - generic [ref=e118] [cursor=pointer]: FEMALE
+            - generic [ref=e119]:
+              - radio "MALE" [ref=e120] [cursor=pointer]
+              - generic [ref=e121] [cursor=pointer]: MALE
+            - generic [ref=e122]:
+              - radio "THIRDGENDER" [ref=e123] [cursor=pointer]
+              - generic [ref=e124] [cursor=pointer]: THIRDGENDER
+      - button "Continue" [ref=e128] [cursor=pointer]:
+        - generic [ref=e129]: Continue
+  - dialog "Choose Date" [ref=e135]:
+    - alert [ref=e136]
+    - button "Previous Month" [ref=e137] [cursor=pointer]:
+      - generic: Previous Month
+    - generic [ref=e138]:
+      - generic [ref=e139]:
+        - generic [ref=e140]: June 2005
+        - generic [ref=e141]:
+          - combobox [ref=e143]:
+            - option "January"
+            - option "February"
+            - option "March"
+            - option "April"
+            - option "May"
+            - option "June" [selected]
+            - option "July"
+            - option "August"
+            - option "September"
+            - option "October"
+            - option "November"
+            - option "December"
+          - combobox [ref=e145]:
+            - option "1966"
+            - option "1967"
+            - option "1968"
+            - option "1969"
+            - option "1970"
+            - option "1971"
+            - option "1972"
+            - option "1973"
+            - option "1974"
+            - option "1975"
+            - option "1976"
+            - option "1977"
+            - option "1978"
+            - option "1979"
+            - option "1980"
+            - option "1981"
+            - option "1982"
+            - option "1983"
+            - option "1984"
+            - option "1985"
+            - option "1986"
+            - option "1987"
+            - option "1988"
+            - option "1989"
+            - option "1990"
+            - option "1991"
+            - option "1992"
+            - option "1993"
+            - option "1994"
+            - option "1995"
+            - option "1996"
+            - option "1997"
+            - option "1998"
+            - option "1999"
+            - option "2000"
+            - option "2001"
+            - option "2002"
+            - option "2003"
+            - option "2004"
+            - option "2005" [selected]
+        - generic [ref=e146]:
+          - generic "Sunday" [ref=e147]: Su
+          - generic "Monday" [ref=e148]: Mo
+          - generic "Tuesday" [ref=e149]: Tu
+          - generic "Wednesday" [ref=e150]: We
+          - generic "Thursday" [ref=e151]: Th
+          - generic "Friday" [ref=e152]: Fr
+          - generic "Saturday" [ref=e153]: Sa
+      - listbox "Month June, 2005" [ref=e154]:
+        - generic [ref=e155]:
+          - option "Choose Sunday, May 29th, 2005" [ref=e156] [cursor=pointer]: "29"
+          - option "Choose Monday, May 30th, 2005" [ref=e157] [cursor=pointer]: "30"
+          - option "Choose Tuesday, May 31st, 2005" [ref=e158] [cursor=pointer]: "31"
+          - option "Choose Wednesday, June 1st, 2005" [ref=e159] [cursor=pointer]: "1"
+          - option "Choose Thursday, June 2nd, 2005" [ref=e160] [cursor=pointer]: "2"
+          - option "Choose Friday, June 3rd, 2005" [ref=e161] [cursor=pointer]: "3"
+          - option "Choose Saturday, June 4th, 2005" [ref=e162] [cursor=pointer]: "4"
+        - generic [ref=e163]:
+          - option "Choose Sunday, June 5th, 2005" [ref=e164] [cursor=pointer]: "5"
+          - option "Choose Monday, June 6th, 2005" [ref=e165] [cursor=pointer]: "6"
+          - option "Choose Tuesday, June 7th, 2005" [ref=e166] [cursor=pointer]: "7"
+          - option "Choose Wednesday, June 8th, 2005" [ref=e167] [cursor=pointer]: "8"
+          - option "Choose Thursday, June 9th, 2005" [ref=e168] [cursor=pointer]: "9"
+          - option "Choose Friday, June 10th, 2005" [ref=e169] [cursor=pointer]: "10"
+          - option "Choose Saturday, June 11th, 2005" [ref=e170] [cursor=pointer]: "11"
+        - generic [ref=e171]:
+          - option "Choose Sunday, June 12th, 2005" [ref=e172] [cursor=pointer]: "12"
+          - option "Choose Monday, June 13th, 2005" [ref=e173] [cursor=pointer]: "13"
+          - option "Choose Tuesday, June 14th, 2005" [ref=e174] [cursor=pointer]: "14"
+          - option "Choose Wednesday, June 15th, 2005" [ref=e175] [cursor=pointer]: "15"
+          - option "Choose Thursday, June 16th, 2005" [ref=e176] [cursor=pointer]: "16"
+          - option "Choose Friday, June 17th, 2005" [ref=e177] [cursor=pointer]: "17"
+          - option "Not available Saturday, June 18th, 2005" [disabled] [ref=e178]: "18"
+        - generic [ref=e179]:
+          - option "Not available Sunday, June 19th, 2005" [disabled] [ref=e180]: "19"
+          - option "Not available Monday, June 20th, 2005" [disabled] [ref=e181]: "20"
+          - option "Not available Tuesday, June 21st, 2005" [disabled] [ref=e182]: "21"
+          - option "Not available Wednesday, June 22nd, 2005" [disabled] [ref=e183]: "22"
+          - option "Not available Thursday, June 23rd, 2005" [disabled] [ref=e184]: "23"
+          - option "Not available Friday, June 24th, 2005" [disabled] [ref=e185]: "24"
+          - option "Not available Saturday, June 25th, 2005" [disabled] [ref=e186]: "25"
+        - generic [ref=e187]:
+          - option "Not available Sunday, June 26th, 2005" [disabled] [ref=e188]: "26"
+          - option "Not available Monday, June 27th, 2005" [disabled] [ref=e189]: "27"
+          - option "Not available Tuesday, June 28th, 2005" [disabled] [ref=e190]: "28"
+          - option "Not available Wednesday, June 29th, 2005" [disabled] [ref=e191]: "29"
+          - option "Not available Thursday, June 30th, 2005" [disabled] [ref=e192]: "30"
+          - option "Not available Friday, July 1st, 2005" [disabled] [ref=e193]: "1"
+          - option "Not available Saturday, July 2nd, 2005" [disabled] [ref=e194]: "2"

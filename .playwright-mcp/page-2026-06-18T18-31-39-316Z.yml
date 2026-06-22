@@ -1,0 +1,55 @@
+- generic [ref=e3]:
+  - banner [ref=e447]:
+    - generic [ref=e448]:
+      - generic [ref=e449]:
+        - img [ref=e450] [cursor=pointer]
+        - generic [ref=e452] [cursor=pointer]: Save & exit
+      - generic [ref=e453]: Personal details
+  - generic [ref=e455]:
+    - heading "Office address" [level=4] [ref=e457]
+    - generic [ref=e458]:
+      - button "Select location on maps" [active] [ref=e459] [cursor=pointer]:
+        - img [ref=e460]
+        - text: Select location on maps
+      - generic [ref=e462]: OR
+      - button "+ Add New Address" [ref=e463] [cursor=pointer]:
+        - generic [ref=e464]: +
+        - text: Add New Address
+    - generic [ref=e465]:
+      - button "Continue" [disabled]:
+        - generic: Continue
+  - generic [ref=e466]:
+    - banner [ref=e467]:
+      - img [ref=e469] [cursor=pointer]
+    - generic [ref=e471]:
+      - generic [ref=e472]:
+        - textbox "Search for area, building, street name" [ref=e473]
+        - generic [ref=e475]:
+          - generic:
+            - button "Keyboard shortcuts"
+          - region "Map" [ref=e476]
+          - generic [ref=e477]:
+            - iframe [ref=e499]:
+              
+            - link "Open this area in Google Maps (opens a new window)" [ref=e501] [cursor=pointer]:
+              - /url: https://maps.google.com/maps?ll=12.914352,77.650119&z=18&t=m&hl=en&gl=US&mapclient=apiv3
+              - img "Google" [ref=e503]
+            - generic [ref=e504]:
+              - button "Keyboard shortcuts" [ref=e510] [cursor=pointer]
+              - generic [ref=e515]: Map data ©2026
+              - link "Terms (opens in new tab)" [ref=e520] [cursor=pointer]:
+                - /url: https://www.google.com/intl/en_US/help/terms_maps.html
+                - text: Terms
+              - link "Report a map error (opens in new tab)" [ref=e525] [cursor=pointer]:
+                - /url: https://www.google.com/maps/@12.9143521,77.650119,18z/data=!10m1!1e1!12b1?source=apiv3&rapsrc=apiv3
+                - text: Report a map error
+        - img
+        - button "locate" [ref=e526]:
+          - img "locate" [ref=e527]
+      - generic [ref=e528]:
+        - heading "Office address" [level=3] [ref=e529]
+        - generic [ref=e530]:
+          - img [ref=e531]
+          - paragraph [ref=e533]: 2492, 15th Cross Rd, 1st Sector, HSR Layout, Bengaluru, Karnataka 560102, India
+        - button "Yes, this is my location" [ref=e534] [cursor=pointer]:
+          - generic [ref=e535]: Yes, this is my location
