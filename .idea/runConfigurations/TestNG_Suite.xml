@@ -1,9 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="TestNG Suite" type="TestNG" factoryName="TestNG">
-    <module name="Forge" />
-    <option name="SUITE_NAME" value="$PROJECT_DIR$/src/test/resources/testNg/testng.xml" />
-    <option name="TEST_TYPE" value="SUITE" />
-    <option name="WORKING_DIRECTORY" value="$MODULE_WORKING_DIR$" />
-    <method v="2" />
-  </configuration>
-</component>
