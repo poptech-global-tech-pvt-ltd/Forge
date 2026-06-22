@@ -36,12 +36,12 @@ public class LaunchAppAction implements Action {
         wakeDevice((AndroidDriver) driver);
 
         // 3. Close and relaunch so every test starts from a clean app state.
-        //    When noReset=true: don't force-restart, but DO launch the app if it isn't running.
-        //    Exception: -DforceRestart=true (set by Forge UI on full runs) always restarts.
-        boolean forceRestart = Boolean.parseBoolean(System.getProperty("forceRestart", "false"));
-        if (!forceRestart && TestContext.isNoReset()) {
+        //    - Resume mode (running from mid-step): keep app alive, just bring to foreground.
+        //    - Full run from step 1: always force-restart, even if noReset=true in YAML.
+        if (TestContext.isResumeMode()) {
             ensureAppRunning((AndroidDriver) driver);
         } else {
+            System.out.println("[LaunchApp] Full run from step 1 — force restarting app…");
             forceRestartApp((AndroidDriver) driver);
         }
 

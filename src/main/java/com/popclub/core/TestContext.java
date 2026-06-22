@@ -26,6 +26,7 @@ public class TestContext {
     private static ThreadLocal<String> executionMode = new ThreadLocal<>();
     private static ThreadLocal<Boolean> noReset        = ThreadLocal.withInitial(() -> false);
     private static ThreadLocal<Boolean> loginRequired  = ThreadLocal.withInitial(() -> true);
+    private static ThreadLocal<Boolean> resumeMode     = ThreadLocal.withInitial(() -> false);
     private static ThreadLocal<File> videoFile = new ThreadLocal<>();
     private static ThreadLocal<String> currentTestCase = new ThreadLocal<>();
     private static ThreadLocal<String> userToken = new ThreadLocal<>();
@@ -72,6 +73,14 @@ public class TestContext {
 
     public static boolean isNoReset() {
         return noReset.get();
+    }
+
+    public static void setResumeMode(boolean value) {
+        resumeMode.set(value);
+    }
+
+    public static boolean isResumeMode() {
+        return resumeMode.get();
     }
 
     public static void setLoginRequired(boolean value) {

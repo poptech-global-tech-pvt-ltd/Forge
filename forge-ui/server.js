@@ -930,9 +930,6 @@ function startTest(file, deviceOverride, ws, fromStep) {
 
   if (startStep) {
     args.push(`-DfromStep=${startStep}`);
-  } else {
-    // Full run from step 1 — force app restart even if noReset=true
-    args.push(`-DforceRestart=true`);
   }
 
   console.log(`Running: mvn ${args.join(' ')}`);

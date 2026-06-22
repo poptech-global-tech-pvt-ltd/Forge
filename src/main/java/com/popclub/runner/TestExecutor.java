@@ -49,6 +49,7 @@ public class TestExecutor {
         TestContext.setPlatform(testCase.platform);
         // In resume mode, force noReset so Appium doesn't reinstall/reset the app
         TestContext.setNoReset(testCase.noReset || resumeMode);
+        TestContext.setResumeMode(resumeMode);
         TestContext.setLoginRequired(testCase.loginRequired);
         TestContext.setTestSourceFile(testCase.sourceFile);
 
