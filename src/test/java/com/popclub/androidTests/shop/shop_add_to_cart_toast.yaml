@@ -68,7 +68,7 @@ steps:
     element: size_selection_add_to_cart_button
 
   - action: waitFor
-    locator: add_to_cart_snackbar
+    element: add_to_cart_snackbar
     testCaseId: PO-15310
 
   - action: waitFor

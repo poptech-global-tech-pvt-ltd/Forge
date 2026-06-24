@@ -991,6 +991,11 @@ product_details_go_to_cart_button:
     - type: accessibilityId
       value: product_details_cart_button
 
+add_to_cart_snackbar:
+  android:
+    - type: accessibilityId
+      value: product_details_add_to_cart_toast
+
 # ─── Size Selection ────────────────────────────────────────────────────────────
 size_selection_item_0:
   android:

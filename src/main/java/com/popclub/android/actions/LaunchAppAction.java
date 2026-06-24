@@ -196,8 +196,8 @@ public class LaunchAppAction implements Action {
             dismissed |= tapIfPresent(driver, By.id("com.google.android.gms:id/decline_button"),
                     "Google sign-in — Decline");
 
-            dismissed |= tapIfPresent(driver, By.id("com.android.permissioncontroller:id/permission_deny_button"),
-                    "Permission dialog — Deny");
+            // Permission dialogs are handled automatically by Appium's autoGrantPermissions capability
+            // (install-time) and PermissionWatcher (runtime mid-test). No need to deny them here.
 
             dismissed |= tapIfPresent(driver, By.id("android:id/button2"),
                     "System dialog — Cancel/Deny (button2)");

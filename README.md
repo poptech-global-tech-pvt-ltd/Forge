@@ -28,23 +28,23 @@ Install **all** of these before setting up any Forge component.
 
 | Tool | Version | Install |
 |------|---------|---------|
-| Java (JDK) | 17+     | `brew install openjdk@17` |
-| Maven | 3.8+    | `brew install maven` |
-| Node.js | 20+     | `brew install nvm && nvm install 20` |
-| Android SDK / ADB | latest  | Android Studio → SDK Tools → Android SDK Platform-Tools |
-| Appium | 3.x     | `npm install -g appium` |
-| Appium UiAutomator2 driver | latest  | `appium driver install uiautomator2` |
-| Claude CLI | latest  | [claude.ai/download](https://claude.ai/download) |
+| Java (JDK) | 17+ | `brew install openjdk@17` |
+| Maven | 3.8+ | `brew install maven` |
+| Node.js | 20+ | `brew install nvm && nvm install 20` |
+| Android SDK / ADB | latest | Android Studio → SDK Tools → Android SDK Platform-Tools |
+| Appium | 3.x | `npm install -g appium` |
+| Appium UiAutomator2 driver | latest | `appium driver install uiautomator2` |
+| Claude CLI | latest | [claude.ai/download](https://claude.ai/download) |
 
 ### Verify setup
 
 ```bash
-java -version       # must show 17+
-mvn -version        # must show 3.8+
-node -version       # must show 20+
-adb devices         # must list your device with status "device"
-appium -v           # must show 3.x
-claude -v           # must show claude version
+java -version        # must show 17+
+mvn -version         # must show 3.8+
+node --version       # must show 20+
+adb devices          # must list your device with status "device"
+appium -v            # must show 3.x
+claude -v            # must show claude version
 ```
 
 ### Android device
@@ -60,6 +60,24 @@ claude -v           # must show claude version
 ---
 
 ## Quick Start
+
+**Option A — one-shot setup script (recommended)**
+
+```bash
+git clone <repo-url>
+cd Forge
+chmod +x setup.sh
+./setup.sh          # installs everything + opens Forge UI at http://localhost:3847
+```
+
+Other modes:
+
+```bash
+./setup.sh --check  # verify all dependencies are installed (no install, no start)
+./setup.sh --start  # skip install, just start Forge UI (deps already installed)
+```
+
+**Option B — manual**
 
 ```bash
 # 1 — Clone
@@ -126,6 +144,8 @@ mvn test -DtestFile=shop/ts_add_to_cart.yaml --no-transfer-progress
 
 A browser-based control panel for running, editing, recording, and AI-generating tests.
 
+See [forge-ui/README.md](forge-ui/README.md) for full documentation.
+
 ### Setup
 
 ```bash
@@ -154,44 +174,46 @@ Override port: `PORT=4000 node server.js`
 
 | Tab | What it does |
 |-----|-------------|
-| **▶ Steps** | Live step-by-step execution view, pass/fail highlights, run from any step, drag-reorder, duplicate step |
-| **✏ Editor** | CodeMirror YAML editor — create, edit, save tests. Ctrl+Enter runs step at cursor live on device |
-| **♻ Flows** | Manage reusable flow files callable via `action: call` |
-| **🌐 Network** | Live HTTP traffic capture during test runs (request + response headers and body) |
-| **⏺ Record** | Tap-to-record test steps from device. Auto-read mode, pause/resume, undo/redo, live YAML preview |
-| **🗂 Elements** | Browse, add, edit, delete element keys. Usage report (missing/unused). Untagged screen check |
-| **💬 Chat** | AI test generation via Claude with live device screen context |
+| Steps | Live step-by-step execution view, pass/fail highlights, run from any step, drag-reorder, duplicate step |
+| Editor | CodeMirror YAML editor — create, edit, save tests. Ctrl+Enter runs step at cursor live on device |
+| Flows | Manage reusable flow files callable via `action: call` |
+| Network | Live HTTP traffic capture during test runs (request + response headers and body) |
+| Record | Tap-to-record test steps from device. Auto-read mode, pause/resume, undo/redo, live YAML preview |
+| Elements | Browse, add, edit, delete element keys. Usage report (missing/unused). Untagged screen check |
+| Chat | AI test generation via Claude with live device screen context |
 
 ### Test Picker toolbar
 
 | Control | Purpose |
 |---------|---------|
-| Search box | Search across all 35+ tests by name, folder or tag |
-| ✏ | Rename test file |
-| ⎘ | Duplicate test file |
-| 🗑 | Delete test file |
-| ▶ Run | Run the selected test |
-| ▶ Folder | Batch-run all tests in the selected folder |
-| 📊 | Run history — last 60 runs with pass/fail badges |
+| Search box | Search across all tests by name, folder or tag |
+| Rename | Rename test file |
+| Duplicate | Duplicate test file |
+| Delete | Delete test file |
+| Run | Run the selected test |
+| Run Folder | Batch-run all tests in the selected folder |
+| History | Run history — last 60 runs with pass/fail badges |
 
 ### Device panel
 
 | Control | Purpose |
 |---------|---------|
-| 👆 Tap | Tap mode — click anywhere on the screen image to tap that point on device |
-| ↕ Swipe | Click-drag on screen image to swipe |
-| ✋ Hold | Long press |
-| 🔍 Inspect | Click any element to see its key, accessibilityId, text, bounds, clickable state |
+| Tap | Tap mode — click anywhere on the screen image to tap that point on device |
+| Swipe | Click-drag on screen image to swipe |
+| Hold | Long press |
+| Inspect | Click any element to see its key, accessibilityId, text, bounds, clickable state |
 | Text box + Send | Type text and send to the focused field on device |
-| ◀ Back · ⬤ Home · ▣ Apps | Hardware key shortcuts |
-| 📋 Scan Tags | Shows all qaTestTag elements on screen |
-| 🏷 Tag Sync | Pushes element keys to device |
+| Back / Home / Apps | Hardware key shortcuts |
+| Scan Tags | Shows all qaTestTag elements on screen |
+| Tag Sync | Pushes element keys to device |
 
 ---
 
 ## Forge MCP
 
 An MCP server that gives Claude real-time visibility into the Android device and the ability to write, run, and heal tests autonomously.
+
+See [forge-mcp/README.md](forge-mcp/README.md) for full documentation of all 19 tools.
 
 ### Setup
 
@@ -278,10 +300,10 @@ To use Forge MCP tools directly in Claude desktop app:
 3. Quit and reopen Claude desktop.
 
 Usage examples:
-- *"Test the add to cart flow"* → scans screen, writes test, runs it, heals failures
-- *"Fix the failing step in ts_checkout.yaml"* → reads test, heals step, saves, re-runs
-- *"What elements are on the home screen?"* → runs `forge_get_hierarchy`
-- *"Clean up unused elements"* → runs `forge_check_elements`, deletes unused
+- "Test the add to cart flow" — scans screen, writes test, runs it, heals failures
+- "Fix the failing step in ts_checkout.yaml" — reads test, heals step, saves, re-runs
+- "What elements are on the home screen?" — runs `forge_get_hierarchy`
+- "Clean up unused elements" — runs `forge_check_elements`, deletes unused
 
 ---
 
@@ -291,7 +313,7 @@ Usage examples:
 Forge/
 ├── src/
 │   ├── main/java/com/popclub/
-│   │   ├── android/actions/        # Action implementations (tap, scroll, enterText…)
+│   │   ├── android/actions/        # Action implementations (tap, scroll, enterText...)
 │   │   ├── core/                   # WaitUtil, TestContext, LocatorUtil
 │   │   ├── heal/                   # Self-healing engine
 │   │   ├── ai/                     # ForgeRecorder, tag analysis
@@ -299,17 +321,18 @@ Forge/
 │   │   └── runner/                 # TestExecutor, TestRunnerTest
 │   └── test/
 │       ├── java/com/popclub/
-│       │   └── androidTests/       # YAML test scripts (by feature)
-│       │       ├── shop/
-│       │       ├── login/
-│       │       ├── home/
-│       │       ├── profile/
-│       │       ├── rewards/
-│       │       ├── upi/
-│       │       ├── billpay/
-│       │       └── recorded/
+│       │   ├── androidTests/       # YAML test scripts (by feature)
+│       │   │   ├── shop/
+│       │   │   ├── login/
+│       │   │   ├── home/
+│       │   │   ├── profile/
+│       │   │   ├── rewards/
+│       │   │   ├── upi/
+│       │   │   ├── billpay/
+│       │   │   └── recorded/
+│       │   └── androidFlows/       # Reusable flow YAML files
 │       └── resources/
-│           ├── testdata/elements/  # Element key → accessibilityId mappings
+│           ├── testdata/elements/  # Element key -> accessibilityId mappings
 │           │   ├── shop.yaml
 │           │   ├── common.yaml
 │           │   ├── home.yaml
@@ -323,11 +346,15 @@ Forge/
 │           └── suites/             # TestNG XML suite files
 ├── forge-ui/                       # Browser UI (Node.js + Express)
 │   ├── server.js                   # Express + WebSocket server
-│   └── public/index.html           # Single-page app
+│   ├── public/index.html           # Single-page app
+│   └── README.md
 ├── forge-mcp/                      # MCP server for Claude integration
 │   ├── index.js                    # 19 MCP tools
-│   └── package.json
+│   ├── package.json
+│   └── README.md
 ├── reports/                        # Screenshots, failure images, run reports
+├── scripts/                        # Utility scripts
+├── setup.sh                        # One-shot dependency installer + launcher
 ├── .claude/
 │   ├── settings.json               # MCP registration for Claude Code
 │   └── skills/                     # Claude Code slash command skills
@@ -456,20 +483,20 @@ shop_add_to_cart_button:
 - Keys must be `snake_case` alphanumeric only
 - Each key lives in exactly one feature file
 - Declare which files your test uses under `features:` in the test header
-- Add new keys via Forge UI → 🗂 Elements tab, or directly edit the YAML file
+- Add new keys via Forge UI Elements tab, or directly edit the YAML file
 
 ### Finding element keys
 
 ```bash
 # Option 1 — Forge UI Inspector
-# Click Inspect on device → click element → key shown in green
+# Click Inspect on device panel -> click element -> key shown in inspector popup
 
 # Option 2 — Scan Tags button
-# Forge UI → 📋 Scan Tags → lists all qaTestTags on current screen
+# Forge UI -> Scan Tags -> lists all qaTestTags on current screen
 
 # Option 3 — Claude MCP
 # "What elements are available on the cart screen?"
-# → forge_get_hierarchy returns all element keys ready to use
+# -> forge_get_hierarchy returns all element keys ready to use
 ```
 
 ---
@@ -479,12 +506,13 @@ shop_add_to_cart_button:
 | Problem | Fix |
 |---------|-----|
 | `adb: command not found` | `brew install android-platform-tools` |
-| Device not listed in `adb devices` | Reconnect USB → allow debugging prompt on device |
+| Device not listed in `adb devices` | Reconnect USB — allow debugging prompt on device |
 | `INSTALL_FAILED` | `adb install -r` (replace existing) or uninstall first |
 | UiAutomator2 not connected | Forge MCP auto-recovers. Manual fix: force-stop `io.appium.uiautomator2.server` on device |
 | Port 3847 already in use | `pkill -f "node server.js"` then restart |
 | Screen not loading in Forge UI | Check green dot top-left of device panel; run `adb devices` |
-| `npm install` fails | Check Node version: `node -v` must be 20+ |
+| `npm install` fails | Check Node version: `node --version` must be 20+ |
 | Maven build fails | Check Java version: `java -version` must be 17+ |
 | Element not found in test | Run `forge_validate_test` (MCP) or Usage Report (Elements tab) |
 | Claude chat not working | Ensure `claude` is in PATH: `which claude` |
+| `setup.sh` check fails | Run `./setup.sh --check` to see which dependency is missing |

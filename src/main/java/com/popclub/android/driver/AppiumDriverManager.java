@@ -53,7 +53,9 @@ public class AppiumDriverManager {
             if (device.platformVersion != null && !device.platformVersion.isEmpty()) {
                 options.setPlatformVersion(device.platformVersion);
             }
-            options.setAutoGrantPermissions(true);
+            // autoGrantPermissions removed — grantAllPermissions() below covers all dangerous
+            // permissions via ADB after session creation, and PermissionWatcher handles any
+            // runtime dialogs mid-test. The capability is redundant.
 
             boolean resumeMode = TestContext.isNoReset();
             // Even in noReset/resume mode, install the app if it is not present on the device.
@@ -104,11 +106,9 @@ public class AppiumDriverManager {
             deviceInfo.set(device);
 
             // Grant all dangerous permissions declared in the manifest upfront via ADB.
-            // autoGrantPermissions handles install-time grants; this catches any that slip through.
+            // pm grant marks them as granted at system level — Android never shows a runtime
+            // dialog for a permission that's already granted, so no watcher is needed.
             grantAllPermissions(udid, "com.popclub.android");
-
-            // Start background watcher that auto-accepts runtime permission dialogs mid-test.
-            PermissionWatcher.start(driverInstance);
 
             return driverInstance;
 
@@ -125,8 +125,6 @@ public class AppiumDriverManager {
 
     public static void quitDriver() {
         if (driver.get() != null) {
-            // Stop the permission watcher before closing the driver
-            PermissionWatcher.stop();
             try {
                 driver.get().quit();
             } catch (Exception ignored) {}

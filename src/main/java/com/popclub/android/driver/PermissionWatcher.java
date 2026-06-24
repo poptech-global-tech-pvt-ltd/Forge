@@ -1,9 +1,9 @@
 package com.popclub.android.driver;
 
-import io.appium.java_client.AppiumBy;
 import io.appium.java_client.AppiumDriver;
+import org.openqa.selenium.By;
 
-import java.util.List;
+import java.time.Duration;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -24,34 +24,47 @@ import java.util.concurrent.TimeUnit;
  *   PermissionWatcher.stop();          // in quitDriver()
  * </pre>
  *
- * <p>Recognized allow-button texts (case-insensitive):
- *   "Allow", "While using the app", "Only this time",
- *   "Allow all the time", "Allow anyway", "OK", "ALLOW"
+ * <p>{@code grantAllPermissions()} in AppiumDriverManager handles install-time
+ * grants via ADB. This class handles runtime dialogs that appear mid-test.
+ *
+ * <p>Strategy: resource IDs first (fast, zero implicit-wait overhead),
+ * then exact-text fallback for older Android / custom ROMs.
+ * Implicit wait is zeroed for the duration of each tick so no lookup
+ * ever stalls the test thread with a 10 s timeout.
  */
 public class PermissionWatcher {
 
-    /** Button texts that dismiss permission dialogs permissively. */
-    private static final List<String> ALLOW_TEXTS = List.of(
+    /**
+     * Permission-controller resource IDs for "allow"-family buttons.
+     * Checked in preference order — most specific first.
+     */
+    private static final String[] ALLOW_IDS = {
+        "com.android.permissioncontroller:id/permission_allow_button",
+        "com.android.permissioncontroller:id/permission_allow_foreground_only_button",
+        "com.android.permissioncontroller:id/permission_allow_one_time_button",
+        "com.android.permissioncontroller:id/permission_allow_always_button",
+        // Android 10 and some OEM variants use this ID
+        "com.android.packageinstaller:id/permission_allow_button",
+    };
+
+    /**
+     * Exact button texts used as fallback when resource IDs don't match
+     * (older Android builds, custom ROMs, vendor-modified dialogs).
+     * These MUST be exact strings — no partial matching.
+     */
+    private static final String[] ALLOW_TEXTS = {
         "Allow",
+        "ALLOW",
         "While using the app",
         "Only this time",
         "Allow all the time",
         "Allow anyway",
-        "ALLOW",
-        "OK"
-    );
-
-    /** Button texts that should be dismissed (deny / close) if no allow is present. */
-    private static final List<String> DISMISS_TEXTS = List.of(
-        "Don't allow",
-        "Deny",
-        "No thanks"
-    );
+    };
 
     private static ScheduledExecutorService executor;
     private static ScheduledFuture<?>       task;
 
-    /** Start watching for permission dialogs every 800 ms. */
+    /** Start watching for permission dialogs every 3 s. */
     public static synchronized void start(AppiumDriver driver) {
         stop(); // clean up any leftover watcher from previous test
         executor = Executors.newSingleThreadScheduledExecutor(r -> {
@@ -60,7 +73,7 @@ public class PermissionWatcher {
             return t;
         });
         task = executor.scheduleWithFixedDelay(
-            () -> tick(driver), 500, 800, TimeUnit.MILLISECONDS);
+            () -> tick(driver), 1000, 3000, TimeUnit.MILLISECONDS);
         System.out.println("[PermissionWatcher] Started — auto-accepting runtime permission dialogs");
     }
 
@@ -79,38 +92,58 @@ public class PermissionWatcher {
     // ── Internal ──────────────────────────────────────────────────────────────
 
     private static void tick(AppiumDriver driver) {
+        // Zero implicit wait for the entire tick so every findElements() returns
+        // immediately when the element is absent — no 10 s stall per lookup.
+        Duration saved;
         try {
-            // Check for "Allow"-family buttons first (prefer permissive over deny)
-            for (String text : ALLOW_TEXTS) {
-                if (clickByText(driver, text)) {
-                    System.out.println("[PermissionWatcher] ✅ Allowed: \"" + text + "\"");
-                    return; // one click per tick
-                }
+            saved = driver.manage().timeouts().getImplicitWaitTimeout();
+        } catch (Exception ignored) {
+            return; // driver gone
+        }
+
+        try {
+            driver.manage().timeouts().implicitlyWait(Duration.ZERO);
+
+            // 1. Fast path — resource IDs (deterministic, no text parsing)
+            for (String resId : ALLOW_IDS) {
+                if (clickById(driver, resId)) return;
             }
+
+            // 2. Fallback — exact text match (older Android / custom ROMs)
+            for (String text : ALLOW_TEXTS) {
+                if (clickByExactText(driver, text)) return;
+            }
+
         } catch (Exception ignored) {
             // Driver may have gone away between tests — swallow silently
+        } finally {
+            try {
+                driver.manage().timeouts().implicitlyWait(saved);
+            } catch (Exception ignored) {}
         }
     }
 
-    private static boolean clickByText(AppiumDriver driver, String text) {
+    private static boolean clickById(AppiumDriver driver, String resourceId) {
         try {
-            String sel = "new UiSelector().text(\"" + text + "\")";
-            var elements = driver.findElements(AppiumBy.androidUIAutomator(sel));
-            if (!elements.isEmpty()) {
+            var elements = driver.findElements(By.id(resourceId));
+            if (!elements.isEmpty() && elements.get(0).isDisplayed()) {
                 elements.get(0).click();
+                System.out.println("[PermissionWatcher] ✅ Allowed via id: " + resourceId);
                 return true;
             }
-            // Also try textContains for partial matches like "While using"
-            if (text.length() > 6) {
-                String partial = "new UiSelector().textContains(\"" + text.substring(0, 6) + "\")";
-                var partials = driver.findElements(AppiumBy.androidUIAutomator(partial));
-                for (var el : partials) {
-                    String elText = el.getText();
-                    if (elText != null && elText.toLowerCase().contains(text.toLowerCase())) {
-                        el.click();
-                        return true;
-                    }
-                }
+        } catch (Exception ignored) {}
+        return false;
+    }
+
+    private static boolean clickByExactText(AppiumDriver driver, String text) {
+        try {
+            // Use xpath for exact text match — avoids UIAutomator's built-in wait loop
+            var elements = driver.findElements(
+                By.xpath("//*[@text='" + text + "']"));
+            if (!elements.isEmpty() && elements.get(0).isDisplayed()) {
+                elements.get(0).click();
+                System.out.println("[PermissionWatcher] ✅ Allowed via text: \"" + text + "\"");
+                return true;
             }
         } catch (Exception ignored) {}
         return false;
