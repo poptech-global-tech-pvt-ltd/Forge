@@ -296,7 +296,12 @@ if ! $START_ONLY && ! $CHECK_ONLY; then
   # Maven (Java) deps
   info "Installing Maven dependencies (this may take a few minutes on first run)…"
   cd "$FORGE_ROOT"
-  mvn install -DskipTests --no-transfer-progress -q && ok "Maven dependencies installed" \
+  # On macOS, Homebrew JDK doesn't include system CA certs — use Keychain trust store
+  MVN_SSL_OPTS=""
+  if [[ "$(uname)" == "Darwin" ]]; then
+    MVN_SSL_OPTS="-Djavax.net.ssl.trustStoreType=KeychainStore"
+  fi
+  mvn install -DskipTests --no-transfer-progress -q $MVN_SSL_OPTS && ok "Maven dependencies installed" \
     || { err "mvn install failed — check Java version and network connection"; flag_error "Maven install"; }
 
   # Forge UI npm deps
