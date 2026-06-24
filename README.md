@@ -516,4 +516,4 @@ shop_add_to_cart_button:
 | Element not found in test | Run `forge_validate_test` (MCP) or Usage Report (Elements tab) |
 | Claude chat not working | Ensure `claude` is in PATH: `which claude` |
 | `setup.sh` check fails | Run `./setup.sh --check` to see which dependency is missing |
-| `PKIX path building failed` during Maven | macOS JDK SSL issue — fixed in `setup.sh` via `-Djavax.net.ssl.trustStoreType=KeychainStore`. Run manually: `mvn install -DskipTests -Djavax.net.ssl.trustStoreType=KeychainStore` |
+| `PKIX path building failed` during Maven | Zscaler SSL interception — the JDK doesn't trust the Zscaler CA. Export the Zscaler cert from Keychain Access → System Roots, then: `sudo keytool -import -trustcacerts -alias zscaler -file ~/zscaler.pem -keystore "$JAVA_HOME/lib/security/cacerts" -storepass changeit -noprompt` |

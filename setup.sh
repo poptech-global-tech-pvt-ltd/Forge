@@ -301,8 +301,34 @@ if ! $START_ONLY && ! $CHECK_ONLY; then
   if [[ "$(uname)" == "Darwin" ]]; then
     MVN_SSL_OPTS="-Djavax.net.ssl.trustStoreType=KeychainStore"
   fi
-  mvn install -DskipTests --no-transfer-progress -q $MVN_SSL_OPTS && ok "Maven dependencies installed" \
-    || { err "mvn install failed — check Java version and network connection"; flag_error "Maven install"; }
+  MVN_OUTPUT=$(mvn install -DskipTests --no-transfer-progress -q $MVN_SSL_OPTS 2>&1)
+  if echo "$MVN_OUTPUT" | grep -q "PKIX\|certificate\|SSL\|TLS\|sun.security"; then
+    err "Maven SSL error — likely caused by Zscaler certificate interception"
+    echo ""
+    echo -e "  ${YELLOW}Zscaler injects its own CA certificate for SSL inspection."
+    echo -e "  The Homebrew JDK does not trust it by default.${RESET}"
+    echo ""
+    echo -e "  ${BOLD}Fix:${RESET} Import the Zscaler root certificate into the JDK truststore:"
+    echo ""
+    echo -e "  ${CYAN}  1. Export the Zscaler cert from macOS Keychain:${RESET}"
+    echo -e "       Open Keychain Access → System Roots → find 'Zscaler' → Export as .pem"
+    echo ""
+    echo -e "  ${CYAN}  2. Import it into the JDK cacerts:${RESET}"
+    echo -e "       sudo keytool -import -trustcacerts -alias zscaler \\"
+    echo -e "         -file ~/zscaler.pem \\"
+    echo -e "         -keystore \"\$JAVA_HOME/lib/security/cacerts\" \\"
+    echo -e "         -storepass changeit -noprompt"
+    echo ""
+    echo -e "  ${CYAN}  3. Re-run:${RESET}  ./setup.sh"
+    echo ""
+    flag_error "Maven install (Zscaler SSL)"
+  elif [[ -n "$MVN_OUTPUT" ]]; then
+    err "mvn install failed"
+    echo "$MVN_OUTPUT" | tail -10
+    flag_error "Maven install"
+  else
+    ok "Maven dependencies installed"
+  fi
 
   # Forge UI npm deps
   info "Installing Forge UI npm dependencies…"
