@@ -10,6 +10,6 @@ cloud.enabled=true
 # IP of the device farm (the Mac running pop-device-farm / start.sh)
 stf.base.url=https://192.168.15.62
 
-# Appium paths on THIS machine
-appium.node.path=/opt/homebrew/bin/node
-appium.js.path=/opt/homebrew/lib/node_modules/appium/build/lib/main.js
+# Appium paths — leave blank to auto-detect from PATH, or override if needed
+# appium.node.path=/opt/homebrew/bin/node
+# appium.js.path=/opt/homebrew/lib/node_modules/appium/build/lib/main.js

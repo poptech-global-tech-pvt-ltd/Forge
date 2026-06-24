@@ -154,14 +154,25 @@ public class CloudConfig {
 
     // ── Local Appium path settings ────────────────────────────────────────────
 
-    /** Path to the node executable e.g. /usr/local/bin/node */
+    /**
+     * Path to the node executable.
+     * Uses appium.node.path from properties if set; otherwise auto-detects via `which node`.
+     */
     public static String getNodePath() {
-        return require("appium.node.path");
+        String val = get("appium.node.path");
+        if (val != null && !val.isBlank()) return val;
+        return autoDetect("node", "appium.node.path");
     }
 
-    /** Path to appium main.js e.g. /usr/local/lib/node_modules/appium/build/lib/main.js */
+    /**
+     * Path to appium's main.js entry point.
+     * Uses appium.js.path from properties if set; otherwise auto-detects from
+     * `npm root -g` or the appium binary location.
+     */
     public static String getAppiumJsPath() {
-        return require("appium.js.path");
+        String val = get("appium.js.path");
+        if (val != null && !val.isBlank()) return val;
+        return autoDetectAppiumJs();
     }
 
     /**
@@ -170,14 +181,72 @@ public class CloudConfig {
      * then ANDROID_SDK_ROOT, so the property is optional when the env var is already set.
      */
     public static String getAndroidHome() {
-        // Explicit property wins
         String val = get("android.home");
         if (val != null && !val.isBlank()) return val;
-        // Fall back to environment variables already set on the machine
         val = System.getenv("ANDROID_HOME");
         if (val != null && !val.isBlank()) return val;
         val = System.getenv("ANDROID_SDK_ROOT");
         if (val != null && !val.isBlank()) return val;
         return null; // let Appium try to auto-detect
+    }
+
+    // ── Auto-detection helpers ────────────────────────────────────────────────
+
+    /** Runs `which <binary>` and returns the trimmed path, or throws with a helpful message. */
+    private static String autoDetect(String binary, String propertyName) {
+        try {
+            Process p = Runtime.getRuntime().exec(new String[]{"which", binary});
+            String path = new String(p.getInputStream().readAllBytes()).trim();
+            if (!path.isBlank()) {
+                System.out.println("[CloudConfig] Auto-detected " + binary + " → " + path);
+                return path;
+            }
+        } catch (Exception ignored) {}
+        throw new RuntimeException(
+            "[CloudConfig] Cannot find '" + binary + "' on PATH. " +
+            "Set " + propertyName + " in src/main/resources/config/local.cloud.properties"
+        );
+    }
+
+    /**
+     * Locates appium's main.js by trying (in order):
+     *  1. npm root -g  →  <npm-global>/appium/build/lib/main.js
+     *  2. which appium →  <bin-prefix>/lib/node_modules/appium/build/lib/main.js
+     */
+    private static String autoDetectAppiumJs() {
+        // Strategy 1: npm root -g
+        try {
+            Process p = Runtime.getRuntime().exec(new String[]{"npm", "root", "-g"});
+            String npmRoot = new String(p.getInputStream().readAllBytes()).trim();
+            if (!npmRoot.isBlank()) {
+                java.io.File candidate = new java.io.File(npmRoot + "/appium/build/lib/main.js");
+                if (candidate.exists()) {
+                    System.out.println("[CloudConfig] Auto-detected appium.js → " + candidate.getPath());
+                    return candidate.getPath();
+                }
+            }
+        } catch (Exception ignored) {}
+
+        // Strategy 2: derive from `which appium` → sibling lib/node_modules/
+        try {
+            Process p = Runtime.getRuntime().exec(new String[]{"which", "appium"});
+            String appiumBin = new String(p.getInputStream().readAllBytes()).trim();
+            if (!appiumBin.isBlank()) {
+                // appiumBin = /prefix/bin/appium → prefix = /prefix
+                String prefix = new java.io.File(appiumBin).getParentFile().getParent();
+                java.io.File candidate = new java.io.File(
+                        prefix + "/lib/node_modules/appium/build/lib/main.js");
+                if (candidate.exists()) {
+                    System.out.println("[CloudConfig] Auto-detected appium.js → " + candidate.getPath());
+                    return candidate.getPath();
+                }
+            }
+        } catch (Exception ignored) {}
+
+        throw new RuntimeException(
+            "[CloudConfig] Cannot find Appium main.js. " +
+            "Set appium.js.path in src/main/resources/config/local.cloud.properties\n" +
+            "  Example: appium.js.path=/opt/homebrew/lib/node_modules/appium/build/lib/main.js"
+        );
     }
 }
