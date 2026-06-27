@@ -171,48 +171,10 @@
                             </sources>
                         </configuration>
                     </execution>
-                    <execution>
-                        <id>add-source</id>
-                        <phase>generate-sources</phase>
-                        <goals><goal>add-source</goal></goals>
-                        <configuration>
-                            <sources>
-                                <source>target/generated-sources/protobuf/java</source>
-                                <source>target/generated-sources/protobuf/grpc-java</source>
-                            </sources>
-                        </configuration>
-                    </execution>
                 </executions>
             </plugin>
-
-            <plugin>
-                <groupId>com.github.os72</groupId>
-                <artifactId>protoc-jar-maven-plugin</artifactId>
-                <version>3.11.4</version>
-                <executions>
-                    <execution>
-                        <phase>generate-sources</phase>
-                        <goals><goal>run</goal></goals>
-                        <configuration>
-                            <protocVersion>3.25.3</protocVersion>
-                            <inputDirectories>
-                                <include>src/main/proto</include>
-                            </inputDirectories>
-                            <outputTargets>
-                                <outputTarget>
-                                    <type>java</type>
-                                    <outputDirectory>target/generated-sources/protobuf/java</outputDirectory>
-                                </outputTarget>
-                                <outputTarget>
-                                    <type>grpc-java</type>
-                                    <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.63.0</pluginArtifact>
-                                    <outputDirectory>target/generated-sources/protobuf/grpc-java</outputDirectory>
-                                </outputTarget>
-                            </outputTargets>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+            <!-- Proto stubs are pre-generated and committed to src/main/java/com/popclub/forgedriver/proto/
+                 No protoc plugin needed at build time — avoids SSL/network issues in corporate environments. -->
         </plugins>
     </build>
 
