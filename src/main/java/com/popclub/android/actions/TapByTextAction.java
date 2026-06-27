@@ -1,6 +1,6 @@
 package com.popclub.android.actions;
 
-import com.popclub.android.driver.DriverManager;
+import com.popclub.driver.DriverFacade;
 import com.popclub.model.Step;
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.AppiumDriver;
@@ -36,11 +36,19 @@ public class TapByTextAction implements Action {
             throw new RuntimeException("tapByText requires a non-empty value");
         }
 
-        AppiumDriver driver = DriverManager.getDriver();
+        DriverFacade facade = DriverFacade.get();
         String text = step.value.trim();
 
         System.out.println("  tapByText → looking for: \"" + text + "\"");
 
+        // ForgeDriver: direct UiAutomator2 tap by text (no scroll needed — it searches full hierarchy)
+        if (facade.isForgeDriverMode()) {
+            facade.tapByText(text);
+            System.out.println("  ✅ Tapped (ForgeDriver): \"" + text + "\"");
+            return;
+        }
+
+        AppiumDriver driver = facade.appium();
         WebElement element = findWithScroll(driver, text);
         if (element == null) {
             throw new RuntimeException(

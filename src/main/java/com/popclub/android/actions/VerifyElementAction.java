@@ -1,23 +1,18 @@
 package com.popclub.android.actions;
 
 import com.popclub.core.TestContext;
-import com.popclub.core.WaitUtil;
-import com.popclub.android.driver.DriverManager;
+import com.popclub.driver.DriverFacade;
 import com.popclub.model.Step;
-import io.appium.java_client.AppiumDriver;
-import org.openqa.selenium.WebElement;
 
 public class VerifyElementAction implements Action {
 
     @Override
     public void perform(Step step) {
+        DriverFacade facade = DriverFacade.get();
 
-        AppiumDriver driver = DriverManager.getDriver();
-
-        // shouldExist = false → assert element is NOT present (no poll — check immediately)
+        // shouldExist = false → assert element is NOT present (check immediately)
         if (Boolean.FALSE.equals(step.shouldExist)) {
-            WebElement element = WaitUtil.findElementQuick(driver, step.locators);
-            if (element != null) {
+            if (facade.isPresent(step.locators)) {
                 throw new RuntimeException(
                     "Element should NOT exist but was found: " + step.locator);
             }
@@ -25,12 +20,9 @@ public class VerifyElementAction implements Action {
             return;
         }
 
-        // shouldExist = true (default) → poll until visible, then assert
+        // shouldExist = true (default) → poll until visible
         int timeout = step.timeout > 0 ? step.timeout : TestContext.getDefaultTimeout();
-        WebElement element = WaitUtil.pollUntilVisible(driver, step.locators, timeout);
-        if (element == null) {
-            throw new RuntimeException("Element not found: " + step.locator);
-        }
+        facade.waitForElement(step.locators, timeout);
         System.out.println("✅ Verified element: " + step.locator);
     }
 }

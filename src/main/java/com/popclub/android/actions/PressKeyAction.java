@@ -1,6 +1,6 @@
 package com.popclub.android.actions;
 
-import com.popclub.android.driver.DriverManager;
+import com.popclub.driver.DriverFacade;
 import com.popclub.model.Step;
 import io.appium.java_client.AppiumDriver;
 
@@ -11,8 +11,16 @@ public class PressKeyAction implements Action {
     @Override
     public void perform(Step step) {
 
-        AppiumDriver driver = DriverManager.getDriver();
+        DriverFacade facade = DriverFacade.get();
+        AppiumDriver driver = facade.appium();
         String key = step.value == null ? null : step.value.toLowerCase().trim();
+
+        // ForgeDriver handles hardware keys directly
+        if (facade.isForgeDriverMode() && isHardwareKey(key)) {
+            facade.pressKey(key);
+            System.out.println("Pressed key (ForgeDriver): " + key);
+            return;
+        }
 
         // "search" and "enter" are IME actions — must use performEditorAction so Compose
         // TextFields receive the onImeAction callback. Hardware keycodes (mobile: pressKey)
@@ -34,6 +42,10 @@ public class PressKeyAction implements Action {
         int keycode = resolveKeycode(key);
         driver.executeScript("mobile: pressKey", Map.of("keycode", keycode));
         System.out.println("Pressed key: " + step.value + " (keycode " + keycode + ")");
+    }
+
+    private boolean isHardwareKey(String key) {
+        return key != null && (key.equals("back") || key.equals("home") || key.equals("delete") || key.equals("backspace"));
     }
 
     private int resolveKeycode(String key) {

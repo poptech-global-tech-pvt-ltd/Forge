@@ -1,10 +1,8 @@
 package com.popclub.android.actions;
 
 import com.popclub.core.TestContext;
-import com.popclub.core.WaitUtil;
-import com.popclub.android.driver.DriverManager;
+import com.popclub.driver.DriverFacade;
 import com.popclub.model.Step;
-import io.appium.java_client.AppiumDriver;
 
 /**
  * WaitForGoneAction — polls until the element disappears from screen.
@@ -24,14 +22,14 @@ public class WaitForGoneAction implements Action {
 
     @Override
     public void perform(Step step) {
-        AppiumDriver driver = DriverManager.getDriver();
+        DriverFacade facade = DriverFacade.get();
         int timeout = step.timeout > 0 ? step.timeout : TestContext.getDefaultTimeout();
         long deadline = System.currentTimeMillis() + (long) timeout * 1000;
 
         System.out.println("[waitForGone] Waiting up to " + timeout + "s for element to disappear");
 
         while (System.currentTimeMillis() < deadline) {
-            if (WaitUtil.findElementQuick(driver, step.locators) == null) {
+            if (!facade.isPresent(step.locators)) {
                 System.out.println("[waitForGone] Element gone");
                 return;
             }
