@@ -4,6 +4,7 @@ import com.popclub.core.Locator;
 import com.popclub.core.TestContext;
 import com.popclub.core.WaitUtil;
 import com.popclub.android.driver.DriverManager;
+import com.popclub.driver.DriverFacade;
 import com.popclub.model.Step;
 import io.appium.java_client.AppiumDriver;
 import org.openqa.selenium.WebElement;
@@ -19,11 +20,12 @@ public class TapAction implements Action {
     @Override
     public void perform(Step step) {
 
-        AppiumDriver driver = DriverManager.getDriver();
+        DriverFacade facade = DriverFacade.get();
+        AppiumDriver driver = facade.appium();
 
         // x/y set directly — recorder absolute last resort
         if ((step.locators == null || step.locators.isEmpty()) && (step.x > 0 || step.y > 0)) {
-            tapByCoordinates(driver, step.x, step.y);
+            facade.tapByCoords(step.x, step.y);
             return;
         }
 
@@ -33,29 +35,26 @@ public class TapAction implements Action {
             for (Locator loc : step.locators) {
                 if ("point".equalsIgnoreCase(loc.type)) {
                     String[] parts = loc.value.split(",");
-                    tapByCoordinates(driver,
-                            Integer.parseInt(parts[0].trim()),
-                            Integer.parseInt(parts[1].trim()));
+                    facade.tapByCoords(Integer.parseInt(parts[0].trim()),
+                                       Integer.parseInt(parts[1].trim()));
                     return;
                 } else if ("bounds".equalsIgnoreCase(loc.type)) {
                     int[] b = parseBounds(loc.value);
                     if (b != null) {
-                        tapByCoordinates(driver, (b[0] + b[2]) / 2, (b[1] + b[3]) / 2);
+                        facade.tapByCoords((b[0] + b[2]) / 2, (b[1] + b[3]) / 2);
                         return;
                     }
                 } else {
                     normalLocators.add(loc);
                 }
             }
-            // Try normal locators: accessibilityId first, then uiautomator text
             if (!normalLocators.isEmpty()) {
-                WebElement element = WaitUtil.pollUntilVisible(driver, normalLocators, effectiveTimeout(step));
-                element.click();
+                facade.tap(normalLocators, effectiveTimeout(step));
                 return;
             }
         }
 
-        WaitUtil.pollUntilVisible(driver, step.locators, effectiveTimeout(step)).click();
+        facade.tap(step.locators, effectiveTimeout(step));
     }
 
     private static void tapByCoordinates(AppiumDriver driver, int x, int y) {

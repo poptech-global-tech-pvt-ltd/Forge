@@ -2,6 +2,7 @@ package com.popclub.android.actions;
 
 import com.popclub.core.GestureUtil;
 import com.popclub.android.driver.DriverManager;
+import com.popclub.driver.DriverFacade;
 import com.popclub.model.Step;
 import io.appium.java_client.AppiumDriver;
 import org.openqa.selenium.Dimension;
@@ -26,7 +27,8 @@ public class SwipeAction implements Action {
 
     @Override
     public void perform(Step step) {
-        AppiumDriver driver = DriverManager.getDriver();
+        DriverFacade facade = DriverFacade.get();
+        AppiumDriver driver = facade.appium();
 
         String direction = step.direction != null ? step.direction.trim().toLowerCase() : "up";
         int durationMs = DEFAULT_DURATION_MS;
@@ -46,7 +48,8 @@ public class SwipeAction implements Action {
             }
         }
 
-        GestureUtil.swipe(driver, direction, durationMs);
+        // ForgeDriver: direct UiAutomator swipe; Appium: GestureUtil pointer sequence
+        facade.swipe(direction);
         System.out.println("[swipe] direction=" + direction + " " + durationMs + "ms");
     }
 

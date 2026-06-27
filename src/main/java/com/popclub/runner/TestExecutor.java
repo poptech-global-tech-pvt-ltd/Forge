@@ -1,6 +1,7 @@
 package com.popclub.runner;
 
 import com.popclub.core.*;
+import com.popclub.driver.DriverFacade;
 import com.popclub.heal.SelfHealingEngine;
 import com.popclub.android.driver.DeviceKeepAlive;
 import com.popclub.android.driver.DriverManager;
@@ -50,6 +51,8 @@ public class TestExecutor {
         // In resume mode, force noReset so Appium doesn't reinstall/reset the app
         TestContext.setNoReset(testCase.noReset || resumeMode);
         TestContext.setResumeMode(resumeMode);
+        // Reset DriverFacade so it re-detects ForgeDriver APK for each test run
+        DriverFacade.reset();
         TestContext.setLoginRequired(testCase.loginRequired);
         TestContext.setTestSourceFile(testCase.sourceFile);
 

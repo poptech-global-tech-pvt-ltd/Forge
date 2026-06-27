@@ -2,6 +2,7 @@ package com.popclub.android.actions;
 
 import com.popclub.core.WaitUtil;
 import com.popclub.android.driver.DriverManager;
+import com.popclub.driver.DriverFacade;
 import com.popclub.model.Step;
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.AppiumDriver;
@@ -14,7 +15,8 @@ public class EnterTextAction implements Action {
     @Override
     public void perform(Step step) {
 
-        AppiumDriver driver = DriverManager.getDriver();
+        DriverFacade facade = DriverFacade.get();
+        AppiumDriver driver = facade.appium();
 
         // Accept text from either `value:` or `variable:` — whichever is set.
         // Both are already interpolated by TestExecutor before this action runs.
