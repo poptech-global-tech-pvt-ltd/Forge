@@ -51,7 +51,9 @@ src/test/resources/local.cloud.properties
 src/main/resources/config/local.cloud.properties
 
 ### Forge ###
+# Keep forge-driver.apk tracked (bundled driver) but ignore other APKs
 *.apk
+!src/test/resources/forge-driver.apk
 *.ipa
 reports/
 graphify-out/

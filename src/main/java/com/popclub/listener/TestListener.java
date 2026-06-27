@@ -7,6 +7,7 @@ import com.popclub.core.VideoUtil;
 import com.popclub.android.cloud.CloudConfig;
 import com.popclub.android.driver.DeviceKeepAlive;
 import com.popclub.android.driver.DriverManager;
+import com.popclub.driver.ForgeDriverManager;
 import com.popclub.model.TestCase;
 import com.popclub.parser.YamlParser;
 import com.popclub.testsigma.*;
@@ -31,10 +32,22 @@ public class TestListener implements ITestListener, ISuiteListener {
         title = suite.getParameter("runTitle");
 
         // Forward deviceSerial from testng.xml to CloudConfig
-        CloudConfig.setDeviceSerialFromTestNG(suite.getParameter("deviceSerial"));
+        String deviceSerial = suite.getParameter("deviceSerial");
+        CloudConfig.setDeviceSerialFromTestNG(deviceSerial);
 
         long start = System.currentTimeMillis() / 1000;
         TestContext.setStartTime(start);
+
+        // ── Auto-start ForgeDriver companion APK (like Maestro) ──────────────
+        // Installs APK if not present, forwards port, starts server — transparent to tests.
+        // Falls back gracefully if APK not available (Appium used instead).
+        if (deviceSerial != null && !deviceSerial.isBlank()) {
+            try {
+                ForgeDriverManager.start(deviceSerial);
+            } catch (Exception e) {
+                System.out.println("[TestListener] ⚠️  ForgeDriver not started (Appium fallback): " + e.getMessage());
+            }
+        }
 
         // ── TestSigma: collect all testCaseIds from YAML files and create a run ──
         System.out.println("[TestSigma] Scanning for test cases to register in run...");
@@ -83,6 +96,14 @@ public class TestListener implements ITestListener, ISuiteListener {
 
     @Override
     public void onFinish(ISuite suite) {
+        // Stop ForgeDriver server on device
+        try {
+            String deviceSerial = suite.getParameter("deviceSerial");
+            if (deviceSerial != null && !deviceSerial.isBlank()) {
+                ForgeDriverManager.stop(deviceSerial);
+            }
+        } catch (Exception ignored) {}
+
         if (TestContext.getRunId() == null) return;
         try {
             TestSigmaClient.updateRunStatus(projectId, TestContext.getRunId(), RunStatus.FINISHED);
