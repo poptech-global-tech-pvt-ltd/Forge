@@ -1,0 +1,189 @@
+testName: Shop PDP — Quantity increase beyond available stock is blocked
+platform: android
+noReset: true
+loginRequired: true
+
+features:
+  - common
+  - shop
+
+tags:
+  - smoke
+  - shop
+  - pdp
+  - stock
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab  # healed locator → common_home_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  # ── Search for a product ──────────────────────────────────────────────────
+  - action: waitFor
+    element: shop_search_button
+
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: enterText
+    element: search_products_search_input
+    value: "t-shirt"
+
+  - action: pressKey
+    value: search
+
+  - action: waitFor
+    element: product_list_item_0
+
+  # ── Navigate to PDP ───────────────────────────────────────────────────────
+  - action: tap
+    element: product_list_item_0
+
+  - action: waitFor
+    element: product_details_title
+
+  - action: captureText
+    element: product_details_title
+    variable: pdp_title
+
+  - action: scanTags
+
+  # ── Add to cart from PDP ──────────────────────────────────────────────────
+  - action: tap
+    element: product_details_bottom_sticky_bar_button
+
+  - action: waitFor
+    element: size_selection_item_0
+
+  - action: tap
+    element: size_selection_item_0
+
+  - action: tap
+    element: size_selection_add_to_cart_button
+
+  - action: waitFor
+    element: product_details_go_to_cart_button
+
+  - action: tap
+    element: product_details_go_to_cart_button
+
+  # ── Cart: capture baseline quantity ───────────────────────────────────────
+  - action: waitFor
+    element: cart_item_row_0
+
+  - action: captureText
+    element: cart_item_quantity_0
+    variable: qty_initial
+
+  - action: logVar
+    variable: qty_initial
+    value: "Baseline cart quantity: ${qty_initial}"
+
+  # ── First batch: tap increase 10 times ───────────────────────────────────
+  - action: tap
+    element: cart_item_increase_button_0
+
+  - action: tap
+    element: cart_item_increase_button_0
+
+  - action: tap
+    element: cart_item_increase_button_0
+
+  - action: tap
+    element: cart_item_increase_button_0
+
+  - action: tap
+    element: cart_item_increase_button_0
+
+  - action: tap
+    element: cart_item_increase_button_0
+
+  - action: tap
+    element: cart_item_increase_button_0
+
+  - action: tap
+    element: cart_item_increase_button_0
+
+  - action: tap
+    element: cart_item_increase_button_0
+
+  - action: tap
+    element: cart_item_increase_button_0
+
+  # ── Capture quantity mid-way (after 10 taps) ──────────────────────────────
+  - action: captureText
+    element: cart_item_quantity_0
+    variable: qty_mid
+
+  - action: logVar
+    variable: qty_mid
+    value: "Quantity after 10 increase taps: ${qty_mid}"
+
+  # ── Second batch: tap increase 10 more times ──────────────────────────────
+  - action: tap
+    element: cart_item_increase_button_0
+
+  - action: tap
+    element: cart_item_increase_button_0
+
+  - action: tap
+    element: cart_item_increase_button_0
+
+  - action: tap
+    element: cart_item_increase_button_0
+
+  - action: tap
+    element: cart_item_increase_button_0
+
+  - action: tap
+    element: cart_item_increase_button_0
+
+  - action: tap
+    element: cart_item_increase_button_0
+
+  - action: tap
+    element: cart_item_increase_button_0
+
+  - action: tap
+    element: cart_item_increase_button_0
+
+  - action: tap
+    element: cart_item_increase_button_0
+
+  # ── Capture final quantity ────────────────────────────────────────────────
+  - action: captureText
+    element: cart_item_quantity_0
+    variable: qty_final
+
+  - action: logVar
+    variable: qty_final
+    value: |
+      ── Stock limit check ──
+      Product          : ${pdp_title}
+      Quantity initial : ${qty_initial}
+      Quantity mid     : ${qty_mid}
+      Quantity final   : ${qty_final}
+
+  # ── Verify quantity is capped: final == mid (no increase in second batch) ──
+  # If qty_final == qty_mid the stock cap was enforced between the two batches
+  - action: assertStoredText
+    element: cart_item_quantity_0
+    value: qty_mid
+
+  # ── Verify decrease button still works (quantity can be reduced) ───────────
+  - action: verifyElement
+    element: cart_item_decrease_button_0
+    shouldExist: true

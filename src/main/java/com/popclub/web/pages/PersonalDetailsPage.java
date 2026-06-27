@@ -141,5 +141,7 @@ public class PersonalDetailsPage {
         page.locator(CONTINUE_BTN)
                 .waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         page.locator(CONTINUE_BTN).click();
+        page.waitForURL("**/level-0.1");
+        log.info("PersonalDetailsPage navigation to /level-0.1 complete");
     }
 }

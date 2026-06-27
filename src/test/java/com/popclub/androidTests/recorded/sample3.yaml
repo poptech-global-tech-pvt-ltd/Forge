@@ -1,4 +1,4 @@
-testName: Recorded — 2026-06-22 18:30
+testName: Recorded — 2026-06-23 16:44
 platform: android
 noReset: true
 loginRequired: true
@@ -21,18 +21,16 @@ steps:
     text: "560102"
 
   - action: tap
-    element: shop_tab
+    element: Shop
   - action: tap
-    element: shop_search_button
+    element: shop_search_icon
   - action: tap
-    element: search_trending_item_0
+    element: search_trending_item_2
   - action: tap
-    element: Women Beige Tss Originals Party Animal Printed Relaxed Fit T-shirt
-  - action: scrollDown
-  - action: scrollUp
+    element: Men's Blue Solid Slim Fit Shorts With Technolite
   - action: assertText
     element: product_details_title
-    value: "Women Beige Tss Originals Party Animal Printed Relaxed Fit T-shirt"
+    value: "Men's Blue Solid Slim Fit Shorts With Technolite"
   - action: tap
     element: product_details_bottom_sticky_bar_button
   - action: tap
@@ -43,3 +41,11 @@ steps:
     element: size_selection_add_to_cart_button
   - action: tap
     element: product_details_bottom_sticky_bar_button
+  - action: waitFor
+    element: cart_item_decrease_button_0
+  - action: scrollDown
+  - action: assertText
+    element: cart_item_title_3
+    value: "Men's Blue Solid Slim Fit Shorts With Technolite"
+  - action: verifyElement
+    element: cart_s2_s_payment_button_button

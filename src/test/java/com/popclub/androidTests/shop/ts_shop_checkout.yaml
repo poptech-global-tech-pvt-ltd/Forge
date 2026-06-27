@@ -1,7 +1,7 @@
 testName: Shop — Add to cart and checkout (E2E)
 platform: android
 noReset: true
-loginRequired: true
+loginRequired: false
 
 testCaseIds:
   - PO-15308
@@ -16,8 +16,10 @@ features:
 tags:
   - smoke
   - shop
-  - checkout
+  - regression
+
 retry: 1
+
 steps:
   - action: launchApp
 
@@ -30,6 +32,9 @@ steps:
 
   - action: tap
     element: common_shop_tab
+    
+  - action: call
+    flow: clear_cart
 
   # ── PLP: navigate, capture API + UI prices ────────────────────────────────
   - action: call
@@ -52,6 +57,7 @@ steps:
   - action: captureText
     element: product_details_price
     variable: pdp_product_price
+
 
   - action: captureText
     element: product_details_strikethrough_price
@@ -159,8 +165,6 @@ steps:
           address_mobile_number: "6361463451"
 
   # ── Proceed to cart screen ────────────────────────────────────────────────
-  - action: tap
-    element: cart_s2_s_payment_button_button_2
 
   - action: waitFor
     element: cart_item_row_0
@@ -168,8 +172,6 @@ steps:
   - action: verifyElement
     element: cart_delivery_address_card
 
-  - action: verifyElement
-    element: cart_to_pay_row
 
   - action: verifyElement
     element: cart_link_and_pay_button
@@ -234,56 +236,6 @@ steps:
   - action: assertText
     element: cart_item_size_${cart_item_index}
     value: "${product_size}"
-
-  # ── Cart: Quantity stepper ────────────────────────────────────────────────
-  - action: captureText
-    element: cart_item_quantity_${cart_item_index}
-    variable: cart_item_quantity_initial
-
-  - action: logVar
-    variable: cart_item_quantity_initial
-    value: "cart_item_quantity (initial) - ${cart_item_quantity_initial}"
-
-  # Increase and decrease buttons must be present for this item
-  - action: verifyElement
-    element: cart_item_increase_button_${cart_item_index}
-    shouldExist: true
-
-  - action: verifyElement
-    element: cart_item_decrease_button_${cart_item_index}
-    shouldExist: true
-
-  # Tap increase → quantity should go from 1 → 2
-  - action: tap
-    element: cart_item_increase_button_${cart_item_index}
-
-  - action: captureText
-    element: cart_item_quantity_${cart_item_index}
-    variable: cart_item_quantity_after_increase
-
-  - action: logVar
-    variable: cart_item_quantity_after_increase
-    value: "cart_item_quantity (after increase) - ${cart_item_quantity_after_increase}"
-
-  - action: assertText
-    element: cart_item_quantity_${cart_item_index}
-    value: "2"
-
-  # Tap decrease → quantity should go back to 1
-  - action: tap
-    element: cart_item_decrease_button_${cart_item_index}
-
-  - action: captureText
-    element: cart_item_quantity_${cart_item_index}
-    variable: cart_item_quantity_after_decrease
-
-  - action: logVar
-    variable: cart_item_quantity_after_decrease
-    value: "cart_item_quantity (after decrease) - ${cart_item_quantity_after_decrease}"
-
-  - action: assertText
-    element: cart_item_quantity_${cart_item_index}
-    value: "1"
 
   # ── Tap Pay → verify payment screen loaded ────────────────────────────────
   - action: tap

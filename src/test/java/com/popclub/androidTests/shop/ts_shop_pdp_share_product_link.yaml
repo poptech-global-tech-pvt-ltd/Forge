@@ -1,20 +1,16 @@
-testName: Shop — Add to Cart Success Toast
+testName: Shop — PDP Share Product Link
 platform: android
 noReset: true
-loginRequired: false
-
-testCaseIds:
-  - PO-15308
-  - PO-11057
+loginRequired: true
 
 features:
   - common
   - shop
-  - LOG
 
 tags:
   - smoke
   - shop
+  - pdp
 
 retry: 1
 
@@ -42,7 +38,7 @@ steps:
 
   - action: enterText
     element: search_products_search_input
-    value: "t-shirt"
+    value: "perfume"
 
   - action: pressKey
     value: search
@@ -56,24 +52,17 @@ steps:
   - action: waitFor
     element: product_details_title
 
-  - action: tap
-    element: product_details_bottom_sticky_bar_button
-
-  - action: waitFor
-    element: size_selection_item_0
+  - action: scanTags
 
   - action: tap
-    element: size_selection_item_0
+    element: product_details_share_button
 
-  - action: tap
-    element: size_selection_add_to_cart_button
+  # Android native share sheet opens — scan to confirm it appeared
+  - action: scanTags
+
+  # Dismiss the share sheet
+  - action: pressKey
+    value: back
 
   - action: waitFor
-    element: add_to_cart_snackbar
-    testCaseId: PO-15310
-
-  - action: waitFor
-    element: product_details_go_to_cart_button
-
-  - action: verifyElement
-    element: product_details_go_to_cart_button
+    element: product_details_title

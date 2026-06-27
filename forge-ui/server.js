@@ -1,6 +1,7 @@
 const express = require('express');
 const http    = require('http');
 const WebSocket = require('ws');
+const multer  = require('multer');
 const { spawn, execSync, exec } = require('child_process');
 
 // Promise wrapper for exec — keeps the event loop free

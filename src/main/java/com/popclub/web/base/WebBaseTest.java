@@ -133,11 +133,15 @@ public class WebBaseTest {
         try {
             testBody.run();
         } catch (Throwable t) {
-            if (isYblErrorPage()) {
-                String msg = "[WEB] YBL stage env is down — test failed mid-flow. " +
-                    "Check https://cardstack-sit.popclub.co.in health. Original error: " + t.getMessage();
-                log.error(msg);
-                throw new AssertionError(msg, t);
+            try {
+                if (isYblErrorPage()) {
+                    String msg = "[WEB] YBL stage env is down — test failed mid-flow. " +
+                        "Check https://cardstack-sit.popclub.co.in health. Original error: " + t.getMessage();
+                    log.error(msg);
+                    throw new AssertionError(msg, t);
+                }
+            } catch (com.microsoft.playwright.PlaywrightException ignored) {
+                // page is closed/crashed — cannot determine YBL status, re-throw original
             }
             throw t;
         }
