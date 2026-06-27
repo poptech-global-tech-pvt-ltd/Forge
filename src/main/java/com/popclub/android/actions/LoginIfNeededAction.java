@@ -56,6 +56,7 @@ public class LoginIfNeededAction implements Action {
             captureTokenFromLogcat();   // reads jwt_access_token from OkHttp logcat
         } else {
             System.out.println("[loginIfNeeded] No login required — already on home screen.");
+            dismissSystemDialogs(driver);
             // App is already logged in — token won't be in logcat (no recent login response).
             // Try DataStore / SharedPrefs fallbacks so the token is available for API calls.
             captureTokenFromDevice();
@@ -82,6 +83,10 @@ public class LoginIfNeededAction implements Action {
                 .until(ExpectedConditions.presenceOfElementLocated(
                         AppiumBy.accessibilityId(HOME_TAB_TAG)));
 
+        // Dismiss any system dialogs that may appear after login
+        // (e.g. Google "Choose a phone number", notification permission, etc.)
+        dismissSystemDialogs(driver);
+
         System.out.println("[loginIfNeeded] ✅ Login succeeded — home screen visible");
     }
 
@@ -98,6 +103,47 @@ public class LoginIfNeededAction implements Action {
         }
         try {
             driver.executeScript("mobile: hideKeyboard");
+        } catch (Exception ignored) {}
+    }
+
+    /**
+     * Dismisses common system dialogs that appear after login:
+     * - Google "Choose a phone number" popup
+     * - Android notification permission dialog
+     * - Any other dialog with a close/dismiss/cancel button
+     */
+    private void dismissSystemDialogs(AppiumDriver driver) {
+        // Try dismissing via the X / close button on Google dialogs
+        String[] closeSelectors = {
+            "//android.widget.ImageButton[@content-desc='Close']",
+            "//android.widget.Button[@text='Cancel']",
+            "//android.widget.Button[@text='No thanks']",
+            "//android.widget.Button[@text='Dismiss']",
+            "//android.widget.Button[@text='Not now']",
+            "//android.widget.Button[@text='CANCEL']",
+        };
+
+        sleep(800); // brief pause for dialogs to fully render
+
+        for (String xpath : closeSelectors) {
+            try {
+                List<WebElement> found = driver.findElements(AppiumBy.xpath(xpath));
+                if (!found.isEmpty() && found.get(0).isDisplayed()) {
+                    found.get(0).click();
+                    System.out.println("[loginIfNeeded] Dismissed system dialog via: " + xpath);
+                    sleep(500);
+                    return;
+                }
+            } catch (Exception ignored) {}
+        }
+
+        // Fallback: press Back to close any overlay
+        try {
+            if (!isVisible(driver, HOME_TAB_TAG, 1500)) {
+                driver.navigate().back();
+                System.out.println("[loginIfNeeded] Pressed Back to dismiss overlay");
+                sleep(500);
+            }
         } catch (Exception ignored) {}
     }
 
