@@ -1,0 +1,43 @@
+syntax = "proto3";
+package forgedriver;
+option java_package = "com.popclub.forgedriver.proto";
+option java_outer_classname = "ForgeDriverProto";
+
+service ForgeDriver {
+  rpc Ping(PingRequest) returns (PingResponse);
+  rpc Tap(TapRequest) returns (ActionResponse);
+  rpc TapByText(TapByTextRequest) returns (ActionResponse);
+  rpc TapByCoords(TapByCoordsRequest) returns (ActionResponse);
+  rpc Type(TypeRequest) returns (ActionResponse);
+  rpc ClearAndType(TypeRequest) returns (ActionResponse);
+  rpc Swipe(SwipeRequest) returns (ActionResponse);
+  rpc PressKey(PressKeyRequest) returns (ActionResponse);
+  rpc WaitPresent(WaitPresentRequest) returns (WaitPresentResponse);
+  rpc IsPresent(IsPresentRequest) returns (IsPresentResponse);
+  rpc GetSource(SourceRequest) returns (SourceResponse);
+  rpc Screenshot(ScreenshotRequest) returns (ScreenshotResponse);
+}
+
+message PingRequest {}
+message PingResponse { string status = 1; }
+message TapRequest { string tag = 1; }
+message TapByTextRequest { string text = 1; }
+message TapByCoordsRequest { int32 x = 1; int32 y = 2; }
+message TypeRequest { string text = 1; }
+message SwipeRequest {
+  string direction = 1;
+  int32 x1 = 2; int32 y1 = 3; int32 x2 = 4; int32 y2 = 5;
+}
+message PressKeyRequest { string key = 1; }
+message WaitPresentRequest { string tag = 1; int64 timeout_ms = 2; }
+message IsPresentRequest { string tag = 1; }
+message SourceRequest {}
+message ScreenshotRequest {}
+message ActionResponse { bool success = 1; string error = 2; }
+message WaitPresentResponse {
+  bool found = 1;
+  int32 left = 2; int32 top = 3; int32 right = 4; int32 bottom = 5;
+}
+message IsPresentResponse { bool found = 1; }
+message SourceResponse { string xml = 1; }
+message ScreenshotResponse { bytes png = 1; }
