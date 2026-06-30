@@ -1,7 +1,7 @@
 testName: Shop — Add to cart and checkout (E2E)
 platform: android
 noReset: true
-loginRequired: false
+loginRequired: true
 
 testCaseIds:
   - PO-15308
