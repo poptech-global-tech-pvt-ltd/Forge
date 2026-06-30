@@ -33,8 +33,6 @@ steps:
   - action: tap
     element: common_shop_tab
     
-  - action: call
-    flow: clear_cart
 
   # ── PLP: navigate, capture API + UI prices ────────────────────────────────
   - action: call
