@@ -65,7 +65,6 @@ public class LaunchAppAction implements Action {
         try {
             if (driver.isDeviceLocked()) {
                 driver.unlockDevice();
-                sleep(500);
                 System.out.println("[LaunchApp] Device was locked — unlocked.");
             }
         } catch (Exception e) {
@@ -102,65 +101,29 @@ public class LaunchAppAction implements Action {
         try {
             io.appium.java_client.appmanagement.ApplicationState state = driver.queryAppState(APP_PACKAGE);
             System.out.println("[LaunchApp] noReset=true — app state: " + state);
-
-            boolean running = state == io.appium.java_client.appmanagement.ApplicationState.RUNNING_IN_FOREGROUND
-                    || state == io.appium.java_client.appmanagement.ApplicationState.RUNNING_IN_BACKGROUND
-                    || state == io.appium.java_client.appmanagement.ApplicationState.RUNNING_IN_BACKGROUND_SUSPENDED;
-
-            if (running) {
-                // App is running (background or foreground) — bring it to front
-                driver.activateApp(APP_PACKAGE);
-                sleep(600);
-                System.out.println("[LaunchApp] App already running — brought to foreground.");
-            } else {
-                // App is not running — launch it fresh
-                System.out.println("[LaunchApp] App not running — launching…");
-                driver.activateApp(APP_PACKAGE);
-                sleep(1200);
-                System.out.println("[LaunchApp] App launched (noReset=true, was not running).");
-            }
+            driver.activateApp(APP_PACKAGE);
+            System.out.println("[LaunchApp] App activated.");
         } catch (Exception e) {
-            // queryAppState or activateApp unsupported — fall back to activateApp directly
-            System.out.println("[LaunchApp] queryAppState failed (" + e.getMessage()
-                    + ") — attempting activateApp anyway");
-            try {
-                driver.activateApp(APP_PACKAGE);
-                sleep(1000);
-            } catch (Exception e2) {
-                System.out.println("[LaunchApp] ⚠️  activateApp also failed: " + e2.getMessage()
-                        + " — proceeding anyway; loginIfNeeded will handle screen state");
-            }
+            System.out.println("[LaunchApp] queryAppState/activateApp failed: " + e.getMessage());
         }
     }
 
     /** Restarts the app; each strategy falls through to the next on failure. */
     private void forceRestartApp(AndroidDriver driver) {
-        // extended timeout — default 500ms is too short for some devices
-        boolean stopped = false;
         try {
             driver.executeScript("mobile: terminateApp", java.util.Map.of(
                     "appId",   APP_PACKAGE,
-                    "timeout", 8_000          // wait up to 8 s for the process to die
+                    "timeout", 8_000
             ));
-            sleep(800);
-            stopped = true;
             System.out.println("[LaunchApp] terminateApp succeeded");
         } catch (Exception e) {
-            System.out.println("[LaunchApp] terminateApp failed: " + e.getMessage()
-                    + " — will attempt activateApp anyway");
+            System.out.println("[LaunchApp] terminateApp failed: " + e.getMessage());
         }
-
-        if (stopped) {
-            sleep(500);
-        }
-
         try {
             driver.activateApp(APP_PACKAGE);
-            sleep(800);
             System.out.println("[LaunchApp] activateApp succeeded — app launched");
         } catch (Exception e) {
-            System.out.println("[LaunchApp] ⚠️  activateApp failed: " + e.getMessage()
-                    + " — proceeding anyway; loginIfNeeded will handle screen state");
+            System.out.println("[LaunchApp] ⚠️  activateApp failed: " + e.getMessage());
         }
     }
 
@@ -214,7 +177,7 @@ public class LaunchAppAction implements Action {
             }
 
             System.out.println("[LaunchApp] Dismissed a system dialog (round " + round + "), checking again…");
-            sleep(800);
+            sleep(200);
         }
     }
 

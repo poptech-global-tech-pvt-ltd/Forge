@@ -72,9 +72,13 @@ steps:
     element: product_list_item_price_${product_index}
     variable: product_list_item_price
 
-  - action: captureText
-    element: product_list_item_strikethrough_price_${product_index}
-    variable: product_list_item_strikethrough_price
+  - action: ifVarNotEquals
+    variable: api_product_list_item_price
+    value: "${api_product_list_item_strikethrough_price}"
+    steps:
+      - action: captureText
+        element: product_list_item_strikethrough_price_${product_index}
+        variable: product_list_item_strikethrough_price
 
   - action: captureText
     element: plp_item_price_with_popcoin_${product_index}

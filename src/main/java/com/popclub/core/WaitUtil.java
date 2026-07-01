@@ -32,7 +32,7 @@ public class WaitUtil {
     public static WebElement pollUntilVisible(AppiumDriver driver,
                                               List<Locator> locators,
                                               int timeoutSeconds) {
-        final int POLL_INTERVAL_MS = 400;
+        final int POLL_INTERVAL_MS = 100;
         long deadline = System.currentTimeMillis() + (long) timeoutSeconds * 1000;
 
         // Disable Appium's own implicit wait so our poll controls the timing

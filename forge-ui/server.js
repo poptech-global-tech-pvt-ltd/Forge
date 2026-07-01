@@ -880,7 +880,6 @@ function broadcast(data) {
 function stopTest(ws) {
   stopNetworkCapture();
   if (!currentRun) {
-    // Nothing running — still ack so the client can reset its UI
     if (ws) send(ws, { type: 'stopped' });
     return;
   }
@@ -888,25 +887,44 @@ function stopTest(ws) {
   const pid = currentRun.pid;
   currentRun = null;
 
-  // SIGTERM first — gives Maven/Surefire a chance to clean up
+  // 1. SIGTERM the whole process group (mvn + forked Surefire JVM)
   try { process.kill(-pid, 'SIGTERM'); } catch (_) {}
 
-  // SIGKILL after 3 s in case SIGTERM is ignored (Surefire fork sometimes is)
-  setTimeout(() => {
+  // 2. Also kill by name — catches any orphaned maven/java processes on macOS
+  try { exec('pkill -TERM -f "surefire\|DtestFile"', () => {}); } catch (_) {}
+
+  // 3. SIGKILL after 2s — reduced from 3s; if SIGTERM didn't work, SIGKILL will
+  const killTimer = setTimeout(() => {
     try { process.kill(-pid, 'SIGKILL'); } catch (_) {}
-  }, 3000);
+    try { exec('pkill -KILL -f "surefire\|DtestFile"', () => {}); } catch (_) {}
+  }, 2000);
+  killTimer.unref(); // don't keep Node alive just for this timer
+
+  // 4. Kill any stale ForgeDriver instrumentation on device so next run starts clean
+  const device = getConnectedDevice();
+  if (device) {
+    exec(`adb -s ${device} shell am force-stop com.popclub.forgedriver.test`, () => {});
+    exec(`adb -s ${device} forward --remove tcp:7790`, () => {});
+  }
 
   if (ws) send(ws, { type: 'stopped' });
-  // Also broadcast to all connected clients so other tabs update
   broadcast({ type: 'stopped' });
 }
 
 function startTest(file, deviceOverride, ws, fromStep) {
   if (currentRun) {
     try { process.kill(-currentRun.pid, 'SIGTERM'); } catch (_) {}
+    try { exec('pkill -KILL -f "surefire\|DtestFile"', () => {}); } catch (_) {}
     currentRun = null;
   }
   runWasStopped = false;
+
+  // Clean up any stale device state from a previous stopped run
+  const prevDevice = deviceOverride || getConnectedDevice();
+  if (prevDevice) {
+    exec(`adb -s ${prevDevice} shell am force-stop com.popclub.forgedriver.test`, () => {});
+    exec(`adb -s ${prevDevice} forward --remove tcp:7790`, () => {});
+  }
 
   const suite  = suiteFor(file);
   const device = deviceOverride || getConnectedDevice() || '10BDCM0YJZ00043';

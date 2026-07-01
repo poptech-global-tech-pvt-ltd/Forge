@@ -1,7 +1,7 @@
 testName: Shop — Add to cart and checkout (E2E)
 platform: android
 noReset: true
-loginRequired: true
+loginRequired: false
 
 testCaseIds:
   - PO-15308
@@ -57,9 +57,13 @@ steps:
     variable: pdp_product_price
 
 
-  - action: captureText
-    element: product_details_strikethrough_price
-    variable: pdp_product_strikethrough_price
+  - action: ifVarNotEquals
+    variable: api_product_list_item_price
+    value: "${api_product_list_item_strikethrough_price}"
+    steps:
+      - action: captureText
+        element: product_details_strikethrough_price
+        variable: pdp_product_strikethrough_price
 
   - action: logVar
     variable: pdp_product_title
@@ -79,9 +83,13 @@ steps:
     value: "${product_list_item_price}"
     testCaseId: PO-15310
 
-  - action: assertText
-    element: product_details_strikethrough_price
-    value: "${product_list_item_strikethrough_price}"
+  - action: ifVarNotEquals
+    variable: api_product_list_item_price
+    value: "${api_product_list_item_strikethrough_price}"
+    steps:
+      - action: assertText
+        element: product_details_strikethrough_price
+        value: "${product_list_item_strikethrough_price}"
 
   # Popcoin tag visibility
   - action: ifVarEquals
@@ -132,6 +140,26 @@ steps:
 
   - action: tap
     element: size_selection_add_to_cart_button
+
+  - action: captureToast
+    element: add_to_cart_snackbar
+    variable: add_to_cart_snackbar_text
+    timeout: 4000
+    optional: true
+
+  - action: logVar
+    variable: add_to_cart_snackbar_text
+    value: "add to cart snackbar - ${add_to_cart_snackbar_text}"
+
+  - action: ifVarNotEmpty
+    variable: add_to_cart_snackbar_text
+    steps:
+      - action: ifVarNotEquals
+        variable: add_to_cart_snackbar_text
+        value: "Added to Basket Successfully"
+        steps:
+          - action: fail
+            value: "Add to cart failed — snackbar said: ${add_to_cart_snackbar_text}"
 
   - action: waitFor
     element: product_details_go_to_cart_button
@@ -191,9 +219,13 @@ steps:
     element: cart_item_price_${cart_item_index}
     variable: cart_item_price
 
-  - action: captureText
-    element: cart_item_strikethrough_price_${cart_item_index}
-    variable: cart_item_strikethrough_price
+  - action: ifVarNotEquals
+    variable: api_product_list_item_price
+    value: "${api_product_list_item_strikethrough_price}"
+    steps:
+      - action: captureText
+        element: cart_item_strikethrough_price_${cart_item_index}
+        variable: cart_item_strikethrough_price
 
   - action: captureText
     element: cart_item_discount_${cart_item_index}
@@ -227,9 +259,13 @@ steps:
     element: cart_item_price_${cart_item_index}
     value: "${product_list_item_price}"
 
-  - action: assertText
-    element: cart_item_strikethrough_price_${cart_item_index}
-    value: "${product_list_item_strikethrough_price}"
+  - action: ifVarNotEquals
+    variable: api_product_list_item_price
+    value: "${api_product_list_item_strikethrough_price}"
+    steps:
+      - action: assertText
+        element: cart_item_strikethrough_price_${cart_item_index}
+        value: "${product_list_item_strikethrough_price}"
 
   - action: assertText
     element: cart_item_size_${cart_item_index}

@@ -57,7 +57,10 @@ public class AssertTextAction implements Action {
         if (actual == null) actual = "";
         actual = actual.trim();
 
-        if (!actual.equals(expected.trim())) {
+        String expectedNorm = normalizePrice(expected.trim());
+        String actualNorm   = normalizePrice(actual);
+
+        if (!actualNorm.equals(expectedNorm)) {
             throw new RuntimeException(
                 "assertText FAIL — " + describeLocator(step) + "\n" +
                 "  expected: \"" + expected.trim() + "\"\n" +
@@ -79,6 +82,22 @@ public class AssertTextAction implements Action {
             }
         }
         return null;
+    }
+
+    /**
+     * Normalise price strings so formatting differences don't cause false failures.
+     * Strips thousands-separator commas from numeric price values only.
+     * e.g. "₹1,099" → "₹1099",  "₹1,099.00" → "₹1099.00"
+     * Non-price strings (titles, labels) are returned unchanged.
+     */
+    private String normalizePrice(String text) {
+        if (text == null) return "";
+        // Only strip commas when the string looks like a price (currency symbol + digits)
+        // Pattern: optional currency symbol, then digits/commas/dots
+        if (text.matches("[₹$€£¥]?[\\d,]+(\\.\\d+)?")) {
+            return text.replace(",", "");
+        }
+        return text;
     }
 
     private String describeLocator(Step step) {

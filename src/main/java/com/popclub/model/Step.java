@@ -74,4 +74,10 @@ public class Step {
      * Each matched value is stored as a TestContext variable.
      */
     public Map<String, String> extract;
+
+    /**
+     * If true, the step does not fail when the element is not found.
+     * Useful for transient elements like snackbars/toasts — stores empty string instead.
+     */
+    public boolean optional = false;
 }
