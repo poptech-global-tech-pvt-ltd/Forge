@@ -351,22 +351,26 @@ public class TestExecutor {
                     Action action = ActionFactory.get(step.action);
                     action.perform(step);
 
-                    // 🔥 START VIDEO
-                    if ("launchApp".equalsIgnoreCase(step.action)
-                            && TestContext.isFreshLaunch()) {
+                    // 🔥 START VIDEO — record on every launch (incl. noReset/resume
+                    // attach) so a failing test always produces a video. Previously this
+                    // was gated on isFreshLaunch(), so noReset=true tests never recorded.
+                    if ("launchApp".equalsIgnoreCase(step.action)) {
 
                         AppiumDriver driver = DriverManager.getDriver();
 
                         VideoUtil.startRecording(driver);
 
-                        // Start screen keep-alive heartbeat (KEYCODE_WAKEUP every 25s)
-                        DeviceKeepAlive.start(driver);
+                        // One-time fresh-launch setup: keep-alive heartbeat + dismiss popups.
+                        if (TestContext.isFreshLaunch()) {
+                            // Start screen keep-alive heartbeat (KEYCODE_WAKEUP every 25s)
+                            DeviceKeepAlive.start(driver);
 
-                        Thread.sleep(3000);
+                            Thread.sleep(3000);
 
-                        SystemPopupHandler.handle(driver);
+                            SystemPopupHandler.handle(driver);
 
-                        TestContext.setFreshLaunch(false);
+                            TestContext.setFreshLaunch(false);
+                        }
                     }
 
                     success = true;
