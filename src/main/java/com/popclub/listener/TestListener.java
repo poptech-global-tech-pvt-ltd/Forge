@@ -3,6 +3,7 @@ package com.popclub.listener;
 import com.popclub.ai.FailureTagReporter;
 import com.popclub.core.ScreenshotUtil;
 import com.popclub.core.TestContext;
+import com.popclub.core.TestLogCapture;
 import com.popclub.core.VideoUtil;
 import com.popclub.android.cloud.CloudConfig;
 import com.popclub.android.driver.DeviceKeepAlive;
@@ -95,45 +96,115 @@ public class TestListener implements ITestListener, ISuiteListener {
     }
 
     @Override
+    public void onTestStart(ITestResult result) {
+        // Begin capturing this test's console output into reports/logs/{name}.log
+        TestLogCapture.start(result.getName());
+    }
+
+    @Override
     public void onTestSuccess(ITestResult result) {
         stopVideoQuietly(result.getName() + "_passed");
         updateStatus(result, TestCaseStatus.PASSED);
+
+        // On PASS → upload only the log to TestSigma
+        File log = TestLogCapture.stop();
+        uploadAttachments(log);
     }
 
     @Override
     public void onTestFailure(ITestResult result) {
         DeviceKeepAlive.stop();
-        AppiumDriver driver = DriverManager.getDriver();
-        if (driver == null) return;
 
-        // 1. Final screenshot at the exact moment of failure
         String safeName = result.getName().replaceAll("[^a-zA-Z0-9_-]", "_");
-        File screenshot = ScreenshotUtil.capture("FAIL_" + safeName);
-        System.out.println("[TestListener] 📸 Failure screenshot saved.");
+        File screenshot = null;
+        File video = null;
 
-        // 2. Stop and save the full video recorded since launchApp
-        try {
-            File video = VideoUtil.stopAndSave(driver, "FAIL_" + safeName);
-            if (video != null) {
-                System.out.println("[TestListener] 🎥 Failure video saved: " + video.getPath());
+        AppiumDriver driver = DriverManager.getDriver();
+        if (driver != null) {
+            // 1. Final screenshot at the exact moment of failure
+            screenshot = ScreenshotUtil.capture("FAIL_" + safeName);
+            System.out.println("[TestListener] 📸 Failure screenshot saved.");
+
+            // 2. Stop and save the full video recorded since launchApp
+            try {
+                video = VideoUtil.stopAndSave(driver, "FAIL_" + safeName);
+                if (video != null) {
+                    System.out.println("[TestListener] 🎥 Failure video saved: " + video.getPath());
+                }
+            } catch (Exception e) {
+                System.out.println("[TestListener] ⚠️  Video save failed: " + e.getMessage());
             }
-        } catch (Exception e) {
-            System.out.println("[TestListener] ⚠️  Video save failed: " + e.getMessage());
-        }
 
-        // 3. Analyze screen for missing qaTestTags and write report for popdroid
-        String screenshotPath = screenshot != null ? screenshot.getAbsolutePath() : null;
-        String failingElement = TestContext.getFailingElement();
-        FailureTagReporter.report(driver, failingElement, safeName, screenshotPath);
+            // 3. Analyze screen for missing qaTestTags and write report for popdroid
+            String screenshotPath = screenshot != null ? screenshot.getAbsolutePath() : null;
+            String failingElement = TestContext.getFailingElement();
+            FailureTagReporter.report(driver, failingElement, safeName, screenshotPath);
+        }
 
         // 4. Report FAILED status to TestSigma
         updateStatus(result, TestCaseStatus.FAILED);
+
+        // 5. On FAIL → upload video + log + screenshot to TestSigma
+        File log = TestLogCapture.stop();
+        uploadAttachments(screenshot, video, log);
     }
 
     @Override
     public void onTestSkipped(ITestResult result) {
         stopVideoQuietly(result.getName() + "_skipped");
         updateStatus(result, TestCaseStatus.SKIPPED);
+        // Stop capture to restore console streams (no upload for skipped tests)
+        TestLogCapture.stop();
+    }
+
+    /**
+     * Upload the given artifacts (screenshot / video / log) to TestSigma, attaching
+     * them to the test_case_run for each of this test's testCaseIds.
+     *
+     * Tests whose testCaseIds are placeholders (not resolvable in TestSigma) have no
+     * test_case_run to attach to — those are skipped quietly. Null / missing files
+     * are ignored. Upload failures never affect the test result.
+     */
+    private void uploadAttachments(File... files) {
+        if (TestContext.getRunId() == null) return;
+
+        List<String> testCases = TestContext.getTestCaseIds();
+        if (testCases == null || testCases.isEmpty()) return;
+
+        try {
+            Map<String, String> runCaseMap = TestSigmaClient.getTestCaseRunMap(TestContext.getRunId());
+            if (runCaseMap.isEmpty()) return;
+
+            for (String id : testCases) {
+
+                // getTestCaseRunMap keys by both humanId and uuid; try humanId first,
+                // then fall back to the resolved uuid for PO- ids.
+                String runCaseId = runCaseMap.get(id);
+                if (runCaseId == null && id.startsWith("PO-")) {
+                    String uuid = TestSigmaClient.getTestCaseIdByHumanId(projectId, id);
+                    if (uuid != null) runCaseId = runCaseMap.get(uuid);
+                }
+
+                if (runCaseId == null) {
+                    System.out.println("[TestSigma] No test_case_run for " + id + " — skipping attachment upload");
+                    continue;
+                }
+
+                for (File f : files) {
+                    if (f == null || !f.exists()) continue;
+                    try {
+                        TestSigmaClient.uploadAttachment(runCaseId, f);
+                        System.out.println("[TestSigma] 📎 Uploaded " + f.getName() + " → " + id);
+                    } catch (Exception e) {
+                        System.out.println("[TestSigma] ⚠️  Attachment upload failed for "
+                                + f.getName() + ": " + e.getMessage());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // Never let attachment upload affect the test result itself.
+            System.err.println("[TestSigma] ⚠️  Attachment upload error: " + e.getMessage());
+        }
     }
 
     /**
