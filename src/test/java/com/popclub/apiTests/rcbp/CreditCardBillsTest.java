@@ -18,7 +18,6 @@ import static org.testng.Assert.*;
 /**
  * Integration tests for Credit Card bill payment APIs.
  *
- * Source: RCBP Copy.postman_collection.json → bills → credit card
  * Base URL: {{pop-rcbp-base}}
  * Auth: X-Userid: {{user_id}} (Authorization header is disabled in the collection)
  *

@@ -19,8 +19,6 @@ import static org.testng.Assert.*;
 
 /**
  * Integration tests for Mobile Postpaid bill payment APIs.
- *
- * Source: RCBP Copy.postman_collection.json → bills → mobile postpaid
  * Base URL: {{pop-rcbp-base}}
  *
  * The collection implements a chained flow — values extracted from each response
