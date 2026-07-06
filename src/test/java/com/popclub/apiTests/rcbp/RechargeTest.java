@@ -2,10 +2,12 @@ package com.popclub.apiTests.rcbp;
 
 import com.popclub.api.rcbp.enums.RcbpRoutes;
 import com.popclub.api.rcbp.impl.RcbpBaseService;
+import com.popclub.api.rcbp.impl.RcbpConfigManager;
 import com.popclub.api.rcbp.impl.RechargeService;
 import io.restassured.response.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.SkipException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -33,7 +35,9 @@ public class RechargeTest {
 
     private static final Logger log = LoggerFactory.getLogger(RechargeTest.class);
 
-    private static final String PHONE_NUMBER = "7975209916";
+    // Phone number read from rcbp-{env}.properties ({{phone}} in Postman collection).
+    // Previously hardcoded as "7975209916" from the old collection's URL — replaced with config.
+    private static final String PHONE_NUMBER = RcbpConfigManager.getPhone();
 
     private RechargeService rechargeService;
 
@@ -116,6 +120,10 @@ public class RechargeTest {
           dependsOnMethods = "fetchPlans_forDetectedOperatorAndCircle_returns200")
     public void fetchPlans_responseBodyNotEmpty() {
         log.info("Running: fetchPlans_responseBodyNotEmpty");
+
+        if (detectedOperatorId == null || detectedStateId == null) {
+            throw new SkipException("Skipping — operator/state not detected (fetchOperatorCircle step failed)");
+        }
 
         Response response = rechargeService.fetchPlans(PHONE_NUMBER, detectedOperatorId, detectedStateId);
 

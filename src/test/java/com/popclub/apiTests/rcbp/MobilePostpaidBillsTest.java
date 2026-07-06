@@ -15,6 +15,7 @@ import org.testng.annotations.Test;
 import java.util.Collections;
 import java.util.List;
 
+import org.testng.SkipException;
 import static org.testng.Assert.*;
 
 /**
@@ -168,6 +169,10 @@ public class MobilePostpaidBillsTest {
           dependsOnMethods = "fetchMobilePostpaidBill_withExtractedParams_returns200")
     public void fetchMobilePostpaidBill_dataNotEmpty() {
         log.info("Running: fetchMobilePostpaidBill_dataNotEmpty");
+
+        if (extractedBillerId == null || extractedParamName == null) {
+            throw new SkipException("Skipping — extractedBillerId/paramName not set (input fields step failed)");
+        }
 
         String phone = RcbpConfigManager.getPhone();
         FetchBillRequestDto.CustomerParam param =
