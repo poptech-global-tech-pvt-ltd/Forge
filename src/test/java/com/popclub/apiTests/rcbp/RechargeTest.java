@@ -109,6 +109,10 @@ public class RechargeTest {
         log.info("Running: fetchPlans_forDetectedOperatorAndCircle_returns200 | operator={} circle={}",
                 detectedOperatorId, detectedStateId);
 
+        if (detectedOperatorId == null || detectedStateId == null) {
+            throw new SkipException("Skipping — operator/state not detected (fetchOperatorCircle step failed)");
+        }
+
         Response response = rechargeService.fetchPlans(PHONE_NUMBER, detectedOperatorId, detectedStateId);
 
         RcbpBaseService.assertStatus(response, 200, "GET",

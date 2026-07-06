@@ -147,6 +147,10 @@ public class MobilePostpaidBillsTest {
         log.info("Running: fetchMobilePostpaidBill_withExtractedParams_returns200 | billerId={} paramName={}",
                 extractedBillerId, extractedParamName);
 
+        if (extractedBillerId == null || extractedParamName == null) {
+            throw new SkipException("Skipping — extractedBillerId/paramName not set (input fields step failed)");
+        }
+
         // Postman body: billerId={{biller_id}}, customerMobile={{phone}},
         //               customerParams=[{name={{customer_param_name}}, value={{phone}}}]
         String phone = RcbpConfigManager.getPhone();
