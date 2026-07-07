@@ -57,6 +57,7 @@ public class ActionFactory {
 
             // ── Text capture / assertion primitives ───────────────────────────
             case "captureText":              return new CaptureTextAction();
+            case "captureToast":             return new CaptureToastAction();
             case "assertStoredText":         return new AssertStoredTextAction();
             case "assertText":               return new AssertTextAction();
 
@@ -74,6 +75,10 @@ public class ActionFactory {
             case "ifVarEquals":              return step -> {}; // no-op sentinel
             case "ifVarNotEquals":           return step -> {}; // no-op sentinel
             case "logVar":                   return step -> {}; // no-op sentinel
+            case "fail":                     return step -> {
+                String msg = step.value != null ? step.value : "Test failed via fail action";
+                throw new RuntimeException(msg);
+            };
             case "call":                     return step -> {}; // no-op sentinel
 
             // ── Search / Cart / Wishlist flows ────────────────────────────────

@@ -1,0 +1,79 @@
+# PO-11047 — Verify Delivery section shows estimated date and delivery address on PDP
+# PO-11048 — Verify tapping 'Change' on Delivery section opens address selection on PDP
+testName: PDP — Delivery section, estimated date, change address
+platform: android
+noReset: true
+loginRequired: true
+retry: 1
+
+testCaseIds:
+  - PO-11047
+  - PO-11048
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - smoke
+  - pdp
+  - delivery
+
+steps:
+  - action: call
+    flow: navigate_to_pdp
+    params:
+      search_query:   "yogabar"
+      search_pincode: "560102"
+      login_phone:    "1234561819"
+      login_pin:      "560102"
+
+  # ── PO-11047: Scroll to delivery section and verify ─────────────────────
+  - action: swipe
+    value: up
+
+  - action: waitFor
+    element: product_details_check_delivery_date_section_row
+
+  - action: verifyElement
+    element: product_details_check_delivery_date_section_row
+    testCaseId: PO-11047
+
+  # ── PO-11048: Tap delivery section → opens address/pincode entry ───────
+  - action: tap
+    element: product_details_check_delivery_date_section_row
+
+  - action: tap
+    element: product_details_change_address_button
+    testCaseId: PO-11048
+
+  - action: waitFor
+    element: address_selection_pincode_input
+    testCaseId: PO-11048
+
+  - action: verifyElement
+    element: address_selection_pincode_input
+    testCaseId: PO-11048
+
+  # ── Enter pincode and check delivery date ───────────────────────────────
+  - action: enterText
+    element: address_selection_pincode_input
+    value: "560102"
+
+  - action: tap
+    element: address_selection_pincode_check_button
+
+  - action: waitFor
+    element: product_details_check_delivery_date_section_row
+
+  - action: verifyElement
+    element: product_details_check_delivery_date_section_row
+    testCaseId: PO-11047
+
+  - action: pressKey
+    value: back
+
+  - action: waitFor
+    element: product_details_title

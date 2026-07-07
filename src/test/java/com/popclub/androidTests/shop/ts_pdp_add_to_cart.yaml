@@ -1,0 +1,103 @@
+# PO-11057 — Verify bottom CTA changes to 'Go to cart' after product is added to cart
+# PO-11059 — Verify tapping 'Go to cart' from PDP navigates to the Cart screen
+testName: PDP — Add to cart CTA change and Go to cart navigation
+platform: android
+noReset: true
+loginRequired: true
+retry: 1
+
+testCaseIds:
+  - PO-11057
+  - PO-11059
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - smoke
+  - pdp
+  - cart
+
+steps:
+  - action: call
+    flow: navigate_to_pdp
+    params:
+      search_query:   "yogabar"
+      search_pincode: "560102"
+      login_phone:    "1234561819"
+      login_pin:      "560102"
+
+  # ── Capture PDP prices before adding to cart ─────────────────────────────
+  - action: captureText
+    element: product_details_price
+    variable: pdp_selling_price
+
+  - action: captureText
+    element: product_details_strikethrough_price
+    variable: pdp_mrp_price
+
+  - action: logVar
+    variable: pdp_selling_price
+    value: |
+      ── PDP prices ──
+      pdp_selling_price  - ${pdp_selling_price}
+      pdp_mrp_price      - ${pdp_mrp_price}
+
+  # ── Verify Add to Cart button exists ─────────────────────────────────────
+  - action: verifyElement
+    element: product_details_bottom_sticky_bar_button
+
+  # ── PO-11057: Add to cart → CTA changes to "Go to cart" ────────────────
+  - action: tap
+    element: product_details_bottom_sticky_bar_button
+
+  - action: tapIfPresent
+    element: size_selection_item_0
+
+  - action: tapIfPresent
+    element: size_selection_add_to_cart_button
+
+  - action: waitFor
+    element: product_details_go_to_cart_button
+    testCaseId: PO-11057
+
+  - action: verifyElement
+    element: product_details_go_to_cart_button
+    testCaseId: PO-11057
+
+  # ── PO-11059: Tap "Go to cart" → navigates to Cart screen ──────────────
+  - action: tap
+    element: product_details_go_to_cart_button
+
+  - action: waitFor
+    element: cart_item_row_0
+    testCaseId: PO-11059
+
+  # ── Cart: verify prices match PDP ───────────────────────────────────────
+  - action: captureText
+    element: cart_item_price_0
+    variable: cart_selling_price
+
+  - action: captureText
+    element: cart_item_strikethrough_price_0
+    variable: cart_mrp_price
+
+  - action: logVar
+    variable: cart_selling_price
+    value: |
+      ── Cart prices ──
+      cart_selling_price  - ${cart_selling_price}
+      cart_mrp_price      - ${cart_mrp_price}
+
+  - action: assertText
+    element: cart_item_price_0
+    value: "${pdp_selling_price}"
+    testCaseId: PO-11059
+
+  - action: assertText
+    element: cart_item_strikethrough_price_0
+    value: "${pdp_mrp_price}"
+    testCaseId: PO-11059

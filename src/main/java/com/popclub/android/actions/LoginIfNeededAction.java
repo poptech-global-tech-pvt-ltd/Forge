@@ -67,16 +67,13 @@ public class LoginIfNeededAction implements Action {
     private void doLogin(AppiumDriver driver, String phone, String otp) throws Exception {
         WebElement phoneInput = waitFor(driver, PHONE_INPUT_TAG, LOGIN_TIMEOUT_SEC);
         phoneInput.click();
-        sleep(800);
         typeIntoFocusedField(driver, phone);
 
         WebElement continueBtn = waitFor(driver, CONTINUE_BTN_TAG, LOGIN_TIMEOUT_SEC);
         continueBtn.click();
-        sleep(1200);
 
         WebElement otpInput = waitFor(driver, OTP_INPUT_TAG, LOGIN_TIMEOUT_SEC);
         otpInput.click();
-        sleep(800);
         typeIntoFocusedField(driver, otp);
         new WebDriverWait(driver, Duration.ofSeconds(LOGIN_TIMEOUT_SEC))
                 .until(ExpectedConditions.presenceOfElementLocated(
@@ -109,7 +106,7 @@ public class LoginIfNeededAction implements Action {
                 List<WebElement> found = driver.findElements(AppiumBy.accessibilityId(tag));
                 if (!found.isEmpty() && found.get(0).isDisplayed()) return true;
             } catch (Exception ignored) {}
-            sleep(300);
+            sleep(100);
         }
         return false;
     }

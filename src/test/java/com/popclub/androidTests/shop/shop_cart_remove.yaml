@@ -4,7 +4,7 @@ noReset: true
 loginRequired: false
 
 testCaseIds:
-  - PO-SHOP-CART-REMOVE
+  -
 
 features:
   - common

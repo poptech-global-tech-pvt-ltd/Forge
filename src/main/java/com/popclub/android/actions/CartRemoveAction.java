@@ -93,7 +93,18 @@ public class CartRemoveAction implements Action {
             int qty = readQuantity(driver);
 
             if (qty == 1 || qty < 0) {
-                // Quantity is 1 (or unreadable) — proceed to removal
+                // Tap decrease one more time to trigger remove confirmation (handles out-of-stock items)
+                WebElement decBtn = find(driver, "accessibilityId", "cart_item_decrease_button");
+                if (decBtn != null) {
+                    decBtn.click();
+                    long confirmDeadline = System.currentTimeMillis() + 2000;
+                    while (System.currentTimeMillis() < confirmDeadline) {
+                        WebElement confirm = find(driver, "accessibilityId", "cart_remove_product_button");
+                        if (confirm == null) confirm = find(driver, "accessibilityId", "cart_unavailable_remove_button");
+                        if (confirm != null) { confirm.click(); handleRemoveConfirmation(driver); return; }
+                        try { Thread.sleep(100); } catch (InterruptedException ie) { Thread.currentThread().interrupt(); break; }
+                    }
+                }
                 break;
             }
 
@@ -120,6 +131,10 @@ public class CartRemoveAction implements Action {
 
         WebElement removeBtn = waitFor(driver, "accessibilityId",
                 "cart_remove_product_button", 5_000);
+        if (removeBtn == null) {
+            // Fallback: out-of-stock items expose a different remove button
+            removeBtn = find(driver, "accessibilityId", "cart_unavailable_remove_button");
+        }
         if (removeBtn == null)
             throw new RuntimeException(
                 "cartRemoveItem: cart_remove_product_button not found after quantity decrease");

@@ -1,37 +1,7 @@
-shop_search_icon:
+add_to_cart_snackbar:
   android:
     - type: accessibilityId
-      value: shop_search_button
-  ios:
-
-
-wishlist_icon:
-  android:
-    - type: accessibilityId
-      value: wishlsit
-
-cart_icon:
-  android:
-    - type: accessibilityId
-      value: cart
-
-
-banner_image:
-  android:
-    - type: accessibilityId
-      value: home_editor_pick_item_0
-
-search_input:
-  android:
-    - type: accessibilityId
-      value: search_products_search_input   # qaDebug build only (qaTestTag enabled)
-
-search_key:
-  android:
-    - type: accessibilityId
-      value: enter
-
-# ─── Address Selection ─────────────────────────────────────────────────────────
+      value: product_details_add_to_cart_toast
 address_selection_add_button:
   android:
     - type: accessibilityId
@@ -68,8 +38,10 @@ address_selection_title_text:
   android:
     - type: accessibilityId
       value: address_selection_title_text
-
-# ─── Cart Add ──────────────────────────────────────────────────────────────────
+banner_image:
+  android:
+    - type: accessibilityId
+      value: home_editor_pick_item_0
 cart_add_from_wishlist_button:
   android:
     - type: accessibilityId
@@ -78,14 +50,14 @@ cart_add_to_wishlist_button:
   android:
     - type: accessibilityId
       value: cart_add_to_wishlist_button
-
-# ─── Cart Checkout ─────────────────────────────────────────────────────────────
+cart_back_button:
+  android:
+    - type: accessibilityId
+      value: cart_back_button
 cart_checkout_pop_shop_button:
   android:
     - type: accessibilityId
       value: cart_checkout_pop_shop_button
-
-# ─── Cart Delivery ─────────────────────────────────────────────────────────────
 cart_delivery_address_card:
   android:
     - type: accessibilityId
@@ -98,14 +70,14 @@ cart_delivery_fee_info_button:
   android:
     - type: accessibilityId
       value: cart_delivery_fee_info_button
-
-# ─── Cart Go ───────────────────────────────────────────────────────────────────
 cart_go_to_wishlist_button:
   android:
     - type: accessibilityId
       value: cart_go_to_wishlist_button
-
-# ─── Cart Item ─────────────────────────────────────────────────────────────────
+cart_icon:
+  android:
+    - type: accessibilityId
+      value: cart
 cart_item_decrease_button:
   android:
     - type: accessibilityId
@@ -118,34 +90,6 @@ cart_item_decrease_button_1:
   android:
     - type: accessibilityId
       value: cart_item_decrease_button_1
-cart_item_image:
-  android:
-    - type: accessibilityId
-      value: cart_item_image
-cart_item_increase_button:
-  android:
-    - type: accessibilityId
-      value: cart_item_increase_button
-cart_item_increase_button_0:
-  android:
-    - type: accessibilityId
-      value: cart_item_increase_button_0
-cart_item_increase_button_1:
-  android:
-    - type: accessibilityId
-      value: cart_item_increase_button_1
-cart_item_increase_button_2:
-  android:
-    - type: accessibilityId
-      value: cart_item_increase_button_2
-cart_item_increase_button_3:
-  android:
-    - type: accessibilityId
-      value: cart_item_increase_button_3
-cart_item_increase_button_4:
-  android:
-    - type: accessibilityId
-      value: cart_item_increase_button_4
 cart_item_decrease_button_2:
   android:
     - type: accessibilityId
@@ -158,88 +102,10 @@ cart_item_decrease_button_4:
   android:
     - type: accessibilityId
       value: cart_item_decrease_button_4
-
-# Per-item indexed elements (use _0, _1, _2 suffix in tests)
-cart_item_title_0:
+cart_item_delivery_date_chip:
   android:
     - type: accessibilityId
-      value: cart_item_title_0
-cart_item_title_1:
-  android:
-    - type: accessibilityId
-      value: cart_item_title_1
-cart_item_title_2:
-  android:
-    - type: accessibilityId
-      value: cart_item_title_2
-cart_item_title_3:
-  android:
-    - type: accessibilityId
-      value: cart_item_title_3
-cart_item_title_4:
-  android:
-    - type: accessibilityId
-      value: cart_item_title_4
-cart_item_size_0:
-  android:
-    - type: accessibilityId
-      value: cart_item_size_0
-cart_item_size_1:
-  android:
-    - type: accessibilityId
-      value: cart_item_size_1
-cart_item_size_2:
-  android:
-    - type: accessibilityId
-      value: cart_item_size_2
-cart_item_size_3:
-  android:
-    - type: accessibilityId
-      value: cart_item_size_3
-cart_item_size_4:
-  android:
-    - type: accessibilityId
-      value: cart_item_size_4
-cart_item_price_0:
-  android:
-    - type: accessibilityId
-      value: cart_item_price_0
-cart_item_price_1:
-  android:
-    - type: accessibilityId
-      value: cart_item_price_1
-cart_item_price_2:
-  android:
-    - type: accessibilityId
-      value: cart_item_price_2
-cart_item_price_3:
-  android:
-    - type: accessibilityId
-      value: cart_item_price_3
-cart_item_price_4:
-  android:
-    - type: accessibilityId
-      value: cart_item_price_4
-cart_item_strikethrough_price_0:
-  android:
-    - type: accessibilityId
-      value: cart_item_strikethrough_price_0
-cart_item_strikethrough_price_1:
-  android:
-    - type: accessibilityId
-      value: cart_item_strikethrough_price_1
-cart_item_strikethrough_price_2:
-  android:
-    - type: accessibilityId
-      value: cart_item_strikethrough_price_2
-cart_item_strikethrough_price_3:
-  android:
-    - type: accessibilityId
-      value: cart_item_strikethrough_price_3
-cart_item_strikethrough_price_4:
-  android:
-    - type: accessibilityId
-      value: cart_item_strikethrough_price_4
+      value: cart_item_delivery_date_chip
 cart_item_discount_0:
   android:
     - type: accessibilityId
@@ -280,6 +146,54 @@ cart_item_final_price_4:
   android:
     - type: accessibilityId
       value: cart_item_final_price_4
+cart_item_image:
+  android:
+    - type: accessibilityId
+      value: cart_item_image
+cart_item_increase_button:
+  android:
+    - type: accessibilityId
+      value: cart_item_increase_button
+cart_item_increase_button_0:
+  android:
+    - type: accessibilityId
+      value: cart_item_increase_button_0
+cart_item_increase_button_1:
+  android:
+    - type: accessibilityId
+      value: cart_item_increase_button_1
+cart_item_increase_button_2:
+  android:
+    - type: accessibilityId
+      value: cart_item_increase_button_2
+cart_item_increase_button_3:
+  android:
+    - type: accessibilityId
+      value: cart_item_increase_button_3
+cart_item_increase_button_4:
+  android:
+    - type: accessibilityId
+      value: cart_item_increase_button_4
+cart_item_price_0:
+  android:
+    - type: accessibilityId
+      value: cart_item_price_0
+cart_item_price_1:
+  android:
+    - type: accessibilityId
+      value: cart_item_price_1
+cart_item_price_2:
+  android:
+    - type: accessibilityId
+      value: cart_item_price_2
+cart_item_price_3:
+  android:
+    - type: accessibilityId
+      value: cart_item_price_3
+cart_item_price_4:
+  android:
+    - type: accessibilityId
+      value: cart_item_price_4
 cart_item_quantity_0:
   android:
     - type: accessibilityId
@@ -308,20 +222,98 @@ cart_item_return_info_1:
   android:
     - type: accessibilityId
       value: cart_item_return_info_1
-
-# ─── Cart Move ─────────────────────────────────────────────────────────────────
+cart_item_row_0:
+  android:
+    - type: accessibilityId
+      value: cart_item_row_0
+cart_item_row_1:
+  android:
+    - type: accessibilityId
+      value: cart_item_row_1
+cart_item_row_2:
+  android:
+    - type: accessibilityId
+      value: cart_item_row_2
+cart_item_row_3:
+  android:
+    - type: accessibilityId
+      value: cart_item_row_3
+cart_item_row_4:
+  android:
+    - type: accessibilityId
+      value: cart_item_row_4
+cart_item_size_0:
+  android:
+    - type: accessibilityId
+      value: cart_item_size_0
+cart_item_size_1:
+  android:
+    - type: accessibilityId
+      value: cart_item_size_1
+cart_item_size_2:
+  android:
+    - type: accessibilityId
+      value: cart_item_size_2
+cart_item_size_3:
+  android:
+    - type: accessibilityId
+      value: cart_item_size_3
+cart_item_size_4:
+  android:
+    - type: accessibilityId
+      value: cart_item_size_4
+cart_item_strikethrough_price_0:
+  android:
+    - type: accessibilityId
+      value: cart_item_strikethrough_price_0
+cart_item_strikethrough_price_1:
+  android:
+    - type: accessibilityId
+      value: cart_item_strikethrough_price_1
+cart_item_strikethrough_price_2:
+  android:
+    - type: accessibilityId
+      value: cart_item_strikethrough_price_2
+cart_item_strikethrough_price_3:
+  android:
+    - type: accessibilityId
+      value: cart_item_strikethrough_price_3
+cart_item_strikethrough_price_4:
+  android:
+    - type: accessibilityId
+      value: cart_item_strikethrough_price_4
+cart_item_title_0:
+  android:
+    - type: accessibilityId
+      value: cart_item_title_0
+cart_item_title_1:
+  android:
+    - type: accessibilityId
+      value: cart_item_title_1
+cart_item_title_2:
+  android:
+    - type: accessibilityId
+      value: cart_item_title_2
+cart_item_title_3:
+  android:
+    - type: accessibilityId
+      value: cart_item_title_3
+cart_item_title_4:
+  android:
+    - type: accessibilityId
+      value: cart_item_title_4
+cart_link_and_pay_button:
+  android:
+    - type: accessibilityId
+      value: cart_s2_s_payment_button_button
 cart_move_from_cart_button:
   android:
     - type: accessibilityId
       value: cart_move_from_cart_button
-
-# ─── Cart Pay ──────────────────────────────────────────────────────────────────
 cart_pay_button:
   android:
     - type: accessibilityId
       value: cart_pay_button
-
-# ─── Cart Payment ──────────────────────────────────────────────────────────────
 cart_payment_category_section_row:
   android:
     - type: accessibilityId
@@ -330,8 +322,10 @@ cart_payment_method_bottom_sheet_button:
   android:
     - type: accessibilityId
       value: cart_payment_method_bottom_sheet_button
-
-# ─── Cart Price ────────────────────────────────────────────────────────────────
+cart_payment_method_dropdown:
+  android:
+    - type: accessibilityId
+      value: Select
 cart_price_summary_expand_button:
   android:
     - type: accessibilityId
@@ -340,14 +334,10 @@ cart_price_summary_toggle:
   android:
     - type: accessibilityId
       value: cart_price_summary_toggle
-
-# ─── Cart Remove ───────────────────────────────────────────────────────────────
 cart_remove_product_button:
   android:
     - type: accessibilityId
       value: cart_remove_product_button
-
-# ─── Cart S2 ───────────────────────────────────────────────────────────────────
 cart_s2_s_payment_button_button:
   android:
     - type: accessibilityId
@@ -359,25 +349,23 @@ cart_s2_s_payment_button_button_1:
 cart_s2_s_payment_button_button_2:
   android:
     - type: accessibilityId
-      value: cart_s2_s_payment_button_button  # healed from: cart_s2_s_payment_button_button_2
+      value: cart_s2_s_payment_button_button
 cart_s2_s_payment_button_row:
   android:
     - type: accessibilityId
       value: cart_s2_s_payment_button_row
-
-# ─── Cart Saved ────────────────────────────────────────────────────────────────
 cart_saved_and_earned_chip:
   android:
     - type: accessibilityId
       value: cart_saved_and_earned_chip
-
-# ─── Cart Shop ─────────────────────────────────────────────────────────────────
 cart_shop_more_button:
   android:
     - type: accessibilityId
       value: cart_shop_more_button
-
-# ─── Cart Unavailable ──────────────────────────────────────────────────────────
+cart_to_pay_row:
+  android:
+    - type: accessibilityId
+      value: cart_to_pay_row
 cart_unavailable_add_to_wishlist_button:
   android:
     - type: accessibilityId
@@ -386,20 +374,154 @@ cart_unavailable_remove_button:
   android:
     - type: accessibilityId
       value: cart_unavailable_remove_button
-
-# ─── Cart Vpa ──────────────────────────────────────────────────────────────────
 cart_vpa_account_list_item_radio:
   android:
     - type: accessibilityId
       value: cart_vpa_account_list_item_radio
-
-# ─── Cart Wishlist ─────────────────────────────────────────────────────────────
 cart_wishlist_item_add_to_cart_button:
   android:
     - type: accessibilityId
       value: cart_wishlist_item_add_to_cart_button
-
-# ─── Order Details ─────────────────────────────────────────────────────────────
+clp_screen:
+  android:
+    - type: accessibilityId
+      value: clp_screen
+clp_section_row_0:
+  android:
+    - type: accessibilityId
+      value: clp_section_row_0
+clp_section_row_1:
+  android:
+    - type: accessibilityId
+      value: clp_section_row_1
+clp_section_row_10:
+  android:
+    - type: accessibilityId
+      value: clp_section_row_10
+clp_section_row_11:
+  android:
+    - type: accessibilityId
+      value: clp_section_row_11
+clp_section_row_2:
+  android:
+    - type: accessibilityId
+      value: clp_section_row_2
+clp_section_row_3:
+  android:
+    - type: accessibilityId
+      value: clp_section_row_3
+clp_section_row_4:
+  android:
+    - type: accessibilityId
+      value: clp_section_row_4
+clp_section_row_5:
+  android:
+    - type: accessibilityId
+      value: clp_section_row_5
+clp_section_row_6:
+  android:
+    - type: accessibilityId
+      value: clp_section_row_6
+clp_section_row_7:
+  android:
+    - type: accessibilityId
+      value: clp_section_row_7
+clp_section_row_8:
+  android:
+    - type: accessibilityId
+      value: clp_section_row_8
+clp_section_row_9:
+  android:
+    - type: accessibilityId
+      value: clp_section_row_9
+clp_section_title_0:
+  android:
+    - type: accessibilityId
+      value: clp_section_title_0
+clp_section_title_1:
+  android:
+    - type: accessibilityId
+      value: clp_section_title_1
+clp_section_title_2:
+  android:
+    - type: accessibilityId
+      value: clp_section_title_2
+clp_section_title_3:
+  android:
+    - type: accessibilityId
+      value: clp_section_title_3
+clp_section_title_4:
+  android:
+    - type: accessibilityId
+      value: clp_section_title_4
+clp_section_title_5:
+  android:
+    - type: accessibilityId
+      value: clp_section_title_5
+clp_section_title_6:
+  android:
+    - type: accessibilityId
+      value: clp_section_title_6
+clp_section_title_7:
+  android:
+    - type: accessibilityId
+      value: clp_section_title_7
+clp_section_title_8:
+  android:
+    - type: accessibilityId
+      value: clp_section_title_8
+clp_section_title_9:
+  android:
+    - type: accessibilityId
+      value: clp_section_title_9
+clp_section_view_all_0:
+  android:
+    - type: accessibilityId
+      value: clp_section_view_all_0
+clp_section_view_all_1:
+  android:
+    - type: accessibilityId
+      value: clp_section_view_all_1
+clp_section_view_all_2:
+  android:
+    - type: accessibilityId
+      value: clp_section_view_all_2
+clp_section_view_all_3:
+  android:
+    - type: accessibilityId
+      value: clp_section_view_all_3
+clp_section_view_all_4:
+  android:
+    - type: accessibilityId
+      value: clp_section_view_all_4
+clp_section_view_all_5:
+  android:
+    - type: accessibilityId
+      value: clp_section_view_all_5
+clp_section_view_all_6:
+  android:
+    - type: accessibilityId
+      value: clp_section_view_all_6
+clp_section_view_all_7:
+  android:
+    - type: accessibilityId
+      value: clp_section_view_all_7
+clp_section_view_all_8:
+  android:
+    - type: accessibilityId
+      value: clp_section_view_all_8
+clp_section_view_all_9:
+  android:
+    - type: accessibilityId
+      value: clp_section_view_all_9
+Collapse:
+  android:
+    - type: accessibilityId
+      value: Collapse
+Expand:
+  android:
+    - type: accessibilityId
+      value: Expand
 order_details_bill_items_list_row:
   android:
     - type: accessibilityId
@@ -416,14 +538,6 @@ order_details_cancel_order_bottom_sheet_icon_button:
   android:
     - type: accessibilityId
       value: order_details_cancel_order_bottom_sheet_icon_button
-order_details_cancel_order_bottom_sheet_item1_item_0:
-  android:
-    - type: accessibilityId
-      value: order_details_cancel_order_bottom_sheet_item1_item_0
-order_details_cancel_order_bottom_sheet_item1_item_1:
-  android:
-    - type: accessibilityId
-      value: order_details_cancel_order_bottom_sheet_item1_item_1
 order_details_cancel_order_bottom_sheet_item_item_0:
   android:
     - type: accessibilityId
@@ -432,6 +546,14 @@ order_details_cancel_order_bottom_sheet_item_item_1:
   android:
     - type: accessibilityId
       value: order_details_cancel_order_bottom_sheet_item_item_1
+order_details_cancel_order_bottom_sheet_item1_item_0:
+  android:
+    - type: accessibilityId
+      value: order_details_cancel_order_bottom_sheet_item1_item_0
+order_details_cancel_order_bottom_sheet_item1_item_1:
+  android:
+    - type: accessibilityId
+      value: order_details_cancel_order_bottom_sheet_item1_item_1
 order_details_cancel_order_bottom_sheet_row:
   android:
     - type: accessibilityId
@@ -508,14 +630,6 @@ order_details_v2_cancel_reason_selection_button:
   android:
     - type: accessibilityId
       value: order_details_v2_cancel_reason_selection_button
-order_details_v2_cancel_reason_selection_v2_item1_item_0:
-  android:
-    - type: accessibilityId
-      value: order_details_v2_cancel_reason_selection_v2_item1_item_0
-order_details_v2_cancel_reason_selection_v2_item1_item_1:
-  android:
-    - type: accessibilityId
-      value: order_details_v2_cancel_reason_selection_v2_item1_item_1
 order_details_v2_cancel_reason_selection_v2_item_item_0:
   android:
     - type: accessibilityId
@@ -524,6 +638,14 @@ order_details_v2_cancel_reason_selection_v2_item_item_1:
   android:
     - type: accessibilityId
       value: order_details_v2_cancel_reason_selection_v2_item_item_1
+order_details_v2_cancel_reason_selection_v2_item1_item_0:
+  android:
+    - type: accessibilityId
+      value: order_details_v2_cancel_reason_selection_v2_item1_item_0
+order_details_v2_cancel_reason_selection_v2_item1_item_1:
+  android:
+    - type: accessibilityId
+      value: order_details_v2_cancel_reason_selection_v2_item1_item_1
 order_details_v2_delivery_info_bottom_sheet_v2_button:
   android:
     - type: accessibilityId
@@ -572,14 +694,30 @@ order_details_v2_track_button:
   android:
     - type: accessibilityId
       value: order_details_v2_track_button
-
-# ─── Order Item ────────────────────────────────────────────────────────────────
 order_item_row:
   android:
     - type: accessibilityId
       value: order_item_row
-
-# ─── Order Success ─────────────────────────────────────────────────────────────
+order_list_item_brand_0:
+  android:
+    - type: accessibilityId
+      value: order_list_item_brand_0
+order_list_item_date_0:
+  android:
+    - type: accessibilityId
+      value: order_list_item_date_0
+order_list_item_status_0:
+  android:
+    - type: accessibilityId
+      value: order_list_item_status_0
+order_list_item_status_1:
+  android:
+    - type: accessibilityId
+      value: order_list_item_status_1
+order_list_item_title_0:
+  android:
+    - type: accessibilityId
+      value: order_list_item_title_0
 order_success_copy_order_id_button:
   android:
     - type: accessibilityId
@@ -608,16 +746,34 @@ order_success_title_text:
   android:
     - type: accessibilityId
       value: order_success_title_text
-
-# ─── Product Details ───────────────────────────────────────────────────────────
+payment_processing_received_subtitle_text:
+  android:
+    - type: accessibilityId
+      value: payment_processing_received_subtitle_text
+payment_processing_received_title_text:
+  android:
+    - type: accessibilityId
+      value: payment_processing_received_title_text
+payment_processing_status_text:
+  android:
+    - type: accessibilityId
+      value: payment_processing_status_text
+pdp_search_icon:
+  android:
+    - type: accessibilityId
+      value: product_details_search_button
+popcoins_navigation:
+  android:
+    - type: accessibilityId
+      value: Navigation
+product_details_back_button:
+  android:
+    - type: accessibilityId
+      value: product_details_back_button
 product_details_bottom_sticky_bar_button:
   android:
     - type: accessibilityId
       value: product_details_bottom_sticky_bar_button
-product_details_change_address_button:
-  android:
-    - type: accessibilityId
-      value: product_details_change_address_button
 product_details_check_delivery_date_section_button:
   android:
     - type: accessibilityId
@@ -626,10 +782,22 @@ product_details_check_delivery_date_section_row:
   android:
     - type: accessibilityId
       value: product_details_check_delivery_date_section_row
+product_details_go_to_cart_button:
+  android:
+    - type: accessibilityId
+      value: product_details_cart_button
+product_details_popcoin:
+  android:
+    - type: accessibilityId
+      value: product_details_popcoin
+product_details_price:
+  android:
+    - type: accessibilityId
+      value: pdp_product_price
 product_details_product_info_section_row:
   android:
     - type: accessibilityId
-      value: product_details_product_info_section_row
+      value: product_details_section_row  # healed from: product_details_product_info_section_row
 product_details_section_row:
   android:
     - type: accessibilityId
@@ -662,28 +830,18 @@ product_details_size_option_1:
   android:
     - type: accessibilityId
       value: product_details_size_option_1
+product_details_strikethrough_price:
+  android:
+    - type: accessibilityId
+      value: pdp_product_price  # healed from: pdp_product_strikethrough_price
 product_details_title:
   android:
     - type: accessibilityId
       value: product_details_title
-product_details_price:
-  android:
-    - type: accessibilityId
-      value: pdp_product_price
-product_details_strikethrough_price:
-  android:
-    - type: accessibilityId
-      value: pdp_product_strikethrough_price
-product_details_popcoin:
-  android:
-    - type: accessibilityId
-      value: product_details_popcoin
 product_details_wishlist_button:
   android:
     - type: accessibilityId
       value: product_details_wishlist_button
-
-# ─── Product Filter ────────────────────────────────────────────────────────────
 product_filter_apply_button:
   android:
     - type: accessibilityId
@@ -712,8 +870,6 @@ product_filter_sub_item_1:
   android:
     - type: accessibilityId
       value: product_filter_sub_item_1
-
-# ─── Product List ──────────────────────────────────────────────────────────────
 product_list_filter_button:
   android:
     - type: accessibilityId
@@ -726,6 +882,50 @@ product_list_item_1:
   android:
     - type: accessibilityId
       value: product_list_item_1
+product_list_item_2:
+  android:
+    - type: accessibilityId
+      value: product_list_item_2
+product_list_item_brand_0:
+  android:
+    - type: accessibilityId
+      value: product_list_item_brand_0
+product_list_item_brand_1:
+  android:
+    - type: accessibilityId
+      value: product_list_item_brand_1
+product_list_item_out_of_stock_0:
+  android:
+    - type: accessibilityId
+      value: product_list_item_out_of_stock_0
+product_list_item_price_0:
+  android:
+    - type: accessibilityId
+      value: product_list_item_price_0
+product_list_item_price_1:
+  android:
+    - type: accessibilityId
+      value: product_list_item_price_1
+product_list_item_rating_0:
+  android:
+    - type: accessibilityId
+      value: product_list_item_rating_0
+product_list_item_strikethrough_price_0:
+  android:
+    - type: accessibilityId
+      value: product_list_item_price_0  # healed from: product_list_item_strikethrough_price_0
+product_list_item_strikethrough_price_1:
+  android:
+    - type: accessibilityId
+      value: product_list_item_strikethrough_price_1
+product_list_item_title_0:
+  android:
+    - type: accessibilityId
+      value: product_list_item_title_0
+product_list_item_title_1:
+  android:
+    - type: accessibilityId
+      value: product_list_item_title_1
 product_list_product_card_row:
   android:
     - type: accessibilityId
@@ -742,8 +942,6 @@ product_list_sort_selection_screen_radio:
   android:
     - type: accessibilityId
       value: product_list_sort_selection_screen_radio
-
-# ─── Return Details ────────────────────────────────────────────────────────────
 return_details_status_text:
   android:
     - type: accessibilityId
@@ -752,8 +950,6 @@ return_details_title_text:
   android:
     - type: accessibilityId
       value: return_details_title_text
-
-# ─── Return Media ──────────────────────────────────────────────────────────────
 return_media_item_0:
   android:
     - type: accessibilityId
@@ -770,14 +966,10 @@ return_media_title_text:
   android:
     - type: accessibilityId
       value: return_media_title_text
-
-# ─── Return Order ──────────────────────────────────────────────────────────────
 return_order_proceed_button:
   android:
     - type: accessibilityId
       value: return_order_proceed_button
-
-# ─── Return Reason ─────────────────────────────────────────────────────────────
 return_reason_comments_input:
   android:
     - type: accessibilityId
@@ -794,8 +986,6 @@ return_reason_proceed_button:
   android:
     - type: accessibilityId
       value: return_reason_proceed_button
-
-# ─── Return Success ────────────────────────────────────────────────────────────
 return_success_done_button:
   android:
     - type: accessibilityId
@@ -808,8 +998,6 @@ return_success_v2_return_status_card_v2_button:
   android:
     - type: accessibilityId
       value: return_success_v2_return_status_card_v2_button
-
-# ─── Return Summary ────────────────────────────────────────────────────────────
 return_summary_proceed_button:
   android:
     - type: accessibilityId
@@ -838,20 +1026,74 @@ return_summary_v2_upi_selection_content_v2_row:
   android:
     - type: accessibilityId
       value: return_summary_v2_upi_selection_content_v2_row
-
-# ─── Shop Accounts ─────────────────────────────────────────────────────────────
+saved_address_item_detail_0:
+  android:
+    - type: accessibilityId
+      value: saved_address_item_detail_0
+saved_address_item_detail_1:
+  android:
+    - type: accessibilityId
+      value: saved_address_item_detail_1
+saved_address_item_label_0:
+  android:
+    - type: accessibilityId
+      value: saved_address_item_label_0
+saved_address_item_label_1:
+  android:
+    - type: accessibilityId
+      value: saved_address_item_label_1
+search_back_button:
+  android:
+    - type: accessibilityId
+      value: toolbar_search_button  # healed from: search_back_button
+search_input:
+  android:
+    - type: accessibilityId
+      value: search_products_search_input
+search_key:
+  android:
+    - type: accessibilityId
+      value: enter
+search_products_search_input:
+  android:
+    - type: accessibilityId
+      value: search_products_search_input
+search_recent_item_0:
+  android:
+    - type: accessibilityId
+      value: search_recent_item_0
+search_recent_item_1:
+  android:
+    - type: accessibilityId
+      value: search_recent_item_1
+search_suggestion_item_0:
+  android:
+    - type: accessibilityId
+      value: search_suggestion_item_0
+search_suggestion_item_1:
+  android:
+    - type: accessibilityId
+      value: search_suggestion_item_1
+search_trending_item_0:
+  android:
+    - type: accessibilityId
+      value: search_trending_item_0
+search_trending_item_1:
+  android:
+    - type: accessibilityId
+      value: search_trending_item_1
+Shop:
+  android:
+    - type: accessibilityId
+      value: Shop
 shop_accounts_list_component_default_selected_account_item_row:
   android:
     - type: accessibilityId
       value: shop_accounts_list_component_default_selected_account_item_row
-
-# ─── Shop Actions ──────────────────────────────────────────────────────────────
 shop_actions_card_shop_action_item_row:
   android:
     - type: accessibilityId
       value: shop_actions_card_shop_action_item_row
-
-# ─── Shop Payment ──────────────────────────────────────────────────────────────
 shop_payment_account_item_0:
   android:
     - type: accessibilityId
@@ -928,14 +1170,79 @@ shop_payment_upi_vertical_button_row:
   android:
     - type: accessibilityId
       value: shop_payment_upi_vertical_button_row
-
-# ─── Wishlist Add ──────────────────────────────────────────────────────────────
+shop_promo_banner_row:
+  android:
+    - type: accessibilityId
+      value: shop_promo_banner_row
+shop_search_button:
+  android:
+    - type: accessibilityId
+      value: toolbar_search_button
+shop_search_icon:
+  android:
+    - type: accessibilityId
+      value: shop_search_button
+  ios: null
+similar_product_item_0:
+  android:
+    - type: accessibilityId
+      value: similar_product_item_0
+similar_product_item_1:
+  android:
+    - type: accessibilityId
+      value: similar_product_item_1
+similar_product_item_brand_0:
+  android:
+    - type: accessibilityId
+      value: similar_product_item_brand_0
+similar_product_item_price_0:
+  android:
+    - type: accessibilityId
+      value: similar_product_item_price_0
+similar_product_item_title_0:
+  android:
+    - type: accessibilityId
+      value: similar_product_item_title_0
+similar_product_item_title_1:
+  android:
+    - type: accessibilityId
+      value: similar_product_item_title_1
+size_selection_add_to_cart_button:
+  android:
+    - type: accessibilityId
+      value: size_selection_add_to_cart_button
+size_selection_item_0:
+  android:
+    - type: accessibilityId
+      value: product_details_size_option_0
+size_selection_item_1:
+  android:
+    - type: accessibilityId
+      value: product_details_size_option_1
+size_selection_item_2:
+  android:
+    - type: accessibilityId
+      value: product_details_size_option_2
+toolbar_cart_button:
+  android:
+    - type: accessibilityId
+      value: toolbar_cart_button
+toolbar_popcoin_button:
+  android:
+    - type: accessibilityId
+      value: toolbar_popcoin_button
+View_more:
+  android:
+    - type: accessibilityId
+      value: View more
 wishlist_add_to_cart_button:
   android:
     - type: accessibilityId
       value: wishlist_add_to_cart_button
-
-# ─── Wishlist Item ─────────────────────────────────────────────────────────────
+wishlist_icon:
+  android:
+    - type: accessibilityId
+      value: wishlsit
 wishlist_item_0:
   android:
     - type: accessibilityId
@@ -948,405 +1255,15 @@ wishlist_item_card_compose_row:
   android:
     - type: accessibilityId
       value: wishlist_item_card_compose_row
-
-# ─── Wishlist Remove ───────────────────────────────────────────────────────────
 wishlist_remove_button:
   android:
     - type: accessibilityId
       value: wishlist_remove_button
-
-# ─── Wishlist Size ─────────────────────────────────────────────────────────────
 wishlist_size_selection_section_row:
   android:
     - type: accessibilityId
       value: wishlist_size_selection_section_row
-
-# ─── Shop CLP ──────────────────────────────────────────────────────────────────
-shop_search_button:
+your_cart_merchant_background:
   android:
     - type: accessibilityId
-      value: shop_search_button
-
-shop_promo_banner_row:
-  android:
-    - type: accessibilityId
-      value: shop_promo_banner_row
-
-# ─── Product List ──────────────────────────────────────────────────────────────
-search_products_search_input:
-  android:
-    - type: accessibilityId
-      value: search_products_search_input
-
-
-
-product_list_item_2:
-  android:
-    - type: accessibilityId
-      value: product_list_item_2
-
-# ─── Product Details ───────────────────────────────────────────────────────────
-product_details_go_to_cart_button:
-  android:
-    - type: accessibilityId
-      value: product_details_cart_button
-
-add_to_cart_snackbar:
-  android:
-    - type: accessibilityId
-      value: product_details_add_to_cart_toast
-
-# ─── Size Selection ────────────────────────────────────────────────────────────
-size_selection_item_0:
-  android:
-    - type: accessibilityId
-      value: product_details_size_option_0
-
-size_selection_item_1:
-  android:
-    - type: accessibilityId
-      value: product_details_size_option_1
-
-size_selection_item_2:
-  android:
-    - type: accessibilityId
-      value: product_details_size_option_2
-
-size_selection_add_to_cart_button:
-  android:
-    - type: accessibilityId
-      value: size_selection_add_to_cart_button
-
-# ─── Cart ──────────────────────────────────────────────────────────────────────
-cart_item_row_0:
-  android:
-    - type: accessibilityId
-      value: cart_item_row_0
-
-cart_item_row_1:
-  android:
-    - type: accessibilityId
-      value: cart_item_row_1
-
-cart_item_row_2:
-  android:
-    - type: accessibilityId
-      value: cart_item_row_2
-
-cart_item_row_3:
-  android:
-    - type: accessibilityId
-      value: cart_item_row_3
-
-cart_item_row_4:
-  android:
-    - type: accessibilityId
-      value: cart_item_row_4
-
-cart_to_pay_row:
-  android:
-    - type: accessibilityId
-      value: cart_to_pay_row
-
-cart_link_and_pay_button:
-  android:
-    - type: accessibilityId
-      value: cart_s2_s_payment_button_button
-
-cart_item_delivery_date_chip:
-  android:
-    - type: accessibilityId
-      value: cart_item_delivery_date_chip
-
-# ─── Product List — per-item indexed ──────────────────────────────────────────
-product_list_item_title_0:
-  android:
-    - type: accessibilityId
-      value: product_list_item_title_0
-product_list_item_title_1:
-  android:
-    - type: accessibilityId
-      value: product_list_item_title_1
-product_list_item_brand_0:
-  android:
-    - type: accessibilityId
-      value: product_list_item_brand_0
-product_list_item_brand_1:
-  android:
-    - type: accessibilityId
-      value: product_list_item_brand_1
-product_list_item_price_0:
-  android:
-    - type: accessibilityId
-      value: product_list_item_price_0
-product_list_item_price_1:
-  android:
-    - type: accessibilityId
-      value: product_list_item_price_1
-product_list_item_strikethrough_price_0:
-  android:
-    - type: accessibilityId
-      value: product_list_item_strikethrough_price_0
-product_list_item_strikethrough_price_1:
-  android:
-    - type: accessibilityId
-      value: product_list_item_strikethrough_price_1
-product_list_item_out_of_stock_0:
-  android:
-    - type: accessibilityId
-      value: product_list_item_out_of_stock_0
-product_list_item_rating_0:
-  android:
-    - type: accessibilityId
-      value: product_list_item_rating_0
-
-# ─── Similar Products (PDP carousel) — per-item indexed ───────────────────────
-similar_product_item_0:
-  android:
-    - type: accessibilityId
-      value: similar_product_item_0
-similar_product_item_1:
-  android:
-    - type: accessibilityId
-      value: similar_product_item_1
-similar_product_item_title_0:
-  android:
-    - type: accessibilityId
-      value: similar_product_item_title_0
-similar_product_item_title_1:
-  android:
-    - type: accessibilityId
-      value: similar_product_item_title_1
-similar_product_item_brand_0:
-  android:
-    - type: accessibilityId
-      value: similar_product_item_brand_0
-similar_product_item_price_0:
-  android:
-    - type: accessibilityId
-      value: similar_product_item_price_0
-
-# ─── Search — indexed suggestions / recent / trending ─────────────────────────
-search_suggestion_item_0:
-  android:
-    - type: accessibilityId
-      value: search_suggestion_item_0
-search_suggestion_item_1:
-  android:
-    - type: accessibilityId
-      value: search_suggestion_item_1
-search_recent_item_0:
-  android:
-    - type: accessibilityId
-      value: search_recent_item_0
-search_recent_item_1:
-  android:
-    - type: accessibilityId
-      value: search_recent_item_1
-search_trending_item_0:
-  android:
-    - type: accessibilityId
-      value: search_trending_item_0
-search_trending_item_1:
-  android:
-    - type: accessibilityId
-      value: search_trending_item_1
-
-# ─── Order List — per-item indexed ────────────────────────────────────────────
-order_list_item_status_0:
-  android:
-    - type: accessibilityId
-      value: order_list_item_status_0
-order_list_item_status_1:
-  android:
-    - type: accessibilityId
-      value: order_list_item_status_1
-order_list_item_date_0:
-  android:
-    - type: accessibilityId
-      value: order_list_item_date_0
-order_list_item_brand_0:
-  android:
-    - type: accessibilityId
-      value: order_list_item_brand_0
-order_list_item_title_0:
-  android:
-    - type: accessibilityId
-      value: order_list_item_title_0
-
-# ─── Saved Addresses — per-item indexed ───────────────────────────────────────
-saved_address_item_label_0:
-  android:
-    - type: accessibilityId
-      value: saved_address_item_label_0
-saved_address_item_label_1:
-  android:
-    - type: accessibilityId
-      value: saved_address_item_label_1
-saved_address_item_detail_0:
-  android:
-    - type: accessibilityId
-      value: saved_address_item_detail_0
-saved_address_item_detail_1:
-  android:
-    - type: accessibilityId
-      value: saved_address_item_detail_1
-
-# ─── Payment Processing ────────────────────────────────────────────────────────
-payment_processing_status_text:
-  android:
-    - type: accessibilityId
-      value: payment_processing_status_text
-payment_processing_received_title_text:
-  android:
-    - type: accessibilityId
-      value: payment_processing_received_title_text
-payment_processing_received_subtitle_text:
-  android:
-    - type: accessibilityId
-      value: payment_processing_received_subtitle_text
-
-# ─── CLP Section Rows (indexed by widget position) ────────────────────────────
-clp_section_row_0:
-  android:
-    - type: accessibilityId
-      value: clp_section_row_0
-clp_section_row_1:
-  android:
-    - type: accessibilityId
-      value: clp_section_row_1
-clp_section_row_2:
-  android:
-    - type: accessibilityId
-      value: clp_section_row_2
-clp_section_row_3:
-  android:
-    - type: accessibilityId
-      value: clp_section_row_3
-clp_section_row_4:
-  android:
-    - type: accessibilityId
-      value: clp_section_row_4
-clp_section_row_5:
-  android:
-    - type: accessibilityId
-      value: clp_section_row_5
-clp_section_row_6:
-  android:
-    - type: accessibilityId
-      value: clp_section_row_6
-clp_section_row_7:
-  android:
-    - type: accessibilityId
-      value: clp_section_row_7
-clp_section_row_8:
-  android:
-    - type: accessibilityId
-      value: clp_section_row_8
-clp_section_row_9:
-  android:
-    - type: accessibilityId
-      value: clp_section_row_9
-clp_section_row_10:
-  android:
-    - type: accessibilityId
-      value: clp_section_row_10
-clp_section_row_11:
-  android:
-    - type: accessibilityId
-      value: clp_section_row_11
-
-# ─── CLP Section Titles ────────────────────────────────────────────────────────
-clp_section_title_0:
-  android:
-    - type: accessibilityId
-      value: clp_section_title_0
-clp_section_title_1:
-  android:
-    - type: accessibilityId
-      value: clp_section_title_1
-clp_section_title_2:
-  android:
-    - type: accessibilityId
-      value: clp_section_title_2
-clp_section_title_3:
-  android:
-    - type: accessibilityId
-      value: clp_section_title_3
-clp_section_title_4:
-  android:
-    - type: accessibilityId
-      value: clp_section_title_4
-clp_section_title_5:
-  android:
-    - type: accessibilityId
-      value: clp_section_title_5
-clp_section_title_6:
-  android:
-    - type: accessibilityId
-      value: clp_section_title_6
-clp_section_title_7:
-  android:
-    - type: accessibilityId
-      value: clp_section_title_7
-clp_section_title_8:
-  android:
-    - type: accessibilityId
-      value: clp_section_title_8
-clp_section_title_9:
-  android:
-    - type: accessibilityId
-      value: clp_section_title_9
-
-# ─── CLP Section View All buttons ─────────────────────────────────────────────
-clp_section_view_all_0:
-  android:
-    - type: accessibilityId
-      value: clp_section_view_all_0
-clp_section_view_all_1:
-  android:
-    - type: accessibilityId
-      value: clp_section_view_all_1
-clp_section_view_all_2:
-  android:
-    - type: accessibilityId
-      value: clp_section_view_all_2
-clp_section_view_all_3:
-  android:
-    - type: accessibilityId
-      value: clp_section_view_all_3
-clp_section_view_all_4:
-  android:
-    - type: accessibilityId
-      value: clp_section_view_all_4
-clp_section_view_all_5:
-  android:
-    - type: accessibilityId
-      value: clp_section_view_all_5
-clp_section_view_all_6:
-  android:
-    - type: accessibilityId
-      value: clp_section_view_all_6
-clp_section_view_all_7:
-  android:
-    - type: accessibilityId
-      value: clp_section_view_all_7
-clp_section_view_all_8:
-  android:
-    - type: accessibilityId
-      value: clp_section_view_all_8
-clp_section_view_all_9:
-  android:
-    - type: accessibilityId
-      value: clp_section_view_all_9
-
-# ─── CLP Screen ────────────────────────────────────────────────────────────────
-clp_screen:
-  android:
-    - type: accessibilityId
-      value: clp_screen
-
-Shop:
-  android:
-    - type: accessibilityId
-      value: Shop
+      value: Merchant background

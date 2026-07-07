@@ -107,3 +107,49 @@ steps:
       PDP UI strikethrough - ${pdp_product_strikethrough_price}
       API price            - ₹${api_product_list_item_price}
       API strikethrough    - ₹${api_product_list_item_strikethrough_price}
+
+  # ── Add item to cart ──────────────────────────────────────────────────────
+  - action: tap
+    element: product_details_bottom_sticky_bar_button
+
+  - action: tap
+    element: size_selection_item_0
+
+  - action: tap
+    element: size_selection_add_to_cart_button
+
+  # ── Navigate to cart ──────────────────────────────────────────────────────
+  - action: tap
+    element: product_details_go_to_cart_button
+
+  - action: waitFor
+    element: cart_item_price_0
+
+  # ── Capture cart prices ───────────────────────────────────────────────────
+  - action: captureText
+    element: cart_item_price_0
+    variable: cart_item_price
+
+  - action: captureText
+    element: cart_item_strikethrough_price_0
+    variable: cart_item_strikethrough_price
+
+  # ── Assert: cart price == PDP price ──────────────────────────────────────
+  - action: assertText
+    element: cart_item_price_0
+    value: "${pdp_product_price}"
+
+  # ── Assert: cart strikethrough == PDP strikethrough ──────────────────────
+  - action: assertText
+    element: cart_item_strikethrough_price_0
+    value: "${pdp_product_strikethrough_price}"
+
+  # ── Cart price summary log ────────────────────────────────────────────────
+  - action: logVar
+    variable: cart_item_price
+    value: |
+      ── PDP vs Cart price summary ──
+      PDP price          - ${pdp_product_price}
+      Cart price         - ${cart_item_price}
+      PDP strikethrough  - ${pdp_product_strikethrough_price}
+      Cart strikethrough - ${cart_item_strikethrough_price}

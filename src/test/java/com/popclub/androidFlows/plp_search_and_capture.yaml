@@ -72,11 +72,9 @@ steps:
     element: product_list_item_price_${product_index}
     variable: product_list_item_price
 
-  # Strikethrough (MRP) price only renders when the product is discounted.
-  # Probe the UI element directly — capture it only when it's actually on screen,
-  # otherwise skip so non-discounted products don't fail the flow.
-  - action: ifPresent
-    element: product_list_item_strikethrough_price_${product_index}
+  - action: ifVarNotEquals
+    variable: api_product_list_item_price
+    value: "${api_product_list_item_strikethrough_price}"
     steps:
       - action: captureText
         element: product_list_item_strikethrough_price_${product_index}

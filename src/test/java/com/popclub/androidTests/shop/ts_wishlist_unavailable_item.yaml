@@ -1,0 +1,80 @@
+testName: Wishlist — Move unavailable cart item to wishlist
+platform: android
+noReset: true
+loginRequired: true
+
+features:
+  - common
+  - home
+  - shop
+
+tags:
+  - smoke
+  - shop
+  - wishlist
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  # ── Navigate to Shop and search ──────────────────────────────────────────
+  - action: tap
+    element: common_shop_tab
+
+  - action: waitFor
+    element: shop_search_icon
+
+  - action: tap
+    element: shop_search_icon
+
+  - action: enterText
+    element: search_input
+    value: "t-shirt"
+
+  - action: pressKey
+    value: search
+
+  - action: waitFor
+    element: product_list_item_0
+
+  # ── Add item to cart ─────────────────────────────────────────────────────
+  - action: tap
+    element: product_list_item_0
+
+  - action: waitFor
+    element: product_details_title
+
+  - action: tap
+    element: product_details_bottom_sticky_bar_button
+
+  - action: waitFor
+    element: size_selection_item_0
+
+  - action: tap
+    element: size_selection_item_0
+
+  - action: tap
+    element: size_selection_add_to_cart_button
+
+  - action: waitFor
+    element: product_details_go_to_cart_button
+
+  - action: tap
+    element: product_details_go_to_cart_button
+
+  - action: waitFor
+    element: cart_item_row_0
+
+  # ── If unavailable item section exists, move to wishlist ─────────────────
+  - action: scrollDown
+
+  - action: tapIfPresent
+    element: cart_unavailable_add_to_wishlist_button

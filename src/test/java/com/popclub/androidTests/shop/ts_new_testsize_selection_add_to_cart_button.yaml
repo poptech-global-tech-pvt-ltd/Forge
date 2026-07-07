@@ -1,0 +1,39 @@
+testName: PDP — Add to Cart size prompt
+platform: android
+noReset: true
+loginRequired: true
+retry: 1
+
+testCaseIds:
+  - PO-11070
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - smoke
+  - pdp
+  - size
+
+steps:
+  - action: call
+    flow: login_and_go_to_shop
+
+  - action: call
+    flow: search_and_open_pdp
+
+  - action: tap
+    element: product_details_bottom_sticky_bar_button
+
+  - action: waitFor
+    element: size_selection_item_0
+
+  - action: verifyElement
+    element: size_selection_item_0
+
+  - action: verifyElement
+    element: size_selection_add_to_cart_button
+    testCaseId: PO-11070

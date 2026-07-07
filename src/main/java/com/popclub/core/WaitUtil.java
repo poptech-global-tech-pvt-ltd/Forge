@@ -3,8 +3,6 @@ package com.popclub.core;
 import io.appium.java_client.AppiumDriver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.WebDriverWait;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.time.Duration;
 import java.util.List;
@@ -12,18 +10,18 @@ import java.util.List;
 public class WaitUtil {
 
     /**
-     * Zero-wait intelligence — Maestro-style poll loop.
+     * Batch poll — Maestro-style "zero-wait" using a single UI-tree dump per poll.
      *
-     * Instead of a single blocking WebDriverWait, this method polls the UI
-     * tree every {@code POLL_INTERVAL_MS} milliseconds and acts the instant
-     * the element becomes visible.  This means:
+     * Instead of firing one HTTP request per locator per poll interval, we fetch
+     * the full page source ONCE per interval and search it in-memory for all
+     * locators. This cuts HTTP calls by up to N× (where N = number of fallback
+     * locators) and eliminates the extra isDisplayed() round-trip.
      *
-     *   • No unnecessary sleep when the UI is already ready (common case).
-     *   • Tolerates transient StaleElement / render glitches automatically.
-     *   • Timeout is configurable per step (via {@code step.timeout}) or
-     *     falls back to the test-level {@code defaultTimeout} in TestCase YAML.
+     * HTTP calls per poll:
+     *   Before: N calls (one findElements per locator) + isDisplayed call
+     *   After:  1 call  (GET /source) + in-memory XML search
      *
-     * Equivalent to Maestro's built-in "zero-wait" behaviour for every command.
+     * Falls back to individual findElements if page source is unavailable.
      *
      * @param driver          Appium driver
      * @param locators        Ordered list of locators to try (accessibilityId first)
@@ -34,7 +32,7 @@ public class WaitUtil {
     public static WebElement pollUntilVisible(AppiumDriver driver,
                                               List<Locator> locators,
                                               int timeoutSeconds) {
-        final int POLL_INTERVAL_MS = 500;
+        final int POLL_INTERVAL_MS = 100;
         long deadline = System.currentTimeMillis() + (long) timeoutSeconds * 1000;
 
         // Disable Appium's own implicit wait so our poll controls the timing
@@ -42,20 +40,47 @@ public class WaitUtil {
 
         try {
             while (System.currentTimeMillis() < deadline) {
-                for (Locator locator : locators) {
-                    try {
-                        By by = LocatorUtil.getLocator(locator);
-                        List<WebElement> found = driver.findElements(by);
-                        if (!found.isEmpty() && found.get(0).isDisplayed()) {
-                            System.out.println("  ✓ found [" + locator.type + "] in "
-                                    + (timeoutSeconds * 1000 - (deadline - System.currentTimeMillis()))
-                                    / 1000.0 + "s");
-                            return found.get(0);
+                // ── Single HTTP call: fetch the entire UI tree ────────────────
+                String pageSource = null;
+                try {
+                    pageSource = driver.getPageSource();
+                } catch (Exception ignored) {
+                    // page source unavailable — fall through to per-locator fallback
+                }
+
+                if (pageSource != null) {
+                    // Search in-memory — no HTTP calls
+                    for (Locator locator : locators) {
+                        if (isPresentInSource(pageSource, locator)) {
+                            // Confirm with a quick findElement to get the WebElement reference
+                            try {
+                                By by = LocatorUtil.getLocator(locator);
+                                List<WebElement> found = driver.findElements(by);
+                                if (!found.isEmpty()) {
+                                    long elapsed = System.currentTimeMillis() - (deadline - (long) timeoutSeconds * 1000);
+                                    System.out.println("  ✓ found [" + locator.type + "] in "
+                                            + elapsed / 1000.0 + "s (batch)");
+                                    return found.get(0);
+                                }
+                            } catch (Exception ignored) {}
                         }
-                    } catch (Exception ignored) {
-                        // StaleElement, NoSuchElement — keep polling
+                    }
+                } else {
+                    // Fallback: individual findElements per locator (original behaviour)
+                    for (Locator locator : locators) {
+                        try {
+                            By by = LocatorUtil.getLocator(locator);
+                            List<WebElement> found = driver.findElements(by);
+                            if (!found.isEmpty() && found.get(0).isDisplayed()) {
+                                long elapsed = System.currentTimeMillis() - (deadline - (long) timeoutSeconds * 1000);
+                                System.out.println("  ✓ found [" + locator.type + "] in "
+                                        + elapsed / 1000.0 + "s (fallback)");
+                                return found.get(0);
+                            }
+                        } catch (Exception ignored) {}
                     }
                 }
+
                 try {
                     Thread.sleep(POLL_INTERVAL_MS);
                 } catch (InterruptedException e) {
@@ -64,7 +89,6 @@ public class WaitUtil {
                 }
             }
         } finally {
-            // Restore a reasonable implicit wait for any Appium calls outside WaitUtil
             driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
         }
 
@@ -73,26 +97,46 @@ public class WaitUtil {
     }
 
     /**
+     * Fast in-memory check — does the page source XML contain this locator?
+     * No HTTP call — searches the already-fetched tree string.
+     */
+    private static boolean isPresentInSource(String pageSource, Locator locator) {
+        if (pageSource == null || locator == null || locator.value == null) return false;
+        String val = locator.value;
+        switch (locator.type == null ? "" : locator.type.toLowerCase()) {
+            case "accessibilityid":
+                // <* content-desc="val" ...> or resource-id contains val
+                return pageSource.contains("content-desc=\"" + val + "\"")
+                    || pageSource.contains("resource-id=\"" + val + "\"");
+            case "id":
+                return pageSource.contains("resource-id=\"" + val + "\"");
+            case "xpath":
+                // Can't evaluate XPath on a string — fall back to contains heuristic
+                return pageSource.contains(val);
+            case "text":
+            case "uiautomator":
+                return pageSource.contains(val);
+            default:
+                return pageSource.contains(val);
+        }
+    }
+
+    /**
      * Convenience overload — reads the effective timeout from {@link TestContext}.
-     * Used by actions that receive a resolved step timeout via
-     * {@code TestExecutor.resolveStepTimeout(step)}.
      */
     public static WebElement pollUntilVisible(AppiumDriver driver, List<Locator> locators) {
         return pollUntilVisible(driver, locators, TestContext.getDefaultTimeout());
     }
 
     /**
-     * Legacy entry point — kept for backward compatibility and used by actions
-     * that haven't been migrated yet.  Internally delegates to
-     * {@link #pollUntilVisible} so all callers benefit from the poll loop.
+     * Legacy entry point — kept for backward compatibility.
      */
     public static WebElement waitForElement(AppiumDriver driver, List<Locator> locators) {
         return pollUntilVisible(driver, locators, TestContext.getDefaultTimeout());
     }
 
     /**
-     * waitForElement with an explicit timeout — used by callers that already
-     * compute the effective timeout (e.g. WaitForAction, TapAction).
+     * waitForElement with an explicit timeout.
      */
     public static WebElement waitForElement(AppiumDriver driver, List<Locator> locators,
                                             int timeoutSeconds) {
@@ -102,12 +146,17 @@ public class WaitUtil {
     /**
      * Quick non-blocking check — returns {@code null} if element is absent.
      * Used for {@code shouldExist: false} assertions and ifPresent probes.
-     * Does NOT use the poll loop — returns immediately.
      */
     public static WebElement findElementQuick(AppiumDriver driver, List<Locator> locators) {
         try {
             driver.manage().timeouts().implicitlyWait(Duration.ofMillis(0));
+
+            // Try batch source check first
+            String pageSource = null;
+            try { pageSource = driver.getPageSource(); } catch (Exception ignored) {}
+
             for (Locator locator : locators) {
+                if (pageSource != null && !isPresentInSource(pageSource, locator)) continue;
                 try {
                     By by = LocatorUtil.getLocator(locator);
                     List<WebElement> found = driver.findElements(by);

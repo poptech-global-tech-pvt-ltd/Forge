@@ -17,7 +17,7 @@ public class EligibilityPage {
     private static final String RELATIONSHIP_YES   = "text=yes";
     private static final String RELATIONSHIP_NO    = "text=no";
     private static final String YESBANK_CONSENT    = "input[name='yesbank_authorize_consent']";
-    // All required YES Bank consent checkboxes on /level-0.1
+    // All YES Bank consent checkboxes on /level-0.1 (yesbank_cross_selling is optional in UI but included for completeness)
     private static final String[] ALL_REQUIRED_CONSENTS = {
         "yesbank_authorize_consent",
         "promo_consent",
@@ -26,6 +26,7 @@ public class EligibilityPage {
         "user_comm_consent",
         "kfs_consent",
         "yesbank_gogreen_consent",
+        "yesbank_cross_selling",
         "digit_app_consent"
     };
     private static final String BANK_OFFICER_INPUT = "input[name='bank_officer_name']";
@@ -84,6 +85,14 @@ public class EligibilityPage {
     }
 
     public boolean isYesBankConsentVisible() {
+        try {
+            page.locator(YESBANK_CONSENT).waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        } catch (com.microsoft.playwright.impl.TargetClosedError e) {
+            throw e; // page is dead — let caller handle it
+        } catch (com.microsoft.playwright.PlaywrightException e) {
+            log.debug("EligibilityPage isYesBankConsentVisible: false (element not found after wait)");
+            return false;
+        }
         boolean visible = page.locator(YESBANK_CONSENT).isVisible();
         log.debug("EligibilityPage isYesBankConsentVisible: {}", visible);
         return visible;

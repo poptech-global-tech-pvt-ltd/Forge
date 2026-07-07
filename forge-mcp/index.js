@@ -466,6 +466,15 @@ function resolveLocator(tag, text, x, y) {
   return { type: "coords", x, y };
 }
 
+// ── Screenshot helper (shared by all action tools) ───────────────────────────
+
+function captureScreen(adbBase) {
+  const r = spawnSync("adb", [...adbBase, "exec-out", "screencap", "-p"],
+    { timeout: 10000, encoding: "buffer" });
+  if (r.error || !r.stdout?.length) return null;
+  return { type: "image", data: r.stdout.toString("base64"), mimeType: "image/png" };
+}
+
 // ── forge_device_screenshot ───────────────────────────────────────────────────
 
 server.tool(
@@ -478,20 +487,10 @@ server.tool(
   {},
 
   async () => {
-    const id = deviceId();
-    const args = [...(id ? ["-s", id] : []), "exec-out", "screencap", "-p"];
-    const r = spawnSync("adb", args, { timeout: 10000, encoding: "buffer" });
-    if (r.error || !r.stdout?.length) {
-      return { content: [{ type: "text", text: "❌ Screenshot failed: " + (r.error?.message || "no output") }] };
-    }
-    const b64 = r.stdout.toString("base64");
-    return {
-      content: [{
-        type : "image",
-        data : b64,
-        mimeType: "image/png",
-      }]
-    };
+    const id  = deviceId();
+    const img = captureScreen(id ? ["-s", id] : []);
+    if (!img) return { content: [{ type: "text", text: "❌ Screenshot failed" }] };
+    return { content: [img] };
   }
 );
 
@@ -568,7 +567,10 @@ server.tool(
     const out = [`✅ Tapped (${tapX}, ${tapY})`, ``, `Forge YAML step:`, yamlStep];
     if (warning) out.push(``, warning);
 
-    return { content: [{ type: "text", text: out.join("\n") }] };
+    const content = [{ type: "text", text: out.join("\n") }];
+    const img = captureScreen(adbBase);
+    if (img) content.push(img);
+    return { content };
   }
 );
 
@@ -590,7 +592,10 @@ server.tool(
     }
     const escaped = text.replace(/ /g, "%s").replace(/['"]/g, "");
     spawnSync("adb", [...adbBase, "shell", "input", "text", escaped], { timeout: 5000 });
-    return { content: [{ type: "text", text: `✅ Typed: "${text}"\n\nForge YAML step:\n- action: enterText\n  value: "${text}"` }] };
+    const content = [{ type: "text", text: `✅ Typed: "${text}"\n\nForge YAML step:\n- action: enterText\n  value: "${text}"` }];
+    const img = captureScreen(adbBase);
+    if (img) content.push(img);
+    return { content };
   }
 );
 
@@ -606,9 +611,13 @@ server.tool(
     const KEY_CODES = { back: 4, home: 3, search: 84, enter: 66, tab: 61, delete: 67 };
     const code = KEY_CODES[key.toLowerCase()];
     if (!code) return { content: [{ type: "text", text: `❌ Unknown key: ${key}. Use: ${Object.keys(KEY_CODES).join(", ")}` }] };
-    const id = deviceId();
-    spawnSync("adb", [...(id ? ["-s", id] : []), "shell", "input", "keyevent", String(code)], { timeout: 5000 });
-    return { content: [{ type: "text", text: `✅ Pressed: ${key}\n\nForge YAML step:\n- action: pressKey\n  value: ${key}` }] };
+    const id      = deviceId();
+    const adbBase = id ? ["-s", id] : [];
+    spawnSync("adb", [...adbBase, "shell", "input", "keyevent", String(code)], { timeout: 5000 });
+    const content = [{ type: "text", text: `✅ Pressed: ${key}\n\nForge YAML step:\n- action: pressKey\n  value: ${key}` }];
+    const img = captureScreen(adbBase);
+    if (img) content.push(img);
+    return { content };
   }
 );
 
@@ -622,7 +631,8 @@ server.tool(
     distance : z.number().optional().describe("Swipe distance in pixels (default 600)"),
   },
   ({ direction, distance = 600 }) => {
-    const id = deviceId();
+    const id      = deviceId();
+    const adbBase = id ? ["-s", id] : [];
     const cx = 540, cy = 1200;
     const d = distance;
     const coords = {
@@ -631,9 +641,265 @@ server.tool(
       left : [cx + d/2, cy, cx - d/2, cy],
       right: [cx - d/2, cy, cx + d/2, cy],
     }[direction];
-    spawnSync("adb", [...(id ? ["-s", id] : []), "shell", "input", "swipe",
+    spawnSync("adb", [...adbBase, "shell", "input", "swipe",
       ...coords.map(String), "400"], { timeout: 5000 });
-    return { content: [{ type: "text", text: `✅ Swiped ${direction}\n\nForge YAML step:\n- action: swipe\n  value: ${direction}` }] };
+    const content = [{ type: "text", text: `✅ Swiped ${direction}\n\nForge YAML step:\n- action: swipe\n  value: ${direction}` }];
+    const img = captureScreen(adbBase);
+    if (img) content.push(img);
+    return { content };
+  }
+);
+
+// ── forge_device_scroll_to ────────────────────────────────────────────────────
+
+server.tool(
+  "forge_device_scroll_to",
+  "Scroll the screen until the element with the given tag or text becomes visible " +
+  "(up to 8 swipes). Use direction 'down' to scroll forward (default), 'up' to go back. " +
+  "Generates a Forge YAML scrollDown/scrollUp step.",
+  {
+    tag      : z.string().optional().describe("qaTestTag / content-desc of the target element"),
+    text     : z.string().optional().describe("Visible text of the target element"),
+    direction: z.enum(["down", "up"]).optional().default("down").describe("Scroll direction"),
+    maxSwipes: z.number().optional().default(8).describe("Max swipes before giving up"),
+  },
+  async ({ tag, text, direction = "down", maxSwipes = 8 }) => {
+    const id      = deviceId();
+    const adbBase = id ? ["-s", id] : [];
+    const cx = 540, cy = 1200, dist = 600;
+    const [fromY, toY] = direction === "down" ? [cy, cy - dist] : [cy - dist, cy];
+
+    function findInXml(xml) {
+      return xml.split("<node").some(seg => {
+        const desc = (seg.match(/content-desc="([^"]*)"/) || [])[1] || "";
+        const txt  = (seg.match(/text="([^"]*)"/)         || [])[1] || "";
+        if (tag  && (desc === tag  || desc.includes(tag)))  return true;
+        if (text && (txt  === text || txt.toLowerCase().includes(text.toLowerCase()))) return true;
+        return false;
+      });
+    }
+
+    for (let i = 0; i < maxSwipes; i++) {
+      // Dump and check
+      spawnSync("adb", [...adbBase, "shell", "uiautomator", "dump", "/sdcard/wd.xml"], { timeout: 8000 });
+      const r = spawnSync("adb", [...adbBase, "shell", "cat", "/sdcard/wd.xml"],
+        { encoding: "utf8", maxBuffer: 10 * 1024 * 1024, timeout: 8000 });
+      if (findInXml(r.stdout || "")) {
+        const label = tag || `"${text}"`;
+        const content = [{ type: "text", text:
+          `✅ Found ${label} after ${i} swipe(s)\n\nForge YAML step:\n- action: scrollDown\n  element: ${tag || ""}` }];
+        const img = captureScreen(adbBase);
+        if (img) content.push(img);
+        return { content };
+      }
+      // Swipe
+      spawnSync("adb", [...adbBase, "shell", "input", "swipe",
+        String(cx), String(fromY), String(cx), String(toY), "400"], { timeout: 5000 });
+      await new Promise(r => setTimeout(r, 600));
+    }
+
+    const label = tag || `"${text}"`;
+    return { content: [{ type: "text", text: `❌ "${label}" not found after ${maxSwipes} swipe(s)` }] };
+  }
+);
+
+// ── forge_device_assert_text ──────────────────────────────────────────────────
+
+server.tool(
+  "forge_device_assert_text",
+  "Assert that a specific text string is visible on screen right now. " +
+  "Optionally also check that an element with the given tag contains that text. " +
+  "Returns PASS or FAIL with a Forge YAML verifyElement step.",
+  {
+    text   : z.string().describe("Text that must be visible on screen"),
+    tag    : z.string().optional().describe("qaTestTag of the element expected to contain this text"),
+    element: z.string().optional().describe("Registered element key expected to contain this text"),
+  },
+  async ({ text, tag, element }) => {
+    const id      = deviceId();
+    const adbBase = id ? ["-s", id] : [];
+
+    spawnSync("adb", [...adbBase, "shell", "uiautomator", "dump", "/sdcard/wd.xml"], { timeout: 8000 });
+    const r = spawnSync("adb", [...adbBase, "shell", "cat", "/sdcard/wd.xml"],
+      { encoding: "utf8", maxBuffer: 10 * 1024 * 1024, timeout: 8000 });
+    const xml = r.stdout || "";
+
+    // Check if text appears anywhere
+    const textFound = xml.split("<node").some(seg => {
+      const txt = (seg.match(/text="([^"]*)"/) || [])[1] || "";
+      return txt === text || txt.includes(text);
+    });
+
+    // Optionally verify it's inside the expected tagged element
+    let tagMatch = true;
+    if ((tag || element) && textFound) {
+      tagMatch = xml.split("<node").some(seg => {
+        const desc = (seg.match(/content-desc="([^"]*)"/) || [])[1] || "";
+        const txt  = (seg.match(/text="([^"]*)"/)         || [])[1] || "";
+        const tagVal = tag || element;
+        return (desc === tagVal || desc.includes(tagVal)) && txt.includes(text);
+      });
+    }
+
+    const pass = textFound && tagMatch;
+    const yamlStep = element
+      ? `- action: verifyElement\n  element: ${element}\n  text: "${text}"`
+      : `- action: tapByText\n  value: "${text}"  # use verifyElement if element key exists`;
+
+    return { content: [{ type: "text", text:
+      `${pass ? "✅ PASS" : "❌ FAIL"} — "${text}" ${pass ? "found" : "NOT found"} on screen` +
+      (tag || element ? `\nElement check (${tag || element}): ${tagMatch ? "✅ matched" : "❌ not matched"}` : "") +
+      `\n\nForge YAML step:\n${yamlStep}` }] };
+  }
+);
+
+// ── iOS device helpers ────────────────────────────────────────────────────────
+// All iOS tools use xcrun simctl / idb — no ADB.
+
+function iosDeviceId() {
+  // Prefer a booted simulator
+  const r = spawnSync("xcrun", ["simctl", "list", "devices", "booted", "--json"],
+    { encoding: "utf8", timeout: 8000 });
+  try {
+    const json = JSON.parse(r.stdout);
+    for (const runtimeDevices of Object.values(json.devices || {})) {
+      for (const d of runtimeDevices) {
+        if (d.state === "Booted") return { udid: d.udid, name: d.name, type: "simulator" };
+      }
+    }
+  } catch (_) {}
+  return null;
+}
+
+function xcrun(...args) {
+  const r = spawnSync("xcrun", args, { encoding: "utf8", timeout: 15000, maxBuffer: 10 * 1024 * 1024 });
+  return r.stdout || "";
+}
+
+server.tool(
+  "forge_ios_screenshot",
+  "Take a screenshot of the booted iOS Simulator and return it as a base64 PNG.",
+  {},
+  async () => {
+    const dev = iosDeviceId();
+    if (!dev) return { content: [{ type: "text", text: "❌ No booted iOS Simulator found. Boot one in Xcode first." }] };
+    const tmp = `/tmp/forge_ios_${Date.now()}.png`;
+    spawnSync("xcrun", ["simctl", "io", dev.udid, "screenshot", tmp], { timeout: 10000 });
+    try {
+      const buf = readFileSync(tmp);
+      return { content: [{ type: "image", data: buf.toString("base64"), mimeType: "image/png" }] };
+    } catch (_) {
+      return { content: [{ type: "text", text: "❌ Screenshot failed" }] };
+    }
+  }
+);
+
+server.tool(
+  "forge_ios_tap",
+  "Tap an element on the booted iOS Simulator by accessibility identifier or x/y coordinates.",
+  {
+    tag: z.string().optional().describe("Accessibility identifier (testTag) of element to tap"),
+    x  : z.number().optional().describe("X coordinate"),
+    y  : z.number().optional().describe("Y coordinate"),
+  },
+  async ({ tag, x, y }) => {
+    const dev = iosDeviceId();
+    if (!dev) return { content: [{ type: "text", text: "❌ No booted iOS Simulator found." }] };
+
+    if (tag) {
+      // Use idb if available, else fall back to simctl UI interaction
+      const idb = spawnSync("idb", ["ui", "tap", "--udid", dev.udid, "--accessibility-id", tag],
+        { encoding: "utf8", timeout: 8000 });
+      if (!idb.error) {
+        return { content: [{ type: "text", text: `✅ Tapped "${tag}"\n\nForge YAML step:\n- action: tap\n  element: ${tag}` }] };
+      }
+    }
+
+    if (x != null && y != null) {
+      spawnSync("xcrun", ["simctl", "io", dev.udid, "sendevent", "--type", "touch",
+        "--x", String(Math.round(x)), "--y", String(Math.round(y))], { timeout: 5000 });
+      return { content: [{ type: "text", text: `✅ Tapped (${x}, ${y})\n\nForge YAML step:\n- action: tap\n  x: ${x}\n  y: ${y}` }] };
+    }
+
+    return { content: [{ type: "text", text: "❌ Provide tag or x/y coordinates" }] };
+  }
+);
+
+server.tool(
+  "forge_ios_type",
+  "Type text into the currently focused field on the booted iOS Simulator.",
+  {
+    text: z.string().describe("Text to type"),
+  },
+  ({ text }) => {
+    const dev = iosDeviceId();
+    if (!dev) return { content: [{ type: "text", text: "❌ No booted iOS Simulator found." }] };
+    spawnSync("xcrun", ["simctl", "io", dev.udid, "sendtext", text], { timeout: 8000 });
+    return { content: [{ type: "text", text: `✅ Typed: "${text}"\n\nForge YAML step:\n- action: enterText\n  value: "${text}"` }] };
+  }
+);
+
+server.tool(
+  "forge_ios_key",
+  "Press a hardware key on the iOS Simulator. Common: home, lock.",
+  {
+    key: z.string().describe("Key: home | lock | siri | rotate_left | rotate_right"),
+  },
+  ({ key }) => {
+    const dev = iosDeviceId();
+    if (!dev) return { content: [{ type: "text", text: "❌ No booted iOS Simulator found." }] };
+    const BUTTONS = { home: "home", lock: "lock", siri: "siri", rotate_left: "rotate_left", rotate_right: "rotate_right" };
+    const btn = BUTTONS[key.toLowerCase()];
+    if (!btn) return { content: [{ type: "text", text: `❌ Unknown key: ${key}` }] };
+    spawnSync("xcrun", ["simctl", "io", dev.udid, "button", btn], { timeout: 5000 });
+    return { content: [{ type: "text", text: `✅ Pressed: ${key}` }] };
+  }
+);
+
+server.tool(
+  "forge_ios_swipe",
+  "Swipe on the booted iOS Simulator screen.",
+  {
+    direction: z.enum(["up", "down", "left", "right"]).describe("Swipe direction"),
+  },
+  ({ direction }) => {
+    const dev = iosDeviceId();
+    if (!dev) return { content: [{ type: "text", text: "❌ No booted iOS Simulator found." }] };
+    const cx = 200, cy = 400, dist = 300;
+    const coords = {
+      up   : [cx, cy + dist, cx, cy],
+      down : [cx, cy, cx, cy + dist],
+      left : [cx + dist, cy, cx, cy],
+      right: [cx, cy, cx + dist, cy],
+    }[direction];
+    // idb swipe — falls back gracefully if not installed
+    const idb = spawnSync("idb", ["ui", "swipe", "--udid", dev.udid,
+      String(coords[0]), String(coords[1]), String(coords[2]), String(coords[3])],
+      { encoding: "utf8", timeout: 8000 });
+    if (idb.error) {
+      return { content: [{ type: "text", text: `⚠️  idb not found — install with: brew install idb-companion\n(swipe not executed)` }] };
+    }
+    return { content: [{ type: "text", text: `✅ Swiped ${direction} on iOS Simulator\n\nForge YAML step:\n- action: swipe\n  value: ${direction}` }] };
+  }
+);
+
+server.tool(
+  "forge_ios_get_hierarchy",
+  "Dump the accessibility hierarchy of the booted iOS Simulator screen. " +
+  "Use this to find element identifiers before tapping.",
+  {},
+  async () => {
+    const dev = iosDeviceId();
+    if (!dev) return { content: [{ type: "text", text: "❌ No booted iOS Simulator found." }] };
+    // idb gives the richest output
+    const r = spawnSync("idb", ["ui", "describe-all", "--udid", dev.udid],
+      { encoding: "utf8", timeout: 15000, maxBuffer: 10 * 1024 * 1024 });
+    if (r.error || !r.stdout) {
+      return { content: [{ type: "text", text: "❌ idb not found or failed. Install: brew install idb-companion" }] };
+    }
+    // Trim to relevant fields only
+    const lines = r.stdout.split("\n").filter(l => /label|identifier|type|frame/.test(l)).slice(0, 100);
+    return { content: [{ type: "text", text: lines.join("\n") || "(empty hierarchy)" }] };
   }
 );
 
@@ -643,11 +909,16 @@ server.tool(
   "forge_device_launch",
   "Launch the POP app on the device (cold start).",
   {},
-  () => {
-    const id = deviceId();
-    spawnSync("adb", [...(id ? ["-s", id] : []), "shell", "monkey", "-p",
+  async () => {
+    const id      = deviceId();
+    const adbBase = id ? ["-s", id] : [];
+    spawnSync("adb", [...adbBase, "shell", "monkey", "-p",
       "com.popclub.android", "-c", "android.intent.category.LAUNCHER", "1"], { timeout: 8000 });
-    return { content: [{ type: "text", text: "✅ App launched\n\nForge YAML step:\n- action: launchApp" }] };
+    await new Promise(r => setTimeout(r, 2000)); // wait for app to load
+    const content = [{ type: "text", text: "✅ App launched\n\nForge YAML step:\n- action: launchApp" }];
+    const img = captureScreen(adbBase);
+    if (img) content.push(img);
+    return { content };
   }
 );
 

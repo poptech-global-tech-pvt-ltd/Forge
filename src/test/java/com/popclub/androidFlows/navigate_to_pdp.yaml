@@ -1,0 +1,60 @@
+# Reusable flow: login → search → open first qualifying product's PDP
+#
+# Pre-condition: none — starts from app launch.
+#
+# Inputs (set via `params:` in the calling test):
+#   search_query   — what to search for              (required)
+#   search_pincode — delivery pincode for API filter  (required)
+#   login_phone    — phone number for login           (optional — default: "1234561819")
+#   login_pin      — PIN for login                    (optional — default: "560102")
+#
+# Outputs stored in TestContext:
+#   — all vars from search_get_product (product_title, product_id, product_index,
+#     product_size, product_brand, api_product_list_item_price, etc.)
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "${login_phone}"
+    text: "${login_pin}"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  # ── API: get product data ────────────────────────────────────────────────
+  - action: call
+    flow: search_get_product
+    params:
+      search_query:   "${search_query}"
+      search_pincode: "${search_pincode}"
+
+  # ── UI: search and navigate to PLP ───────────────────────────────────────
+  - action: waitFor
+    element: shop_search_button
+
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: enterText
+    element: search_products_search_input
+    value: "${search_query}"
+
+  - action: pressKey
+    value: search
+
+  - action: waitFor
+    element: product_list_filter_button
+
+  - action: tap
+    element: product_list_item_${product_index}
+
+  # ── Wait for PDP to load ─────────────────────────────────────────────────
+  - action: waitFor
+    element: product_details_title

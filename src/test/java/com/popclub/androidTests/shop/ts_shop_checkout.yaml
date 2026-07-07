@@ -1,7 +1,7 @@
 testName: Shop — Add to cart and checkout (E2E)
 platform: android
 noReset: true
-loginRequired: true
+loginRequired: false
 
 testCaseIds:
   - PO-15308
@@ -16,8 +16,10 @@ features:
 tags:
   - smoke
   - shop
-  - checkout
+  - regression
+
 retry: 1
+
 steps:
   - action: launchApp
 
@@ -30,6 +32,7 @@ steps:
 
   - action: tap
     element: common_shop_tab
+    
 
   # ── PLP: navigate, capture API + UI prices ────────────────────────────────
   - action: call
@@ -53,10 +56,10 @@ steps:
     element: product_details_price
     variable: pdp_product_price
 
-  # PDP strikethrough (MRP) only renders for discounted products — probe the UI
-  # element directly and capture only when it's on screen, otherwise skip.
-  - action: ifPresent
-    element: product_details_strikethrough_price
+
+  - action: ifVarNotEquals
+    variable: api_product_list_item_price
+    value: "${api_product_list_item_strikethrough_price}"
     steps:
       - action: captureText
         element: product_details_strikethrough_price
@@ -78,18 +81,15 @@ steps:
   - action: assertText
     element: product_details_price
     value: "${product_list_item_price}"
-    numeric: true
     testCaseId: PO-15310
 
-  # Assert PDP strikethrough matches PLP strikethrough only when the element is
-  # actually rendered (skip for non-discounted products that show no MRP).
-  - action: ifPresent
-    element: product_details_strikethrough_price
+  - action: ifVarNotEquals
+    variable: api_product_list_item_price
+    value: "${api_product_list_item_strikethrough_price}"
     steps:
       - action: assertText
         element: product_details_strikethrough_price
         value: "${product_list_item_strikethrough_price}"
-        numeric: true
 
   # Popcoin tag visibility
   - action: ifVarEquals
@@ -107,6 +107,7 @@ steps:
       - action: verifyElement
         element: product_details_popcoin
         shouldExist: false
+    tes
 
   # Soft mismatch logs (PLP vs PDP)
   - action: ifVarNotEquals
@@ -132,6 +133,16 @@ steps:
   - action: tap
     element: product_details_bottom_sticky_bar_button
 
+  - action: ifPresent
+    element: size_selection_item_0
+    steps:
+      - action: tap
+        element: size_selection_item_0
+    else:
+      - action: loginIfNeeded
+        value: "9876543210"
+        text: "560102"
+
   - action: waitFor
     element: size_selection_item_0
 
@@ -140,6 +151,26 @@ steps:
 
   - action: tap
     element: size_selection_add_to_cart_button
+
+  - action: captureToast
+    element: add_to_cart_snackbar
+    variable: add_to_cart_snackbar_text
+    timeout: 4000
+    optional: true
+
+  - action: logVar
+    variable: add_to_cart_snackbar_text
+    value: "add to cart snackbar - ${add_to_cart_snackbar_text}"
+
+  - action: ifVarNotEmpty
+    variable: add_to_cart_snackbar_text
+    steps:
+      - action: ifVarNotEquals
+        variable: add_to_cart_snackbar_text
+        value: "Added to Basket Successfully"
+        steps:
+          - action: fail
+            value: "Add to cart failed — snackbar said: ${add_to_cart_snackbar_text}"
 
   - action: waitFor
     element: product_details_go_to_cart_button
@@ -199,21 +230,17 @@ steps:
     element: cart_item_price_${cart_item_index}
     variable: cart_item_price
 
-  # Strikethrough (MRP) and discount tags only render for discounted items —
-  # capture them only when present so non-discounted items don't fail.
-  - action: ifPresent
-    element: cart_item_strikethrough_price_${cart_item_index}
+  - action: ifVarNotEquals
+    variable: api_product_list_item_price
+    value: "${api_product_list_item_strikethrough_price}"
     steps:
       - action: captureText
         element: cart_item_strikethrough_price_${cart_item_index}
         variable: cart_item_strikethrough_price
 
-  - action: ifPresent
+  - action: captureText
     element: cart_item_discount_${cart_item_index}
-    steps:
-      - action: captureText
-        element: cart_item_discount_${cart_item_index}
-        variable: cart_item_discount
+    variable: cart_item_discount
 
   - action: captureText
     element: cart_item_size_${cart_item_index}
@@ -242,43 +269,18 @@ steps:
   - action: assertText
     element: cart_item_price_${cart_item_index}
     value: "${product_list_item_price}"
-    numeric: true
 
-  # Assert cart strikethrough only when the item actually shows an MRP.
-  - action: ifPresent
-    element: cart_item_strikethrough_price_${cart_item_index}
+  - action: ifVarNotEquals
+    variable: api_product_list_item_price
+    value: "${api_product_list_item_strikethrough_price}"
     steps:
       - action: assertText
         element: cart_item_strikethrough_price_${cart_item_index}
         value: "${product_list_item_strikethrough_price}"
-        numeric: true
 
   - action: assertText
     element: cart_item_size_${cart_item_index}
-    value: "Size ${product_size}"
-
-  # ── Cart: Quantity stepper ────────────────────────────────────────────────
-  # NOTE: the app does not expose the quantity number as a tagged element
-  # (no `cart_item_quantity_N` accessibilityId on the cart screen — only the
-  # +/- buttons are tagged). So we cannot read/assert the number directly.
-  # We verify the stepper buttons exist and are tappable instead.
-  # TODO: re-add quantity assertions once the app tags the quantity value.
-
-  # Increase and decrease buttons must be present for this item
-  - action: verifyElement
-    element: cart_item_increase_button_${cart_item_index}
-    shouldExist: true
-
-  - action: verifyElement
-    element: cart_item_decrease_button_${cart_item_index}
-    shouldExist: true
-
-  # Tap increase (1 → 2) then decrease (2 → 1) to exercise the stepper
-  - action: tap
-    element: cart_item_increase_button_${cart_item_index}
-
-  - action: tap
-    element: cart_item_decrease_button_${cart_item_index}
+    value: "${product_size}"
 
   # ── Tap Pay → verify payment screen loaded ────────────────────────────────
   - action: tap

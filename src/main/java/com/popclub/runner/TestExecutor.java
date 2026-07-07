@@ -30,7 +30,12 @@ public class TestExecutor {
     public void execute(TestCase testCase) {
 
         int stepIndex = 1;
-        int maxRetry = testCase.retry > 0 ? testCase.retry : 2;
+        // retry: N in YAML means "total attempts per step"
+        //   retry: 1 → 1 attempt, no retry
+        //   retry: 2 → 2 attempts, 1 retry
+        //   retry: 0 or unset → default 3 attempts (2 retries)
+        // maxRetry = total - 1 (used as while(attempt <= maxRetry))
+        int maxRetry = testCase.retry > 0 ? testCase.retry - 1 : 2;
 
         // fromStep: skip all steps before this index (1-based). When set, noReset
         // is forced so the running app is NOT killed/restarted — the device must

@@ -34,6 +34,7 @@ public class FullApplicationFlowTest extends WebBaseTest {
     private static final String MAP_QUERY      = "Poptech";
     private static final String MAP_SUGGESTION = "Poptech Growth Private Limited, Haralur,";
     private static final String AADHAAR_NUMBER = "314510407414";
+    private static final String AADHAAR_OTP    = "608495";
 
     @Override
     protected boolean isEkycTest(org.testng.ITestResult result) {
@@ -255,10 +256,9 @@ public class FullApplicationFlowTest extends WebBaseTest {
         YesBankConsentPage yesBankPage = new YesBankConsentPage(page);
         yesBankPage.fillAadhaar(AADHAAR_NUMBER)
                    .acceptConsent()
-                   .clickSubmit();
-        String aadhaarOtp = AadhaarOtpReader.waitForOtp(30_000);
-        log.info("[WEB] Step 13: Aadhaar OTP received: {}", aadhaarOtp);
-        yesBankPage.fillOtp(aadhaarOtp).clickSubmitOtp();
+                   .clickSubmit()
+                   .fillOtp(AADHAAR_OTP)
+                   .clickSubmitOtp();
         assertNotOnErrorPage();
 
         log.info("[WEB] Step 14: Video KYC — verify and start");

@@ -1,0 +1,71 @@
+testName: Shop — Verify Empty Cart State
+platform: android
+noReset: true
+loginRequired: true
+
+features:
+  - common
+  - shop
+
+tags:
+  - smoke
+  - shop
+  - cart
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab  # healed locator → common_home_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  - action: waitFor
+    element: shop_search_button
+
+  - action: call
+    flow: clear_cart
+
+  # Verify empty cart state
+  - action: waitFor
+    element: cart_shop_more_button
+
+  - action: verifyElement
+    element: cart_shop_more_button
+
+  - action: verifyElement
+    element: cart_item_row_0
+    shouldExist: false
+
+  # Verify search results for yogabar
+  - action: tap
+    element: common_shop_tab
+
+  - action: waitFor
+    element: shop_search_button
+
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: enterText
+    element: search_products_search_input
+    value: "yogabar"
+
+  - action: pressKey
+    element: search_key
+
+  - action: waitFor
+    element: product_list_item_0
+
+  - action: verifyElement
+    element: product_list_item_0
