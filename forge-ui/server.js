@@ -852,7 +852,7 @@ wss.on('connection', (ws) => {
     try { msg = JSON.parse(raw); } catch (_) { return; }
 
     if (msg.type === 'run') {
-      startTest(msg.file, msg.device, ws, msg.fromStep);
+      startTest(msg.file, msg.device, ws, msg.fromStep, msg.batchRun);
     } else if (msg.type === 'stop') {
       stopTest(ws);
     } else if (msg.type === 'chat') {
@@ -900,7 +900,7 @@ function stopTest(ws) {
   broadcast({ type: 'stopped' });
 }
 
-function startTest(file, deviceOverride, ws, fromStep) {
+function startTest(file, deviceOverride, ws, fromStep, batchRun) {
   if (currentRun) {
     try { process.kill(-currentRun.pid, 'SIGTERM'); } catch (_) {}
     currentRun = null;
@@ -930,6 +930,12 @@ function startTest(file, deviceOverride, ws, fromStep) {
 
   if (startStep) {
     args.push(`-DfromStep=${startStep}`);
+  }
+
+  // Only a "Run Folder" batch represents an actual reportable run — a single ad-hoc
+  // test shouldn't create a TestSigma run (see TestListener.onStart / TestSigmaYamlListener.onStart).
+  if (batchRun) {
+    args.push('-DbatchRun=true');
   }
 
   console.log(`Running: mvn ${args.join(' ')}`);
