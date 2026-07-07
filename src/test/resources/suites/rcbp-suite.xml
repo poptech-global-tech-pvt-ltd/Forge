@@ -3,20 +3,12 @@
   RCBP API Test Suite
   Run: mvn test -DsuiteXmlFile=src/test/resources/suites/rcbp-suite.xml -Denv=sit
 
-  Tests run sequentially (parallel=false) because each test class is a chained
-  flow where later steps depend on values extracted from earlier steps.
-
-  Credit Card Bills (10 tests):
-    list billers → input fields → fetch bills → initiate payment → confirm payment
-
-  Mobile Postpaid Bills (10 tests):
-    list billers → input fields → bill fetch → initiate payment → confirm payment
-
-  Prepaid Recharge (10 tests + 2 independent operator-circle tests):
-    fetch plans → bill fetch → initiate payment → confirm payment
-    + independent: fetch operator-circle
+  Tests run sequentially (parallel=false).
+  Positive flows are chained; negative tests are all independent (no dependsOnMethods).
 -->
 <suite name="RCBP API Tests" verbose="2" parallel="false">
+
+    <!-- ── Positive flows ──────────────────────────────────────────────────── -->
 
     <test name="Credit Card Bills">
         <groups>
@@ -48,6 +40,41 @@
         </groups>
         <classes>
             <class name="com.popclub.apiTests.rcbp.RechargeTest"/>
+        </classes>
+    </test>
+
+    <!-- ── Negative tests ──────────────────────────────────────────────────── -->
+
+    <test name="Credit Card Bills - Negative">
+        <groups>
+            <run>
+                <include name="rcbp-credit-card-negative"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.popclub.apiTests.rcbp.CreditCardBillsNegativeTest"/>
+        </classes>
+    </test>
+
+    <test name="Mobile Postpaid Bills - Negative">
+        <groups>
+            <run>
+                <include name="rcbp-mobile-postpaid-negative"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.popclub.apiTests.rcbp.MobilePostpaidBillsNegativeTest"/>
+        </classes>
+    </test>
+
+    <test name="Prepaid Recharge - Negative">
+        <groups>
+            <run>
+                <include name="rcbp-recharge-negative"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.popclub.apiTests.rcbp.PrepaidRechargeNegativeTest"/>
         </classes>
     </test>
 
