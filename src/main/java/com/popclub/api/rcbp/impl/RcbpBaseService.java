@@ -10,56 +10,71 @@ import io.restassured.specification.RequestSpecification;
 /**
  * Base service for RCBP APIs.
  *
- * All requests share {{pop-rcbp-base}} as the base URL.
- * The Authorization header ({{rcbp_token}}) is DISABLED on every request in the
- * collection — no token is sent. Auth is done exclusively via X-Userid headers,
- * whose variable name differs per request group:
+ * Two base URLs are used across the collections:
+ *   rcbp.base.url     → catalogue, recharge, CC, prepaid initiate  (base())
+ *   rcbp.api.base.url → postpaid+prepaid bill fetch / payment       (apiBase())
  *
- *   buildCreditCardSpec()       → X-Userid: {{user_id}}
- *   buildMobilePostpaidSpec()   → X-Userid: {{userid}}
- *   buildMobilePostpaidInputFieldsSpec() → phone: {{phone}} + X-Userid: {{userid}}
- *   buildRechargeSpec(userid)   → X-Userid: supplied by caller ({{X-Userid}} or hardcoded)
- *   buildNoAuthSpec()           → X-Userid: {{X-Userid}}, Postman auth type = "noauth"
- *                                 (used for fetch operators/states — no Authorization token)
+ * Authorization is DISABLED on every request. Auth is via X-Userid only.
+ *
+ * Spec builder → X-Userid mapping:
+ *   buildSpecWithUserId()       → X-Userid: {{user_id}}  (CC list billers, postpaid catalogue, prepaid initiate)
+ *   buildSpecWithCcInputId()    → X-Userid: 019a97c6-... (CC input fields, bills, initiate, confirm)
+ *   buildSpecWithOperatorId()   → X-Userid: 019cfef7-... (operator-circle, prepaid plans)
+ *   buildApiSpecWithOperatorId()→ X-Userid: 019cfef7-... + rcbp.api.base.url (postpaid+prepaid bills/payment)
+ *   buildRechargeSpec(userid)   → X-Userid: supplied by caller (legacy — {{X-Userid}} for operators/states)
  */
 public abstract class RcbpBaseService {
 
-    // ── Spec builders ─────────────────────────────────────────────────────────
+    // ── Spec builders (rcbp.base.url) ─────────────────────────────────────────
 
-    /** Credit card requests — X-Userid: {{user_id}} */
-    protected RequestSpecification buildCreditCardSpec() {
+    /**
+     * X-Userid: {{user_id}}.
+     * Used by: CC list billers, postpaid list billers + input fields, prepaid initiate.
+     */
+    protected RequestSpecification buildSpecWithUserId() {
         return base()
                 .header("X-Userid", RcbpConfigManager.getUserId());
     }
 
-    /** Mobile postpaid billers + fetch bill — X-Userid: {{userid}} */
-    protected RequestSpecification buildMobilePostpaidSpec() {
+    /**
+     * X-Userid: 019a97c6-d10a-745c-b303-e39b963e540d (CC-specific hardcoded UUID).
+     * Used by: CC input fields, CC fetch bills, CC initiate payment, CC confirm payment.
+     */
+    protected RequestSpecification buildSpecWithCcInputId() {
         return base()
-                .header("X-Userid", RcbpConfigManager.getUserid());
+                .header("X-Userid", RcbpConfigManager.getCcInputUserId());
     }
 
     /**
-     * Mobile postpaid input fields — phone header + X-Userid: {{userid}}.
-     * The collection sends a "phone" request header (not a query param) on this
-     * specific request, alongside X-Userid.
+     * X-Userid: 019cfef7-10b7-7cdc-8077-b96cf69e39d6 (operator UUID).
+     * Used by: operator-circle, prepaid fetch plans.
      */
-    protected RequestSpecification buildMobilePostpaidInputFieldsSpec() {
+    protected RequestSpecification buildSpecWithOperatorId() {
         return base()
-                .header("phone",    RcbpConfigManager.getPhone())
-                .header("X-Userid", RcbpConfigManager.getUserid());
+                .header("X-Userid", RcbpConfigManager.getOperatorUserid());
     }
 
     /**
      * Recharge spec — X-Userid supplied by caller.
-     * Used because the collection uses different X-Userid values per recharge request:
-     *   - fetch operators/states → {{X-Userid}}
-     *   - operator-circle        → hardcoded UUID (019cfef7-10b7-7cdc-8077-b96cf69e39d6)
-     *   - fetch plans            → {{X-Userid}}
+     * Kept for: fetch operators/states (X-Userid: {{X-Userid}}).
      */
     protected RequestSpecification buildRechargeSpec(String xUserid) {
         return base()
                 .header("X-Userid", xUserid);
     }
+
+    // ── Spec builders (rcbp.api.base.url) ────────────────────────────────────
+
+    /**
+     * Uses rcbp.api.base.url + X-Userid: 019cfef7-10b7-7cdc-8077-b96cf69e39d6.
+     * Used by: postpaid+prepaid bill fetch, payment initiate, payment confirm.
+     */
+    protected RequestSpecification buildApiSpecWithOperatorId() {
+        return apiBase()
+                .header("X-Userid", RcbpConfigManager.getOperatorUserid());
+    }
+
+    // ── Private base helpers ──────────────────────────────────────────────────
 
     private RequestSpecification base() {
         return RestAssured.given()
@@ -68,6 +83,25 @@ public abstract class RcbpBaseService {
                 .filter(new RequestLoggingFilter())
                 .filter(new ResponseLoggingFilter());
     }
+
+    private RequestSpecification apiBase() {
+        return RestAssured.given()
+                .baseUri(RcbpConfigManager.getApiBaseUrl())
+                .contentType(ContentType.JSON)
+                .filter(new RequestLoggingFilter())
+                .filter(new ResponseLoggingFilter());
+    }
+
+    // ── Legacy aliases (kept to avoid breaking existing callers) ─────────────
+
+    /** @deprecated use buildSpecWithUserId() */
+    protected RequestSpecification buildCreditCardSpec()             { return buildSpecWithUserId(); }
+
+    /** @deprecated use buildSpecWithOperatorId() or buildApiSpecWithOperatorId() */
+    protected RequestSpecification buildMobilePostpaidSpec()         { return buildSpecWithUserId(); }
+
+    /** @deprecated use buildSpecWithUserId() */
+    protected RequestSpecification buildMobilePostpaidInputFieldsSpec() { return buildSpecWithUserId(); }
 
     // ── Status assertion (mirrors BaseService pattern) ────────────────────────
 

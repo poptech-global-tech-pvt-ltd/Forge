@@ -3,9 +3,18 @@
   RCBP API Test Suite
   Run: mvn test -DsuiteXmlFile=src/test/resources/suites/rcbp-suite.xml -Denv=sit
 
-  Tests run sequentially (parallel=false) because:
-  - MobilePostpaidBillsTest is a chained flow (steps depend on each other)
-  - RechargeTest is a chained flow (operator-circle → plans)
+  Tests run sequentially (parallel=false) because each test class is a chained
+  flow where later steps depend on values extracted from earlier steps.
+
+  Credit Card Bills (10 tests):
+    list billers → input fields → fetch bills → initiate payment → confirm payment
+
+  Mobile Postpaid Bills (10 tests):
+    list billers → input fields → bill fetch → initiate payment → confirm payment
+
+  Prepaid Recharge (10 tests + 2 independent operator-circle tests):
+    fetch plans → bill fetch → initiate payment → confirm payment
+    + independent: fetch operator-circle
 -->
 <suite name="RCBP API Tests" verbose="2" parallel="false">
 
@@ -31,7 +40,7 @@
         </classes>
     </test>
 
-    <test name="Recharge">
+    <test name="Prepaid Recharge">
         <groups>
             <run>
                 <include name="rcbp-recharge"/>
