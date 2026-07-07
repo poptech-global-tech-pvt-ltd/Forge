@@ -52,7 +52,31 @@ public class TestSigmaClient {
             return null;
         }
 
-        return response.jsonPath().getString("data.test_run.id");
+        String uuid = response.jsonPath().getString("data.test_run.id");
+        String humanId = response.jsonPath().getString("data.test_run.human_id");
+
+        // The internal UUID is what every other API call needs, but it's useless for a
+        // human to track — TestSigma's own UI lists runs by this short human_id (e.g.
+        // "PO-R-361") instead. Surface it clearly and save it to disk so it's easy to
+        // find the run in the dashboard without digging through logs for a UUID.
+        System.out.println("[TestSigma] Run ID: " + humanId + "  (internal id: " + uuid + ")");
+        writeLastRunIdToFile(title, humanId, uuid);
+
+        return uuid;
+    }
+
+    /** Writes the most recently created run's identifiers to reports/testsigma_last_run.txt. */
+    private static void writeLastRunIdToFile(String title, String humanId, String uuid) {
+        try {
+            java.io.File dir = new java.io.File("reports");
+            if (!dir.exists()) dir.mkdirs();
+            String content = "Run title: " + title + "\n"
+                    + "Run ID: " + humanId + "\n"
+                    + "Internal UUID: " + uuid + "\n";
+            java.nio.file.Files.writeString(new java.io.File(dir, "testsigma_last_run.txt").toPath(), content);
+        } catch (Exception e) {
+            System.out.println("[TestSigma] ⚠️  Could not write testsigma_last_run.txt: " + e.getMessage());
+        }
     }
 
     public static void updateRunStatus(String projectId, String runId, RunStatus status) {
@@ -90,14 +114,22 @@ public class TestSigmaClient {
         throw new RuntimeException("TestCase not found: " + humanId);
     }
 
-    public static Map<String, String> getTestCaseRunMap(String runId) {
+    /**
+     * Maps each test case (by human_id and uuid) in a run to its test_case_run id
+     * (needed for attachment uploads and status overrides).
+     *
+     * NOTE: the endpoint is "/projects/{projectId}/test_runs/{runId}/test_cases"
+     * (same path as the status-update PUT, just GET) returning "test_run_cases" —
+     * NOT "/test_runs/{runId}/test_case_runs" / "test_case_runs", which 404s.
+     */
+    public static Map<String, String> getTestCaseRunMap(String projectId, String runId) {
         Map<String, String> map = new HashMap<>();
 
         Response response = given()
                 .header("Authorization", authHeader())
-                .get("/test_runs/" + runId + "/test_case_runs");
+                .get("/projects/" + projectId + "/test_runs/" + runId + "/test_cases");
 
-        List<Map<String, Object>> list = response.jsonPath().getList("data.test_case_runs");
+        List<Map<String, Object>> list = response.jsonPath().getList("data.test_run_cases");
         if (list == null) return map;
 
         for (Map<String, Object> item : list) {
@@ -148,11 +180,153 @@ public class TestSigmaClient {
         }
     }
 
-    public static void uploadAttachment(String testCaseRunId, java.io.File file) {
-        given()
-                .header("Authorization", authHeader())
-                .multiPart("file", file)
-                .post("/test_case_runs/" + testCaseRunId + "/attachments");
+    /** Host for the GraphQL API — a completely different path root than the REST /api/v1 base. */
+    private static final String GRAPHQL_HOST = "https://test-management.testsigma.com";
+
+    /**
+     * Uploads a file (screenshot/video/log) as an attachment on a test case's run attempt.
+     *
+     * TestSigma has NO REST endpoint for this — every "/test_case_runs/.../attachments"
+     * style path 404s. The web app itself uploads via a GraphQL mutation
+     * (CreateRunAttemptForTestCase → updateTestRunCaseStatus) at a different host path
+     * (/private/graphql, not /api/v1/...), discovered by inspecting the web app's own
+     * network traffic. It uses the GraphQL multipart request spec: an "operations" JSON
+     * part (file field set to null), a "map" JSON part pointing at that field, and the
+     * raw file as a separate named part ("0").
+     *
+     * Auth: this endpoint rejects the Bearer API token ("Invalid session token") — it only
+     * accepts a live browser session via the X-TMS-SESSION-ID cookie. Confirmed by testing
+     * both directly against /private/graphql. Set testsigma.session.cookie (system property
+     * or testsigma.properties) to a value copied from DevTools → Application → Cookies after
+     * logging into test-management.testsigma.com. This is a manual, expiring workaround, not
+     * a long-term automation fix — there is no public API for attachments (confirmed against
+     * TestSigma's official API module list).
+     *
+     * @return true if TestSigma accepted the upload (2xx, no GraphQL "errors"), false otherwise.
+     */
+    public static boolean uploadAttachment(String testRunId, String testCaseId,
+                                            String testRunStatusId, String userId,
+                                            String description, java.io.File file) {
+        String sessionCookie = TestSigmaConfig.sessionCookie();
+        if (sessionCookie == null || sessionCookie.isEmpty()) {
+            System.out.println("[TestSigma] ⚠️  testsigma.session.cookie not set — skipping attachment upload for "
+                    + file.getName());
+            return false;
+        }
+
+        String operations = "{"
+                + "\"operationName\":\"CreateRunAttemptForTestCase\","
+                + "\"query\":\"mutation CreateRunAttemptForTestCase($input: [UpdateTestRunCaseStatusInput!]!) "
+                + "{ updateTestRunCaseStatus(input: $input) { testRunAttempt { id attachments { id name } } } }\","
+                + "\"variables\":{\"input\":[{"
+                + "\"attachments\":[{\"attachment\":null,\"resourceType\":\"TEST_CASES\"}],"
+                + "\"description\":\"" + description + "\","
+                + "\"testCaseId\":\"" + testCaseId + "\","
+                + "\"testRunId\":\"" + testRunId + "\","
+                + "\"testRunStatusId\":\"" + testRunStatusId + "\","
+                + "\"userId\":\"" + userId + "\""
+                + "}]}}";
+
+        String map = "{\"0\":[\"variables.input.0.attachments.0.attachment\"]}";
+
+        Response response = given()
+                .baseUri(GRAPHQL_HOST)
+                .header("Cookie", "X-TMS-SESSION-ID=" + sessionCookie)
+                .multiPart("operations", operations)
+                .multiPart("map", map)
+                .multiPart("0", file)
+                .post("/private/graphql");
+
+        System.out.println("[TestSigma] 🔍 Upload response for " + file.getName() + " (testCaseId="
+                + testCaseId + ", testRunId=" + testRunId + "): " + response.getBody().asString());
+
+        int status = response.getStatusCode();
+        if (status < 200 || status >= 300) {
+            System.out.println("[TestSigma] ⚠️  Attachment upload FAILED [" + status + "] for "
+                    + file.getName() + ": " + response.getBody().asString());
+            return false;
+        }
+
+        // GraphQL returns 200 even when the mutation itself failed — check "errors"
+        // AND check that the mutation's own return payload isn't null (TestSigma
+        // silently returns {"data":{"updateTestRunCaseStatus":null}} when the
+        // testCaseId it was given doesn't match a case in this run).
+        Object mutationResult = response.jsonPath().get("data.updateTestRunCaseStatus");
+        if (mutationResult == null) {
+            System.out.println("[TestSigma] ⚠️  Attachment upload returned null result (testCaseId not matched in this run) for "
+                    + file.getName() + ": " + response.getBody().asString());
+            return false;
+        }
+
+        List<Object> errors = response.jsonPath().getList("errors");
+        if (errors != null && !errors.isEmpty()) {
+            System.out.println("[TestSigma] ⚠️  Attachment upload GraphQL error for "
+                    + file.getName() + ": " + errors);
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Adds a text-only comment (no attachment) to a test case's run attempt — the same
+     * GraphQL mutation used by {@link #uploadAttachment}, but with an empty attachments
+     * array. Used to attach the full captured console log as a FAILED case's comment,
+     * since the REST /test_runs/.../test_cases PUT's "description" field is silently
+     * ignored by TestSigma (confirmed by inspecting the request TestSigma's own UI
+     * sends when a user manually adds a comment — it's this same mutation, not REST).
+     */
+    public static boolean addRunComment(String testRunId, String testCaseId,
+                                         String testRunStatusId, String userId,
+                                         String description) {
+        String sessionCookie = TestSigmaConfig.sessionCookie();
+        if (sessionCookie == null || sessionCookie.isEmpty()) {
+            System.out.println("[TestSigma] ⚠️  testsigma.session.cookie not set — skipping comment for " + testCaseId);
+            return false;
+        }
+
+        try {
+            Map<String, Object> input = new HashMap<>();
+            input.put("attachments", List.of());
+            input.put("description", description);
+            input.put("testCaseId", testCaseId);
+            input.put("testRunId", testRunId);
+            input.put("testRunStatusId", testRunStatusId);
+            input.put("userId", userId);
+
+            Map<String, Object> body = new HashMap<>();
+            body.put("operationName", "CreateRunAttemptForTestCase");
+            body.put("query", "mutation CreateRunAttemptForTestCase($input: [UpdateTestRunCaseStatusInput!]!) "
+                    + "{ updateTestRunCaseStatus(input: $input) { testRunAttempt { id attachments { id name } } } }");
+            body.put("variables", Map.of("input", List.of(input)));
+
+            Response response = given()
+                    .baseUri(GRAPHQL_HOST)
+                    .header("Cookie", "X-TMS-SESSION-ID=" + sessionCookie)
+                    .contentType("application/json")
+                    .body(body)
+                    .post("/private/graphql");
+
+            Object mutationResult = response.jsonPath().get("data.updateTestRunCaseStatus");
+            if (mutationResult == null) {
+                System.out.println("[TestSigma] ⚠️  Comment failed (null result) for " + testCaseId
+                        + ": " + response.getBody().asString());
+                return false;
+            }
+
+            List<Object> errors = response.jsonPath().getList("errors");
+            if (errors != null && !errors.isEmpty()) {
+                System.out.println("[TestSigma] ⚠️  Comment GraphQL error for " + testCaseId + ": " + errors);
+                return false;
+            }
+
+            System.out.println("[TestSigma] 💬 Failure log comment added for " + testCaseId);
+            return true;
+
+        } catch (Exception e) {
+            System.out.println("[TestSigma] ⚠️  Failed to add comment for " + testCaseId + ": " + e.getMessage());
+            return false;
+        }
     }
 
     public static List<Map<String, Object>> getTestRuns(String projectId, String search) {

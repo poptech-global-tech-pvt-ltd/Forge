@@ -49,6 +49,7 @@ src/test/resources/qa.properties
 local.cloud.properties
 src/test/resources/local.cloud.properties
 src/main/resources/config/local.cloud.properties
+src/test/resources/config/testsigma-local.properties
 
 ### Forge ###
 *.apk

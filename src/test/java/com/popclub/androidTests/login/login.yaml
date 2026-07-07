@@ -3,7 +3,7 @@ platform: android
 noReset: false
 
 testCaseIds:
-  - PO-6184
+  - PO-1589
 
 features:
   - login

@@ -46,11 +46,24 @@ public class TestSigmaYamlListener implements ISuiteListener, ITestListener {
             return;
         }
 
+        // Single-file runs shouldn't create a TestSigma run either — only a group of
+        // tests does: a Forge UI "Run Folder" batch (-DbatchRun=true), or a tag-based
+        // run (-Dtag=..., e.g. in CI/CD), since tags are themselves a grouping
+        // mechanism. See TestListener.onStart for the full rationale.
+        String tagParam = System.getProperty("tag", suite.getParameter("tag"));
+        boolean tagRun = tagParam != null && !tagParam.isEmpty();
+        if (!Boolean.parseBoolean(System.getProperty("batchRun", "false")) && !tagRun) {
+            System.out.println("[TestSigma] Single-file run — skipping TestSigma run creation (YAML listener).");
+            enabled = false;
+            return;
+        }
+
         try {
             projectId = TestSigmaConfig.projectId();
 
             // 1. Collect testCaseIds from YAML files that will run
             List<String> humanIds = collectTestCaseIds(suite);
+
             if (humanIds.isEmpty()) {
                 System.out.println("[TestSigma] No testCaseIds found in YAML files — skipping run creation");
                 enabled = false;
@@ -109,7 +122,7 @@ public class TestSigmaYamlListener implements ISuiteListener, ITestListener {
             System.out.println("[TestSigma] Run created: " + title + " (" + runId + ")");
 
             // 4. Build testCaseRun map (UUID / humanId → testCaseRun id)
-            testCaseRunMap = TestSigmaClient.getTestCaseRunMap(runId);
+            testCaseRunMap = TestSigmaClient.getTestCaseRunMap(projectId, runId);
 
         } catch (Exception e) {
             System.out.println("[TestSigma] Initialization failed: " + e.getMessage());

@@ -5606,7 +5606,9 @@ function runNextInBatch() {
     renderSteps();
     updateStats();
     document.getElementById('result-badge').className = 'result-badge';
-    ws.send(JSON.stringify({ type: 'run', file }));
+    // batchRun tells the Java side this is part of a "Run Folder" batch (as opposed
+    // to an ad-hoc single-file run), so it should create a TestSigma run to report to.
+    ws.send(JSON.stringify({ type: 'run', file, batchRun: true }));
     startScreenPoll();
     updateBatchBadge();
   }, 600);
