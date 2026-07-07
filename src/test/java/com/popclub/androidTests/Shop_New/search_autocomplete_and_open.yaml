@@ -1,0 +1,74 @@
+testName: Search — Search icon, autocomplete suggestions, tap suggestion
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-10999
+  - PO-11003
+  - PO-11004
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - search
+  - shop
+  - regression
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: tap
+    element: search_trending_item_0
+
+  - action: waitFor
+    element: product_list_item_0
+
+  # PO-10999: Tap search icon on PLP — opens Search screen
+  - action: tap
+    element: toolbar_search_button
+    testCaseId: PO-10999
+
+  - action: waitFor
+    element: search_products_search_input
+
+  # PO-11003: Type partial text — verify autocomplete suggestions appear
+  - action: enterText
+    element: search_products_search_input
+    value: "shi"
+
+  - action: waitFor
+    element: search_suggestion_item_0
+    testCaseId: PO-11003
+
+  # PO-11004: Tap first suggestion — navigates to search results
+  - action: tap
+    element: search_suggestion_item_0
+    testCaseId: PO-11004
+
+  - action: waitFor
+    element: product_list_item_0
+
+  - action: scanTags

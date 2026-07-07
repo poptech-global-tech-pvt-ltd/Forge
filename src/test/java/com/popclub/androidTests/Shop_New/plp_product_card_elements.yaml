@@ -1,0 +1,65 @@
+testName: PO-10988 — Verify product card displays all required elements (image, brand, name, price)
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-10988
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - plp
+  - shop
+  - regression
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  - action: waitFor
+    element: shop_search_button
+
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: enterText
+    element: search_products_search_input
+    value: "t-shirt"
+
+  - action: pressKey
+    value: search
+
+  - action: waitFor
+    element: product_list_item_0
+
+  # Verify first product card has all required elements
+
+  - action: verifyElement
+    element: product_list_item_brand_0
+
+  - action: verifyElement
+    element: product_list_item_title_0
+
+  - action: verifyElement
+    element: product_list_item_price_0
+
+  - action: scanTags

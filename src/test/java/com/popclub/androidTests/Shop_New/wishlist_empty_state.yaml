@@ -1,0 +1,54 @@
+testName: Wishlist — Empty state UI and Explore more CTA
+platform: android
+noReset: true
+loginRequired: false
+testCaseIds:
+  - PO-11467
+  - PO-11468
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - wishlist
+  - regression
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: tap
+    element: search_trending_item_0
+
+  - action: waitFor
+    element: product_list_item_0
+
+  - action: tap
+    element: toolbar_wishlist_button
+
+  # PO-11467: Verify empty state UI
+  - action: tapByText
+    value: "Explore more"
+    testCaseId: PO-11467
+
+  

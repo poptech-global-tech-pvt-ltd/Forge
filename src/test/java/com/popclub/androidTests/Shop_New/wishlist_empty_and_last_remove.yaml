@@ -1,0 +1,82 @@
+testName: Wishlist — Empty state after removing last item
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-11474
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - wishlist
+  - regression
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  # Add one product to wishlist
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: enterText
+    element: search_products_search_input
+    value: "superyou"
+
+  - action: pressKey
+    value: search
+
+  - action: waitFor
+    element: product_list_item_0
+
+  - action: tap
+    element: product_list_item_0
+
+  - action: waitFor
+    element: product_details_title
+
+  - action: tap
+    element: product_details_wishlist_button
+
+  - action: pressKey
+    value: BACK
+
+  - action: waitFor
+    element: product_list_item_0
+
+  # Go to wishlist
+  - action: tap
+    element: toolbar_wishlist_button
+
+  - action: waitFor
+    element: wishlist_item_0
+
+  # Remove the only item
+  - action: tap
+    element: wishlist_remove_button
+    testCaseId: PO-11474
+
+  # Verify empty state appears
+  - action: tapByText
+    value: "Explore more"
+
+  - action: scanTags

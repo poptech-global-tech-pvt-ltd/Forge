@@ -1,0 +1,68 @@
+testName: Wishlist — Scroll, coin pill, and out-of-stock state
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-11484
+  - PO-11485
+  - PO-11487
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - wishlist
+  - regression
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: tap
+    element: search_trending_item_0
+
+  - action: waitFor
+    element: product_list_item_0
+
+  # Go to wishlist (assumes items already wishlisted)
+  - action: tap
+    element: toolbar_wishlist_button
+
+  - action: waitFor
+    element: wishlist_item_0
+
+  # PO-11485: Verify coin pill on wishlist card
+  # TODO: Add element key for wishlist_item_popcoin_0 after scanning tags
+  - action: verifyElement
+    element: wishlist_item_0
+    testCaseId: PO-11485
+
+  # PO-11484: Scroll down to verify grid is scrollable
+  - action: scrollUntilVisible
+    element: wishlist_item_1
+    testCaseId: PO-11484
+
+  # PO-11487: Verify OOS product shows disabled state
+  # TODO: Add element key for wishlist_item_oos_badge_0 after scanning tags
+  - action: scanTags

@@ -1,0 +1,77 @@
+testName: Wishlist — Back arrow and Cart icon navigation
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-11481
+  - PO-11482
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - wishlist
+  - regression
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: tap
+    element: search_trending_item_0
+
+  - action: waitFor
+    element: product_list_item_0
+
+  # Go to wishlist
+  - action: tap
+    element: toolbar_wishlist_button
+
+  - action: waitFor
+    element: wishlist_item_card_compose_row
+
+  # PO-11482: Tap cart icon — navigates to Cart
+  - action: tap
+    element: toolbar_cart_button
+    testCaseId: PO-11482
+
+  - action: waitFor
+    element: cart_item_row_0
+
+  - action: pressKey
+    value: BACK
+
+  - action: waitFor
+    element: wishlist_item_card_compose_row
+
+  # PO-11481: Tap back arrow — exits wishlist
+  - action: tap
+    element: wishlist_back_button
+    testCaseId: PO-11481
+
+  # Verify we're back on PLP
+  - action: waitFor
+    element: product_list_item_0
+
+  - action: scanTags

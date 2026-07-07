@@ -1,0 +1,65 @@
+testName: PLP — Tapping product card navigates to PDP
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-10994
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - plp
+  - shop
+  - regression
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: tap
+    element: search_trending_item_0
+
+  - action: waitFor
+    element: product_list_item_0
+
+  # Capture product title on PLP
+  - action: captureText
+    element: product_list_item_title_0
+    value: "plp_title"
+
+  # PO-10994: Tap product card
+  - action: tap
+    element: product_list_item_0
+    testCaseId: PO-10994
+
+  # Verify PDP loads
+  - action: waitFor
+    element: product_details_title
+
+  # Verify same product opened
+  - action: assertStoredText
+    value: "plp_title"
+
+  - action: scanTags

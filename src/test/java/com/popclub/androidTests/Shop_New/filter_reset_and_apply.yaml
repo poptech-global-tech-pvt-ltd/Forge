@@ -1,0 +1,98 @@
+testName: Filters — Reset clears all filters and Applies filters
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-11021
+  - PO-11022
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - filter
+  - shop
+  - regression
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561234"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: enterText
+    element: search_products_search_input
+    value: "t-shirt"
+
+  - action: pressKey
+    value: search
+
+  - action: waitFor
+    element: product_list_item_0
+
+  # Capture first product before filter
+  - action: captureText
+    element: product_list_item_title_0
+    value: "title_before_filter"
+
+  # Open filter and select an option
+  - action: tap
+    element: product_list_filter_button
+
+  - action: waitFor
+    element: product_filter_category_item_0
+
+  - action: tap
+    element: product_filter_category_item_0
+
+  - action: waitFor
+    element: product_filter_sub_item_0
+
+  - action: tap
+    element: product_filter_sub_item_0
+
+  # PO-11022: Tap Apply — filters applied, PLP updates
+  - action: tap
+    element: product_filter_apply_button
+    testCaseId: PO-11022
+
+  - action: waitFor
+    element: product_list_item_0
+
+  # Reopen filter sheet
+  - action: tap
+    element: product_list_filter_button
+
+  - action: waitFor
+    element: product_filter_reset_button
+
+  # PO-11021: Tap Reset — clears all filters
+  - action: tap
+    element: product_filter_reset_button
+    testCaseId: PO-11021
+
+  # Apply with no filters to go back to unfiltered PLP
+
+  - action: waitFor
+    element: product_list_item_0
+
+  - action: scanTags

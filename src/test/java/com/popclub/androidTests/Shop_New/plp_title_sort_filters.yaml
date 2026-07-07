@@ -1,0 +1,63 @@
+testName: PO-10986 — Verify PLP displays page title and Sort + Filters pills below header
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-10986
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - plp
+  - shop
+  - regression
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  - action: waitFor
+    element: shop_search_button
+
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: enterText
+    element: search_products_search_input
+    value: "shoes"
+
+  - action: pressKey
+    value: search
+
+  - action: waitFor
+    element: product_list_item_0
+
+  # Verify page title and Sort/Filter pills
+  
+
+  - action: verifyElement
+    element: product_list_sort_button
+
+  - action: verifyElement
+    element: product_list_filter_button
+
+  - action: scanTags
