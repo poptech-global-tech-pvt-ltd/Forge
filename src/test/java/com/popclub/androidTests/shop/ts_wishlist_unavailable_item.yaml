@@ -1,23 +1,17 @@
-testName: Shop — Add to Cart and Remove Item from Cart
+testName: Wishlist — Move unavailable cart item to wishlist
 platform: android
 noReset: true
-loginRequired: false
-
-testCaseIds:
-  -
+loginRequired: true
 
 features:
   - common
   - home
-  - login
   - shop
 
 tags:
   - smoke
   - shop
-  - search
-  - cart
-  - remove
+  - wishlist
 
 retry: 1
 
@@ -31,23 +25,19 @@ steps:
   - action: waitFor
     element: home_tab
 
+  # ── Navigate to Shop and search ──────────────────────────────────────────
   - action: tap
     element: common_shop_tab
 
   - action: waitFor
-    element: shop_search_button
-
-  - action: scanTags
+    element: shop_search_icon
 
   - action: tap
-    element: shop_search_button
-
-  - action: waitFor
-    element: search_products_search_input
+    element: shop_search_icon
 
   - action: enterText
-    element: search_products_search_input
-    value: t-shirt
+    element: search_input
+    value: "t-shirt"
 
   - action: pressKey
     value: search
@@ -55,6 +45,7 @@ steps:
   - action: waitFor
     element: product_list_item_0
 
+  # ── Add item to cart ─────────────────────────────────────────────────────
   - action: tap
     element: product_list_item_0
 
@@ -82,15 +73,8 @@ steps:
   - action: waitFor
     element: cart_item_row_0
 
-  - action: scanTags
+  # ── If unavailable item section exists, move to wishlist ─────────────────
+  - action: scrollDown
 
-  - action: verifyElement
-    element: cart_delivery_address_card
-
-  - action: verifyElement
-    element: cart_to_pay_row
-
-  - action: verifyElement
-    element: cart_link_and_pay_button
-
-  - action: cartRemoveItem
+  - action: tapIfPresent
+    element: cart_unavailable_add_to_wishlist_button

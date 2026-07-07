@@ -1,0 +1,125 @@
+testName: PDP — Price consistency across PLP, PDP, Cart
+platform: android
+noReset: true
+loginRequired: true
+retry: 1
+
+testCaseIds:
+  - PO-15776
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - smoke
+  - pdp
+  - price
+
+steps:
+  - action: call
+    flow: login_and_go_to_shop
+
+  - action: call
+    flow: search_and_open_pdp
+
+  # ── Go back to PLP to capture PLP prices ───────────────────────────────
+  - action: tap
+    element: product_details_back_button
+
+  - action: waitFor
+    element: product_list_filter_button
+
+  - action: captureText
+    element: product_list_item_price_0
+    variable: plp_selling_price
+
+  - action: captureText
+    element: product_list_item_strikethrough_price_0
+    variable: plp_mrp_price
+
+  - action: logVar
+    variable: plp_selling_price
+    value: |
+      ── PLP prices ──
+      plp_selling_price  - ${plp_selling_price}
+      plp_mrp_price      - ${plp_mrp_price}
+
+  # ── Re-enter PDP ──────────────────────────────────────────────────────
+  - action: tap
+    element: product_list_item_0
+
+  - action: waitFor
+    element: product_details_title
+
+  # ── Capture PDP prices ────────────────────────────────────────────────
+  - action: captureText
+    element: product_details_price
+    variable: pdp_selling_price
+
+  - action: captureText
+    element: product_details_strikethrough_price
+    variable: pdp_mrp_price
+
+  - action: logVar
+    variable: pdp_selling_price
+    value: |
+      ── PDP prices ──
+      pdp_selling_price  - ${pdp_selling_price}
+      pdp_mrp_price      - ${pdp_mrp_price}
+
+  # ── Assert PLP == PDP ─────────────────────────────────────────────────
+  - action: assertText
+    element: product_details_price
+    value: "${plp_selling_price}"
+
+  - action: assertText
+    element: product_details_strikethrough_price
+    value: "${plp_mrp_price}"
+    testCaseId: PO-11060
+
+  # ── Add to cart ────────────────────────────────────────────────────────
+  - action: tap
+    element: product_details_bottom_sticky_bar_button
+
+  - action: tapIfPresent
+    element: size_selection_item_0
+
+  - action: tapIfPresent
+    element: size_selection_add_to_cart_button
+
+  - action: waitFor
+    element: product_details_go_to_cart_button
+
+  - action: tap
+    element: product_details_go_to_cart_button
+
+  # ── Cart: capture prices ──────────────────────────────────────────────
+  - action: waitFor
+    element: cart_item_row_0
+
+  - action: captureText
+    element: cart_item_price_0
+    variable: cart_selling_price
+
+  - action: captureText
+    element: cart_item_strikethrough_price_0
+    variable: cart_mrp_price
+
+  - action: logVar
+    variable: cart_selling_price
+    value: |
+      ── Cart prices ──
+      cart_selling_price  - ${cart_selling_price}
+      cart_mrp_price      - ${cart_mrp_price}
+
+  # ── Assert PDP == Cart ────────────────────────────────────────────────
+  - action: assertText
+    element: cart_item_price_0
+    value: "${pdp_selling_price}"
+
+  - action: assertText
+    element: cart_item_strikethrough_price_0
+    value: "${pdp_mrp_price}"

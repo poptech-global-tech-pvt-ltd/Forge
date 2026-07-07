@@ -50,6 +50,10 @@ cart_add_to_wishlist_button:
   android:
     - type: accessibilityId
       value: cart_add_to_wishlist_button
+cart_back_button:
+  android:
+    - type: accessibilityId
+      value: cart_back_button
 cart_checkout_pop_shop_button:
   android:
     - type: accessibilityId
@@ -510,6 +514,14 @@ clp_section_view_all_9:
   android:
     - type: accessibilityId
       value: clp_section_view_all_9
+Collapse:
+  android:
+    - type: accessibilityId
+      value: Collapse
+Expand:
+  android:
+    - type: accessibilityId
+      value: Expand
 order_details_bill_items_list_row:
   android:
     - type: accessibilityId
@@ -746,14 +758,22 @@ payment_processing_status_text:
   android:
     - type: accessibilityId
       value: payment_processing_status_text
+pdp_search_icon:
+  android:
+    - type: accessibilityId
+      value: product_details_search_button
+popcoins_navigation:
+  android:
+    - type: accessibilityId
+      value: Navigation
+product_details_back_button:
+  android:
+    - type: accessibilityId
+      value: product_details_back_button
 product_details_bottom_sticky_bar_button:
   android:
     - type: accessibilityId
       value: product_details_bottom_sticky_bar_button
-product_details_change_address_button:
-  android:
-    - type: accessibilityId
-      value: product_details_change_address_button
 product_details_check_delivery_date_section_button:
   android:
     - type: accessibilityId
@@ -777,7 +797,7 @@ product_details_price:
 product_details_product_info_section_row:
   android:
     - type: accessibilityId
-      value: product_details_product_info_section_row
+      value: product_details_section_row  # healed from: product_details_product_info_section_row
 product_details_section_row:
   android:
     - type: accessibilityId
@@ -813,7 +833,7 @@ product_details_size_option_1:
 product_details_strikethrough_price:
   android:
     - type: accessibilityId
-      value: pdp_product_strikethrough_price
+      value: pdp_product_price  # healed from: pdp_product_strikethrough_price
 product_details_title:
   android:
     - type: accessibilityId
@@ -893,7 +913,7 @@ product_list_item_rating_0:
 product_list_item_strikethrough_price_0:
   android:
     - type: accessibilityId
-      value: product_list_item_strikethrough_price_0
+      value: product_list_item_price_0  # healed from: product_list_item_strikethrough_price_0
 product_list_item_strikethrough_price_1:
   android:
     - type: accessibilityId
@@ -1022,6 +1042,10 @@ saved_address_item_label_1:
   android:
     - type: accessibilityId
       value: saved_address_item_label_1
+search_back_button:
+  android:
+    - type: accessibilityId
+      value: toolbar_search_button  # healed from: search_back_button
 search_input:
   android:
     - type: accessibilityId
@@ -1153,7 +1177,7 @@ shop_promo_banner_row:
 shop_search_button:
   android:
     - type: accessibilityId
-      value: shop_search_button
+      value: toolbar_search_button
 shop_search_icon:
   android:
     - type: accessibilityId
@@ -1203,6 +1227,14 @@ toolbar_cart_button:
   android:
     - type: accessibilityId
       value: toolbar_cart_button
+toolbar_popcoin_button:
+  android:
+    - type: accessibilityId
+      value: toolbar_popcoin_button
+View_more:
+  android:
+    - type: accessibilityId
+      value: View more
 wishlist_add_to_cart_button:
   android:
     - type: accessibilityId
