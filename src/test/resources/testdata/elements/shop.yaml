@@ -746,6 +746,10 @@ payment_processing_status_text:
   android:
     - type: accessibilityId
       value: payment_processing_status_text
+pls_sort_text:
+  android:
+    - type: accessibilityId
+      value: plp_sort_text
 product_details_bottom_sticky_bar_button:
   android:
     - type: accessibilityId
@@ -842,6 +846,10 @@ product_filter_select_all_checkbox:
   android:
     - type: accessibilityId
       value: product_filter_select_all_checkbox
+product_filter_sheet_title:
+  android:
+    - type: accessibilityId
+      value: product_filter_category_item_0
 product_filter_sub_item_0:
   android:
     - type: accessibilityId
@@ -1199,6 +1207,10 @@ size_selection_item_2:
   android:
     - type: accessibilityId
       value: product_details_size_option_2
+Sort:
+  android:
+    - type: accessibilityId
+      value: plp_sort_text
 toolbar_cart_button:
   android:
     - type: accessibilityId

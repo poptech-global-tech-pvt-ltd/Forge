@@ -13,7 +13,6 @@ features:
   - shop
 
 tags:
-  - search
   - shop
   - regression
 
@@ -77,5 +76,3 @@ steps:
   # Verify PLP loads with search results
   - action: waitFor
     element: product_list_item_0
-
-  - action: scanTags

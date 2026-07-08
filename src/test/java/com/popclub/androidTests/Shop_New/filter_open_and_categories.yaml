@@ -35,7 +35,7 @@ steps:
     element: common_shop_tab
 
   - action: tap
-    element: shop_search_icon  # healed from: shop_search_button
+    element: shop_search_icon
 
   - action: waitFor
     element: search_products_search_input
@@ -46,26 +46,40 @@ steps:
   - action: waitFor
     element: product_list_item_0
 
-  # PO-11014: Tap Filters pill to open filter sheet
+  # Capture PLP price before filter
+  - action: captureText
+    element: product_list_item_price_0
+    variable: plp_first_product_price
+
+  # PO-11014 + PO-11015: Filter sheet opened with categories visible
   - action: tap
     element: product_list_filter_button
-    testCaseId: PO-11014
 
-  # PO-11015: Verify filter categories are visible
+  - action: waitFor
+    element: product_filter_category_item_0
+
   - action: verifyElement
     element: product_filter_category_item_0
-    testCaseId: PO-11015
 
   - action: verifyElement
     element: product_filter_category_item_1
 
-  # PO-11027: Close filter sheet without applying (tap X / back)
+  - action: verifyElement
+    element: product_filter_reset_button
+    testCaseId: PO-11014
+
+  - action: verifyElement
+    element: product_filter_apply_button
+    testCaseId: PO-11015
+
+  # PO-11027: Close filter sheet without applying
   - action: pressKey
     value: BACK
-    testCaseId: PO-11027
 
-  # Verify we're back on PLP unchanged
   - action: waitFor
     element: product_list_item_0
 
-  - action: scanTags
+  - action: assertText
+    element: product_list_item_price_0
+    value: "${plp_first_product_price}"
+    testCaseId: PO-11027

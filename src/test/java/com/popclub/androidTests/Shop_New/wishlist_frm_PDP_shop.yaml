@@ -6,7 +6,6 @@ loginRequired: false
 testCaseIds:
   - PO-11060
   - PO-11469
-  
 
 features:
   - home
@@ -18,8 +17,6 @@ tags:
   - shop
   - search
   - wishlist
-
-
 
 steps:
   - action: launchApp

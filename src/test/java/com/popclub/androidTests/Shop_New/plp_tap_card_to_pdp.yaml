@@ -13,8 +13,6 @@ features:
   - shop
 
 tags:
-  - plp
-  - shop
   - regression
 
 retry: 1
@@ -61,5 +59,3 @@ steps:
   # Verify same product opened
   - action: assertStoredText
     value: "plp_title"
-
-  - action: scanTags

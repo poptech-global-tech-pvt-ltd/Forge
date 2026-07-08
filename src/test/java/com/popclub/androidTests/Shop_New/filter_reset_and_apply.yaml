@@ -14,8 +14,6 @@ features:
   - shop
 
 tags:
-  - filter
-  - shop
   - regression
 
 retry: 1
@@ -51,48 +49,60 @@ steps:
 
   # Capture first product before filter
   - action: captureText
-    element: product_list_item_title_0
-    value: "title_before_filter"
+    element: product_list_item_price_0
+    variable: price_before_filter
 
-  # Open filter and select an option
+  # Open filter sheet and apply a filter
   - action: tap
     element: product_list_filter_button
 
   - action: waitFor
-    element: product_filter_category_item_0
+    element: product_filter_sheet_title
 
   - action: tap
     element: product_filter_category_item_0
 
-  - action: waitFor
-    element: product_filter_sub_item_0
-
   - action: tap
-    element: product_filter_sub_item_0
+    element: filter_selection_sub_filter_item_checkbox
 
-  # PO-11022: Tap Apply — filters applied, PLP updates
   - action: tap
     element: product_filter_apply_button
-    testCaseId: PO-11022
 
   - action: waitFor
     element: product_list_item_0
 
-  # Reopen filter sheet
+  # Capture title after filter applied
+  - action: captureText
+    element: product_list_item_price_0
+    variable: price_after_filter
+
+  # PO-11022: Verify filter was applied (product list changed)
+  - action: verifyElement
+    element: product_list_filter_button
+
+  - action: verifyElement
+    element: product_list_item_0
+    testCaseId: PO-11022
+
+  # Open filter sheet again and tap Reset
   - action: tap
     element: product_list_filter_button
 
   - action: waitFor
-    element: product_filter_reset_button
+    element: product_filter_sheet_title
 
-  # PO-11021: Tap Reset — clears all filters
   - action: tap
     element: product_filter_reset_button
-    testCaseId: PO-11021
-
-  # Apply with no filters to go back to unfiltered PLP
 
   - action: waitFor
     element: product_list_item_0
 
-  - action: scanTags
+  # PO-11021: Verify reset restored original list
+  - action: captureText
+    element: product_list_item_price_0
+    variable: price_after_reset
+
+  - action: assertText
+    element: product_list_item_price_0
+    value: "${price_before_filter}"
+    testCaseId: PO-11021

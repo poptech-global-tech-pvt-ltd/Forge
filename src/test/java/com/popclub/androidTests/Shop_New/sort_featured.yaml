@@ -1,4 +1,4 @@
-testName: shop sort flow High to Low
+testName: shop sort flow featured
 platform: android
 noReset: true
 loginRequired: false
@@ -34,8 +34,7 @@ steps:
   - action: tap
     element: common_shop_tab
     
-   #Navigate to PLP through Search
-  
+  # Navigate to PLP through Search 
   - action: tap
     element: shop_search_button
 
@@ -49,14 +48,11 @@ steps:
     element: product_list_item_0
     
   # Capture 1st product price before sort
-  
   - action: captureText
     element:  product_list_item_0
     value: "product_list_item_price_0"
-    
-    
-  # Verify Sort and Filters are present
-  
+       
+  # Verify Sort and Filters are present  
   - action: verifyElement
     element: product_list_sort_button
     
@@ -64,38 +60,28 @@ steps:
     element: product_list_sort_button
     
   # Verify Sort options are visible
-  
- 
-  
   - action: tapByText
     value: "Price High → Low"
-    testCaseId: PO-11011
-    
+    testCaseId: PO-11011   
     
   # Wait for PLP to reload
   - action: waitFor
     element: product_list_item_0
     
-    # Capture first product's price after sort
+  # Capture first product's price after sort
   - action: captureText
     element:  product_list_item_0
     value: "product_list_item_price_0"
-    
-  
-    
 
   - action: waitFor
     element: product_list_item_0
     
-  # Capture 1st product price before sort
-  
+  # Capture 1st product price before sort  
   - action: captureText
     element:  product_list_item_0
-    value: "product_list_item_price_0"
+    value: "product_list_item_price_0"   
     
-    
-  # Verify Sort and Filters are present
-  
+  # Verify Sort and Filters are present  
   - action: verifyElement
     element: product_list_sort_button
     
@@ -103,14 +89,10 @@ steps:
     element: product_list_sort_button
     
   # Verify Sort options are visible
-  
- 
-  
   - action: tapByText
     value: "Featured"
     testCaseId: PO-11011
     
-    
   # Wait for PLP to reload
   - action: waitFor
     element: product_list_item_0
@@ -125,16 +107,3 @@ steps:
     
   - action: tap
     element: product_list_sort_button
-    
-
-    
-    
-    
-  
-    
-  
-  
-
-    
-
-  

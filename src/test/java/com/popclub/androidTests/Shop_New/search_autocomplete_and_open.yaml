@@ -15,8 +15,6 @@ features:
   - shop
 
 tags:
-  - search
-  - shop
   - regression
 
 retry: 1
@@ -70,5 +68,3 @@ steps:
 
   - action: waitFor
     element: product_list_item_0
-
-  - action: scanTags

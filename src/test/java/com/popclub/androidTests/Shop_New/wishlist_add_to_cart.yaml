@@ -100,5 +100,3 @@ steps:
 
   - action: assertStoredText
     value: "wishlisted_title"
-
-  - action: scanTags

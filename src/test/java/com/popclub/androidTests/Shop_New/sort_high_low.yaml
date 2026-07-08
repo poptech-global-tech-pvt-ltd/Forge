@@ -3,13 +3,11 @@ platform: android
 noReset: true
 loginRequired: false
 
-
 testCaseIds:
   - PO-11009
   - PO-11010
   - PO-11011
  
-
 features:
   - common
   - login
@@ -17,7 +15,6 @@ features:
   - shop
   
 retry: 1
-
 
 tags:
   - smoke
@@ -35,8 +32,7 @@ steps:
   - action: tap
     element: common_shop_tab
     
-   #Navigate to PLP through Search
-  
+  # Navigate to PLP through Search  
   - action: tap
     element: shop_search_button
 
@@ -49,15 +45,12 @@ steps:
   - action: waitFor
     element: product_list_item_0
     
-  # Capture 1st product price before sort
-  
+  # Capture 1st product price before sort 
   - action: captureText
     element:  product_list_item_0
     value: "product_list_item_price_0"
     
-    
-  # Verify Sort and Filters are present
-  
+  # Verify Sort and Filters are present  
   - action: verifyElement
     element: product_list_sort_button
     
@@ -65,9 +58,6 @@ steps:
     element: product_list_sort_button
     
   # Verify Sort options are visible
-  
- 
-  
   - action: tapByText
     value: "Price High → Low"
     testCaseId: PO-11011
@@ -77,23 +67,7 @@ steps:
   - action: waitFor
     element: product_list_item_0
     
-    # Capture first product's price after sort
+  # Capture first product's price after sort
   - action: captureText
     element:  product_list_item_0
     value: "product_list_item_price_0"
-    
-    
-
-   
-
-    
-    
-    
-  
-    
-  
-  
-
-    
-
-  

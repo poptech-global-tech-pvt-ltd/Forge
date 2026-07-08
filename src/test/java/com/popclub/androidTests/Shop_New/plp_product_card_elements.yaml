@@ -13,8 +13,6 @@ features:
   - shop
 
 tags:
-  - plp
-  - shop
   - regression
 
 retry: 1
@@ -52,7 +50,6 @@ steps:
     element: product_list_item_0
 
   # Verify first product card has all required elements
-
   - action: verifyElement
     element: product_list_item_brand_0
 
@@ -62,4 +59,14 @@ steps:
   - action: verifyElement
     element: product_list_item_price_0
 
-  - action: scanTags
+  - action: captureText
+    element: product_list_item_price_0
+    variable: product_card_price
+
+  - action: logVar
+    variable: product_card_price
+    value: "Product card price: ${product_card_price}"
+
+  - action: verifyElement
+    element: product_list_item_price_0
+    testCaseId: PO-10988

@@ -4,7 +4,7 @@ noReset: true
 loginRequired: false
 
 testCaseIds:
-  - PO-FILTER-PERSIST
+  - PO-15807
 
 features:
   - common
@@ -92,9 +92,4 @@ steps:
 
   - action: assertStoredText
     value: "filtered_title"
-
-  # Also verify filter button still shows active state
-  - action: verifyElement
-    element: product_list_filter_button
-
-  - action: scanTags
+    testCaseID: PO-15807

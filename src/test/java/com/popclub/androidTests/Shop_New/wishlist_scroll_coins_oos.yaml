@@ -64,5 +64,3 @@ steps:
     testCaseId: PO-11484
 
   # PO-11487: Verify OOS product shows disabled state
-  # TODO: Add element key for wishlist_item_oos_badge_0 after scanning tags
-  - action: scanTags

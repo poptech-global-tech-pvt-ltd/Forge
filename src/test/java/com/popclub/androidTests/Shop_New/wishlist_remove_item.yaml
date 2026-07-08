@@ -125,5 +125,3 @@ steps:
   - action: verifyElement
     element: product_details_wishlist_button
     testCaseId: PO-11476
-
-  - action: scanTags

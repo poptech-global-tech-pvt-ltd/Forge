@@ -71,5 +71,3 @@ steps:
   - action: verifyElement
     element: toolbar_cart_button
     testCaseId: PO-11030
-
-  - action: scanTags

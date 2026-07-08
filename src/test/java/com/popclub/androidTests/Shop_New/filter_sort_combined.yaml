@@ -55,6 +55,11 @@ steps:
   - action: waitFor
     element: product_list_item_0
 
+  # Capture price after sort (should be lowest)
+  - action: captureText
+    element: product_list_item_price_0
+    variable: price_after_sort
+
   # Now apply Filter
   - action: tap
     element: product_list_filter_button
@@ -73,10 +78,26 @@ steps:
 
   - action: tap
     element: product_filter_apply_button
-    testCaseId: PO-11028
 
   # Verify PLP loads with combined sort + filter
   - action: waitFor
     element: product_list_item_0
 
-  - action: scanTags
+  - action: captureText
+    element: product_list_item_price_0
+    variable: price_after_sort_and_filter
+
+  - action: captureText
+    element: product_list_item_price_1
+    variable: price_second_item
+
+  - action: logVar
+    variable: price_after_sort_and_filter
+    value: "Sort+Filter prices — first: ${price_after_sort_and_filter}, second: ${price_second_item}"
+
+  - action: verifyElement
+    element: product_list_item_0
+
+  - action: verifyElement
+    element: product_list_filter_button
+    testCaseId: PO-11028

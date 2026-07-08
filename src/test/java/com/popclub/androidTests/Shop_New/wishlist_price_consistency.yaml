@@ -90,5 +90,3 @@ steps:
   # Assert PLP price matches PDP price
   - action: assertStoredText
     value: "plp_price"
-
-  - action: scanTags

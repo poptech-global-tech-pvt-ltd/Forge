@@ -17,8 +17,6 @@ tags:
   - shop
   - regression
 
-
-
 steps:
   - action: launchApp
 
@@ -42,14 +40,9 @@ steps:
     element: search_products_search_input
 
   # Verify Recent searches section
-
   - action: verifyElement
     element: search_recent_item_0
 
   # Verify Trending searches section
-
-
   - action: verifyElement
     element: search_trending_item_0
-
-  - action: scanTags

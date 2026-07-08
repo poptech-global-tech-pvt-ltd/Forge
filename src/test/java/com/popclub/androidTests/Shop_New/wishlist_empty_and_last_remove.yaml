@@ -78,5 +78,3 @@ steps:
   # Verify empty state appears
   - action: tapByText
     value: "Explore more"
-
-  - action: scanTags

@@ -73,5 +73,3 @@ steps:
   # Verify we're back on PLP
   - action: waitFor
     element: product_list_item_0
-
-  - action: scanTags

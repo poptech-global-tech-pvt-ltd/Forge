@@ -14,8 +14,6 @@ features:
   - shop
 
 tags:
-  - search
-  - shop
   - regression
 
 retry: 1
@@ -51,9 +49,11 @@ steps:
   # PO-10997: Submit search — verify no products found on PLP
   - action: pressKey
     value: search
-    testCaseId: PO-10997
 
-  - action: tapByText
+  - action: waitFor
+    accessibilityId: Empty state
+
+  - action: assertText
+    element: search_no_products_found
     value: "No products found"
-
-  - action: scanTags
+    testCaseId: PO-10997

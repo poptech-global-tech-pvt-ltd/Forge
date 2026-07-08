@@ -50,5 +50,3 @@ steps:
   - action: tapByText
     value: "Explore more"
     testCaseId: PO-11467
-
-  

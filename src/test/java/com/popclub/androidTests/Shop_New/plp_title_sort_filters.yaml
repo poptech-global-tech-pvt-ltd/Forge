@@ -13,8 +13,6 @@ features:
   - shop
 
 tags:
-  - plp
-  - shop
   - regression
 
 retry: 1
@@ -52,12 +50,13 @@ steps:
     element: product_list_item_0
 
   # Verify page title and Sort/Filter pills
-  
-
-  - action: verifyElement
-    element: product_list_sort_button
+  - action: assertText
+    element: plp_sort_text
+    value: "Sort"
 
   - action: verifyElement
     element: product_list_filter_button
+    testCaseId: PO-10986
 
-  - action: scanTags
+  - action: verifyElement
+    element: product_list_filter_button
