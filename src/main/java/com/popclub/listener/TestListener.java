@@ -27,27 +27,19 @@ public class TestListener implements ITestListener, ISuiteListener {
     @Override
     public void onStart(ISuite suite) {
 
-        // Refresh the TestSigma session cookie (needed for attachment uploads) before
-        // anything else runs, so it doesn't need to be manually copy-pasted each time
-        // it expires. Skips silently if login credentials aren't configured, and never
-        // throws — a failed refresh just falls back to whatever cookie is already saved.
+        // Refreshes the session cookie so it never needs manual copy-pasting.
         TestSigmaSessionManager.refreshSessionCookie();
 
         projectId = suite.getParameter("projectId");
         tags = suite.getParameter("tag");
         title = suite.getParameter("runTitle");
 
-        // Forward deviceSerial from testng.xml to CloudConfig
         CloudConfig.setDeviceSerialFromTestNG(suite.getParameter("deviceSerial"));
 
         long start = System.currentTimeMillis() / 1000;
         TestContext.setStartTime(start);
 
-        // A single, independent test (local debugging via `mvn test -DtestFile=one.yaml`,
-        // or Forge UI's single "Run" button) should NOT create a TestSigma run. But a
-        // group of tests — a Forge UI "Run Folder" batch (-DbatchRun=true), OR a
-        // tag-based run (-Dtag=..., e.g. in CI/CD) — IS a group/batch and should create
-        // one, since tags are themselves a grouping mechanism, same as running a folder.
+        // Only a batch/folder run or a tag-based run should create a TestSigma run — not a single ad-hoc test.
         String tagParam = System.getProperty("tag", suite.getParameter("tag"));
         boolean tagRun = tagParam != null && !tagParam.isEmpty();
         boolean batchRun = Boolean.parseBoolean(System.getProperty("batchRun", "false")) || tagRun;
@@ -58,12 +50,9 @@ public class TestListener implements ITestListener, ISuiteListener {
             return;
         }
 
-        // ── TestSigma: collect testCaseIds and create a run ──
         System.out.println("[TestSigma] Scanning for test cases to register in run...");
 
-        // Only register the tests actually being run. When -DtestFile (or the suite's
-        // testFile parameter) is set, restrict to those files instead of scanning the
-        // whole folder — otherwise other tests' (placeholder) ids would break run creation.
+        // Restrict to -DtestFile when set, else placeholder ids from other files can break run creation.
         java.util.Set<String> onlyFiles = new java.util.HashSet<>();
         String testFileParam = System.getProperty("testFile");
         if (testFileParam == null || testFileParam.isEmpty()) {
@@ -93,8 +82,7 @@ public class TestListener implements ITestListener, ISuiteListener {
             List<String> uuidList = new ArrayList<>();
             for (String id : allTestCaseIds) {
                 if (id.startsWith("PO-")) {
-                    // Skip ids that don't resolve in TestSigma (e.g. placeholder ids
-                    // like PO-CARD-CLP) so one bad id doesn't fail the whole run.
+                    // Skip ids that don't resolve so one bad id doesn't fail the whole run.
                     try {
                         String uuid = TestSigmaClient.getTestCaseIdByHumanId(projectId, id);
                         if (uuid != null) {
@@ -116,10 +104,7 @@ public class TestListener implements ITestListener, ISuiteListener {
                 return;
             }
 
-            // TestSigma rejects a run title that already exists, and testng.xml's runTitle
-            // parameter is a static string — so re-running the same suite always collided
-            // with the previous run's title ("Error test run title already exists") and
-            // silently produced no run at all. Append a timestamp so every run is unique.
+            // Append a timestamp so re-running the suite doesn't collide with the previous run's title.
             String baseTitle = (title != null && !title.isBlank()) ? title : "Forge Run";
             String runTitle = baseTitle + " - "
                     + new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date());
@@ -155,7 +140,6 @@ public class TestListener implements ITestListener, ISuiteListener {
 
     @Override
     public void onTestStart(ITestResult result) {
-        // Begin capturing this test's console output into reports/logs/{name}.log
         TestLogCapture.start(resolveTestName(result));
     }
 
@@ -164,7 +148,6 @@ public class TestListener implements ITestListener, ISuiteListener {
         stopVideoQuietly(resolveTestName(result) + "_passed");
         updateStatus(result, TestCaseStatus.PASSED);
 
-        // On PASS → upload only the log to TestSigma, no comment/description dump.
         File log = TestLogCapture.stop();
         uploadAttachments(TestCaseStatus.PASSED, log);
     }
@@ -179,11 +162,9 @@ public class TestListener implements ITestListener, ISuiteListener {
 
         AppiumDriver driver = DriverManager.getDriver();
         if (driver != null) {
-            // 1. Final screenshot at the exact moment of failure
             screenshot = ScreenshotUtil.capture("FAIL_" + safeName);
             System.out.println("[TestListener] 📸 Failure screenshot saved.");
 
-            // 2. Stop and save the full video recorded since launchApp
             try {
                 video = VideoUtil.stopAndSave(driver, "FAIL_" + safeName);
                 if (video != null) {
@@ -193,30 +174,21 @@ public class TestListener implements ITestListener, ISuiteListener {
                 System.out.println("[TestListener] ⚠️  Video save failed: " + e.getMessage());
             }
 
-            // 3. Analyze screen for missing qaTestTags and write report for popdroid
             String screenshotPath = screenshot != null ? screenshot.getAbsolutePath() : null;
             String failingElement = TestContext.getFailingElement();
             FailureTagReporter.report(driver, failingElement, safeName, screenshotPath);
         }
 
-        // 4. Report FAILED status to TestSigma
         updateStatus(result, TestCaseStatus.FAILED);
 
-        // 5. On FAIL → upload video + log + screenshot to TestSigma
         File log = TestLogCapture.stop();
         uploadAttachments(TestCaseStatus.FAILED, screenshot, video, log);
 
-        // 6. Also post the full captured console log as a comment, so a reader can see
-        // what happened without downloading the log attachment. PASS results don't get
-        // this — only FAILED, per manager's request.
+        // Comment only on FAILED — PASS doesn't need the full log.
         postFailureLogComment(log);
     }
 
-    /**
-     * Resolves the human-readable test name (e.g. "Login Test", from the YAML's
-     * testName field) for use in log/screenshot/video file names — falls back to
-     * TestNG's generic method name ("runTest") when the YAML TestCase isn't available.
-     */
+    /** Resolves the YAML's testName for file naming, falling back to TestNG's generic method name. */
     private String resolveTestName(ITestResult result) {
         Object[] params = result.getParameters();
         if (params != null && params.length > 0 && params[0] instanceof TestCase) {
@@ -226,12 +198,7 @@ public class TestListener implements ITestListener, ISuiteListener {
         return result.getName();
     }
 
-    /**
-     * Posts the full captured console log as a comment on each of this test's
-     * testCaseIds, via the same GraphQL mutation used for attachment uploads (the
-     * REST test_cases PUT's "description" field is silently ignored by TestSigma —
-     * see TestSigmaClient.addRunComment for how this was confirmed).
-     */
+    /** Posts the full captured log as a comment — the REST description field is silently ignored by TestSigma. */
     private void postFailureLogComment(File log) {
         String runId = TestContext.getRunId();
         if (runId == null || log == null || !log.exists()) return;
@@ -272,14 +239,7 @@ public class TestListener implements ITestListener, ISuiteListener {
         TestLogCapture.stop();
     }
 
-    /**
-     * Upload the given artifacts (screenshot / video / log) to TestSigma, attaching
-     * them to each of this test's testCaseIds via the CreateRunAttemptForTestCase
-     * GraphQL mutation (see TestSigmaClient.uploadAttachment for why — there is no
-     * REST endpoint for this). Only needs the run id + the test case's own uuid —
-     * no test_case_run lookup required. Null / missing files are ignored. Upload
-     * failures never affect the test result.
-     */
+    /** Uploads the given artifacts to each testCaseId via the GraphQL mutation — there's no REST endpoint for this. */
     private void uploadAttachments(TestCaseStatus status, File... files) {
         String runId = TestContext.getRunId();
         if (runId == null) return;
@@ -304,16 +264,13 @@ public class TestListener implements ITestListener, ISuiteListener {
             for (File f : files) {
                 if (f == null || !f.exists()) continue;
                 try {
-                    // Must be the session cookie's OWN user id, not testsigma.user.id
-                    // (a separate API/service account) — see TestSigmaConfig.sessionUserId().
+                    // Must be the session cookie's own user id, not testsigma.user.id.
                     boolean uploaded = TestSigmaClient.uploadAttachment(
                             runId, uuid, status.id(), TestSigmaConfig.sessionUserId(),
                             "Forge automation — " + f.getName(), f);
                     if (uploaded) {
                         System.out.println("[TestSigma] 📎 Uploaded " + f.getName() + " → " + id);
                     }
-                    // On failure, TestSigmaClient.uploadAttachment() already printed the
-                    // real error — don't print a fake success line here.
                 } catch (Exception e) {
                     System.out.println("[TestSigma] ⚠️  Attachment upload failed for "
                             + f.getName() + ": " + e.getMessage());
@@ -322,10 +279,7 @@ public class TestListener implements ITestListener, ISuiteListener {
         }
     }
 
-    /**
-     * Recursively collects all testCaseIds from YAML files under {@code dir}.
-     * Files without a testCaseIds field are silently skipped.
-     */
+    /** Recursively collects all testCaseIds from YAML files under {@code dir}. */
     private void collectTestCaseIds(File dir, List<String> result, java.util.Set<String> onlyFiles) {
         File[] entries = dir.listFiles();
         if (entries == null) return;
@@ -334,7 +288,6 @@ public class TestListener implements ITestListener, ISuiteListener {
             if (entry.isDirectory()) {
                 collectTestCaseIds(entry, result, onlyFiles);
             } else if (entry.getName().endsWith(".yaml")) {
-                // When a testFile filter is set, only include the requested files.
                 if (onlyFiles != null && !onlyFiles.isEmpty()
                         && !onlyFiles.contains(entry.getName().toLowerCase())) {
                     continue;
@@ -364,9 +317,6 @@ public class TestListener implements ITestListener, ISuiteListener {
         }
     }
 
-    // ===============================
-    // UPDATE STATUS
-    // ===============================
     private void updateStatus(ITestResult result, TestCaseStatus status) {
 
         if (TestContext.getRunId() == null) return;
@@ -377,7 +327,6 @@ public class TestListener implements ITestListener, ISuiteListener {
         try {
             long duration = (result.getEndMillis() - result.getStartMillis()) / 1000;
 
-            // Build a map of (humanId / uuid) → test_case_run id for this run
             Map<String, String> runCaseMap = TestSigmaClient.getTestCaseRunMap(projectId, TestContext.getRunId());
             for (int attempt = 0; runCaseMap.isEmpty() && attempt < 4; attempt++) {
                 System.out.println("[TestSigma] Run case map empty (attempt " + (attempt + 1) + ") — retrying in 2s...");
@@ -394,7 +343,6 @@ public class TestListener implements ITestListener, ISuiteListener {
 
                 System.out.println("[TestSigma] Reporting " + id + " (" + uuid + ") → " + status);
 
-                // Primary update via test_runs endpoint
                 TestSigmaClient.updateTestCaseRun(
                         projectId, TestContext.getRunId(), uuid,
                         status.id(), TestSigmaConfig.userId(), duration);

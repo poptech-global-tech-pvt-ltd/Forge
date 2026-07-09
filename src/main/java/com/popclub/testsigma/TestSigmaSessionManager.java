@@ -15,17 +15,7 @@ import java.util.regex.Pattern;
 
 import static io.restassured.RestAssured.given;
 
-/**
- * Automates TestSigma's 3-hop SSO login (id.testsigma.com → callbacks/authorize →
- * test-management.testsigma.com/identity/authorize_callback) to obtain a fresh
- * X-TMS-SESSION-ID session cookie at the start of a run.
- *
- * This exists because attachment uploads (TestSigmaClient.uploadAttachment) can only
- * authenticate via this session cookie, not the Bearer API token, and the cookie
- * expires — previously requiring a manual DevTools copy-paste before every run.
- *
- * Ported from the manually-verified scripts/testsigma_login.sh shell script.
- */
+/** Automates TestSigma's 3-hop SSO login to obtain a fresh X-TMS-SESSION-ID cookie for attachment uploads. */
 public class TestSigmaSessionManager {
 
     private static final String LOGIN_HOST = "https://id.testsigma.com";
@@ -34,22 +24,11 @@ public class TestSigmaSessionManager {
     private static final String REDIRECT_TO = APP_HOST + "/ui/test_cases?generateTestCases=false";
     private static final String LOCAL_PROPS_PATH = "src/test/resources/config/testsigma-local.properties";
 
-    // Corporate networks (e.g. Zscaler) intercept HTTPS with a proxy cert the JDK
-    // doesn't trust by default, causing PKIX path errors. TestSigmaClient already
-    // relaxes this for its own calls, but only once that class is loaded — which
-    // happens AFTER this login flow runs in TestListener.onStart(). Apply the same
-    // relaxed config here directly so it doesn't depend on class-load order.
+    // Applied directly here so SSL relaxation doesn't depend on TestSigmaClient's class-load order.
     private static final RestAssuredConfig RELAXED_SSL_CONFIG =
             RestAssuredConfig.config().sslConfig(SSLConfig.sslConfig().relaxedHTTPSValidation());
 
-    /**
-     * Attempts to log in and refresh the session cookie. On success, the fresh cookie
-     * is both applied to this JVM run (via a system property, so it takes effect
-     * immediately for the current test run) and persisted to the local properties
-     * file for future runs. Never throws — any failure (missing credentials, captcha,
-     * network error, unexpected page structure) is logged and returns false, leaving
-     * whatever session cookie was already configured in place.
-     */
+    /** Never throws — any failure is logged and returns false, leaving the existing cookie in place. */
     public static boolean refreshSessionCookie() {
         String email = TestSigmaConfig.loginEmail();
         String password = TestSigmaConfig.loginPassword();

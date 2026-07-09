@@ -140,20 +140,10 @@ public class TestRunnerTest {
         } catch (Exception e) {
             throw new RuntimeException("Test failed: " + testCase.testName, e);
         }
-        // NOTE: the driver is intentionally NOT quit here. TestNG fires the
-        // ITestListener callbacks (onTestSuccess / onTestFailure) AFTER the @Test
-        // method returns but BEFORE @AfterMethod runs. Those callbacks need a live
-        // Appium session to capture the failure screenshot/video. The driver is
-        // quit in quitDriverAfterTest() below so the session is still alive when
-        // the listener captures and uploads artifacts.
+        // Driver stays alive here so the ITestListener callbacks can still capture it.
     }
 
-    /**
-     * Quits the Appium driver after the test result has been recorded and the
-     * ITestListener callbacks (which capture/upload screenshot, video and log)
-     * have already run. alwaysRun=true ensures cleanup happens even when setup
-     * or the test itself failed.
-     */
+    /** Quits the driver after the ITestListener callbacks have already run. */
     @AfterMethod(alwaysRun = true)
     public void quitDriverAfterTest() {
         //  ALWAYS CLEAN DRIVER

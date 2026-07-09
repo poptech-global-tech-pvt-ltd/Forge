@@ -12,12 +12,7 @@ import java.util.Base64;
 
 public class VideoUtil {
 
-    /**
-     * Max recording length. Android's native screenrecord stops automatically
-     * after ~180s by default, which silently truncates (or empties) the video
-     * for long E2E tests. UiAutomator2 supports up to 1800s (30 min) — set it
-     * high so the recording stays alive for the whole test run.
-     */
+    /** Raised from Android's ~180s default so long E2E runs don't get truncated. */
     private static final Duration MAX_RECORDING = Duration.ofSeconds(1800);
 
     public static void startRecording(AppiumDriver driver) {

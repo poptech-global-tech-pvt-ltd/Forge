@@ -9,19 +9,7 @@ import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-/**
- * Captures everything printed to System.out / System.err during a single test
- * into a per-test .log file, while still echoing to the real console.
- *
- * The TestNG suite runs single-threaded (parallel="false", thread-count=1), so
- * installing a global tee on the standard streams is safe — only one test runs
- * at a time. Saved logs are uploaded to TestSigma by {@code TestListener}.
- *
- * Usage:
- *   TestLogCapture.start("login_test");   // onTestStart
- *   ...
- *   File log = TestLogCapture.stop();      // onTestSuccess / onTestFailure
- */
+/** Captures System.out/System.err for one test into a per-test .log file, while still echoing to the console. */
 public class TestLogCapture {
 
     private static final String LOG_DIR = "reports/logs/";
