@@ -46,10 +46,7 @@ public class TestSigmaYamlListener implements ISuiteListener, ITestListener {
             return;
         }
 
-        // Single-file runs shouldn't create a TestSigma run either — only a group of
-        // tests does: a Forge UI "Run Folder" batch (-DbatchRun=true), or a tag-based
-        // run (-Dtag=..., e.g. in CI/CD), since tags are themselves a grouping
-        // mechanism. See TestListener.onStart for the full rationale.
+        // Same batch/tag gating as TestListener.onStart — see there for the full rationale.
         String tagParam = System.getProperty("tag", suite.getParameter("tag"));
         boolean tagRun = tagParam != null && !tagParam.isEmpty();
         if (!Boolean.parseBoolean(System.getProperty("batchRun", "false")) && !tagRun) {

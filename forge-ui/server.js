@@ -951,8 +951,7 @@ function startTest(file, deviceOverride, ws, fromStep, batchRun) {
     args.push(`-DfromStep=${startStep}`);
   }
 
-  // Only a "Run Folder" batch represents an actual reportable run — a single ad-hoc
-  // test shouldn't create a TestSigma run (see TestListener.onStart / TestSigmaYamlListener.onStart).
+  // Only a "Run Folder" batch should create a TestSigma run.
   if (batchRun) {
     args.push('-DbatchRun=true');
   }

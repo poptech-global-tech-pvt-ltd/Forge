@@ -356,9 +356,7 @@ public class TestExecutor {
                     Action action = ActionFactory.get(step.action);
                     action.perform(step);
 
-                    // 🔥 START VIDEO — record on every launch (incl. noReset/resume
-                    // attach) so a failing test always produces a video. Previously this
-                    // was gated on isFreshLaunch(), so noReset=true tests never recorded.
+                    // Record on every launch, not just fresh ones, so noReset=true tests get video too.
                     if ("launchApp".equalsIgnoreCase(step.action)) {
 
                         AppiumDriver driver = DriverManager.getDriver();

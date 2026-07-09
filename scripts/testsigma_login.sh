@@ -1,16 +1,6 @@
 #!/bin/bash
-# Chains the full TestSigma SSO login flow to obtain a fresh X-TMS-SESSION-ID
-# session cookie, without needing to manually copy it from DevTools.
-#
-# Flow:
-#   1. POST id.testsigma.com/login          (email+password) -> SESSION cookie
-#   2. GET  id.testsigma.com/callbacks/authorize/72987?redirectTo=...
-#                                            -> HTML page containing a "token" field
-#   3. POST test-management.testsigma.com/identity/authorize_callback
-#                                            (token + redirectTo) -> X-TMS-SESSION-ID cookie
-#
-# Usage: ./testsigma_login.sh
-# You will be prompted for email + password interactively (nothing is saved to disk).
+# Chains TestSigma's 3-hop SSO login to obtain a fresh X-TMS-SESSION-ID cookie without DevTools.
+# Usage: ./testsigma_login.sh (prompts for email + password interactively; nothing is saved to disk).
 
 set -euo pipefail
 
@@ -42,8 +32,7 @@ echo "[2/3] Fetching authorization token page..." >&2
 AUTH_HTML=$(curl -s -b "$COOKIE_JAR" -c "$COOKIE_JAR" \
   "https://id.testsigma.com/callbacks/authorize/${CLIENT_PATH}?redirectTo=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1], safe=''))" "$REDIRECT_TO")")
 
-# Try to extract the "token" value from the returned HTML.
-# Adjust this regex if the actual HTML structure differs — inspect $AUTH_HTML if it fails.
+# Inspect $AUTH_HTML if this regex fails — the page's HTML structure may have changed.
 TOKEN=$(echo "$AUTH_HTML" | grep -oE 'name="token"[^>]*value="[^"]*"' | sed -E 's/.*value="([^"]*)".*/\1/')
 
 if [ -z "$TOKEN" ]; then

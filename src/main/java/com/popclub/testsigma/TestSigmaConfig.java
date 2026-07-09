@@ -18,8 +18,7 @@ public class TestSigmaConfig {
             throw new RuntimeException("Failed to load testsigma.properties", e);
         }
 
-        // Machine-local, git-ignored overrides (e.g. session cookie) — optional, so a
-        // missing file is not an error.
+        // Machine-local, git-ignored overrides — optional, missing file is not an error.
         try (InputStream in = TestSigmaConfig.class.getClassLoader()
                 .getResourceAsStream("config/testsigma-local.properties")) {
             if (in != null) localProps.load(in);
@@ -56,33 +55,13 @@ public class TestSigmaConfig {
     public static String runTitlePrefix()   { return get("testsigma.run.title.prefix"); }
     public static String runTags()          { return get("testsigma.run.tags"); }
 
-    /**
-     * Browser session cookie (X-TMS-SESSION-ID) used ONLY for attachment upload,
-     * which requires a session-cookie-based endpoint (/private/graphql) that the
-     * Bearer API token cannot authenticate against. This value expires and must
-     * be refreshed manually — pass it via -Dtestsigma.session.cookie=... rather
-     * than committing it to testsigma.properties.
-     */
+    /** Used only for attachment uploads — the Bearer token can't authenticate against /private/graphql. */
     public static String sessionCookie()    { return get("testsigma.session.cookie"); }
 
-    /**
-     * The TestSigma user id that OWNS the session cookie above (i.e. whoever is
-     * logged into the browser). The private GraphQL attachment mutation silently
-     * returns {"data":{"updateTestRunCaseStatus":null}} — no error — if the
-     * "userId" field doesn't match the session's actual owner, so this must NOT
-     * be testsigma.user.id (that's a separate service/API account). Pass via
-     * -Dtestsigma.session.user.id=... alongside the session cookie.
-     */
+    /** Must be the session cookie's own owner, NOT testsigma.user.id — mismatches fail silently. */
     public static String sessionUserId()    { return get("testsigma.session.user.id"); }
 
-    /**
-     * TestSigma login credentials used ONLY by TestSigmaSessionManager to
-     * automatically refresh the session cookie above at the start of a run.
-     * Local-only — never put these in testsigma.properties. Set them in
-     * config/testsigma-local.properties or via -Dtestsigma.login.email=...
-     * -Dtestsigma.login.password=... . If unset, auto-login is skipped and
-     * whichever session cookie is already saved (if any) is used as-is.
-     */
+    /** Used only by TestSigmaSessionManager to auto-refresh the session cookie; local-only, never commit. */
     public static String loginEmail()       { return get("testsigma.login.email"); }
     public static String loginPassword()    { return get("testsigma.login.password"); }
 }
