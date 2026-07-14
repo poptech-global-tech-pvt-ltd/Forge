@@ -1,14 +1,8 @@
 package com.popclub.testsigma;
 
-import com.popclub.api.dto.TestSigmaLoginRequestDto;
-import com.popclub.api.enums.HttpMethod;
-import com.popclub.api.impl.PopApiClient;
-import com.popclub.api.impl.PopRequestSpecification;
 import io.restassured.response.Response;
 
 import java.io.File;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -19,9 +13,7 @@ import java.util.regex.Pattern;
 
 public class TestSigmaSessionManager {
 
-    private static final String LOGIN_HOST = "https://id.testsigma.com";
     private static final String APP_HOST = "https://test-management.testsigma.com";
-    private static final String CLIENT_PATH = "72987";
     private static final String REDIRECT_TO = APP_HOST + "/ui/test_cases?generateTestCases=false";
     private static final String LOCAL_PROPS_PATH = "src/test/resources/config/testsigma-local.properties";
 
@@ -37,14 +29,7 @@ public class TestSigmaSessionManager {
         try {
             Map<String, String> jar = new LinkedHashMap<>();
 
-            PopRequestSpecification loginSpec = PopRequestSpecification.builder()
-                    .baseUrl(LOGIN_HOST + "/login")
-                    .headers(Map.of("accept", "application/json, text/plain, */*"))
-                    .body(new TestSigmaLoginRequestDto(email, password))
-                    .followRedirects(false)
-                    .build();
-            Response loginResp = PopApiClient.executeRequest(HttpMethod.POST, loginSpec);
-
+            Response loginResp = TestSigmaService.login(email, password);
             if (loginResp.getStatusCode() != 200) {
                 System.out.println("[TestSigma] ⚠️  Auto-login failed (status " + loginResp.getStatusCode()
                         + ") — a captcha may be required, which this cannot solve. "
@@ -53,14 +38,7 @@ public class TestSigmaSessionManager {
             }
             mergeCookies(jar, loginResp);
 
-            PopRequestSpecification authSpec = PopRequestSpecification.builder()
-                    .baseUrl(LOGIN_HOST + "/callbacks/authorize/" + CLIENT_PATH
-                            + "?redirectTo=" + URLEncoder.encode(REDIRECT_TO, StandardCharsets.UTF_8))
-                    .headers(Map.of("Cookie", toCookieHeader(jar)))
-                    .followRedirects(false)
-                    .build();
-            Response authResp = PopApiClient.executeRequest(HttpMethod.GET, authSpec);
-
+            Response authResp = TestSigmaService.authorize(REDIRECT_TO, toCookieHeader(jar));
             mergeCookies(jar, authResp);
             String html = authResp.getBody().asString();
             Matcher tokenMatcher = Pattern.compile("name=\"token\"[^>]*value=\"([^\"]*)\"").matcher(html);
@@ -71,17 +49,7 @@ public class TestSigmaSessionManager {
             }
             String token = tokenMatcher.group(1);
 
-            String formBody = "token=" + URLEncoder.encode(token, StandardCharsets.UTF_8)
-                    + "&redirectTo=" + URLEncoder.encode(REDIRECT_TO, StandardCharsets.UTF_8);
-            PopRequestSpecification exchangeSpec = PopRequestSpecification.builder()
-                    .baseUrl(APP_HOST + "/identity/authorize_callback")
-                    .contentType("application/x-www-form-urlencoded")
-                    .body(formBody)
-                    .headers(Map.of("Cookie", toCookieHeader(jar)))
-                    .followRedirects(false)
-                    .build();
-            Response exchangeResp = PopApiClient.executeRequest(HttpMethod.POST, exchangeSpec);
-
+            Response exchangeResp = TestSigmaService.exchangeToken(token, REDIRECT_TO, toCookieHeader(jar));
             String sessionCookie = extractCookieValue(exchangeResp, "X-TMS-SESSION-ID");
             if (sessionCookie == null) {
                 System.out.println("[TestSigma] ⚠️  Auto-login: X-TMS-SESSION-ID cookie not found in the "
