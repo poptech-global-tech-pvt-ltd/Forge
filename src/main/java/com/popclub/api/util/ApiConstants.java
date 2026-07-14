@@ -25,6 +25,9 @@ public class ApiConstants {
 
     public static final String CARDSTACK_BASE_URL = ApiConfig.get("CARDSTACK_BASE_URL", "https://cardstack.getpopcard.co/api/v1");
 
+    public static final String TESTSIGMA_LOGIN_BASE_URL = ApiConfig.get("TESTSIGMA_LOGIN_BASE_URL", "https://id.testsigma.com");
+    public static final String TESTSIGMA_APP_BASE_URL   = ApiConfig.get("TESTSIGMA_APP_BASE_URL",   "https://test-management.testsigma.com");
+
     public static final String DEVICE_SERIAL = ApiConfig.get("DEVICE_SERIAL", "");
 
     public static final String PHONE_PREFIX = ApiConfig.get("PHONE_PREFIX", "+91");
