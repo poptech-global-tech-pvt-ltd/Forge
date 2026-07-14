@@ -16,7 +16,6 @@ tags:
   - shop
   - regression
 
-
 steps:
   - action: launchApp
 
@@ -34,7 +33,7 @@ steps:
   - action: call
     flow: plp_search_and_capture
     params:
-      search_query:   "the souled store"
+      search_query: "the souled store"
       search_pincode: "560102"
 
   # Capture PLP price before filter

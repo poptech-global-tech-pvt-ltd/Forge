@@ -36,7 +36,6 @@ steps:
   - action: tap
     element: search_trending_item_0
 
-
   - action: tap
     element: toolbar_wishlist_button
 

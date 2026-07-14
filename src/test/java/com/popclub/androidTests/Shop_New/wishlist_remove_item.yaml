@@ -35,7 +35,7 @@ steps:
   - action: call
     flow: plp_search_and_capture
     params:
-      search_query:   "superyoy"
+      search_query: "superyoy"
       search_pincode: "560102"
 
   # Add first product

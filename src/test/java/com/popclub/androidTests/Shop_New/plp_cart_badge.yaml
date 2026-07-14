@@ -31,24 +31,16 @@ steps:
   - action: tap
     element: common_shop_tab
 
-  # Search for superyou (no size selection)
-  - action: tap
-    element: shop_search_button
-
-  - action: waitFor
-    element: search_products_search_input
-
-  - action: enterText
-    element: search_products_search_input
-    value: "superyou"
-
-  - action: pressKey
-    value: search
+   # ── PLP: navigate, capture API + UI prices ────────────────────────────────
+  - action: call
+    flow: plp_search_and_capture
+    params:
+      search_query: "superyou"
+      search_pincode: "560102"
 
   # Open PDP and add to cart
   - action: tap
     element: product_list_item_0
-
 
   - action: tap
     element: product_details_bottom_sticky_bar_button

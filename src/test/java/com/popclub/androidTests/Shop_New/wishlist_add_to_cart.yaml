@@ -37,9 +37,8 @@ steps:
   - action: call
     flow: plp_search_and_capture
     params:
-      search_query:   "superyou"
+      search_query: "superyou"
       search_pincode: "560102"
-
 
   # Add product to wishlist from PDP
   - action: tap
@@ -58,11 +57,9 @@ steps:
   - action: pressKey
     value: BACK
 
-
   # Go to wishlist
   - action: tap
     element: toolbar_wishlist_button
-
 
   # PO-11477: Tap + button to add to cart (no size selection for superyou)
   - action: tap

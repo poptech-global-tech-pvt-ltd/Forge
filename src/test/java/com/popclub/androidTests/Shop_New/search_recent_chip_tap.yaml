@@ -30,7 +30,6 @@ steps:
 
   - action: tap
     element: common_shop_tab
- 
 
   # Do a search first to populate Recent searches
   
@@ -38,7 +37,7 @@ steps:
   - action: call
     flow: plp_search_and_capture
     params:
-      search_query:   "Nike"
+      search_query: "Nike"
       search_pincode: "560102"
 
   # Go back to Search screen
@@ -50,7 +49,6 @@ steps:
 
   - action: tap
     element: shop_search_button
-
 
   # Tap the first recent search chip
   - action: tap

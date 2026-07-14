@@ -35,7 +35,7 @@ steps:
   - action: call
     flow: plp_search_and_capture
     params:
-      search_query:   "the souled store"
+      search_query: "the souled store"
       search_pincode: "560102"
     
   # Capture 1st product price before sort 
@@ -54,7 +54,6 @@ steps:
   - action: tapByText
     value: "Price High → Low"
     testCaseId: PO-11011
-    
     
   # Wait for PLP to reload
   - action: waitFor

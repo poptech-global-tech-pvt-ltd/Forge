@@ -36,7 +36,7 @@ steps:
   - action: call
     flow: plp_search_and_capture
     params:
-      search_query:   "superyou"
+      search_query: "superyou"
       search_pincode: "560102"
       
   - action: waitFor

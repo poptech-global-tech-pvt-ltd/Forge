@@ -35,7 +35,7 @@ steps:
   - action: call
     flow: plp_search_and_capture
     params:
-      search_query:   "the souled store"
+      search_query: "the souled store"
       search_pincode: "560102"
 
   # Apply a filter

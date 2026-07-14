@@ -36,11 +36,11 @@ steps:
   - action: call
     flow: plp_search_and_capture
     params:
-      search_query:   "superyou"
+      search_query: "superyou"
       search_pincode: "560102"
+      
   - action: tap
     element: product_list_item_0
-
 
   - action: tap
     element: product_details_wishlist_button
@@ -51,7 +51,6 @@ steps:
   # Go to wishlist
   - action: tap
     element: toolbar_wishlist_button
-
 
   # Remove the only item
   - action: tap
