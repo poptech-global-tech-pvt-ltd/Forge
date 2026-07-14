@@ -43,17 +43,18 @@ public class PopApiClient {
 
         log.info("[PopApiClient] {} {}", method, spec.getBaseUrl());
 
-        return execute(method, spec.getBaseUrl(), reqSpec);
+        return execute(method, spec.getBaseUrl(), reqSpec, spec.isFollowRedirects());
     }
 
-    private static Response execute(HttpMethod method, String url, RequestSpecification spec) {
+    private static Response execute(HttpMethod method, String url, RequestSpecification spec, boolean followRedirects) {
         try {
+            RequestSpecification req = RestAssured.given().spec(spec).redirects().follow(followRedirects);
             switch (method) {
-                case GET:    return RestAssured.given().spec(spec).get(url).then().log().ifError().extract().response();
-                case POST:   return RestAssured.given().spec(spec).post(url).then().log().ifError().extract().response();
-                case PUT:    return RestAssured.given().spec(spec).put(url).then().log().ifError().extract().response();
-                case PATCH:  return RestAssured.given().spec(spec).patch(url).then().log().ifError().extract().response();
-                case DELETE: return RestAssured.given().spec(spec).delete(url).then().log().ifError().extract().response();
+                case GET:    return req.get(url).then().log().ifError().extract().response();
+                case POST:   return req.post(url).then().log().ifError().extract().response();
+                case PUT:    return req.put(url).then().log().ifError().extract().response();
+                case PATCH:  return req.patch(url).then().log().ifError().extract().response();
+                case DELETE: return req.delete(url).then().log().ifError().extract().response();
                 default: throw new IllegalArgumentException("Unknown method: " + method);
             }
         } catch (Exception e) {
