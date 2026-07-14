@@ -33,41 +33,24 @@ steps:
  
 
   # Do a search first to populate Recent searches
-  - action: tap
-    element: shop_search_button
-
-  - action: waitFor
-    element: search_products_search_input
-
-  - action: enterText
-    element: search_products_search_input
-    value: "shoes"
-
-  - action: pressKey
-    value: search
-
-  - action: waitFor
-    element: product_list_item_0
+  
+  # ── PLP: navigate, capture API + UI prices ────────────────────────────────
+  - action: call
+    flow: plp_search_and_capture
+    params:
+      search_query:   "Nike"
+      search_pincode: "560102"
 
   # Go back to Search screen
   - action: tap
     element: Navigation
-    
-  - action: waitFor
-    element: search_back_button  
-    
   
   - action: tap
     element: search_back_button
 
-  - action: waitFor
-    element: shop_search_button
-
   - action: tap
     element: shop_search_button
 
-  - action: waitFor
-    element: search_products_search_input
 
   # Tap the first recent search chip
   - action: tap

@@ -6,9 +6,6 @@ loginRequired: false
 
 testCaseIds:
   - PO-11009
-  - PO-11010
-  - PO-11011
- 
 
 features:
   - common
@@ -20,6 +17,7 @@ retry: 1
 
 tags:
   - smoke
+  - shop
 
 steps:
   - action: launchApp
@@ -33,19 +31,13 @@ steps:
    
   - action: tap
     element: common_shop_tab
-    
-  # Navigate to PLP through Search 
-  - action: tap
-    element: shop_search_button
-
-  - action: waitFor
-    element: search_products_search_input
-
-  - action: tap
-    element: search_trending_item_0
-    
-  - action: waitFor
-    element: product_list_item_0
+ 
+ # ── PLP: navigate, capture API + UI prices ────────────────────────────────
+  - action: call
+    flow: plp_search_and_capture
+    params:
+      search_query:   "the souled store"
+      search_pincode: "560102"
     
   # Capture 1st product price before sort
   - action: captureText

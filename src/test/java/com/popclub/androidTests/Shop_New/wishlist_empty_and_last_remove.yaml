@@ -13,7 +13,7 @@ features:
   - shop
 
 tags:
-  - wishlist
+  - shop
   - regression
 
 retry: 1
@@ -32,27 +32,15 @@ steps:
     element: common_shop_tab
 
   # Add one product to wishlist
-  - action: tap
-    element: shop_search_button
-
-  - action: waitFor
-    element: search_products_search_input
-
-  - action: enterText
-    element: search_products_search_input
-    value: "superyou"
-
-  - action: pressKey
-    value: search
-
-  - action: waitFor
-    element: product_list_item_0
-
+   # ── PLP: navigate, capture API + UI prices ────────────────────────────────
+  - action: call
+    flow: plp_search_and_capture
+    params:
+      search_query:   "superyou"
+      search_pincode: "560102"
   - action: tap
     element: product_list_item_0
 
-  - action: waitFor
-    element: product_details_title
 
   - action: tap
     element: product_details_wishlist_button
@@ -60,15 +48,10 @@ steps:
   - action: pressKey
     value: BACK
 
-  - action: waitFor
-    element: product_list_item_0
-
   # Go to wishlist
   - action: tap
     element: toolbar_wishlist_button
 
-  - action: waitFor
-    element: wishlist_item_0
 
   # Remove the only item
   - action: tap

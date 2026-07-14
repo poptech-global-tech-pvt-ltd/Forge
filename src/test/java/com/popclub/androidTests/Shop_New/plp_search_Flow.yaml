@@ -5,9 +5,6 @@ loginRequired: false
 
 testCaseIds:
   - PO-10985
-  - PO-11007
-  - PO-11005
-  - PO-11002
   
 features:
   - common
@@ -17,7 +14,8 @@ features:
 
 tags:
   - regression
-
+  - shop
+  
 retry: 1
 
 steps:
@@ -33,21 +31,14 @@ steps:
   - action: tap
     element: common_shop_tab
 
-  - action: waitFor
-    element: shop_search_button
-
-  # Navigate to PLP via search
-  - action: tap
-    element: shop_search_button
-
-  - action: waitFor
-    element: search_products_search_input
-
-  - action: enterText
-    element: search_products_search_input
-    value: "shoes"
-    
-   # Tap the X (clear) button
+  # ── PLP: navigate, capture API + UI prices ────────────────────────────────
+  - action: call
+    flow: plp_search_and_capture
+    params:
+      search_query:   "the souled store"
+      search_pincode: "560102"
+      
+  # Tap the X (clear) button
   - action: tap
     element: Clear
     testCaseId: PO-11005
@@ -81,9 +72,6 @@ steps:
   # Back to PLP from search results
   - action: tap
     element: Navigation
-    
-  - action: waitFor
-    element: search_products_search_input
     
   - action: tap
     element: search_back_button

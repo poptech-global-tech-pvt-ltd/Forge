@@ -5,7 +5,6 @@ loginRequired: false
 
 testCaseIds:
   - PO-11481
-  - PO-11482
 
 features:
   - common
@@ -14,7 +13,7 @@ features:
   - shop
 
 tags:
-  - wishlist
+  - shop
   - regression
 
 retry: 1
@@ -31,18 +30,13 @@ steps:
 
   - action: tap
     element: common_shop_tab
-
-  - action: tap
-    element: shop_search_button
-
-  - action: waitFor
-    element: search_products_search_input
-
-  - action: tap
-    element: search_trending_item_0
-
-  - action: waitFor
-    element: product_list_item_0
+    
+ # ── PLP: navigate, capture API + UI prices ────────────────────────────────
+  - action: call
+    flow: plp_search_and_capture
+    params:
+      search_query:   "the souled store"
+      search_pincode: "560102"
 
   # Go to wishlist
   - action: tap

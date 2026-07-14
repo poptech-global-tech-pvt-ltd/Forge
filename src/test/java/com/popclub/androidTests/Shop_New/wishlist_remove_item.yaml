@@ -5,9 +5,6 @@ loginRequired: false
 
 testCaseIds:
   - PO-11061
-  - PO-11473
-  - PO-11475
-  - PO-11476
 
 features:
   - common
@@ -16,7 +13,7 @@ features:
   - shop
 
 tags:
-  - wishlist
+  - shop
   - regression
 
 retry: 1
@@ -34,22 +31,12 @@ steps:
   - action: tap
     element: common_shop_tab
 
-  # Add 2 products to wishlist
-  - action: tap
-    element: shop_search_button
-
-  - action: waitFor
-    element: search_products_search_input
-
-  - action: enterText
-    element: search_products_search_input
-    value: "superyou"
-
-  - action: pressKey
-    value: search
-
-  - action: waitFor
-    element: product_list_item_0
+  # ── PLP: navigate, capture API + UI prices ────────────────────────────────
+  - action: call
+    flow: plp_search_and_capture
+    params:
+      search_query:   "superyoy"
+      search_pincode: "560102"
 
   # Add first product
   - action: tap
@@ -68,9 +55,6 @@ steps:
   - action: pressKey
     value: BACK
 
-  - action: waitFor
-    element: product_list_item_0
-
   # Add second product
   - action: tap
     element: product_list_item_1
@@ -88,15 +72,9 @@ steps:
   - action: pressKey
     value: BACK
 
-  - action: waitFor
-    element: product_list_item_0
-
   # Go to wishlist
   - action: tap
     element: toolbar_wishlist_button
-
-  - action: waitFor
-    element: wishlist_item_card_compose_row
 
   # PO-11061 + PO-11473: Remove first item by tapping filled heart
   - action: tap

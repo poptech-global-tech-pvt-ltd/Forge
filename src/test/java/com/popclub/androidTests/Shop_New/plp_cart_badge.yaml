@@ -13,8 +13,6 @@ features:
   - shop
 
 tags:
-  - plp
-  - cart
   - shop
   - regression
 
@@ -47,15 +45,10 @@ steps:
   - action: pressKey
     value: search
 
-  - action: waitFor
-    element: product_list_item_0
-
   # Open PDP and add to cart
   - action: tap
     element: product_list_item_0
 
-  - action: waitFor
-    element: product_details_title
 
   - action: tap
     element: product_details_bottom_sticky_bar_button

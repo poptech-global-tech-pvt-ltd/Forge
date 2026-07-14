@@ -5,8 +5,6 @@ loginRequired: false
 
 testCaseIds:
   - PO-11014
-  - PO-11015
-  - PO-11027
 
 features:
   - common
@@ -15,17 +13,15 @@ features:
   - shop
 
 tags:
-  - filter
   - shop
   - regression
 
-retry: 1
 
 steps:
   - action: launchApp
 
   - action: loginIfNeeded
-    value: "1234561122"
+    value: "1234561234"
     text: "560102"
 
   - action: waitFor
@@ -34,17 +30,12 @@ steps:
   - action: tap
     element: common_shop_tab
 
-  - action: tap
-    element: shop_search_icon
-
-  - action: waitFor
-    element: search_products_search_input
-
-  - action: tap
-    element: search_trending_item_0
-
-  - action: waitFor
-    element: product_list_item_0
+  # ── PLP: navigate, capture API + UI prices ────────────────────────────────
+  - action: call
+    flow: plp_search_and_capture
+    params:
+      search_query:   "the souled store"
+      search_pincode: "560102"
 
   # Capture PLP price before filter
   - action: captureText
@@ -54,9 +45,6 @@ steps:
   # PO-11014 + PO-11015: Filter sheet opened with categories visible
   - action: tap
     element: product_list_filter_button
-
-  - action: waitFor
-    element: product_filter_category_item_0
 
   - action: verifyElement
     element: product_filter_category_item_0

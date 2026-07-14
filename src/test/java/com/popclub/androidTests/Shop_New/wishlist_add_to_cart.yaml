@@ -5,9 +5,6 @@ loginRequired: false
 
 testCaseIds:
   - PO-11477
-  - PO-11478
-  - PO-11480
-  - PO-11483
 
 features:
   - common
@@ -16,7 +13,7 @@ features:
   - shop
 
 tags:
-  - wishlist
+  - shop
   - smoke
   - regression
 
@@ -36,21 +33,13 @@ steps:
     element: common_shop_tab
 
   # Search for "superyou" — no size selection needed
-  - action: tap
-    element: shop_search_button
+  # ── PLP: navigate, capture API + UI prices ────────────────────────────────
+  - action: call
+    flow: plp_search_and_capture
+    params:
+      search_query:   "superyou"
+      search_pincode: "560102"
 
-  - action: waitFor
-    element: search_products_search_input
-
-  - action: enterText
-    element: search_products_search_input
-    value: "superyou"
-
-  - action: pressKey
-    value: search
-
-  - action: waitFor
-    element: product_list_item_0
 
   # Add product to wishlist from PDP
   - action: tap
@@ -69,15 +58,10 @@ steps:
   - action: pressKey
     value: BACK
 
-  - action: waitFor
-    element: product_list_item_0
 
   # Go to wishlist
   - action: tap
     element: toolbar_wishlist_button
-
-  - action: waitFor
-    element: wishlist_item_card_compose_row
 
 
   # PO-11477: Tap + button to add to cart (no size selection for superyou)

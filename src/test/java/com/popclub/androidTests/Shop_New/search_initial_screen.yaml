@@ -13,7 +13,6 @@ features:
   - shop
 
 tags:
-  - search
   - shop
   - regression
 
@@ -29,9 +28,6 @@ steps:
 
   - action: tap
     element: common_shop_tab
-
-  - action: waitFor
-    element: shop_search_button
 
   - action: tap
     element: shop_search_button

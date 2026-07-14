@@ -5,8 +5,6 @@ loginRequired: false
 
 testCaseIds:
   - PO-10999
-  - PO-11003
-  - PO-11004
 
 features:
   - common
@@ -16,6 +14,7 @@ features:
 
 tags:
   - regression
+  - shop
 
 retry: 1
 
@@ -35,14 +34,8 @@ steps:
   - action: tap
     element: shop_search_button
 
-  - action: waitFor
-    element: search_products_search_input
-
   - action: tap
     element: search_trending_item_0
-
-  - action: waitFor
-    element: product_list_item_0
 
   # PO-10999: Tap search icon on PLP — opens Search screen
   - action: tap

@@ -4,7 +4,6 @@ noReset: true
 loginRequired: false
 testCaseIds:
   - PO-11467
-  - PO-11468
 
 features:
   - common
@@ -13,7 +12,7 @@ features:
   - shop
 
 tags:
-  - wishlist
+  - shop
   - regression
 
 retry: 1
@@ -34,14 +33,9 @@ steps:
   - action: tap
     element: shop_search_button
 
-  - action: waitFor
-    element: search_products_search_input
-
   - action: tap
     element: search_trending_item_0
 
-  - action: waitFor
-    element: product_list_item_0
 
   - action: tap
     element: toolbar_wishlist_button
