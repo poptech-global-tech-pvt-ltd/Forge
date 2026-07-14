@@ -1,5 +1,6 @@
 package com.popclub.testsigma;
 
+import com.popclub.api.impl.TestSigmaService;
 import io.restassured.response.Response;
 
 import java.io.File;

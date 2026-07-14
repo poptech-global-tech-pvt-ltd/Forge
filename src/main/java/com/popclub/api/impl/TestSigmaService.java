@@ -1,4 +1,4 @@
-package com.popclub.testsigma;
+package com.popclub.api.impl;
 
 import com.popclub.api.dto.TestSigmaLoginRequestDto;
 import com.popclub.api.enums.Routes;
