@@ -1,0 +1,57 @@
+testName: PDP — Product details accordion
+platform: android
+noReset: false
+loginRequired: true
+retry: 1
+
+testCaseIds:
+  - PO-11051
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - sanity
+  - shop
+
+steps:
+  - action: call
+    flow: login_and_go_to_shop
+
+  - action: call
+    flow: search_and_open_pdp
+    params:
+      search_query: "snitch"
+      search_pincode: "560102"
+
+  # ── Scroll to product details section ──────────────────────────────────
+  - action: swipe
+    direction: up
+
+  - action: swipe
+    direction: up
+
+  # ── PO-11051: Accordion collapsed by default ───────────────────────────
+  - action: verifyElement
+    element: product_details_product_info_section_row
+
+  - action: verifyElement
+    element: Expand
+
+  # ── PO-11052: Tap to expand → shows full product info ──────────────────
+  - action: tap
+    element: product_details_product_info_section_row
+
+  - action: verifyElement
+    element: Collapse
+    testCaseId: PO-11052
+
+  # ── Tap again to collapse ──────────────────────────────────────────────
+  - action: tap
+    element: product_details_product_info_section_row
+
+  - action: verifyElement
+    element: Expand
