@@ -13,7 +13,7 @@ features:
   - home
   - shop
   
-retry: 1
+retry: 0
 
 tags:
   - smoke
@@ -26,9 +26,6 @@ steps:
     value: "1234561122"
     text: "560102"
 
-  - action: waitFor
-    element: home_tab
-   
   - action: tap
     element: common_shop_tab
  

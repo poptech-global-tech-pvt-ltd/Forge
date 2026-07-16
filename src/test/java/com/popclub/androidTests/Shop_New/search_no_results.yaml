@@ -16,7 +16,7 @@ tags:
   - regression
   - shop
 
-retry: 1
+retry: 0
 
 steps:
   - action: launchApp
