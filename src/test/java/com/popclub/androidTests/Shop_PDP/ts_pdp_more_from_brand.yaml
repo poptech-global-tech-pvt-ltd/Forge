@@ -1,0 +1,51 @@
+testName: PDP — More from this brand
+platform: android
+noReset: false
+loginRequired: true
+retry: 1
+
+testCaseIds:
+  - PO-11055
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - sanity
+  - shop
+
+steps:
+  - action: call
+    flow: login_and_go_to_shop
+
+  - action: call
+    flow: search_and_open_pdp
+    params:
+      search_query: "snitch"
+      search_pincode: "560102"
+
+  # ── Scroll down to 'More from this brand' section ──────────────────────
+  - action: swipe
+    direction: up
+
+  - action: swipe
+    direction: up
+
+  # ── PO-11054: Verify section exists ────────────────────────────────────
+  - action: verifyElement
+    element: product_details_similar_products_section_row
+
+  - action: verifyElement
+    element: product_details_similar_product_card_row
+    testCaseId: PO-11054
+
+  # ── PO-11055: Tap a product card → opens new PDP ──────────────────────
+  - action: tap
+    element: product_details_similar_product_card_row
+
+  - action: verifyElement
+    element: product_details_title
+    testCaseId: PO-11055

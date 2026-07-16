@@ -1,0 +1,116 @@
+testName: PDP — Core product info, PLP-to-PDP price match
+platform: android
+noReset: false
+loginRequired: true
+retry: 1
+
+testCaseIds:
+  - PO-11039
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - sanity
+  - regression
+  - shop
+
+steps:
+  - action: call
+    flow: login_and_go_to_shop
+
+  - action: call
+    flow: search_and_open_pdp
+    params:
+      search_query: "snitch"
+      search_pincode: "560102"
+
+  # ── Go back to PLP to capture PLP prices ───────────────────────────────
+  - action: tap
+    element: product_details_back_button
+
+  - action: captureText
+    element: product_list_item_title_0
+    variable: plp_title
+
+  - action: captureText
+    element: product_list_item_price_0
+    variable: plp_selling_price
+
+  - action: captureText
+    element: product_list_item_strikethrough_price_0
+    variable: plp_mrp_price
+
+  - action: captureText
+    element: product_list_item_brand_0
+    variable: plp_brand
+
+  - action: logVar
+    variable: plp_title
+    value: |
+      ── PLP prices captured ──
+      plp_title          - ${plp_title}
+      plp_brand          - ${plp_brand}
+      plp_selling_price  - ${plp_selling_price}
+      plp_mrp_price      - ${plp_mrp_price}
+
+  # ── Re-enter PDP ───────────────────────────────────────────────────────
+  - action: tap
+    element: product_list_item_0
+
+  # ── PO-11039: Verify core product info elements ─────────────────────────
+  - action: verifyElement
+    element: product_details_title
+
+  - action: verifyElement
+    element: product_details_price
+
+  - action: verifyElement
+    element: product_details_strikethrough_price
+
+  # ── Capture PDP prices ─────────────────────────────────────────────────
+  - action: captureText
+    element: product_details_price
+    variable: pdp_selling_price
+
+  - action: captureText
+    element: product_details_strikethrough_price
+    variable: pdp_mrp_price
+
+  - action: logVar
+    variable: pdp_selling_price
+    value: |
+      ── PDP prices captured ──
+      pdp_selling_price  - ${pdp_selling_price}
+      pdp_mrp_price      - ${pdp_mrp_price}
+
+  # ── Assert: PLP prices must match PDP prices ───────────────────────────
+  - action: assertText
+    element: product_details_price
+    value: "${plp_selling_price}"
+
+  - action: assertText
+    element: product_details_strikethrough_price
+    value: "${plp_mrp_price}"
+
+  # ── Popcoin visibility ─────────────────────────────────────────────────
+  - action: ifVarEquals
+    variable: api_product_list_item_special_pricing
+    value: "true"
+    steps:
+      - action: verifyElement
+        element: product_details_popcoin
+        shouldExist: true
+
+  # ── Verify share button ────────────────────────────────────────────────
+  - action: verifyElement
+    element: product_details_share_button
+
+  - action: tap
+    element: product_details_share_button
+
+  - action: pressKey
+    value: back
