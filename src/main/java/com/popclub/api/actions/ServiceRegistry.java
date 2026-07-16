@@ -4,6 +4,9 @@ import com.popclub.api.dto.LoginResult;
 import com.popclub.api.impl.PopService;
 import com.popclub.api.impl.SearchService;
 import com.popclub.api.auth.AuthApiClient;
+import com.popclub.api.auth.TokenExtractor;
+import com.popclub.android.driver.AppiumDriverManager;
+import com.popclub.core.TestContext;
 import io.restassured.response.Response;
 
 import java.util.Map;
@@ -80,8 +83,6 @@ public class ServiceRegistry {
     private static LoginResult appAuth(Map<String, String> params) {
         String phone = params.get("phone");
         String otp   = params.get("otp");
-        // Unresolved "${...}" placeholders (variable not passed by the caller)
-        // are left as-is by interpolate() — treat those the same as absent.
         if (phone == null || phone.isBlank() || phone.contains("${")) phone = "1234561122";
         if (otp   == null || otp.isBlank()   || otp.contains("${"))   otp   = "560102";
         return AuthApiClient.loginFull(phone, otp);

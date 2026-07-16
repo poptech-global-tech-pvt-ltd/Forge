@@ -30,6 +30,7 @@ public class TestContext {
     private static ThreadLocal<File> videoFile = new ThreadLocal<>();
     private static ThreadLocal<String> currentTestCase = new ThreadLocal<>();
     private static ThreadLocal<String> userToken = new ThreadLocal<>();
+    private static ThreadLocal<String> legacyToken = new ThreadLocal<>();
     private static ThreadLocal<String> failingElement = new ThreadLocal<>();
 
     public static void setFailingElement(String element) { failingElement.set(element); }
@@ -200,6 +201,9 @@ public class TestContext {
     }
 
     public static String getUserToken() { return userToken.get(); }
+
+    public static void setLegacyToken(String token) { legacyToken.set(token); }
+    public static String getLegacyToken() { return legacyToken.get(); }
 
     // ---------------- USER ID (extracted from JWT payload) ----------------
 
