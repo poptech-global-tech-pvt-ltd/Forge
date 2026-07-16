@@ -3,6 +3,7 @@ package com.popclub.api.actions;
 import com.popclub.api.dto.LoginResult;
 import com.popclub.api.impl.PopService;
 import com.popclub.api.impl.SearchService;
+import com.popclub.api.auth.AuthApiClient;
 import com.popclub.api.auth.TokenExtractor;
 import com.popclub.android.driver.AppiumDriverManager;
 import com.popclub.core.TestContext;
@@ -81,24 +82,30 @@ public class ServiceRegistry {
      * Throws only if both attempts fail.
      */
     private static LoginResult appAuth(Map<String, String> params) {
-        String token = TestContext.getUserToken();
+        String legacyToken = TestContext.getLegacyToken();
+        String jwtToken = TestContext.getUserToken();
 
-        if (token == null || token.isBlank()) {
-            System.out.println("[ServiceRegistry] Token not in TestContext — retrying from logcat…");
-            token = fetchTokenFromLogcat();
-            if (token != null && !token.isBlank()) {
-                TestContext.setUserToken(token);
-                TestContext.setScalarData("auth_token", token);
-                System.out.println("[ServiceRegistry] Token captured from logcat on retry ✓");
-            }
+        if (legacyToken != null && !legacyToken.isBlank()
+                && jwtToken != null && !jwtToken.isBlank()) {
+            return new LoginResult(legacyToken, jwtToken);
         }
 
-        if (token == null || token.isBlank())
-            throw new RuntimeException(
-                "callService: no auth token found.\n"
-                + "Ensure 'action: loginIfNeeded' ran before this step.");
+        String phone = params.getOrDefault("phone", "1234561122");
+        String otp   = params.getOrDefault("otp",   "560102");
+        if (phone.startsWith("${")) phone = "1234561122";
+        if (otp.startsWith("${"))   otp   = "560102";
 
-        return new LoginResult(null, token);   // JWT → X-Access-Token header
+        System.out.println("[ServiceRegistry] Logging in via API to get both tokens…");
+        LoginResult result = AuthApiClient.loginFull(phone, otp);
+        if (result.jwtToken != null && !result.jwtToken.isBlank()) {
+            TestContext.setUserToken(result.jwtToken);
+            TestContext.setScalarData("auth_token", result.jwtToken);
+        }
+        if (result.legacyToken != null && !result.legacyToken.isBlank()) {
+            TestContext.setLegacyToken(result.legacyToken);
+            TestContext.setScalarData("legacy_token", result.legacyToken);
+        }
+        return result;
     }
 
     private static String fetchTokenFromLogcat() {

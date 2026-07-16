@@ -141,10 +141,19 @@ public class LoginIfNeededAction implements Action {
 
     private void storeToken(String deviceSerial, String source) {
         try {
+            TokenExtractor.clearCache();
+            TestContext.setUserToken(null);
+            TestContext.setLegacyToken(null);
             String token = TokenExtractor.get(deviceSerial);
             if (token != null && !token.isBlank()) {
                 TestContext.setUserToken(token);
                 TestContext.setScalarData("auth_token", token);
+                String legacy = TokenExtractor.getLegacyToken(deviceSerial);
+                if (legacy != null && !legacy.isBlank()) {
+                    TestContext.setLegacyToken(legacy);
+                    TestContext.setScalarData("legacy_token", legacy);
+                    System.out.println("  ✅ [loginIfNeeded] Legacy DRF token captured");
+                }
                 String preview = token.length() > 20
                         ? token.substring(0, 10) + "…" + token.substring(token.length() - 6)
                         : token;
