@@ -2,7 +2,7 @@ testName: PDP — Header icons (Back, Search, Cart, POPCoins)
 platform: android
 noReset: false
 loginRequired: true
-retry: 1
+retry: 0
 
 testCaseIds:
   - PO-11032
@@ -22,8 +22,11 @@ steps:
   - action: launchApp
 
   - action: loginIfNeeded
-    value: "1234561102"
+    value: "1234561234"
     text: "560102"
+
+  - action: tap
+    element: common_shop_tab
 
   - action: tap
     element: common_shop_tab
@@ -39,7 +42,7 @@ steps:
     element: pdp_search_icon
 
   - action: tap
-    element: toolbar_search_button
+    element: toolbar_search_button  # healed locator → search_back_button
 
   - action: tap
     element: product_details_go_to_cart_button

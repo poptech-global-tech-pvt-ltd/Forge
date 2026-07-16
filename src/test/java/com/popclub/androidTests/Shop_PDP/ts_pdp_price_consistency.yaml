@@ -2,7 +2,7 @@ testName: PDP — Add to Cart without size shows size prompt
 platform: android
 noReset: false
 loginRequired: true
-retry: 1
+retry: 0
 
 testCaseIds:
   - PO-11070
@@ -18,8 +18,14 @@ tags:
   - shop
 
 steps:
-  - action: call
-    flow: login_and_go_to_shop
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561234"
+    text: "560102"
+
+  - action: tap
+    element: common_shop_tab
 
   - action: call
     flow: search_and_open_pdp
