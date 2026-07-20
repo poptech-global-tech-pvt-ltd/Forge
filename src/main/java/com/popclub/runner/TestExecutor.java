@@ -356,14 +356,12 @@ public class TestExecutor {
                     Action action = ActionFactory.get(step.action);
                     action.perform(step);
 
-                    // Record on every launch, not just fresh ones, so noReset=true tests get video too.
                     if ("launchApp".equalsIgnoreCase(step.action)) {
 
                         AppiumDriver driver = DriverManager.getDriver();
 
                         VideoUtil.startRecording(driver);
 
-                        // One-time fresh-launch setup: keep-alive heartbeat + dismiss popups.
                         if (TestContext.isFreshLaunch()) {
                             // Start screen keep-alive heartbeat (KEYCODE_WAKEUP every 25s)
                             DeviceKeepAlive.start(driver);

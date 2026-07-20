@@ -18,7 +18,6 @@ public class TestSigmaConfig {
             throw new RuntimeException("Failed to load testsigma.properties", e);
         }
 
-        // Machine-local, git-ignored overrides — optional, missing file is not an error.
         try (InputStream in = TestSigmaConfig.class.getClassLoader()
                 .getResourceAsStream("config/testsigma-local.properties")) {
             if (in != null) localProps.load(in);
@@ -55,13 +54,8 @@ public class TestSigmaConfig {
     public static String runTitlePrefix()   { return get("testsigma.run.title.prefix"); }
     public static String runTags()          { return get("testsigma.run.tags"); }
 
-    /** Used only for attachment uploads — the Bearer token can't authenticate against /private/graphql. */
     public static String sessionCookie()    { return get("testsigma.session.cookie"); }
-
-    /** Must be the session cookie's own owner, NOT testsigma.user.id — mismatches fail silently. */
     public static String sessionUserId()    { return get("testsigma.session.user.id"); }
-
-    /** Used only by TestSigmaSessionManager to auto-refresh the session cookie; local-only, never commit. */
     public static String loginEmail()       { return get("testsigma.login.email"); }
     public static String loginPassword()    { return get("testsigma.login.password"); }
 }

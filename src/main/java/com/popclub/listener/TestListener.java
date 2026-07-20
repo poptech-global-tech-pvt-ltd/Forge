@@ -27,7 +27,6 @@ public class TestListener implements ITestListener, ISuiteListener {
     @Override
     public void onStart(ISuite suite) {
 
-        // Refreshes the session cookie so it never needs manual copy-pasting.
         TestSigmaSessionManager.refreshSessionCookie();
 
         projectId = suite.getParameter("projectId");
@@ -39,7 +38,6 @@ public class TestListener implements ITestListener, ISuiteListener {
         long start = System.currentTimeMillis() / 1000;
         TestContext.setStartTime(start);
 
-        // Only a batch/folder run or a tag-based run should create a TestSigma run — not a single ad-hoc test.
         String tagParam = System.getProperty("tag", suite.getParameter("tag"));
         boolean tagRun = tagParam != null && !tagParam.isEmpty();
         boolean batchRun = Boolean.parseBoolean(System.getProperty("batchRun", "false")) || tagRun;
@@ -52,7 +50,6 @@ public class TestListener implements ITestListener, ISuiteListener {
 
         System.out.println("[TestSigma] Scanning for test cases to register in run...");
 
-        // Restrict to -DtestFile when set, else placeholder ids from other files can break run creation.
         java.util.Set<String> onlyFiles = new java.util.HashSet<>();
         String testFileParam = System.getProperty("testFile");
         if (testFileParam == null || testFileParam.isEmpty()) {
@@ -82,7 +79,6 @@ public class TestListener implements ITestListener, ISuiteListener {
             List<String> uuidList = new ArrayList<>();
             for (String id : allTestCaseIds) {
                 if (id.startsWith("PO-")) {
-                    // Skip ids that don't resolve so one bad id doesn't fail the whole run.
                     try {
                         String uuid = TestSigmaClient.getTestCaseIdByHumanId(projectId, id);
                         if (uuid != null) {
@@ -104,7 +100,6 @@ public class TestListener implements ITestListener, ISuiteListener {
                 return;
             }
 
-            // Append a timestamp so re-running the suite doesn't collide with the previous run's title.
             String baseTitle = (title != null && !title.isBlank()) ? title : "Forge Run";
             String runTitle = baseTitle + " - "
                     + new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date());
@@ -184,11 +179,9 @@ public class TestListener implements ITestListener, ISuiteListener {
         File log = TestLogCapture.stop();
         uploadAttachments(TestCaseStatus.FAILED, screenshot, video, log);
 
-        // Comment only on FAILED — PASS doesn't need the full log.
         postFailureLogComment(log);
     }
 
-    /** Resolves the YAML's testName for file naming, falling back to TestNG's generic method name. */
     private String resolveTestName(ITestResult result) {
         Object[] params = result.getParameters();
         if (params != null && params.length > 0 && params[0] instanceof TestCase) {
@@ -198,7 +191,6 @@ public class TestListener implements ITestListener, ISuiteListener {
         return result.getName();
     }
 
-    /** Posts the full captured log as a comment — the REST description field is silently ignored by TestSigma. */
     private void postFailureLogComment(File log) {
         String runId = TestContext.getRunId();
         if (runId == null || log == null || !log.exists()) return;
@@ -235,11 +227,9 @@ public class TestListener implements ITestListener, ISuiteListener {
     public void onTestSkipped(ITestResult result) {
         stopVideoQuietly(resolveTestName(result) + "_skipped");
         updateStatus(result, TestCaseStatus.SKIPPED);
-        // Stop capture to restore console streams (no upload for skipped tests)
         TestLogCapture.stop();
     }
 
-    /** Uploads the given artifacts to each testCaseId via the GraphQL mutation — there's no REST endpoint for this. */
     private void uploadAttachments(TestCaseStatus status, File... files) {
         String runId = TestContext.getRunId();
         if (runId == null) return;
@@ -264,7 +254,6 @@ public class TestListener implements ITestListener, ISuiteListener {
             for (File f : files) {
                 if (f == null || !f.exists()) continue;
                 try {
-                    // Must be the session cookie's own user id, not testsigma.user.id.
                     boolean uploaded = TestSigmaClient.uploadAttachment(
                             runId, uuid, status.id(), TestSigmaConfig.sessionUserId(),
                             "Forge automation — " + f.getName(), f);
@@ -279,7 +268,6 @@ public class TestListener implements ITestListener, ISuiteListener {
         }
     }
 
-    /** Recursively collects all testCaseIds from YAML files under {@code dir}. */
     private void collectTestCaseIds(File dir, List<String> result, java.util.Set<String> onlyFiles) {
         File[] entries = dir.listFiles();
         if (entries == null) return;
@@ -304,7 +292,6 @@ public class TestListener implements ITestListener, ISuiteListener {
         }
     }
 
-    /** Stop recording without saving — cleans up the Appium buffer on pass/skip. */
     private void stopVideoQuietly(String label) {
         DeviceKeepAlive.stop();
         try {
@@ -313,7 +300,6 @@ public class TestListener implements ITestListener, ISuiteListener {
                 VideoUtil.stopAndSave(driver, label);
             }
         } catch (Exception ignored) {
-            // Video may not have been started — safe to swallow
         }
     }
 
@@ -347,7 +333,6 @@ public class TestListener implements ITestListener, ISuiteListener {
                         projectId, TestContext.getRunId(), uuid,
                         status.id(), TestSigmaConfig.userId(), duration);
 
-                // Fallback: override API using test_case_run id
                 String runCaseId = runCaseMap.getOrDefault(id, runCaseMap.get(uuid));
                 if (runCaseId != null) {
                     TestSigmaClient.updateTestCaseStatus(TestContext.getRunId(), runCaseId, status);
@@ -360,7 +345,6 @@ public class TestListener implements ITestListener, ISuiteListener {
         } catch (InterruptedException ie) {
             Thread.currentThread().interrupt();
         } catch (Exception e) {
-            // Never let TestSigma reporting affect the test result itself
             System.err.println("[TestSigma] ⚠️  Failed to update status for "
                     + result.getName() + ": " + e.getMessage());
         }

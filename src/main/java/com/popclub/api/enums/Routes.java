@@ -34,7 +34,6 @@ public enum Routes {
     YBL_MASTER_LISTS        ("/ybl/master-lists?filter=company&filter=industry&filter=profession&filter=business&filter=designation&filter=companytype"),
     YBL_PROFESSIONAL_DETAILS("/ybl/professional-details"),
 
-    // id.testsigma.com / test-management.testsigma.com — SSO login
     TESTSIGMA_LOGIN         ("/login"),
     TESTSIGMA_AUTHORIZE     ("/callbacks/authorize/72987"),
     TESTSIGMA_TOKEN_EXCHANGE("/identity/authorize_callback");

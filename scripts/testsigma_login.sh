@@ -1,6 +1,4 @@
 #!/bin/bash
-# Chains TestSigma's 3-hop SSO login to obtain a fresh X-TMS-SESSION-ID cookie without DevTools.
-# Usage: ./testsigma_login.sh (prompts for email + password interactively; nothing is saved to disk).
 
 set -euo pipefail
 
@@ -8,7 +6,7 @@ COOKIE_JAR=$(mktemp)
 trap 'rm -f "$COOKIE_JAR"' EXIT
 
 REDIRECT_TO="https://test-management.testsigma.com/ui/test_cases?generateTestCases=false"
-CLIENT_PATH="72987"   # the numeric id seen in /callbacks/authorize/72987
+CLIENT_PATH="72987"
 
 read -rp "TestSigma email: " TS_EMAIL
 read -rsp "TestSigma password: " TS_PASSWORD
@@ -32,7 +30,6 @@ echo "[2/3] Fetching authorization token page..." >&2
 AUTH_HTML=$(curl -s -b "$COOKIE_JAR" -c "$COOKIE_JAR" \
   "https://id.testsigma.com/callbacks/authorize/${CLIENT_PATH}?redirectTo=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1], safe=''))" "$REDIRECT_TO")")
 
-# Inspect $AUTH_HTML if this regex fails — the page's HTML structure may have changed.
 TOKEN=$(echo "$AUTH_HTML" | grep -oE 'name="token"[^>]*value="[^"]*"' | sed -E 's/.*value="([^"]*)".*/\1/')
 
 if [ -z "$TOKEN" ]; then

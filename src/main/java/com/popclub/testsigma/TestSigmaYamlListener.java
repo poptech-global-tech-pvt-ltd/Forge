@@ -46,7 +46,6 @@ public class TestSigmaYamlListener implements ISuiteListener, ITestListener {
             return;
         }
 
-        // Same batch/tag gating as TestListener.onStart — see there for the full rationale.
         String tagParam = System.getProperty("tag", suite.getParameter("tag"));
         boolean tagRun = tagParam != null && !tagParam.isEmpty();
         if (!Boolean.parseBoolean(System.getProperty("batchRun", "false")) && !tagRun) {
