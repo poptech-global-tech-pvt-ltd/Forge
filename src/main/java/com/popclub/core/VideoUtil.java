@@ -12,7 +12,6 @@ import java.util.Base64;
 
 public class VideoUtil {
 
-    /** Raised from Android's ~180s default so long E2E runs don't get truncated. */
     private static final Duration MAX_RECORDING = Duration.ofSeconds(1800);
 
     public static void startRecording(AppiumDriver driver) {

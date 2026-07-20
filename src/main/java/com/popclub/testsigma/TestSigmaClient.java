@@ -55,14 +55,12 @@ public class TestSigmaClient {
         String uuid = response.jsonPath().getString("data.test_run.id");
         String humanId = response.jsonPath().getString("data.test_run.human_id");
 
-        // Surface the human_id (e.g. "PO-R-361") — the UUID alone is useless for tracking in the dashboard.
         System.out.println("[TestSigma] Run ID: " + humanId + "  (internal id: " + uuid + ")");
         writeLastRunIdToFile(title, humanId, uuid);
 
         return uuid;
     }
 
-    /** Writes the most recently created run's identifiers to reports/testsigma_last_run.txt. */
     private static void writeLastRunIdToFile(String title, String humanId, String uuid) {
         try {
             java.io.File dir = new java.io.File("reports");
@@ -111,7 +109,6 @@ public class TestSigmaClient {
         throw new RuntimeException("TestCase not found: " + humanId);
     }
 
-    /** Maps each test case in a run to its test_case_run id — "/test_case_runs" 404s, this endpoint doesn't. */
     public static Map<String, String> getTestCaseRunMap(String projectId, String runId) {
         Map<String, String> map = new HashMap<>();
 
@@ -170,10 +167,8 @@ public class TestSigmaClient {
         }
     }
 
-    /** Host for the GraphQL API — a completely different path root than the REST /api/v1 base. */
     private static final String GRAPHQL_HOST = "https://test-management.testsigma.com";
 
-    /** TestSigma has no REST endpoint for attachments — this GraphQL mutation only accepts the session cookie, not the Bearer token. */
     public static boolean uploadAttachment(String testRunId, String testCaseId,
                                             String testRunStatusId, String userId,
                                             String description, java.io.File file) {
@@ -217,7 +212,6 @@ public class TestSigmaClient {
             return false;
         }
 
-        // GraphQL returns 200 even on failure, so check the payload isn't null and "errors" is empty.
         Object mutationResult = response.jsonPath().get("data.updateTestRunCaseStatus");
         if (mutationResult == null) {
             System.out.println("[TestSigma] ⚠️  Attachment upload returned null result (testCaseId not matched in this run) for "
@@ -235,7 +229,6 @@ public class TestSigmaClient {
         return true;
     }
 
-    /** Same mutation as {@link #uploadAttachment} with an empty attachments array — the REST description field is ignored. */
     public static boolean addRunComment(String testRunId, String testCaseId,
                                          String testRunStatusId, String userId,
                                          String description) {

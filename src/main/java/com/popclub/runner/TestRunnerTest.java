@@ -140,10 +140,8 @@ public class TestRunnerTest {
         } catch (Exception e) {
             throw new RuntimeException("Test failed: " + testCase.testName, e);
         }
-        // Driver stays alive here so the ITestListener callbacks can still capture it.
     }
 
-    /** Quits the driver after the ITestListener callbacks have already run. */
     @AfterMethod(alwaysRun = true)
     public void quitDriverAfterTest() {
         //  ALWAYS CLEAN DRIVER
