@@ -194,39 +194,57 @@ public class TestSigmaClient {
 
         String map = "{\"0\":[\"variables.input.0.attachments.0.attachment\"]}";
 
-        Response response = given()
-                .baseUri(GRAPHQL_HOST)
-                .header("Cookie", "X-TMS-SESSION-ID=" + sessionCookie)
-                .multiPart("operations", operations)
-                .multiPart("map", map)
-                .multiPart("0", file)
-                .post("/private/graphql");
+        for (int attempt = 1; attempt <= 4; attempt++) {
+            Response response = given()
+                    .baseUri(GRAPHQL_HOST)
+                    .header("Cookie", "X-TMS-SESSION-ID=" + sessionCookie)
+                    .multiPart("operations", operations)
+                    .multiPart("map", map)
+                    .multiPart("0", file)
+                    .post("/private/graphql");
 
-        System.out.println("[TestSigma] 🔍 Upload response for " + file.getName() + " (testCaseId="
-                + testCaseId + ", testRunId=" + testRunId + "): " + response.getBody().asString());
+            System.out.println("[TestSigma] 🔍 Upload response for " + file.getName() + " (testCaseId="
+                    + testCaseId + ", testRunId=" + testRunId + "): " + response.getBody().asString());
 
-        int status = response.getStatusCode();
-        if (status < 200 || status >= 300) {
-            System.out.println("[TestSigma] ⚠️  Attachment upload FAILED [" + status + "] for "
-                    + file.getName() + ": " + response.getBody().asString());
-            return false;
+            int status = response.getStatusCode();
+            if (status < 200 || status >= 300) {
+                System.out.println("[TestSigma] ⚠️  Attachment upload FAILED [" + status + "] for "
+                        + file.getName() + ": " + response.getBody().asString());
+                return false;
+            }
+
+            Object mutationResult = response.jsonPath().get("data.updateTestRunCaseStatus");
+            if (mutationResult == null) {
+                if (attempt < 4) {
+                    System.out.println("[TestSigma] Attachment target not yet synced for " + file.getName()
+                            + " (attempt " + attempt + ") — retrying in 2s...");
+                    sleepQuietly(2000);
+                    continue;
+                }
+                System.out.println("[TestSigma] ⚠️  Attachment upload returned null result (testCaseId not matched in this run) for "
+                        + file.getName() + ": " + response.getBody().asString());
+                return false;
+            }
+
+            List<Object> errors = response.jsonPath().getList("errors");
+            if (errors != null && !errors.isEmpty()) {
+                System.out.println("[TestSigma] ⚠️  Attachment upload GraphQL error for "
+                        + file.getName() + ": " + errors);
+                return false;
+            }
+
+            return true;
         }
 
-        Object mutationResult = response.jsonPath().get("data.updateTestRunCaseStatus");
-        if (mutationResult == null) {
-            System.out.println("[TestSigma] ⚠️  Attachment upload returned null result (testCaseId not matched in this run) for "
-                    + file.getName() + ": " + response.getBody().asString());
-            return false;
-        }
+        return false;
+    }
 
-        List<Object> errors = response.jsonPath().getList("errors");
-        if (errors != null && !errors.isEmpty()) {
-            System.out.println("[TestSigma] ⚠️  Attachment upload GraphQL error for "
-                    + file.getName() + ": " + errors);
-            return false;
+    private static void sleepQuietly(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
-
-        return true;
     }
 
     public static boolean addRunComment(String testRunId, String testCaseId,
@@ -253,28 +271,38 @@ public class TestSigmaClient {
                     + "{ updateTestRunCaseStatus(input: $input) { testRunAttempt { id attachments { id name } } } }");
             body.put("variables", Map.of("input", List.of(input)));
 
-            Response response = given()
-                    .baseUri(GRAPHQL_HOST)
-                    .header("Cookie", "X-TMS-SESSION-ID=" + sessionCookie)
-                    .contentType("application/json")
-                    .body(body)
-                    .post("/private/graphql");
+            for (int attempt = 1; attempt <= 4; attempt++) {
+                Response response = given()
+                        .baseUri(GRAPHQL_HOST)
+                        .header("Cookie", "X-TMS-SESSION-ID=" + sessionCookie)
+                        .contentType("application/json")
+                        .body(body)
+                        .post("/private/graphql");
 
-            Object mutationResult = response.jsonPath().get("data.updateTestRunCaseStatus");
-            if (mutationResult == null) {
-                System.out.println("[TestSigma] ⚠️  Comment failed (null result) for " + testCaseId
-                        + ": " + response.getBody().asString());
-                return false;
+                Object mutationResult = response.jsonPath().get("data.updateTestRunCaseStatus");
+                if (mutationResult == null) {
+                    if (attempt < 4) {
+                        System.out.println("[TestSigma] Comment target not yet synced for " + testCaseId
+                                + " (attempt " + attempt + ") — retrying in 2s...");
+                        sleepQuietly(2000);
+                        continue;
+                    }
+                    System.out.println("[TestSigma] ⚠️  Comment failed (null result) for " + testCaseId
+                            + ": " + response.getBody().asString());
+                    return false;
+                }
+
+                List<Object> errors = response.jsonPath().getList("errors");
+                if (errors != null && !errors.isEmpty()) {
+                    System.out.println("[TestSigma] ⚠️  Comment GraphQL error for " + testCaseId + ": " + errors);
+                    return false;
+                }
+
+                System.out.println("[TestSigma] 💬 Failure log comment added for " + testCaseId);
+                return true;
             }
 
-            List<Object> errors = response.jsonPath().getList("errors");
-            if (errors != null && !errors.isEmpty()) {
-                System.out.println("[TestSigma] ⚠️  Comment GraphQL error for " + testCaseId + ": " + errors);
-                return false;
-            }
-
-            System.out.println("[TestSigma] 💬 Failure log comment added for " + testCaseId);
-            return true;
+            return false;
 
         } catch (Exception e) {
             System.out.println("[TestSigma] ⚠️  Failed to add comment for " + testCaseId + ": " + e.getMessage());
