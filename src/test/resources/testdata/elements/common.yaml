@@ -1697,7 +1697,7 @@ tnc_section_tnc_checkbox_item_v2_checkbox:
 toolbar_search_button:
   android:
     - type: accessibilityId
-      value: search_back_button  # healed from: toolbar_search_button
+      value: toolbar_search_button
 transaction_detail_row:
   android:
     - type: accessibilityId
