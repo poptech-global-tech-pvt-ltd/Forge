@@ -1788,20 +1788,19 @@ server.tool(
     const testCases = [];
 
     for (const id of ids) {
-      try {
-        const url  = `${baseUrl}/projects/${projectId}/test_cases?search=${encodeURIComponent(id)}`;
-        const resp = await fetch(url, { headers: { "Authorization": `Bearer ${token}` } });
-        if (!resp.ok) {
-          return { content: [{ type: "text", text: `❌ TestSigma API error ${resp.status} for ${id}` }] };
-        }
-        const data = await resp.json();
-        const list = data?.data?.test_cases || [];
-        const tc   = list.find(t => (t.human_id || "").toUpperCase() === id.toUpperCase());
-        if (!tc) return { content: [{ type: "text", text: `❌ Test case not found in TestSigma: ${id}` }] };
-        testCases.push(tc);
-      } catch (e) {
-        return { content: [{ type: "text", text: `❌ TestSigma API error for ${id}: ${e.message}` }] };
+      const url = `${baseUrl}/projects/${projectId}/test_cases?search=${encodeURIComponent(id)}`;
+      const res = spawnSync("curl", ["-s", "-f", "-H", `Authorization: Bearer ${token}`, url], { encoding: "utf8", timeout: 15000 });
+      if (res.error || res.status !== 0) {
+        return { content: [{ type: "text", text: `❌ TestSigma request failed for ${id}: ${res.error?.message || res.stderr || "curl error " + res.status}` }] };
       }
+      let data;
+      try { data = JSON.parse(res.stdout); } catch (e) {
+        return { content: [{ type: "text", text: `❌ TestSigma returned non-JSON for ${id}: ${res.stdout.slice(0, 200)}` }] };
+      }
+      const list = data?.data?.test_cases || [];
+      const tc   = list.find(t => (t.human_id || "").toUpperCase() === id.toUpperCase());
+      if (!tc) return { content: [{ type: "text", text: `❌ Test case not found in TestSigma: ${id}` }] };
+      testCases.push(tc);
     }
 
     // ── Load all known element keys from elements/*.yaml ────────────────────
