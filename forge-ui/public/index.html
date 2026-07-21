@@ -1600,6 +1600,13 @@
       </div>
     </div>
 
+    <!-- APK upload -->
+    <div style="display:flex;align-items:center;gap:6px;width:100%">
+      <input type="file" id="apk-file-input" accept=".apk" style="display:none" onchange="uploadApk(this)">
+      <button class="ibar-btn" onclick="document.getElementById('apk-file-input').click()" style="padding:6px 10px;font-size:11px">⬆ Upload APK</button>
+      <span id="apk-upload-status" style="font-size:11px;flex:1;text-align:right"></span>
+    </div>
+
     <!-- Interaction toolbar — mode buttons (4-col grid) -->
     <div class="interaction-bar">
       <button class="ibar-btn active" id="ibar-tap"       onclick="setMode('tap')"       title="Tap">👆 Tap</button>
@@ -3003,6 +3010,78 @@ async function installApk() {
   btn.disabled    = false;
 }
 
+async function uploadApk(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const status = document.getElementById('apk-upload-status');
+  status.style.color = 'var(--muted, #888)';
+  status.textContent = `Uploading ${file.name}…`;
+  const form = new FormData();
+  form.append('apk', file);
+  try {
+    const res  = await fetch('/api/upload-apk', { method: 'POST', body: form });
+    const data = await res.json();
+    if (!data.ok) {
+      status.style.color = 'var(--red, #f87171)';
+      status.textContent = `✗ ${data.error}`;
+      input.value = '';
+      return;
+    }
+    const sizeMb = (data.size / 1024 / 1024).toFixed(1);
+    // Check if app is already installed on device
+    const statusRes = await fetch('/api/apk/status');
+    const statusData = await statusRes.json();
+    if (statusData.installed) {
+      status.innerHTML =
+        `<span style="color:var(--yellow,#fbbf24)">⚠ App already installed (${sizeMb} MB saved)</span>` +
+        ` <button class="ibar-btn" onclick="uninstallThenInstall(this)" ` +
+        `style="padding:3px 8px;font-size:11px;color:var(--yellow,#fbbf24);border-color:rgba(245,158,11,.4);margin-left:4px">` +
+        `Uninstall & Install</button>`;
+    } else {
+      status.style.color = 'var(--muted, #888)';
+      status.textContent = `Saved (${sizeMb} MB) — installing…`;
+      await fetch('/api/apk/install', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ apk: 'pop-qaDebug.apk' }),
+      });
+      status.style.color = 'var(--green, #4ade80)';
+      status.textContent = `✓ Installing — check log for progress`;
+    }
+  } catch (e) {
+    status.style.color = 'var(--red, #f87171)';
+    status.textContent = '✗ Upload failed';
+  }
+  input.value = '';
+}
+
+async function uninstallThenInstall(btn) {
+  const status = document.getElementById('apk-upload-status');
+  btn.disabled = true;
+  status.innerHTML = '<span style="color:var(--muted,#888)">Uninstalling… check log for progress</span>';
+  try {
+    await fetch('/api/apk/uninstall', { method: 'POST' });
+    // Wait for uninstall_done WS event then trigger install
+    await new Promise(resolve => {
+      const handler = (e) => {
+        const msg = JSON.parse(e.data);
+        if (msg.type === 'apk_uninstall_done') { ws.removeEventListener('message', handler); resolve(msg.success); }
+      };
+      ws.addEventListener('message', handler);
+      setTimeout(() => { ws.removeEventListener('message', handler); resolve(false); }, 30000);
+    });
+    status.innerHTML = '<span style="color:var(--muted,#888)">Installing… check log for progress</span>';
+    await fetch('/api/apk/install', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ apk: 'pop-qaDebug.apk' }),
+    });
+    status.innerHTML = '<span style="color:var(--green,#4ade80)">✓ Uninstalled & installing — check log</span>';
+  } catch (e) {
+    status.innerHTML = '<span style="color:var(--red,#f87171)">✗ Failed: ' + e.message + '</span>';
+  }
+}
+
 // ── Inspector ─────────────────────────────────────────────────────────────
 let inspectMode  = false;
 let screenSize   = { width: 1080, height: 2340 }; // default, updated on init
@@ -3079,6 +3158,40 @@ document.getElementById('inspect-overlay').addEventListener('click', async (e) =
     document.getElementById('inspector-rows').innerHTML =
       `<div class="inspect-loading" style="color:var(--red)">Inspect failed</div>`;
   }
+});
+
+// Hover over device screen → highlight matching scan-tag row
+let _hoverRaf = null;
+let _hoverLastIdx = -1;
+document.getElementById('inspect-overlay').addEventListener('mousemove', (e) => {
+  if (!allTagElems || allTagElems.length === 0) return;
+  if (!document.getElementById('tag-tree-modal').classList.contains('visible')) return;
+  if (_hoverRaf) return;
+  _hoverRaf = requestAnimationFrame(() => {
+    _hoverRaf = null;
+    const { devX, devY } = toDeviceCoords(e);
+    // Find smallest element whose bounds contain the cursor
+    let bestIdx = -1, bestArea = Infinity;
+    allTagElems.forEach((el, i) => {
+      if (devX >= el.x1 && devX <= el.x2 && devY >= el.y1 && devY <= el.y2) {
+        const area = (el.x2 - el.x1) * (el.y2 - el.y1);
+        if (area < bestArea) { bestArea = area; bestIdx = i; }
+      }
+    });
+    if (bestIdx === _hoverLastIdx) return;
+    _hoverLastIdx = bestIdx;
+    if (bestIdx === -1) {
+      document.querySelectorAll('.tag-row').forEach(r => r.classList.remove('selected'));
+      document.getElementById('inspect-highlight').style.display = 'none';
+      return;
+    }
+    highlightTagElement(bestIdx);
+  });
+});
+document.getElementById('inspect-overlay').addEventListener('mouseleave', () => {
+  _hoverLastIdx = -1;
+  document.querySelectorAll('.tag-row').forEach(r => r.classList.remove('selected'));
+  document.getElementById('inspect-highlight').style.display = 'none';
 });
 
 function showInspectLoading() {

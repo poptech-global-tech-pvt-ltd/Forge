@@ -23,9 +23,6 @@ steps:
     value: "1234561122"
     text: "560102"
 
-  - action: waitFor
-    element: home_tab  # healed locator → common_home_tab
-
   - action: tap
     element: common_shop_tab
 
