@@ -1,5 +1,6 @@
 package com.popclub.testsigma;
 
+import com.popclub.api.util.ApiConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.config.RestAssuredConfig;
@@ -52,7 +53,26 @@ public class TestSigmaClient {
             return null;
         }
 
-        return response.jsonPath().getString("data.test_run.id");
+        String uuid = response.jsonPath().getString("data.test_run.id");
+        String humanId = response.jsonPath().getString("data.test_run.human_id");
+
+        System.out.println("[TestSigma] Run ID: " + humanId + "  (internal id: " + uuid + ")");
+        writeLastRunIdToFile(title, humanId, uuid);
+
+        return uuid;
+    }
+
+    private static void writeLastRunIdToFile(String title, String humanId, String uuid) {
+        try {
+            java.io.File dir = new java.io.File("reports");
+            if (!dir.exists()) dir.mkdirs();
+            String content = "Run title: " + title + "\n"
+                    + "Run ID: " + humanId + "\n"
+                    + "Internal UUID: " + uuid + "\n";
+            java.nio.file.Files.writeString(new java.io.File(dir, "testsigma_last_run.txt").toPath(), content);
+        } catch (Exception e) {
+            System.out.println("[TestSigma] ⚠️  Could not write testsigma_last_run.txt: " + e.getMessage());
+        }
     }
 
     public static void updateRunStatus(String projectId, String runId, RunStatus status) {
@@ -90,14 +110,14 @@ public class TestSigmaClient {
         throw new RuntimeException("TestCase not found: " + humanId);
     }
 
-    public static Map<String, String> getTestCaseRunMap(String runId) {
+    public static Map<String, String> getTestCaseRunMap(String projectId, String runId) {
         Map<String, String> map = new HashMap<>();
 
         Response response = given()
                 .header("Authorization", authHeader())
-                .get("/test_runs/" + runId + "/test_case_runs");
+                .get("/projects/" + projectId + "/test_runs/" + runId + "/test_cases");
 
-        List<Map<String, Object>> list = response.jsonPath().getList("data.test_case_runs");
+        List<Map<String, Object>> list = response.jsonPath().getList("data.test_run_cases");
         if (list == null) return map;
 
         for (Map<String, Object> item : list) {
@@ -148,11 +168,145 @@ public class TestSigmaClient {
         }
     }
 
-    public static void uploadAttachment(String testCaseRunId, java.io.File file) {
-        given()
-                .header("Authorization", authHeader())
-                .multiPart("file", file)
-                .post("/test_case_runs/" + testCaseRunId + "/attachments");
+    public static boolean uploadAttachment(String testRunId, String testCaseId,
+                                            String testRunStatusId, String userId,
+                                            String description, java.io.File file) {
+        String sessionCookie = TestSigmaConfig.sessionCookie();
+        if (sessionCookie == null || sessionCookie.isEmpty()) {
+            System.out.println("[TestSigma] ⚠️  testsigma.session.cookie not set — skipping attachment upload for "
+                    + file.getName());
+            return false;
+        }
+
+        String operations = "{"
+                + "\"operationName\":\"CreateRunAttemptForTestCase\","
+                + "\"query\":\"mutation CreateRunAttemptForTestCase($input: [UpdateTestRunCaseStatusInput!]!) "
+                + "{ updateTestRunCaseStatus(input: $input) { testRunAttempt { id attachments { id name } } } }\","
+                + "\"variables\":{\"input\":[{"
+                + "\"attachments\":[{\"attachment\":null,\"resourceType\":\"TEST_CASES\"}],"
+                + "\"description\":\"" + description + "\","
+                + "\"testCaseId\":\"" + testCaseId + "\","
+                + "\"testRunId\":\"" + testRunId + "\","
+                + "\"testRunStatusId\":\"" + testRunStatusId + "\","
+                + "\"userId\":\"" + userId + "\""
+                + "}]}}";
+
+        String map = "{\"0\":[\"variables.input.0.attachments.0.attachment\"]}";
+
+        for (int attempt = 1; attempt <= 4; attempt++) {
+            Response response = given()
+                    .baseUri(ApiConstants.TESTSIGMA_APP_BASE_URL)
+                    .header("Cookie", "X-TMS-SESSION-ID=" + sessionCookie)
+                    .multiPart("operations", operations)
+                    .multiPart("map", map)
+                    .multiPart("0", file)
+                    .post("/private/graphql");
+
+            System.out.println("[TestSigma] 🔍 Upload response for " + file.getName() + " (testCaseId="
+                    + testCaseId + ", testRunId=" + testRunId + "): " + response.getBody().asString());
+
+            int status = response.getStatusCode();
+            if (status < 200 || status >= 300) {
+                System.out.println("[TestSigma] ⚠️  Attachment upload FAILED [" + status + "] for "
+                        + file.getName() + ": " + response.getBody().asString());
+                return false;
+            }
+
+            Object mutationResult = response.jsonPath().get("data.updateTestRunCaseStatus");
+            if (mutationResult == null) {
+                if (attempt < 4) {
+                    System.out.println("[TestSigma] Attachment target not yet synced for " + file.getName()
+                            + " (attempt " + attempt + ") — retrying in 2s...");
+                    sleepQuietly(2000);
+                    continue;
+                }
+                System.out.println("[TestSigma] ⚠️  Attachment upload returned null result (testCaseId not matched in this run) for "
+                        + file.getName() + ": " + response.getBody().asString());
+                return false;
+            }
+
+            List<Object> errors = response.jsonPath().getList("errors");
+            if (errors != null && !errors.isEmpty()) {
+                System.out.println("[TestSigma] ⚠️  Attachment upload GraphQL error for "
+                        + file.getName() + ": " + errors);
+                return false;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private static void sleepQuietly(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    public static boolean addRunComment(String testRunId, String testCaseId,
+                                         String testRunStatusId, String userId,
+                                         String description) {
+        String sessionCookie = TestSigmaConfig.sessionCookie();
+        if (sessionCookie == null || sessionCookie.isEmpty()) {
+            System.out.println("[TestSigma] ⚠️  testsigma.session.cookie not set — skipping comment for " + testCaseId);
+            return false;
+        }
+
+        try {
+            Map<String, Object> input = new HashMap<>();
+            input.put("attachments", List.of());
+            input.put("description", description);
+            input.put("testCaseId", testCaseId);
+            input.put("testRunId", testRunId);
+            input.put("testRunStatusId", testRunStatusId);
+            input.put("userId", userId);
+
+            Map<String, Object> body = new HashMap<>();
+            body.put("operationName", "CreateRunAttemptForTestCase");
+            body.put("query", "mutation CreateRunAttemptForTestCase($input: [UpdateTestRunCaseStatusInput!]!) "
+                    + "{ updateTestRunCaseStatus(input: $input) { testRunAttempt { id attachments { id name } } } }");
+            body.put("variables", Map.of("input", List.of(input)));
+
+            for (int attempt = 1; attempt <= 4; attempt++) {
+                Response response = given()
+                        .baseUri(ApiConstants.TESTSIGMA_APP_BASE_URL)
+                        .header("Cookie", "X-TMS-SESSION-ID=" + sessionCookie)
+                        .contentType("application/json")
+                        .body(body)
+                        .post("/private/graphql");
+
+                Object mutationResult = response.jsonPath().get("data.updateTestRunCaseStatus");
+                if (mutationResult == null) {
+                    if (attempt < 4) {
+                        System.out.println("[TestSigma] Comment target not yet synced for " + testCaseId
+                                + " (attempt " + attempt + ") — retrying in 2s...");
+                        sleepQuietly(2000);
+                        continue;
+                    }
+                    System.out.println("[TestSigma] ⚠️  Comment failed (null result) for " + testCaseId
+                            + ": " + response.getBody().asString());
+                    return false;
+                }
+
+                List<Object> errors = response.jsonPath().getList("errors");
+                if (errors != null && !errors.isEmpty()) {
+                    System.out.println("[TestSigma] ⚠️  Comment GraphQL error for " + testCaseId + ": " + errors);
+                    return false;
+                }
+
+                System.out.println("[TestSigma] 💬 Failure log comment added for " + testCaseId);
+                return true;
+            }
+
+            return false;
+
+        } catch (Exception e) {
+            System.out.println("[TestSigma] ⚠️  Failed to add comment for " + testCaseId + ": " + e.getMessage());
+            return false;
+        }
     }
 
     public static List<Map<String, Object>> getTestRuns(String projectId, String search) {

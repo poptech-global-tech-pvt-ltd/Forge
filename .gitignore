@@ -49,6 +49,7 @@ src/test/resources/qa.properties
 local.cloud.properties
 src/test/resources/local.cloud.properties
 src/main/resources/config/local.cloud.properties
+src/test/resources/config/testsigma-local.properties
 
 ### Forge ###
 *.apk
@@ -62,6 +63,7 @@ allure-results/
 node_modules/
 forge-ui/node_modules/
 forge-mcp/node_modules/
+package-lock.json
 ai/
 .gitignore.save
 screenshots/

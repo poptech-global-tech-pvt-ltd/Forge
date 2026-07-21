@@ -7,6 +7,7 @@ import java.util.Properties;
 public class TestSigmaConfig {
 
     private static final Properties props = new Properties();
+    private static final Properties localProps = new Properties();
 
     static {
         try (InputStream in = TestSigmaConfig.class.getClassLoader()
@@ -16,11 +17,20 @@ public class TestSigmaConfig {
         } catch (IOException e) {
             throw new RuntimeException("Failed to load testsigma.properties", e);
         }
+
+        try (InputStream in = TestSigmaConfig.class.getClassLoader()
+                .getResourceAsStream("config/testsigma-local.properties")) {
+            if (in != null) localProps.load(in);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load testsigma-local.properties", e);
+        }
     }
 
     private static String get(String key) {
         String sysProp = System.getProperty(key);
         if (sysProp != null) return sysProp;
+        String localProp = localProps.getProperty(key);
+        if (localProp != null && !localProp.isBlank()) return localProp;
         return props.getProperty(key);
     }
 
@@ -43,4 +53,9 @@ public class TestSigmaConfig {
 
     public static String runTitlePrefix()   { return get("testsigma.run.title.prefix"); }
     public static String runTags()          { return get("testsigma.run.tags"); }
+
+    public static String sessionCookie()    { return get("testsigma.session.cookie"); }
+    public static String sessionUserId()    { return get("testsigma.session.user.id"); }
+    public static String loginEmail()       { return get("testsigma.login.email"); }
+    public static String loginPassword()    { return get("testsigma.login.password"); }
 }

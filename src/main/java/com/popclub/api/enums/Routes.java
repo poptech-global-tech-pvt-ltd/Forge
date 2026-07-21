@@ -32,7 +32,11 @@ public enum Routes {
     YBL_ADDRESSES           ("/ybl/addresses"),
     YBL_PERSONAL_DETAILS    ("/ybl/personal-details"),
     YBL_MASTER_LISTS        ("/ybl/master-lists?filter=company&filter=industry&filter=profession&filter=business&filter=designation&filter=companytype"),
-    YBL_PROFESSIONAL_DETAILS("/ybl/professional-details");
+    YBL_PROFESSIONAL_DETAILS("/ybl/professional-details"),
+
+    TESTSIGMA_LOGIN         ("/login"),
+    TESTSIGMA_AUTHORIZE     ("/callbacks/authorize/72987"),
+    TESTSIGMA_TOKEN_EXCHANGE("/identity/authorize_callback");
 
     private final String path;
 
@@ -58,5 +62,13 @@ public enum Routes {
 
     public String cardstackUrl(String... args) {
         return ApiConstants.CARDSTACK_BASE_URL + String.format(path, (Object[]) args);
+    }
+
+    public String testSigmaLoginUrl() {
+        return ApiConstants.TESTSIGMA_LOGIN_BASE_URL + path;
+    }
+
+    public String testSigmaAppUrl() {
+        return ApiConstants.TESTSIGMA_APP_BASE_URL + path;
     }
 }

@@ -139,10 +139,13 @@ public class TestRunnerTest {
             new TestExecutor().execute(testCase);
         } catch (Exception e) {
             throw new RuntimeException("Test failed: " + testCase.testName, e);
-        } finally {
-            //  ALWAYS CLEAN DRIVER
-            AppiumDriverManager.quitDriver();
         }
+    }
+
+    @AfterMethod(alwaysRun = true)
+    public void quitDriverAfterTest() {
+        //  ALWAYS CLEAN DRIVER
+        AppiumDriverManager.quitDriver();
     }
 
     // TODO: Re-enable once TestSigma token is refreshed

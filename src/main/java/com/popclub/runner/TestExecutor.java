@@ -356,22 +356,22 @@ public class TestExecutor {
                     Action action = ActionFactory.get(step.action);
                     action.perform(step);
 
-                    // 🔥 START VIDEO
-                    if ("launchApp".equalsIgnoreCase(step.action)
-                            && TestContext.isFreshLaunch()) {
+                    if ("launchApp".equalsIgnoreCase(step.action)) {
 
                         AppiumDriver driver = DriverManager.getDriver();
 
                         VideoUtil.startRecording(driver);
 
-                        // Start screen keep-alive heartbeat (KEYCODE_WAKEUP every 25s)
-                        DeviceKeepAlive.start(driver);
+                        if (TestContext.isFreshLaunch()) {
+                            // Start screen keep-alive heartbeat (KEYCODE_WAKEUP every 25s)
+                            DeviceKeepAlive.start(driver);
 
-                        Thread.sleep(3000);
+                            Thread.sleep(3000);
 
-                        SystemPopupHandler.handle(driver);
+                            SystemPopupHandler.handle(driver);
 
-                        TestContext.setFreshLaunch(false);
+                            TestContext.setFreshLaunch(false);
+                        }
                     }
 
                     success = true;
