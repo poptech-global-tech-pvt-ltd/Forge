@@ -1,5 +1,6 @@
 package com.popclub.testsigma;
 
+import com.popclub.api.util.ApiConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.config.RestAssuredConfig;
@@ -167,8 +168,6 @@ public class TestSigmaClient {
         }
     }
 
-    private static final String GRAPHQL_HOST = "https://test-management.testsigma.com";
-
     public static boolean uploadAttachment(String testRunId, String testCaseId,
                                             String testRunStatusId, String userId,
                                             String description, java.io.File file) {
@@ -196,7 +195,7 @@ public class TestSigmaClient {
 
         for (int attempt = 1; attempt <= 4; attempt++) {
             Response response = given()
-                    .baseUri(GRAPHQL_HOST)
+                    .baseUri(ApiConstants.TESTSIGMA_APP_BASE_URL)
                     .header("Cookie", "X-TMS-SESSION-ID=" + sessionCookie)
                     .multiPart("operations", operations)
                     .multiPart("map", map)
@@ -273,7 +272,7 @@ public class TestSigmaClient {
 
             for (int attempt = 1; attempt <= 4; attempt++) {
                 Response response = given()
-                        .baseUri(GRAPHQL_HOST)
+                        .baseUri(ApiConstants.TESTSIGMA_APP_BASE_URL)
                         .header("Cookie", "X-TMS-SESSION-ID=" + sessionCookie)
                         .contentType("application/json")
                         .body(body)
