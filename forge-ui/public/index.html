@@ -657,6 +657,46 @@
   .result-badge.success { background: rgba(34,197,94,.15); color: var(--green); display: block; }
   .result-badge.failure { background: rgba(239,68,68,.15); color: var(--red);   display: block; }
   /* Fix with Claude button — shown inline next to result badge on failure */
+  #failure-card {
+    display: none;
+    margin-top: 8px;
+    background: rgba(239,68,68,.06);
+    border: 1px solid rgba(239,68,68,.25);
+    border-radius: 8px;
+    font-size: 11px;
+    overflow: hidden;
+  }
+  #failure-card .fc-header {
+    background: rgba(239,68,68,.12);
+    color: var(--red);
+    padding: 6px 10px;
+    font-weight: 600;
+    letter-spacing: .03em;
+    display: flex;
+    align-items: center;
+  }
+  .fc-row {
+    display: grid;
+    grid-template-columns: 36px 18px 76px 1fr auto;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border-top: 1px solid rgba(255,255,255,.04);
+    cursor: pointer;
+  }
+  .fc-row:hover { background: rgba(255,255,255,.04); }
+  .fc-row.fc-failed { background: rgba(239,68,68,.05); }
+  .fc-row.fc-failed:hover { background: rgba(239,68,68,.1); }
+  .fc-step { color: var(--muted); font-size: 10px; }
+  .fc-status-pass { color: var(--green); font-size: 11px; }
+  .fc-status-fail { color: var(--red);   font-size: 11px; }
+  .fc-status-skip { color: var(--muted); font-size: 11px; }
+  .fc-action { color: var(--text); font-weight: 500; }
+  .fc-detail { color: var(--muted); font-family: monospace; font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .fc-detail.fc-el { color: var(--accent); }
+  .fc-detail.fc-err { color: var(--red); }
+  .fc-jump { color: var(--accent); flex-shrink: 0; font-size: 10px; opacity: .7; }
+
   .btn-fix-claude {
     display: none; flex-shrink: 0; background: rgba(108,99,255,.15);
     border: 1px solid rgba(108,99,255,.4); border-radius: 6px;
@@ -1830,6 +1870,12 @@
           </div>
         </div>
 
+        <!-- Failure summary card -->
+        <div id="failure-card">
+          <div class="fc-header">✗ Failure Summary</div>
+          <div id="failure-card-rows"></div>
+        </div>
+
         <!-- Editor view -->
         <div id="view-editor" style="display:none;flex-direction:column;flex:1;overflow:hidden">
           <div class="editor-toolbar">
@@ -2227,6 +2273,10 @@ function handleMessage(msg) {
     case 'apk_install_done':
       // Refresh app status bar after install
       setTimeout(checkApkStatus, 1000);
+      break;
+
+    case 'testsigma_result':
+      showTestSigmaLink(msg);
       break;
 
     case 'qa_tags_done': {
@@ -2744,11 +2794,72 @@ function updateStats() {
 }
 
 function showResult(success) {
-  const badge   = document.getElementById('result-badge');
+  const badge = document.getElementById('result-badge');
   badge.className   = 'result-badge ' + (success ? 'success' : 'failure');
   badge.textContent = success ? '✓ Passed' : '✗ Failed';
-  // Show "Fix with Claude" only on failure
   document.getElementById('btn-fix-claude').style.display = success ? 'none' : 'inline-block';
+
+  const card = document.getElementById('failure-card');
+  if (!steps.length) { card.style.display = 'none'; return; }
+
+  document.querySelector('#failure-card .fc-header').textContent = success ? '✓ Test Summary' : '✗ Test Summary';
+  card.style.background    = success ? 'rgba(34,197,94,.06)'  : 'rgba(239,68,68,.06)';
+  card.style.borderColor   = success ? 'rgba(34,197,94,.25)'  : 'rgba(239,68,68,.25)';
+  document.querySelector('#failure-card .fc-header').style.background = success ? 'rgba(34,197,94,.12)' : 'rgba(239,68,68,.12)';
+  document.querySelector('#failure-card .fc-header').style.color      = success ? 'var(--green)'        : 'var(--red)';
+
+  const rows = steps.map((step, i) => {
+    const s      = stepStates[i] || {};
+    const status = s.status || 'pending';
+    const act    = step.action || '—';
+    const el     = step.element || step.locator || step.value || '';
+    const err    = (s.error || '').replace(/\n[\s\S]*/m, '').trim();
+    const isFail = status === 'failed';
+    const statusIcon  = status === 'passed' ? '<span class="fc-status-pass">✓</span>'
+                      : status === 'failed' ? '<span class="fc-status-fail">✗</span>'
+                      : status === 'skipped' ? '<span class="fc-status-skip">⤷</span>'
+                      : '<span class="fc-status-skip">—</span>';
+    const detail = isFail && err
+      ? `<span class="fc-detail fc-err" title="${err}">${err}</span>`
+      : el ? `<span class="fc-detail fc-el" title="${el}">${el}</span>`
+           : `<span class="fc-detail">—</span>`;
+    return `<div class="fc-row${isFail ? ' fc-failed' : ''}" onclick="jumpToStepLog(${i})">
+      <span class="fc-step">Step ${i + 1}</span>
+      ${statusIcon}
+      <span class="fc-action">${act}</span>
+      ${detail}
+      <span class="fc-jump">↗</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('failure-card-rows').innerHTML = rows;
+  card.style.display = 'block';
+}
+
+function showTestSigmaLink(msg) {
+  let el = document.getElementById('fc-testsigma-link');
+  if (!el) {
+    el = document.createElement('a');
+    el.id = 'fc-testsigma-link';
+    el.target = '_blank';
+    el.rel = 'noopener';
+    el.style.cssText = 'display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:2px 8px;border-radius:4px;text-decoration:none;margin-left:auto;flex-shrink:0;';
+    document.querySelector('#failure-card .fc-header').appendChild(el);
+  }
+  el.href = msg.link;
+  el.style.background = msg.success ? 'rgba(34,197,94,.15)' : 'rgba(239,68,68,.15)';
+  el.style.color = msg.success ? 'var(--green)' : 'var(--red)';
+  el.textContent = `📤 ${msg.humanId} ↗`;
+  el.title = msg.title || msg.humanId;
+}
+
+function jumpToStepLog(stepIndex) {
+  const line = document.querySelector(`#log-body .log-line[data-step-index="${stepIndex}"]`);
+  if (line) {
+    line.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    line.style.outline = '1px solid var(--red)';
+    setTimeout(() => line.style.outline = '', 1500);
+  }
 }
 
 // ── Run / Stop ────────────────────────────────────────────────────────────
@@ -2780,6 +2891,7 @@ document.getElementById('btn-run').addEventListener('click', async () => {
   renderSteps();
   updateStats();
   document.getElementById('result-badge').className = 'result-badge';
+  document.getElementById('failure-card').style.display = 'none';
 
   ws.send(JSON.stringify({ type: 'run', file }));
   startScreenPoll();
@@ -2827,6 +2939,7 @@ function runFromStep(index) {
   renderSteps();
   updateStats();
   document.getElementById('result-badge').className = 'result-badge';
+  document.getElementById('failure-card').style.display = 'none';
   ws.send(JSON.stringify({ type: 'run', file, fromStep: index }));
   startScreenPoll();
   appendLog(`▶ Running from step ${index + 1}: ${steps[index]?.action || ''}`, 'step');
@@ -5719,6 +5832,7 @@ function runNextInBatch() {
     renderSteps();
     updateStats();
     document.getElementById('result-badge').className = 'result-badge';
+  document.getElementById('failure-card').style.display = 'none';
     // Marks this as a "Run Folder" batch so the Java side creates a TestSigma run.
     ws.send(JSON.stringify({ type: 'run', file, batchRun: true }));
     startScreenPoll();

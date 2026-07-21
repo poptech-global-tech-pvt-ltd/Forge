@@ -988,11 +988,29 @@ function startTest(file, deviceOverride, ws, fromStep, batchRun) {
     stopNetworkCapture();
     currentRun = null;
     if (runWasStopped) {
-      // User clicked Stop — already sent 'stopped'; don't show BUILD FAILURE
       runWasStopped = false;
       return;
     }
     send(ws, { type: 'done', success: code === 0, code });
+    // Broadcast TestSigma run link if the listener wrote one
+    try {
+      const runFile = path.join(FORGE_ROOT, 'reports/testsigma_last_run.txt');
+      if (fs.existsSync(runFile)) {
+        const txt      = fs.readFileSync(runFile, 'utf8');
+        const humanId  = (txt.match(/^Run ID:\s*(.+)$/m) || [])[1]?.trim();
+        const title    = (txt.match(/^Run title:\s*(.+)$/m) || [])[1]?.trim();
+        if (humanId) {
+          let uiBase = 'https://test-management.testsigma.com';
+          try {
+            const props = fs.readFileSync(
+              path.join(FORGE_ROOT, 'src/test/resources/config/testsigma.properties'), 'utf8');
+            const m = props.match(/testsigma\.base\.url\s*=\s*(.+)/);
+            if (m) uiBase = m[1].trim().replace(/\/api\/v1\/?$/, '');
+          } catch (_) {}
+          broadcast({ type: 'testsigma_result', humanId, title, link: `${uiBase}/ui/td/test-runs/${humanId}`, success: code === 0 });
+        }
+      }
+    } catch (_) {}
   });
 
   mvn.on('error', (err) => {
