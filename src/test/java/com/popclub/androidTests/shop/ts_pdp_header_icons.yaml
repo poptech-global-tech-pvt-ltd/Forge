@@ -1,0 +1,67 @@
+testName: Verify PDP header shows Back, Search, Cart, and POPCoins icons
+platform: android
+noReset: true
+loginRequired: true
+
+features:
+  - common
+  - shop
+
+tags:
+  - smoke
+  - shop
+
+testCaseIds:
+  - "PO-11032"
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab  # healed locator → common_home_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  - action: waitFor
+    element: clp_screen
+
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: enterText
+    element: search_products_search_input
+    value: "tshirt"
+
+  - action: pressKey
+    value: search
+
+  - action: waitFor
+    element: product_list_item_0
+
+  - action: tap
+    element: product_list_item_0
+
+  - action: waitFor
+    element: product_details_title
+
+  - action: verifyElement
+    element: product_details_back_button
+
+  - action: verifyElement
+    element: toolbar_search_button
+
+  - action: verifyElement
+    element: toolbar_cart_button
+
+  - action: verifyElement
+    element: toolbar_popcoin_button

@@ -67,6 +67,7 @@ public class AppiumDriverManager {
                 // Do NOT set `app` — that triggers install + launch.
                 // Do NOT autoLaunch — keep whatever is on screen.
                 options.setAppPackage("com.popclub.android");
+                options.setAppActivity("com.popclub.android.LauncherFresh");
                 options.setCapability("appium:autoLaunch", false);
                 options.setNoReset(true);
                 System.out.println("[Driver] Resume mode — attaching to running app (no install, no launch)");
