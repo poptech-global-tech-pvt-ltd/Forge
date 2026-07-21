@@ -1747,6 +1747,116 @@ server.tool(
   }
 );
 
+// ── forge_from_testsigma ──────────────────────────────────────────────────────
+
+server.tool(
+  "forge_from_testsigma",
+
+  "Fetch one or more TestSigma test cases by human ID (e.g. PO-15308), extract " +
+  "their title, description, steps and expected results from the TestSigma API, " +
+  "then return the raw content alongside ALL known Forge element keys so Claude " +
+  "can map each step description to the correct element key and generate a " +
+  "ready-to-run Forge YAML test. " +
+  "Pass a comma-separated list to combine multiple test cases into one YAML. " +
+  "After this tool returns, generate the YAML and call forge_save_test to save it.",
+
+  {
+    humanId  : z.string().describe("TestSigma human ID(s), e.g. \"PO-15308\" or \"PO-15308,PO-15309\""),
+    subfolder: z.string().optional().describe("Subfolder hint, e.g. shop | login | home | profile"),
+  },
+
+  async ({ humanId, subfolder }) => {
+
+    // ── Read TestSigma credentials ──────────────────────────────────────────
+    const configPath = join(FORGE_ROOT, "src/test/resources/config/testsigma.properties");
+    let token, projectId, baseUrl;
+    try {
+      const props = readFileSync(configPath, "utf8");
+      const get   = key => { const m = props.match(new RegExp(`^${key}\\s*=\\s*(.+)$`, "m")); return m ? m[1].trim() : null; };
+      token     = get("testsigma.token");
+      projectId = get("testsigma.project.id");
+      baseUrl   = get("testsigma.base.url") || "https://test-management.testsigma.com/api/v1";
+    } catch (e) {
+      return { content: [{ type: "text", text: `❌ Could not read testsigma.properties: ${e.message}` }] };
+    }
+    if (!token || !projectId) {
+      return { content: [{ type: "text", text: "❌ Missing testsigma.token or testsigma.project.id in testsigma.properties" }] };
+    }
+
+    // ── Fetch each test case from TestSigma ─────────────────────────────────
+    const ids       = humanId.split(",").map(s => s.trim()).filter(Boolean);
+    const testCases = [];
+
+    for (const id of ids) {
+      try {
+        const url  = `${baseUrl}/projects/${projectId}/test_cases?search=${encodeURIComponent(id)}`;
+        const resp = await fetch(url, { headers: { "Authorization": `Bearer ${token}` } });
+        if (!resp.ok) {
+          return { content: [{ type: "text", text: `❌ TestSigma API error ${resp.status} for ${id}` }] };
+        }
+        const data = await resp.json();
+        const list = data?.data?.test_cases || [];
+        const tc   = list.find(t => (t.human_id || "").toUpperCase() === id.toUpperCase());
+        if (!tc) return { content: [{ type: "text", text: `❌ Test case not found in TestSigma: ${id}` }] };
+        testCases.push(tc);
+      } catch (e) {
+        return { content: [{ type: "text", text: `❌ TestSigma API error for ${id}: ${e.message}` }] };
+      }
+    }
+
+    // ── Load all known element keys from elements/*.yaml ────────────────────
+    const byFile = {};
+    try {
+      for (const f of readdirSync(ELEMENTS_DIR).filter(f => f.endsWith(".yaml"))) {
+        const feature = f.replace(".yaml", "");
+        const raw     = readFileSync(join(ELEMENTS_DIR, f), "utf8");
+        const keys    = [...raw.matchAll(/^([a-zA-Z_][a-zA-Z0-9_]*):/gm)].map(m => m[1]);
+        if (keys.length) byFile[feature] = keys;
+      }
+    } catch (_) {}
+
+    // ── Format output ───────────────────────────────────────────────────────
+    const L    = [];
+    const line = s => L.push(s ?? "");
+
+    for (const tc of testCases) {
+      line(`${"═".repeat(64)}`);
+      line(`📋  ${tc.human_id}  —  ${tc.title}`);
+      line(`${"═".repeat(64)}`);
+      if (tc.description)      { line(""); line("Description:"); line(tc.description); }
+      if (tc.preconditions)    { line(""); line("Preconditions:"); line(tc.preconditions); }
+      if (tc.steps)            { line(""); line("Steps:"); line(tc.steps); }
+      if (tc.expected_results) { line(""); line("Expected Results:"); line(tc.expected_results); }
+      line("");
+    }
+
+    line(`${"─".repeat(64)}`);
+    line("🗂️  AVAILABLE FORGE ELEMENT KEYS (map step descriptions to these):");
+    line(`${"─".repeat(64)}`);
+    for (const [feature, keys] of Object.entries(byFile).sort()) {
+      line(`\n[${feature}]`);
+      for (let i = 0; i < keys.length; i += 5) line("  " + keys.slice(i, i + 5).join("   "));
+    }
+
+    line("");
+    line(`${"─".repeat(64)}`);
+    line("📝  NOW GENERATE A FORGE YAML TEST:");
+    line(`${"─".repeat(64)}`);
+    line("Rules:");
+    line("  1. Read each step → pick the closest element key from the list above");
+    line("  2. Map verbs:  tap/click→tap  type/enter→enterText  verify/check→verifyElement");
+    line("     scroll→scrollDown  wait/see→waitFor  assert text→assertText");
+    line("  3. Always start: launchApp → loginIfNeeded → waitFor home_tab");
+    line("  4. Add waitFor after every screen navigation");
+    line(`  5. Set testCaseIds: [${ids.map(id => `"${id}"`).join(", ")}]`);
+    line(`  6. Subfolder: ${subfolder || "(infer from feature — shop/login/home/profile/rewards/upi)"}`);
+    line("  7. Phone: 1234561122   OTP: 560102   noReset: true");
+    line("  8. Call forge_save_test when done, then forge_run_test to verify");
+
+    return { content: [{ type: "text", text: L.join("\n") }] };
+  }
+);
+
 // ── Start ─────────────────────────────────────────────────────────────────────
 const transport = new StdioServerTransport();
 await server.connect(transport);
