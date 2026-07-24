@@ -1,0 +1,49 @@
+testName: SMV Fail - Existing User - WA Pass - Logged In
+platform: android
+noReset: false
+loginRequired: false
+
+# Prereq: Phone number must be an EXISTING user (linking date < 1-May-2026 OR CC active/approved).
+# SMV must be forced to fail via backend test flag or unsupported-carrier SIM.
+# WhatsApp must be installed on the device for WA verification to pass.
+# Expected: SMV fails → WA passes → user logged in directly (no CX callback for existing users).
+# Note: PDF flags this path as carrying a fraud risk if WA is spoofed — test confirms intended behavior.
+
+features:
+  - login
+  - common
+
+tags:
+  - login
+  - smv
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: scanTags
+
+  - action: enterText
+    element: login_input_phone
+    value: "9481781677"
+
+  - action: tap
+    element: login_button
+
+  - action: scanTags
+
+  # SMV fails silently. WhatsApp verification triggers and passes for existing user.
+  - action: waitFor
+    locator: smv_wa_verification_screen   # TODO: add to elements/login.yaml — accessibilityId TBD
+
+  - action: scanTags   # capture WA verification screen tags to find real accessibilityId for smv_wa_verification_screen
+
+  # Existing user bypasses CX callback — lands directly on home.
+  - action: waitFor
+    element: home_tab
+
+  - action: scanTags   # confirm home screen — existing user should be logged in, not hit CX callback
+
+  - action: verifyElement
+    element: home_tab
