@@ -205,6 +205,17 @@ public class TestContext {
     public static void setLegacyToken(String token) { legacyToken.set(token); }
     public static String getLegacyToken() { return legacyToken.get(); }
 
+    // ---------------- LOGIN CREDENTIALS (for API fallback) ----------------
+
+    private static ThreadLocal<String> loginPhone = new ThreadLocal<>();
+    private static ThreadLocal<String> loginOtp   = new ThreadLocal<>();
+
+    public static void setLoginPhone(String phone) { loginPhone.set(phone); }
+    public static String getLoginPhone() { return loginPhone.get(); }
+
+    public static void setLoginOtp(String otp) { loginOtp.set(otp); }
+    public static String getLoginOtp() { return loginOtp.get(); }
+
     // ---------------- USER ID (extracted from JWT payload) ----------------
 
     private static ThreadLocal<String> userId = new ThreadLocal<>();
