@@ -1,7 +1,7 @@
 testName: PDP — More from this brand
 platform: android
 noReset: false
-loginRequired: true
+loginRequired: false
 retry: 0
 
 testCaseIds:

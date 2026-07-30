@@ -85,17 +85,30 @@ public class ServiceRegistry {
         String legacyToken = TestContext.getLegacyToken();
         String jwtToken = TestContext.getUserToken();
 
+        if (jwtToken == null || jwtToken.isBlank()) {
+            System.out.println("[ServiceRegistry] JWT not in TestContext — retrying from logcat…");
+            jwtToken = fetchTokenFromLogcat();
+            if (jwtToken != null && !jwtToken.isBlank()) {
+                TestContext.setUserToken(jwtToken);
+                TestContext.setScalarData("auth_token", jwtToken);
+                System.out.println("[ServiceRegistry] JWT captured from logcat on retry ✓");
+            }
+        }
+
         if (legacyToken != null && !legacyToken.isBlank()
                 && jwtToken != null && !jwtToken.isBlank()) {
             return new LoginResult(legacyToken, jwtToken);
         }
 
-        String phone = params.getOrDefault("phone", "1234561122");
-        String otp   = params.getOrDefault("otp",   "560102");
-        if (phone.startsWith("${")) phone = "1234561122";
-        if (otp.startsWith("${"))   otp   = "560102";
+        String phone = TestContext.getLoginPhone();
+        String otp   = TestContext.getLoginOtp();
+        if (phone == null || phone.isBlank() || otp == null || otp.isBlank()) {
+            throw new RuntimeException(
+                "callService: no auth token found and no login credentials available.\n"
+                + "Ensure 'action: loginIfNeeded' ran before this step.");
+        }
 
-        System.out.println("[ServiceRegistry] Logging in via API to get both tokens…");
+        System.out.println("[ServiceRegistry] Legacy token missing — falling back to API login…");
         LoginResult result = AuthApiClient.loginFull(phone, otp);
         if (result.jwtToken != null && !result.jwtToken.isBlank()) {
             TestContext.setUserToken(result.jwtToken);

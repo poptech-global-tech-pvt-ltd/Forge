@@ -48,6 +48,9 @@ public class LoginIfNeededAction implements Action {
         String phone = step.value != null ? step.value.trim() : "1234561122";
         String otp   = step.text  != null ? step.text.trim()  : "560102";
 
+        TestContext.setLoginPhone(phone);
+        TestContext.setLoginOtp(otp);
+
         boolean loginScreenVisible = isVisible(driver, PHONE_INPUT_TAG, QUICK_TIMEOUT_MS);
 
         if (loginScreenVisible) {
