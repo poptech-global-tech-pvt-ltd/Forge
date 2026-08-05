@@ -1,0 +1,22 @@
+# Reusable flow: From cart screen, tap Pay and land on payment screen.
+# Then tap "Pay using" to open payment method bottom sheet.
+#
+# Pre-condition: caller on cart screen (cart_item_row_0 visible).
+#
+# Outputs: payment screen loaded, payment bottom sheet open.
+
+steps:
+  - action: tap
+    element: cart_link_and_pay_button
+
+  - action: waitFor
+    element: shop_payment_screen_row
+    timeout: 5000
+
+  # Tap "Pay using" to open payment method bottom sheet
+  - action: tap
+    element: cart_payment_method_bottom_sheet_button
+
+  - action: waitFor
+    element: payment_method_title_text
+    timeout: 3000

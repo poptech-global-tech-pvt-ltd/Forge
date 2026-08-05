@@ -39,3 +39,4 @@ steps:
   # Verify Trending searches section
   - action: verifyElement
     element: search_trending_item_0
+    testCaseId: PO-11000

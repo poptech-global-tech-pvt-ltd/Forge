@@ -1,0 +1,59 @@
+testName: OLP — Back navigation and multi-product orders
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-11364
+
+features:
+  - common
+  - login
+  - home
+  - shop
+  - profile
+
+tags:
+  - shop
+  - regression
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: call
+    flow: navigate_to_olp
+
+  # PO-11366: Multi-product order shows quantity prefix
+  # Scroll to find multi-product order
+  # - action: scrollUntilVisible
+  #   text: "2x"
+  #   direction: down
+  #   maxScrolls: 15
+  # - action: tapByText
+  #   value: "2x"
+  #   testCaseId: PO-11366
+
+  - action: logVar
+    variable: placeholder
+    value: "PO-11366 — need multi-product order in test account"
+
+  # PO-11364: Back navigation returns to Profile
+  - action: pressKey
+    value: BACK
+
+  - action: waitFor
+    element: profile_orders_button
+    timeout: 5000
+
+  - action: verifyElement
+    element: profile_orders_button
+    testCaseId: PO-11364

@@ -1,0 +1,89 @@
+testName: ODP — Cancel order button, confirmation modal, dismiss and confirm
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-9051
+
+features:
+  - common
+  - login
+  - home
+  - shop
+  - profile
+
+tags:
+  - shop
+  - regression
+
+retry: 1
+
+# NOTE: PO-9051 requires order in 'Order placed' state.
+# PO-9054 actually cancels — run on disposable order only.
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234563737"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: call
+    flow: navigate_to_olp
+
+  - action: tap
+    element: order_list_item_status_0
+    
+  # PO-9051: Cancel order button visible for Order placed state
+  - action: scrollTo
+    element: order_details_v2_cancel_button
+
+  - action: verifyElement
+    element: order_details_v2_cancel_button
+    testCaseId: PO-9051
+
+  # PO-9052: Tap Cancel — shows confirmation modal
+  - action: tap
+    element: order_details_v2_cancel_button
+
+  - action: verifyElement
+    element: skip_tour
+    testCaseId: PO-9052
+
+  # PO-9053: Tap No — dismisses modal without cancelling
+  - action: tap
+    element: skip_tour
+
+  - action: verifyElement
+    element: order_details_v2_cancel_button
+    testCaseId: PO-9053
+
+  # PO-9054: Confirm cancellation — status updates to cancelled
+  # WARNING: This actually cancels the order. Only run on test orders.
+  - action: tap
+    element: order_details_v2_cancel_button
+    
+  - action: tap
+    element: order_details_v2_cancel_reason_selection_v2_item_item_0
+    
+  - action: tap
+    element: order_details_v2_cancel_reason_selection_button
+    
+  - action: tap
+    element: order_details_v2_cancel_confirm_content_v2_button
+    
+  # Verify success popup
+  - action: verifyElement
+    element: cancel_success
+
+  # Close popup
+  - action: tap
+    element: skip_tour
+
+ 
+    
+ 

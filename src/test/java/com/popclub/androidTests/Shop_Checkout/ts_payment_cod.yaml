@@ -1,0 +1,98 @@
+testName: Payment — COD option and selection
+platform: android
+noReset: true
+loginRequired: false
+features:
+  - common
+  - login
+  - home
+  - shop
+
+testCaseIds:
+  - PO-15722
+
+
+tags:
+  - shop
+  - payment
+  - regression
+
+retry: 0
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561233"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: tap
+    element: common_shop_tab
+
+
+  - action: call
+    flow: search_product
+    params:
+      search_query: "souled store"
+
+  # ── Select first product ──
+  - action: tap
+    element: product_list_item_0
+
+  # ── Add to cart ──
+  - action: tap
+    element: product_details_bottom_sticky_bar_button
+
+  - action: tap
+    element: size_selection_item_0
+
+  - action: tap
+    element: size_selection_add_to_cart_button
+
+  # ── Go to cart ──
+  - action: tap
+    element: product_details_go_to_cart_button
+
+  # ── Handle address bottomsheet if needed ──
+  - action: captureText
+    element: cart_s2_s_payment_button_button
+    variable: cart_bottomsheet_cta
+
+  - action: ifVarEquals
+    variable: cart_bottomsheet_cta
+    value: "Add address"
+    steps:
+      - action: tap
+        element: cart_s2_s_payment_button_button_2
+      - action: call
+        flow: add_address
+        params:
+          addressLine1: "123 MG Road"
+          first_name: "Deepa"
+          last_name: "Hegde"
+          address_mobile_number: "6361463451"
+
+  - action: tap
+    element: cart_payment_method_dropdown
+
+  # ── PO-15722: COD option shows descriptive text ──
+
+  - action: verifyElement
+    element: cod_payment_expand
+    shouldExist: true
+    testCaseId: PO-15722
+
+  # ── PO-15723: Select COD updates footer, closes sheet ──
+  - action: tap
+    element: cod_payment_expand
+    
+  - action: tap
+    element: shop_payment_shop_cod_section_button
+
+  - action: verifyElement
+    element: payment_method_title_text
+    shouldExist: false
+    testCaseId: PO-15723

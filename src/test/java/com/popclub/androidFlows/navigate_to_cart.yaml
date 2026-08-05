@@ -1,0 +1,14 @@
+# Flow: navigate_to_cart
+# Pre-condition: on home_tab
+# Post-condition: on Cart screen with items visible
+
+steps:
+  - action: tap
+    element: common_shop_tab
+
+  - action: tap
+    element: toolbar_cart_button
+
+  - action: waitFor
+    element: cart_item_row_0
+    timeout: 5000

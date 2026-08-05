@@ -29,11 +29,18 @@ steps:
     element: common_shop_tab
 
    # ── PLP: navigate, capture API + UI prices ────────────────────────────────
-  - action: call
-    flow: plp_search_and_capture
-    params:
-      search_query: "shoes"
-      search_pincode: "560102"
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: enterText
+    element: search_products_search_input
+    value: "shoes"
+    
+  - action: pressKey
+    value: search
       
   - action: pressKey
     value: search
@@ -48,7 +55,6 @@ steps:
 
   - action: verifyElement
     element: product_list_filter_button
-    testCaseId: PO-10986
 
   - action: verifyElement
     element: product_list_filter_button

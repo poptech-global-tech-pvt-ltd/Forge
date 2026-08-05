@@ -1,0 +1,19 @@
+# Flow: navigate_to_olp
+# Pre-condition: on home_tab
+# Post-condition: on OLP screen
+
+steps:
+  - action: tap
+    element: home_profile_icon
+
+  - action: scrollUntilVisible
+    element: profile_orders_button
+    direction: down
+    maxScrolls: 2
+
+  - action: tap
+    element: profile_orders_button
+
+  - action: waitFor
+    element: orders_screen_row
+    timeout: 5000

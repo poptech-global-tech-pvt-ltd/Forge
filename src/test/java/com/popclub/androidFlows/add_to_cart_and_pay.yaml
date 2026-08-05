@@ -1,0 +1,80 @@
+# Reusable flow: Search product, add to cart, handle address, land on cart screen.
+#
+# Pre-condition: caller on Home screen (home_tab visible).
+#
+# Inputs:
+#   search_query   — product search text          (required)
+#   search_pincode — delivery pincode              (required)
+#   search_phone   — API auth phone   (optional — default: "1234561122")
+#   search_otp     — API auth OTP     (optional — default: "560102")
+#
+# Outputs: all vars from plp_search_and_capture + cart_item_index
+
+steps:
+  - action: tap
+    element: common_shop_tab
+
+  - action: call
+    flow: plp_search_and_capture
+    params:
+      search_query:   "${search_query}"
+      search_pincode: "${search_pincode}"
+      search_phone:   "${search_phone}"
+      search_otp:     "${search_otp}"
+
+  - action: tap
+    element: product_list_item_${product_index}
+
+  - action: waitFor
+    element: product_details_title
+    timeout: 5000
+
+  - action: tap
+    element: product_details_bottom_sticky_bar_button
+
+  - action: waitFor
+    element: size_selection_item_0
+    timeout: 3000
+
+  - action: tap
+    element: size_selection_item_0
+
+  - action: tap
+    element: size_selection_add_to_cart_button
+
+  - action: waitFor
+    element: product_details_go_to_cart_button
+    timeout: 3000
+
+  - action: tap
+    element: product_details_go_to_cart_button
+
+  # Handle address bottomsheet if needed
+  - action: captureText
+    element: cart_s2_s_payment_button_button
+    variable: cart_bottomsheet_cta
+
+  - action: ifVarEquals
+    variable: cart_bottomsheet_cta
+    value: "Add address"
+    steps:
+      - action: tap
+        element: cart_s2_s_payment_button_button_2
+      - action: call
+        flow: add_address
+        params:
+          addressLine1: "123 MG Road"
+          first_name: "Deepa"
+          last_name: "Hegde"
+          address_mobile_number: "6361463451"
+
+  - action: tap
+    element: cart_s2_s_payment_button_button_2
+
+  - action: waitFor
+    element: cart_item_row_0
+    timeout: 5000
+
+  - action: findCartItemIndex
+    value: "${product_title}"
+    variable: cart_item_index

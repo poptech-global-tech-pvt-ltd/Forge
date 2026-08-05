@@ -1,0 +1,25 @@
+# Flow: search_product
+# Searches for a product on Shop PLP.
+#
+# Pre-condition: caller on Shop CLP screen.
+#
+# Inputs:
+#   search_query — text to search for (required)
+
+steps:
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: enterText
+    element: search_products_search_input
+    value: "${search_query}"
+
+  - action: pressKey
+    value: search
+
+  - action: waitFor
+    element: product_list_item_0
+    timeout: 5000

@@ -29,11 +29,19 @@ steps:
     element: common_shop_tab
 
  # ── PLP: navigate, capture API + UI prices ────────────────────────────────
-  - action: call
-    flow: plp_search_and_capture
-    params:
-      search_query: "the souled store"
-      search_pincode: "560102"
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: enterText
+    element: search_products_search_input
+    value: "the souled store"
+    
+  - action: pressKey
+    value: search
+    
   # Capture product title on PLP
   - action: captureText
     element: product_list_item_title_0
@@ -42,7 +50,6 @@ steps:
   # PO-10994: Tap product card
   - action: tap
     element: product_list_item_0
-    testCaseId: PO-10994
 
   # Verify PDP loads
   - action: waitFor

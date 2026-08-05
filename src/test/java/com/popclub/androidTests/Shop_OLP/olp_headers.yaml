@@ -1,0 +1,72 @@
+testName: OLP — Search bar, filter pills, order card elements
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-11330
+
+features:
+  - common
+  - login
+  - home
+  - shop
+  - profile
+
+tags:
+  - shop
+  - regression
+
+retry: 0
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: call
+    flow: navigate_to_olp
+
+  # PO-11330: Search bar and filter pills visible
+  - action: verifyElement
+    element: orders_order_items_container_input
+
+  - action: verifyElement
+    element: olp_filter_dropdown
+    testCaseId: PO-11330
+
+  # PO-11331: Order card shows brand, title, POPCoins
+  - action: verifyElement
+    element: order_list_item_brand_0
+
+  - action: verifyElement
+    element: order_list_item_title_0
+    testCaseId: PO-11331
+
+  # PO-11335: Order placed status label on card
+  - action: verifyElement
+    element: order_list_item_status_0
+
+  - action: captureText
+    element: order_list_item_status_0
+    variable: olp_order_status
+
+  - action: logVar
+    variable: olp_order_status
+    value: "OLP first order status: ${olp_order_status}"
+    testCaseId: PO-11335
+
+  # PO-11368: POPCoins earned per order
+  # Need element key for popcoin earned label on OLP card
+  # - action: verifyElement
+  #   element: order_list_item_popcoin_0
+  #   testCaseId: PO-11368
+
+  - action: logVar
+    variable: placeholder
+    value: "PO-11368 — need order_list_item_popcoin_0 element key"

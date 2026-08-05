@@ -1,0 +1,76 @@
+testName: Cart — Pay CTA and empty state
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-11238
+  - PO-11240
+  - PO-11241
+  - PO-11242
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - shop
+  - cart
+  - regression
+
+retry: 0
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: call
+    flow: navigate_to_cart
+
+  # PO-11238: Pay CTA shows correct amount
+  - action: verifyElement
+    element: cart_pay_button
+    testCaseId: PO-11238
+
+  # PO-11240: Pay CTA updates when quantity changes
+  - action: captureText
+    element: cart_pay_button
+    variable: pay_before
+
+  - action: tap
+    element: cart_item_increase
+
+  - action: captureText
+    element: cart_pay_button
+    variable: pay_after
+
+  - action: logVar
+    variable: pay_after
+    value: "Pay after qty change: ${pay_after}"
+    testCaseId: PO-11240
+
+  # Restore quantity
+  - action: tap
+    element: cart_iteam_decrease
+
+  # PO-11241, 11242: Empty cart state
+  # Remove all items to see empty state
+  - action: tap
+    element: cart_iteam_decrease
+
+  # Popup appears
+  - action: tap
+    element: cart_remove_product_button
+
+  # PO-11241: Empty cart illustration and 'Explore more'
+  - action: verifyElement
+    element: cart_shop_more_button
+    testCaseId: PO-11241

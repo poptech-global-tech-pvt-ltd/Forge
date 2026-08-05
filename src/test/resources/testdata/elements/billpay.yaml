@@ -1,5 +1,3 @@
-
-# ─── Bill Pay ──────────────────────────────────────────────────────────────────
 bill_pay_all_bills_bills_tab:
   android:
     - type: accessibilityId
@@ -608,3 +606,7 @@ bill_pay_txn_history_search_input:
   android:
     - type: accessibilityId
       value: bill_pay_txn_history_search_input
+Delivered:
+  android:
+    - type: accessibilityId
+      value: orders_select_order_filter_bottom_sheet_item1_item_8

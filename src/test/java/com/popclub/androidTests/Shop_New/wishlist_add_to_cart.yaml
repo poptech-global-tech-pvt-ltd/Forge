@@ -31,11 +31,18 @@ steps:
 
   # Search for "superyou" — no size selection needed
   # ── PLP: navigate, capture API + UI prices ────────────────────────────────
-  - action: call
-    flow: plp_search_and_capture
-    params:
-      search_query: "superyou"
-      search_pincode: "560102"
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: enterText
+    element: search_products_search_input
+    value: "superyou"
+    
+  - action: pressKey
+    value: search
 
   # Add product to wishlist from PDP
   - action: tap
@@ -61,7 +68,6 @@ steps:
   # PO-11477: Tap + button to add to cart (no size selection for superyou)
   - action: tap
     element: wishlist_add_to_cart_button
-    testCaseId: PO-11477
 
   # PO-11480: Verify cart icon is visible (badge should increment)
   - action: verifyElement

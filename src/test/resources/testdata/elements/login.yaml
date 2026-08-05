@@ -1,37 +1,19 @@
-login_input_phone:
-  android:
-    - type: accessibilityId
-      value: login_phone_input
-
-login_button:
-  android:
-    - type: accessibilityId
-      value: login_continue_button
-
-
-otp_input:
-  android:
-    - type: accessibilityId
-      value: login_otp_input
-
 home_tab:
   android:
     - type: accessibilityId
       value: Home
-
-skip_tour:
+login_button:
   android:
     - type: accessibilityId
-      value: Close
-
-
-# ─── Login Continue ────────────────────────────────────────────────────────────
+      value: login_continue_button
 login_continue_button:
   android:
     - type: accessibilityId
       value: login_continue_button
-
-# ─── Login Merged ──────────────────────────────────────────────────────────────
+login_input_phone:
+  android:
+    - type: accessibilityId
+      value: login_phone_input
 login_merged_login_and_otp_screen_button:
   android:
     - type: accessibilityId
@@ -52,14 +34,10 @@ login_merged_otp_entry_content_button:
   android:
     - type: accessibilityId
       value: login_merged_otp_entry_content_button
-
-# ─── Login Mobile ──────────────────────────────────────────────────────────────
 login_mobile_field_with_keypad_input:
   android:
     - type: accessibilityId
       value: login_mobile_field_with_keypad_input
-
-# ─── Login Otp ─────────────────────────────────────────────────────────────────
 login_otp_input:
   android:
     - type: accessibilityId
@@ -68,27 +46,31 @@ login_otp_submit_button:
   android:
     - type: accessibilityId
       value: login_otp_submit_button
-
-# ─── Login Phone ───────────────────────────────────────────────────────────────
 login_phone_input:
   android:
     - type: accessibilityId
       value: login_phone_input
-
-# ─── Login Referral ────────────────────────────────────────────────────────────
 login_referral_input:
   android:
     - type: accessibilityId
       value: login_referral_input
-
-# ─── Login Screen ──────────────────────────────────────────────────────────────
 login_screen_title_text:
   android:
     - type: accessibilityId
       value: login_screen_title_text
-
-# ─── Login Tnc ─────────────────────────────────────────────────────────────────
 login_tnc_text:
   android:
     - type: accessibilityId
       value: login_tnc_text
+olp_item_1:
+  android:
+    - type: accessibilityId
+      value: order_item_v2_row
+otp_input:
+  android:
+    - type: accessibilityId
+      value: login_otp_input
+skip_tour:
+  android:
+    - type: accessibilityId
+      value: Close

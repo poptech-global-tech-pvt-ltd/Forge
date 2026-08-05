@@ -31,11 +31,18 @@ steps:
   # Do a search first to populate Recent searches
   
   # ── PLP: navigate, capture API + UI prices ────────────────────────────────
-  - action: call
-    flow: plp_search_and_capture
-    params:
-      search_query: "Nike"
-      search_pincode: "560102"
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: enterText
+    element: search_products_search_input
+    value: "nike"
+    
+  - action: pressKey
+    value: search
 
   # Go back to Search screen
   - action: tap
@@ -54,3 +61,4 @@ steps:
   # Verify PLP loads with search results
   - action: waitFor
     element: product_list_item_0
+    testCaseId: PO-11001

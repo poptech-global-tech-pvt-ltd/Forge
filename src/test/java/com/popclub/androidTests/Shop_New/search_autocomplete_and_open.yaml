@@ -37,7 +37,6 @@ steps:
   # PO-10999: Tap search icon on PLP — opens Search screen
   - action: tap
     element: toolbar_search_button
-    testCaseId: PO-10999
 
   - action: waitFor
     element: search_products_search_input

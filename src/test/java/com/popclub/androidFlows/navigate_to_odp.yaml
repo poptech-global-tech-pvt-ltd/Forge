@@ -1,0 +1,16 @@
+# Flow: navigate_to_odp
+# Pre-condition: on home_tab
+# Post-condition: on ODP screen
+# Params:
+#   odp_product_name — (optional) scroll OLP to find specific product
+
+steps:
+  - action: call
+    flow: navigate_to_olp
+    
+  - action: tap
+    element: order_item_v2_row
+        
+  - action: waitFor
+    element: order_details_v2_status_text
+    timeout: 5000
