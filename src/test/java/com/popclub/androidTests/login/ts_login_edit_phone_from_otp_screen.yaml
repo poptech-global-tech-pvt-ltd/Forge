@@ -1,0 +1,53 @@
+testName: Login - Edit Phone Number From OTP Screen
+platform: android
+noReset: false
+loginRequired: false
+
+# Flow: enter a number not on the device SIM → Continue → "switch data" bottom
+# sheet appears → dismiss with X (BACK key) → tap Continue again → WhatsApp OTP
+# entry screen → verify Edit CTA → tap Edit → back on phone input screen.
+
+features:
+  - login
+
+tags:
+  - login
+  - smoke
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: waitFor
+    element: login_input_phone
+
+  # Phone number not on the device SIM — triggers SMV fail + "switch data" sheet.
+  - action: enterText
+    element: login_input_phone
+    value: "9481781677"
+
+  # "Switch data to *number*" bottom sheet appears — dismiss it with the BACK key.
+  - action: tap
+    element: login_continue_button
+
+  - action: pressKey
+    value: BACK
+
+  # Wait for the login screen to be stable again before tapping Continue a second time.
+  - action: waitFor
+    element: login_input_phone
+    timeout: 10
+
+  # Still on login screen — tap Continue again to proceed to OTP screen.
+  - action: tap
+    element: login_continue_button
+
+  # Tap Edit on the WhatsApp OTP screen — navigates back to phone number input.
+  - action: tapByText
+    value: "Edit"
+    timeout: 30
+
+  # Confirm we are back on the phone number input screen.
+  - action: waitFor
+    element: login_input_phone

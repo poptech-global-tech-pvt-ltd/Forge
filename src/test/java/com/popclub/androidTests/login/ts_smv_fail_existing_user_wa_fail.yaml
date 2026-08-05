@@ -4,9 +4,10 @@ noReset: false
 loginRequired: false
 
 # Prereq: Phone number must be an EXISTING user (linking date < 1-May-2026 OR CC active/approved).
-# SMV must be forced to fail via backend test flag or unsupported-carrier SIM.
-# WhatsApp must NOT be installed on the device (or WA verification must fail).
-# Expected: Both SMV and WA fail → contextual failure screen shown.
+# SMV fails → "Switch mobile data" bottom sheet appears on first Continue tap.
+# Dismiss the sheet via X, tap Continue again → WA OTP screen loads.
+# WA verification times out / fails → "Something went wrong / verification failed" sheet.
+# Expected: "Try again" CTA visible on the failure sheet.
 
 features:
   - login
@@ -16,27 +17,41 @@ tags:
   - login
   - smv
 
-retry: 1
+retry: 0
 
 steps:
   - action: launchApp
 
-  - action: scanTags
+  - action: waitFor
+    element: login_input_phone
 
   - action: enterText
     element: login_input_phone
     value: "9481781677"
 
+  # Tap Continue — SMV fails, "Switch mobile data" bottom sheet appears.
   - action: tap
-    element: login_button
+    element: login_continue_button
 
-  - action: scanTags
+  # Dismiss "Switch mobile data" sheet via X.
+  - action: pressKey
+    value: BACK
 
-  # SMV fails silently. WA verification also fails (not installed / verification failed).
   - action: waitFor
-    locator: smv_contextual_failure_screen   # TODO: add to elements/login.yaml — accessibilityId TBD
+    element: login_input_phone
+    timeout: 10
 
-  - action: scanTags   # capture contextual failure screen tags to find real accessibilityId for smv_contextual_failure_screen
+  # Tap Continue again — app falls through to WA OTP screen.
+  - action: tap
+    element: login_continue_button
 
-  - action: verifyElement
-    locator: smv_contextual_failure_screen   # TODO: add to elements/login.yaml — accessibilityId TBD
+  # WA OTP screen: "Verifying OTP sent on WhatsApp"
+  - action: waitFor
+    element: login_merged_login_and_otp_screen_button  # healed locator → login_merged_login_and_otp_screen_button_4
+    timeout: 60
+
+  # WA verification fails after ~45s → "Something went wrong / verification failed" sheet.
+  # Verify the sheet by asserting the "Try again" CTA is present.
+  - action: tapByText
+    value: "Try again"
+    timeout: 60

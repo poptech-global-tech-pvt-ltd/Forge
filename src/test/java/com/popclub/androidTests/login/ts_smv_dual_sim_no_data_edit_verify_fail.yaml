@@ -1,0 +1,82 @@
+testName: SMV Dual SIM - No Data on SIM2 - Three Taps Fall Through to WA - Edit - Verify Fail
+platform: android
+noReset: false
+loginRequired: false
+
+# Dual SIM device: SIM 2 number entered but mobile data is OFF for that SIM.
+# Each Continue tap triggers the "Switch data to <number>" bottom sheet.
+# The sheet is dismissed via the X (BACK key) twice — once per attempt.
+# On the 3rd Continue the app falls through to the WhatsApp OTP screen.
+# From there: tap Edit → back on phone input → tap Continue → "Verification
+# failed" bottom sheet appears with a "Try again" CTA.
+# Note: the Google "Choose a phone number" dialog is auto-dismissed by the framework.
+
+features:
+  - login
+
+tags:
+  - login
+  - smv
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: waitFor
+    element: login_input_phone
+
+  # SIM 2 number (9538351687) — mobile data is OFF for this SIM, so SMV fails → "switch data" sheet.
+  - action: enterText
+    element: login_input_phone
+    value: "9538351687"
+
+  # --- Attempt 1 ---
+  - action: tap
+    element: login_continue_button
+
+  # "Switch data to <number>" bottom sheet appears — dismiss with X (BACK key).
+  - action: pressKey
+    value: BACK
+
+  - action: waitFor
+    element: login_input_phone
+    timeout: 10
+
+  # --- Attempt 2 ---
+  - action: tap
+    element: login_continue_button
+
+  # Same bottom sheet — dismiss again.
+  - action: pressKey
+    value: BACK
+
+  - action: waitFor
+    element: login_input_phone
+    timeout: 10
+
+  # --- Attempt 3 — app falls back to WhatsApp OTP screen ---
+  - action: tap
+    element: login_continue_button
+
+  # WhatsApp OTP entry screen loads after the 3rd attempt.
+  - action: waitFor
+    element: login_merged_login_and_otp_screen_button
+    timeout: 30
+
+  # Tap Edit — returns to the phone number input screen.
+  - action: tapByText
+    value: "Edit"
+    timeout: 30
+
+  - action: waitFor
+    element: login_input_phone
+
+  # Tap Continue again — triggers "Verification failed" bottom sheet.
+  - action: tap
+    element: login_continue_button
+
+  # Verify the "Something went wrong" sheet appears and tap "Try again".
+  - action: tapByText
+    value: "Try again"
+    timeout: 15

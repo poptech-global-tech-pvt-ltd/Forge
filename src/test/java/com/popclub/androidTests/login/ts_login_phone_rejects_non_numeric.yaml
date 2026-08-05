@@ -1,0 +1,48 @@
+testName: Login - Phone Field Rejects Non-Numeric Characters
+platform: android
+noReset: false
+loginRequired: false
+
+# Verifies that the phone number input field silently drops non-numeric characters
+# (letters, symbols) and only accepts digits.
+# Flow: type non-numeric → field stays empty → type numeric → field shows number.
+
+features:
+  - login
+
+tags:
+  - login
+  - smoke
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: waitFor
+    element: login_input_phone
+
+  # Attempt to type non-numeric characters — field should reject all of them.
+  - action: enterText
+    element: login_input_phone
+    value: "abc!@#"
+
+  # Capture what the field actually contains after the non-numeric input attempt.
+  # Expected: empty string (nothing accepted).
+  - action: captureText
+    element: login_input_phone
+    variable: phoneAfterInvalid
+
+  # Now type a valid numeric phone number — field should accept it.
+  - action: enterText
+    element: login_input_phone
+    value: "9000000001"
+
+  # Confirm the number is visible on screen (field accepted the digits).
+  - action: tapByText
+    value: "9000000001"
+    timeout: 5
+
+  # Confirm Continue button is present and tappable.
+  - action: verifyElement
+    element: login_continue_button

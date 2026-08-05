@@ -1,0 +1,41 @@
+testName: SMV Fail - No WhatsApp Installed - WA Not Found Sheet
+platform: android
+noReset: false
+loginRequired: false
+
+# Prereq: WhatsApp must NOT be installed on the device.
+# Number 9000000001 triggers SMV fail → app tries to open WA → WA absent →
+# "WhatsApp not found on this device" bottom sheet appears (~5-7s after Continue).
+# Sheet UI: title "WhatsApp not found on this device" /
+#           body  "Your login code comes on WhatsApp. Install to continue." /
+#           CTA   "Install WhatsApp" → Play Store
+#
+# Note: The sheet CTA has no qaTestTag/accessibilityId — text only.
+#       tapByText is the correct locator for this element permanently.
+
+features:
+  - login
+
+tags:
+  - login
+  - smv
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: waitFor
+    element: login_input_phone
+
+  - action: enterText
+    element: login_input_phone
+    value: "9000000001"
+
+  - action: tap
+    element: login_continue_button
+
+  # Wait for the "WhatsApp not found" sheet and tap the CTA — confirms sheet appeared and CTA is interactive.
+  - action: tapByText
+    value: "Install WhatsApp"
+    timeout: 30

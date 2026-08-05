@@ -1,0 +1,60 @@
+testName: SMV Dual SIM - Switch Data Sheet - Dismiss - Correct SIM - SMV Pass
+platform: android
+noReset: false
+loginRequired: false
+
+# Dual SIM device: SIM 1 number entered (9481781677), but mobile data is on SIM 2.
+# Tapping Continue shows "Switch mobile data to +91 94817 81677" bottom sheet.
+# User dismisses the sheet via X → back to login screen.
+# User clears and enters SIM 2 number (9538351687) — the SIM with active data.
+# Tapping Continue → SMV runs silently → "We successfully verified your number".
+# User lands on home screen (onboarding modal skipped via "Skip").
+
+features:
+  - login
+
+tags:
+  - login
+  - smv
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: waitFor
+    element: login_input_phone
+
+  # Enter SIM 1 number — data is on SIM 2, so "Switch mobile data" sheet appears.
+  - action: enterText
+    element: login_input_phone
+    value: "9481781677"
+
+  - action: tap
+    element: login_continue_button
+
+  # "Switch mobile data to +91 94817 81677" bottom sheet appears — dismiss via X.
+  - action: pressKey
+    value: BACK
+
+  # Back on login screen — field still shows old number.
+  - action: waitFor
+    element: login_input_phone
+    timeout: 10
+
+  # Clear field and enter SIM 2 number (the one with active mobile data).
+  - action: enterText
+    element: login_input_phone
+    value: "9538351687"
+
+  - action: tap
+    element: login_continue_button
+
+  # SMV runs silently → "We successfully verified your number / Logging you in now..."
+  # Home screen loads with onboarding modal "Meet the all-new POP".
+  - action: tapIfPresent
+    element: skip_tour
+    timeout: 120
+
+  - action: verifyElement
+    element: home_tab
