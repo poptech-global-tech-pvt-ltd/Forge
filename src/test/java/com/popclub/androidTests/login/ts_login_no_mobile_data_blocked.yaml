@@ -2,25 +2,20 @@ testName: Login Blocked - No Mobile Data - Turn On Mobile Data Sheet
 platform: android
 noReset: false
 loginRequired: false
-
-# Device has no mobile data (all SIMs off or WiFi-only mode).
-# Tapping Continue on the login screen shows a "Turn on mobile data" bottom sheet.
-# Sheet has: title "Turn on mobile data", subtitle "Mobile data is needed to login",
-# CTA "Open settings", and an X to dismiss.
-# Expected: sheet appears → dismiss via X → back on login screen with number intact.
+testCaseIds:
+  -PO-15769
 
 features:
   - login
 
 tags:
   - login
-  - smv
+  - regression
 
-retry: 0
+retry: 1
 
 steps:
   - action: launchApp
-
 
   - action: waitFor
     element: login_input_phone
@@ -29,20 +24,16 @@ steps:
     element: login_input_phone
     value: "9538351687"
 
-  # Tap Continue — no mobile data → "Turn on mobile data" bottom sheet appears.
   - action: tap
     element: login_continue_button
 
-  # Verify the sheet is showing by asserting its title text.
   - action: tapByText
     value: "Turn on mobile data"
     timeout: 10
 
-  # Dismiss the sheet via X (BACK key).
   - action: pressKey
     value: BACK
 
-  # Verify we're back on the login screen with the phone number still present.
   - action: waitFor
     element: login_input_phone
     timeout: 10

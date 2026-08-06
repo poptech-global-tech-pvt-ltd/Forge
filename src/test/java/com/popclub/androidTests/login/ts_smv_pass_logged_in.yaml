@@ -2,19 +2,16 @@ testName: SMV Pass - Logged In
 platform: android
 noReset: false
 loginRequired: true
-
-# Prereq: SIM on a carrier that supports SMV (e.g. Jio/Airtel).
-# SMV runs silently after phone number is entered — no user interaction needed.
-# Expected: 3-sec loader appears, then user lands on home screen.
+testCaseIds:
+  - PO-15525
 
 features:
   - login
-  - common
 
 tags:
   - smoke
-  - login
-  - smv
+  - regression
+  - sanity
 
 retry: 1
 

@@ -1,10 +1,9 @@
 testName: Login - Continue Button Disabled Until 10 Digits Entered
 platform: android
 noReset: false
-loginRequired: false
-
-# Verifies that the Continue button remains disabled when fewer than 10 digits
-# are entered, and becomes enabled only when exactly 10 digits are present.
+loginRequired: true
+testCaseIds:
+  - PO-12422
 
 features:
   - login
@@ -12,39 +11,33 @@ features:
 tags:
   - login
   - smoke
+  - regression
 
 retry: 1
 
 steps:
   - action: launchApp
 
-
   - action: waitFor
     element: login_input_phone
 
-  # Enter 5 digits — Continue should be disabled (not clickable).
   - action: enterText
     element: login_input_phone
     value: "94817"
 
-  # Attempt to tap Continue — should not navigate away (button is disabled).
   - action: tap
     element: login_continue_button
 
-  # Still on login screen — phone input still visible.
   - action: verifyElement
     element: login_input_phone
 
-  # Enter full 10-digit number — Continue should now be enabled.
   - action: enterText
     element: login_input_phone
     value: "9538351687"
 
-  # Tap Continue — should succeed and navigate away from login screen.
   - action: tap
     element: login_continue_button
 
-  # Verify we left the login screen (Continue was enabled and worked).
   - action: waitFor
     element: login_merged_login_and_otp_screen_button
     timeout: 30

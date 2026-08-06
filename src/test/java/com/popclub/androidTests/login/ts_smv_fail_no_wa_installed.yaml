@@ -2,20 +2,15 @@ testName: SMV Fail - No WhatsApp Installed - WA Not Found Sheet
 platform: android
 noReset: false
 loginRequired: true
-
-# Prereq: WhatsApp must NOT be installed on the device.
-# Number 9000000001 triggers SMV fail → app tries to open WA → WA absent →
-# "WhatsApp not found on this device" bottom sheet appears (~5-7s after Continue).
-# Sheet UI: title "WhatsApp not found on this device" /
-#           body  "Your login code comes on WhatsApp. Install to continue." /
-#           CTA   "Install WhatsApp" → Play Store
+testCaseIds:
+  - PO-15539
 
 features:
   - login
 
 tags:
   - login
-  - smv
+  - regression
 
 retry: 1
 
@@ -33,12 +28,10 @@ steps:
   - action: tap
     element: login_continue_button
 
-  # On dual-SIM devices the "Switch mobile data" sheet may appear — tap Switch to proceed.
   - action: tapIfPresent
     locator: Switch
     timeout: 10
 
-  # Wait for the "WhatsApp not found" sheet and tap the CTA — confirms sheet appeared and CTA is interactive.
   - action: tapByText
     value: "Install WhatsApp"
     timeout: 30

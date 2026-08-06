@@ -2,14 +2,9 @@ testName: SMV Dual SIM - Switch Data Sheet - Open Settings - WA Fail
 platform: android
 noReset: false
 loginRequired: false
-
-# Dual SIM device: SIM 2 number entered, mobile data is on SIM 1.
-# Tapping Continue shows "Switch mobile data to +91 XXXXX" bottom sheet.
-# User taps "Open settings" → device Settings opens.
-# User presses BACK to return to app → Google dialog auto-dismissed by framework.
-# "Something went wrong / verification failed" sheet appears (SMV failed in background).
-# Tap "Try again" → WA OTP screen loads.
-# WA verification also fails → "Something went wrong" sheet appears again.
+testCaseIds:
+  - PO-15774
+  - PO-15536
 
 features:
   - login
@@ -23,40 +18,31 @@ retry: 1
 steps:
   - action: launchApp
 
-
   - action: waitFor
     element: login_input_phone
 
-  # SIM 2 number — data is on SIM 1, so SMV fails → "Switch mobile data" sheet.
   - action: enterText
     element: login_input_phone
     value: "9538351687"
 
-  # Tap Continue — "Switch mobile data to +91 95383 51687" bottom sheet appears.
   - action: tap
     element: login_continue_button
 
-  # Verify sheet is present and tap "Open settings" CTA.
   - action: tapByText
     value: "Open settings"
     timeout: 10
 
-  # Press BACK to return to POP app from device Settings.
   - action: pressKey
     value: BACK
 
-  # Framework auto-dismisses the Google "Choose a phone number" dialog.
-  # SMV failed in background → "Something went wrong / verification failed" sheet appears.
   - action: tapByText
     value: "Try again"
     timeout: 15
 
-  # WA OTP screen: "Verifying OTP sent on WhatsApp"
   - action: waitFor
     element: login_merged_login_and_otp_screen_button
     timeout: 30
 
-  # WA verification fails after ~35s → "Something went wrong" sheet again.
   - action: tapByText
     value: "Try again"
     timeout: 60

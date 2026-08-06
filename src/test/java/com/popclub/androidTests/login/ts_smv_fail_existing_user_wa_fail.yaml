@@ -2,12 +2,8 @@ testName: SMV Fail - Existing User - WA Fail - Contextual Failure Screen
 platform: android
 noReset: false
 loginRequired: false
-
-# Prereq: Phone number must be an EXISTING user (linking date < 1-May-2026 OR CC active/approved).
-# SMV fails → "Switch mobile data" bottom sheet appears on first Continue tap.
-# Dismiss the sheet via X, tap Continue again → WA OTP screen loads.
-# WA verification times out / fails → "Something went wrong / verification failed" sheet.
-# Expected: "Try again" CTA visible on the failure sheet.
+testCaseIds:
+  - PO-15536
 
 features:
   - login
@@ -17,11 +13,10 @@ tags:
   - login
   - smv
 
-retry: 0
+retry: 1
 
 steps:
   - action: launchApp
-
 
   - action: waitFor
     element: login_input_phone
@@ -30,11 +25,9 @@ steps:
     element: login_input_phone
     value: "9481781677"
 
-  # Tap Continue — SMV fails, "Switch mobile data" bottom sheet appears.
   - action: tap
     element: login_continue_button
 
-  # Dismiss "Switch mobile data" sheet via X.
   - action: pressKey
     value: BACK
 
@@ -42,17 +35,13 @@ steps:
     element: login_input_phone
     timeout: 10
 
-  # Tap Continue again — app falls through to WA OTP screen.
   - action: tap
     element: login_continue_button
 
-  # WA OTP screen: "Verifying OTP sent on WhatsApp"
   - action: waitFor
-    element: login_merged_login_and_otp_screen_button  # healed locator → login_merged_login_and_otp_screen_button_4
+    element: login_merged_login_and_otp_screen_button
     timeout: 60
 
-  # WA verification fails after ~45s → "Something went wrong / verification failed" sheet.
-  # Verify the sheet by asserting the "Try again" CTA is present.
   - action: tapByText
     value: "Try again"
     timeout: 60
