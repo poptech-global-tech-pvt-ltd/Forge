@@ -58,6 +58,7 @@ public class ActionFactory {
             // ── Text capture / assertion primitives ───────────────────────────
             case "captureText":              return new CaptureTextAction();
             case "captureToast":             return new CaptureToastAction();
+            case "captureNetworkValue":      return new CaptureNetworkValueAction();
             case "assertStoredText":         return new AssertStoredTextAction();
             case "assertText":               return new AssertTextAction();
 

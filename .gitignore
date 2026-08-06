@@ -46,8 +46,6 @@ src/test/resources/prod.properties
 src/test/resources/qa.properties
 
 ### Local overrides (machine-specific, never commit) ###
-local.cloud.properties
-src/test/resources/local.cloud.properties
 src/main/resources/config/local.cloud.properties
 src/test/resources/config/testsigma-local.properties
 

@@ -28,8 +28,8 @@ public class AppiumDriverManager {
         try {
             // 1. Obtain a device (local ADB pool  OR  STF cloud reservation)
             device = DeviceManager.getDevice();
-            String udid = device.udid;
-            int    port = device.port;
+            String udid       = device.udid;
+            int    port       = device.port;
 
             System.out.println(
                     "Thread: " + Thread.currentThread().getId() +
@@ -49,6 +49,11 @@ public class AppiumDriverManager {
             options.setPlatformName(device.platformName != null ? device.platformName : "Android");
             options.setDeviceName(udid);
             options.setUdid(udid);
+            // Cloud: route ADB through the STF server's ADB daemon (already has device authorized)
+            if (device.adbHost != null) {
+                options.setCapability("appium:remoteAdbHost", device.adbHost);
+                options.setCapability("appium:adbPort", device.adbServerPort);
+            }
             options.setAutomationName("UiAutomator2");
             if (device.platformVersion != null && !device.platformVersion.isEmpty()) {
                 options.setPlatformVersion(device.platformVersion);
@@ -60,7 +65,7 @@ public class AppiumDriverManager {
             boolean resumeMode = TestContext.isNoReset();
             // Even in noReset/resume mode, install the app if it is not present on the device.
             // This handles first-run on a fresh device without requiring the user to change the flag.
-            boolean appInstalled = resumeMode && isAppInstalled(udid, "com.popclub.android");
+            boolean appInstalled = resumeMode && isAppInstalled(device, "com.popclub.android");
 
             if (resumeMode && appInstalled) {
                 // Resume mode (run-from-step): attach to the already-running app.
@@ -87,6 +92,12 @@ public class AppiumDriverManager {
             options.setNewCommandTimeout(Duration.ofSeconds(300));
             // Keep the screen on throughout the test run — prevents mid-test lock/sleep
             options.setCapability("appium:keepScreenOn", true);
+            // Remote ADB (cloud/STF) is slower — give UiAutomator2 server more time to start
+            if (device.adbHost != null) {
+                options.setCapability("appium:uiautomator2ServerLaunchTimeout", 120000);
+                options.setCapability("appium:uiautomator2ServerInstallTimeout", 120000);
+                options.setCapability("appium:androidInstallTimeout", 120000);
+            }
             TestContext.setFreshLaunch(!resumeMode);
 
             // Unique UiAutomator2 system port to avoid stale-session collisions
@@ -109,7 +120,7 @@ public class AppiumDriverManager {
             // Grant all dangerous permissions declared in the manifest upfront via ADB.
             // pm grant marks them as granted at system level — Android never shows a runtime
             // dialog for a permission that's already granted, so no watcher is needed.
-            grantAllPermissions(udid, "com.popclub.android");
+            grantAllPermissions(device, "com.popclub.android");
 
             return driverInstance;
 
@@ -148,15 +159,28 @@ public class AppiumDriverManager {
         return deviceInfo.get();
     }
 
+    /** Builds the adb base command with optional remote-server and serial flags. */
+    private static String[] adbBase(DeviceInfo device, String... args) {
+        java.util.List<String> cmd = new java.util.ArrayList<>();
+        cmd.add("adb");
+        if (device.adbHost != null) {
+            cmd.add("-H"); cmd.add(device.adbHost);
+            cmd.add("-P"); cmd.add(String.valueOf(device.adbServerPort));
+        }
+        if (device.udid != null && !device.udid.isBlank()) {
+            cmd.add("-s"); cmd.add(device.udid);
+        }
+        for (String a : args) cmd.add(a);
+        return cmd.toArray(new String[0]);
+    }
+
     /**
      * Returns true if the given package is installed on the device.
      * Uses {@code adb shell pm list packages} — fast, no app launch needed.
      */
-    private static boolean isAppInstalled(String serial, String packageName) {
+    private static boolean isAppInstalled(DeviceInfo device, String packageName) {
         try {
-            String[] cmd = (serial != null && !serial.isBlank())
-                ? new String[]{"adb", "-s", serial, "shell", "pm", "list", "packages", packageName}
-                : new String[]{"adb", "shell", "pm", "list", "packages", packageName};
+            String[] cmd = adbBase(device, "shell", "pm", "list", "packages", packageName);
             Process p = Runtime.getRuntime().exec(cmd);
             p.waitFor(5, java.util.concurrent.TimeUnit.SECONDS);
             try (java.io.BufferedReader br = new java.io.BufferedReader(
@@ -184,7 +208,7 @@ public class AppiumDriverManager {
      * which only fires at Appium session creation.  Some permissions (especially
      * on Android 13+ fine-grained media permissions) can slip through.
      */
-    private static void grantAllPermissions(String serial, String packageName) {
+    private static void grantAllPermissions(DeviceInfo device, String packageName) {
         // Full list of dangerous permissions that the POP app might request
         String[] permissions = {
             "android.permission.CAMERA",
@@ -207,16 +231,10 @@ public class AppiumDriverManager {
             "android.permission.USE_FINGERPRINT",
         };
 
-        String[] adbBase = (serial != null && !serial.isBlank())
-            ? new String[]{"adb", "-s", serial, "shell", "pm", "grant", packageName}
-            : new String[]{"adb", "shell", "pm", "grant", packageName};
-
         int granted = 0;
         for (String perm : permissions) {
             try {
-                String[] cmd = new String[adbBase.length + 1];
-                System.arraycopy(adbBase, 0, cmd, 0, adbBase.length);
-                cmd[adbBase.length] = perm;
+                String[] cmd = adbBase(device, "shell", "pm", "grant", packageName, perm);
                 Process p = Runtime.getRuntime().exec(cmd);
                 p.waitFor(3, java.util.concurrent.TimeUnit.SECONDS);
                 granted++;

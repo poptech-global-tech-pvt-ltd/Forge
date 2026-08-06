@@ -98,3 +98,9 @@ login_tnc_text:
   android:
     - type: accessibilityId
       value: login_tnc_text
+
+# ─── SMV / WhatsApp fallback button ────────────────────────────────────────────
+login_merged_login_and_otp_screen_button_3:
+  android:
+    - type: accessibilityId
+      value: login_merged_login_and_otp_screen_button_3
