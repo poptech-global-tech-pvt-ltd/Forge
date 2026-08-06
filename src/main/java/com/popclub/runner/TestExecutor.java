@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -114,6 +115,8 @@ public class TestExecutor {
         }
 
         for (Step step : testCase.steps) {
+
+            resolveDataRef(step);
 
             // Resolve locators — priority: element → locator → resourceId → text → bounds/xy
             if (step.element != null) {
@@ -533,6 +536,41 @@ public class TestExecutor {
         return sb.toString();
     }
 
+    private static void resolveDataRef(Step step) {
+        if (step.dataRef == null || step.dataRef.isBlank()) return;
+
+        if (step.dataRef.indexOf('.') >= 0) {
+            String val = TestDataRepository.resolve(step.dataRef);
+
+            String fieldName = step.dataRef.substring(step.dataRef.indexOf('.') + 1);
+            TestContext.setScalarData(fieldName, val);
+            if (step.value == null) step.value = val;
+
+            System.out.printf("  ↩  dataRef: %s → \"%s\"%n", step.dataRef, val);
+            return;
+        }
+
+        Map<String, String> resolved = TestDataRepository.resolveObject(step.dataRef);
+
+        for (Map.Entry<String, String> entry : resolved.entrySet()) {
+            String key = entry.getKey();
+            String val = entry.getValue();
+
+            TestContext.setScalarData(key, val);
+
+            switch (key) {
+                case "login":
+                    if (step.value == null) step.value = val;
+                    break;
+                case "otp":
+                    if (step.text == null) step.text = val;
+                    break;
+            }
+        }
+
+        System.out.printf("  ↩  dataRef: %s → %s%n", step.dataRef, resolved.keySet());
+    }
+
     // ── Conditional helpers ───────────────────────────────────────────────────
 
     /**
@@ -573,6 +611,8 @@ public class TestExecutor {
     private void resolveAndRunSteps(List<Step> steps, int maxRetry, boolean isFlow) {
         int idx = 1;
         for (Step step : steps) {
+            resolveDataRef(step);
+
             // Resolve locators (same logic as the main loop)
             // Wrap in try-catch so a missing element key surfaces with a clear message
             // instead of an untrapped RuntimeException that kills the session silently.
