@@ -23,6 +23,7 @@ retry: 1
 steps:
   - action: launchApp
 
+
   - action: waitFor
     element: login_input_phone
 

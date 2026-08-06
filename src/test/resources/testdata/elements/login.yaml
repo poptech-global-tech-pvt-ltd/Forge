@@ -25,6 +25,12 @@ skip_tour:
       value: Close
 
 
+# ─── Google Phone Number Dialog ────────────────────────────────────────────────
+google_phone_dialog_cancel_button:
+  android:
+    - type: accessibilityId
+      value: Cancel
+
 # ─── Login Continue ────────────────────────────────────────────────────────────
 login_continue_button:
   android:
@@ -35,7 +41,7 @@ login_continue_button:
 login_merged_login_and_otp_screen_button:
   android:
     - type: accessibilityId
-      value: login_merged_login_and_otp_screen_button_4  # healed from: login_merged_login_and_otp_screen_button
+      value: login_merged_login_and_otp_screen_button_3  # healed from: login_merged_login_and_otp_screen_button_4  # healed from: login_merged_login_and_otp_screen_button
 login_merged_mobile_entry_content_input:
   android:
     - type: accessibilityId

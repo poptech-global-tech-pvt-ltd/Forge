@@ -1,7 +1,7 @@
 testName: SMV Pass - Logged In
 platform: android
 noReset: false
-loginRequired: false
+loginRequired: true
 
 # Prereq: SIM on a carrier that supports SMV (e.g. Jio/Airtel).
 # SMV runs silently after phone number is entered — no user interaction needed.
@@ -21,16 +21,12 @@ retry: 1
 steps:
   - action: launchApp
 
-  - action: scanTags
-
   - action: enterText
     element: login_input_phone
-    value: "9481781677"
+    value: "9538351687"
 
   - action: tap
     element: login_button
-
-  - action: scanTags
 
   - action: waitFor
     element: skip_tour
@@ -38,8 +34,6 @@ steps:
 
   - action: tap
     element: skip_tour
-
-  - action: scanTags
 
   - action: verifyElement
     element: home_tab

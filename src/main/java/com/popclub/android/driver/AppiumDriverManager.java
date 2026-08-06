@@ -142,6 +142,7 @@ public class AppiumDriverManager {
         }
     }
 
+
     public static DeviceInfo getDeviceInfo() {
         return deviceInfo.get();
     }

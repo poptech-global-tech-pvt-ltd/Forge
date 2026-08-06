@@ -22,6 +22,7 @@ retry: 1
 steps:
   - action: launchApp
 
+
   - action: waitFor
     element: login_input_phone
 
@@ -52,9 +53,11 @@ steps:
 
   # SMV runs silently → "We successfully verified your number / Logging you in now..."
   # Home screen loads with onboarding modal "Meet the all-new POP".
+  # Onboarding modal may appear after SMV — dismiss via "Skip" button.
   - action: tapIfPresent
-    element: skip_tour
-    timeout: 120
+    locator: Skip
+    timeout: 30
 
   - action: verifyElement
     element: home_tab
+    timeout: 30

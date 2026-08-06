@@ -1,7 +1,7 @@
-testName: Login via SMV with WhatsApp fallback (auto request_id)
+testName: Login via SMV with WhatsApp fallback - cx Approval (auto request_id)
 platform: android
 noReset: false
-loginRequired: false
+loginRequired: true
 
 features:
   - login
@@ -20,7 +20,7 @@ steps:
 
   - action: enterText
     element: login_input_phone
-    value: "1234567743"
+    value: "1234567740"
 
   - action: tap
     element: login_continue_button
@@ -33,14 +33,12 @@ steps:
     timeout: 120
 
   - action: waitFor
-    element: login_merged_login_and_otp_screen_button
+    element: login_merged_login_and_otp_screen_button  # healed locator → login_merged_login_and_otp_screen_button_3
     timeout: 30
 
   - action: tap
     element: login_merged_login_and_otp_screen_button
 
-  # Scan CX dashboard screen to find "close app" CTA tag
-  - action: scanTags
 
   # Get Keycloak admin token
   - action: fetchApi
@@ -59,21 +57,18 @@ steps:
     headers:
       Authorization: "Bearer ${smv_admin_token}"
       Content-Type: "application/json"
-    body: '{"request_id": "${smv_request_id}", "comments": "+911234567743", "status": "PASSED"}'
+    body: '{"request_id": "${smv_request_id}", "comments": "+911234567740", "status": "PASSED"}'
 
   # Re-activate POP app — app should detect PASSED status on resume
   - action: launchApp
 
-  # Dismiss Google "Choose a phone number" dialog if it appears
-  - action: pressKey
-    value: "BACK"
 
   - action: waitFor
     element: login_input_phone
 
   - action: enterText
     element: login_input_phone
-    value: "1234567743"
+    value: "1234567740"
 
   - action: tap
     element: login_continue_button

@@ -22,6 +22,7 @@ retry: 1
 steps:
   - action: launchApp
 
+
   - action: scanTags
 
   - action: enterText
