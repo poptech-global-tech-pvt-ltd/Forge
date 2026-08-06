@@ -23,8 +23,7 @@ steps:
   - action: launchApp
 
   - action: loginIfNeeded
-    value: "1234561122"
-    text: "560102"
+    dataRef: test_user_default
 
   # ── 2. Search API — find first product deliverable to 560102 ──────────────────
   - action: call

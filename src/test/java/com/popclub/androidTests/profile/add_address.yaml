@@ -13,8 +13,7 @@ steps:
   - action: launchApp
 
   - action: loginIfNeeded
-    value: "1234561122"
-    text: "560102"
+    dataRef: test_user_default
 
   # Add steps below
   - action: tap

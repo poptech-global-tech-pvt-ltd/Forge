@@ -1,6 +1,6 @@
 testName: Login Test
 platform: android
-noReset: false
+noReset: true
 
 testCaseIds:
   - PO-1589
@@ -23,14 +23,14 @@ steps:
 
   - action: enterText
     element: login_input_phone
-    value: 1234561122
+    dataRef: test_user_default.login
 
   - action: tap
     element: login_button
 
   - action: enterText
     element: otp_input
-    value: 560102
+    dataRef: test_user_default.otp
 
 
 #  - action: tap
@@ -61,7 +61,7 @@ steps:
 
   - action: enterText
     element: search_input
-    value: Aloe face wash
+    dataRef: default_search.search_term
 
   - action: scanTags
 

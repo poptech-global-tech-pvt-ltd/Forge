@@ -24,19 +24,18 @@ steps:
 
   - action: enterText
     element: login_input_phone
-    value: 1234561122
+    dataRef: test_user_default.login
 
   - action: tap
     element: login_button
 
   - action: enterText
     element: otp_input
-    value: 560102
+    dataRef: test_user_default.otp
 
   # Login via API to get JWT — CI-safe, no logcat needed
   - action: captureToken
-    value: "1234561122"
-    text: "560102"
+    dataRef: test_user_default
 
   - action: waitFor
     element: home_tab
