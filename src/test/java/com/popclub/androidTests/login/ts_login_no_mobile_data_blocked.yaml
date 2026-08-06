@@ -1,0 +1,42 @@
+testName: Login Blocked - No Mobile Data - Turn On Mobile Data Sheet
+platform: android
+noReset: false
+loginRequired: false
+testCaseIds:
+  -PO-15769
+
+features:
+  - login
+
+tags:
+  - login
+  - regression
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: waitFor
+    element: login_input_phone
+
+  - action: enterText
+    element: login_input_phone
+    value: "9538351687"
+
+  - action: tap
+    element: login_continue_button
+
+  - action: tapByText
+    value: "Turn on mobile data"
+    timeout: 10
+
+  - action: pressKey
+    value: BACK
+
+  - action: waitFor
+    element: login_input_phone
+    timeout: 10
+
+  - action: verifyElement
+    element: login_continue_button
