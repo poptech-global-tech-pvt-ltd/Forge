@@ -58,12 +58,14 @@ public class ActionFactory {
             // ── Text capture / assertion primitives ───────────────────────────
             case "captureText":              return new CaptureTextAction();
             case "captureToast":             return new CaptureToastAction();
+            case "captureNetworkValue":      return new CaptureNetworkValueAction();
             case "assertStoredText":         return new AssertStoredTextAction();
             case "assertText":               return new AssertTextAction();
 
             // ── API calls ─────────────────────────────────────────────────────
             case "fetchApi":                 return new FetchApiAction();
             case "callService":              return new CallServiceAction();
+            case "captureNetworkValue":      return new CaptureNetworkValueAction();
 
             // ── Conditional flow / reusable call ─────────────────────────────
             // These are intercepted by TestExecutor before ActionFactory is reached.

@@ -1,0 +1,69 @@
+testName: Profile — Shop section navigation
+platform: android
+noReset: true
+loginRequired: true
+retry: 0
+
+testCaseIds:
+  - PO-11032
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - sanity
+  - regression
+  - shop
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561234"
+    text: "560102"
+
+  - action: tap
+    element: home_profile_icon
+
+  - action: swipe
+    direction: up
+
+  # ── PO-13851: Orders navigation ────────────────────────────────────────
+  - action: tap
+    element: profile_orders_button
+
+  - action: verifyElement
+    element: profile_page_title_shop_orders
+    testCaseId: PO-13851
+
+  - action: pressKey
+    value: back
+    
+  - action: swipe
+    direction: up
+
+   # ── PO-13852: Wishlist navigation ──────────────────────────────────────
+  - action: tap
+    element: profile_wishlist_button
+
+  - action: verifyElement
+    element: profile_page_title_wishlist
+    testCaseId: PO-13852
+
+  - action: pressKey
+    value: back
+
+  # ── PO-13853: Saved Address navigation ─────────────────────────────────
+
+  - action: tap
+    element: profile_saved_address_button
+
+  - action: verifyElement
+    element: profile_page_title_saved_address
+    testCaseId: PO-13853
+
+  - action: pressKey
+    value: back

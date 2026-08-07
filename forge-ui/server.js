@@ -814,8 +814,7 @@ app.post('/api/apk/install', (req, res) => {
   const apkPath = path.join(APK_DIR, path.basename(apk));
   if (!fs.existsSync(apkPath)) return res.status(404).json({ error: 'APK not found: ' + apk });
 
-  const ws = [...wss.clients].find(c => c.readyState === WebSocket.OPEN);
-  const log = (line, level = '') => ws && send(ws, { type: 'log', line, level });
+  const log = (line, level = '') => broadcast({ type: 'log', line, level });
 
   log(`▶ Installing ${path.basename(apkPath)}…`, 'step');
   res.json({ ok: true });   // respond immediately, install streams to WS
@@ -834,8 +833,7 @@ app.post('/api/apk/install', (req, res) => {
     } else {
       log(`❌ Install failed (exit ${code})`, 'error');
     }
-    // Notify UI to refresh app status
-    ws && send(ws, { type: 'apk_install_done', success: code === 0 });
+    broadcast({ type: 'apk_install_done', success: code === 0 });
   });
   proc.on('error', e => log('Failed to start adb: ' + e.message, 'error'));
 });
@@ -990,11 +988,29 @@ function startTest(file, deviceOverride, ws, fromStep, batchRun) {
     stopNetworkCapture();
     currentRun = null;
     if (runWasStopped) {
-      // User clicked Stop — already sent 'stopped'; don't show BUILD FAILURE
       runWasStopped = false;
       return;
     }
     send(ws, { type: 'done', success: code === 0, code });
+    // Broadcast TestSigma run link if the listener wrote one
+    try {
+      const runFile = path.join(FORGE_ROOT, 'reports/testsigma_last_run.txt');
+      if (fs.existsSync(runFile)) {
+        const txt      = fs.readFileSync(runFile, 'utf8');
+        const humanId  = (txt.match(/^Run ID:\s*(.+)$/m) || [])[1]?.trim();
+        const title    = (txt.match(/^Run title:\s*(.+)$/m) || [])[1]?.trim();
+        if (humanId) {
+          let uiBase = 'https://test-management.testsigma.com';
+          try {
+            const props = fs.readFileSync(
+              path.join(FORGE_ROOT, 'src/test/resources/config/testsigma.properties'), 'utf8');
+            const m = props.match(/testsigma\.base\.url\s*=\s*(.+)/);
+            if (m) uiBase = m[1].trim().replace(/\/api\/v1\/?$/, '');
+          } catch (_) {}
+          broadcast({ type: 'testsigma_result', humanId, title, link: `${uiBase}/ui/td/test-runs/${humanId}`, success: code === 0 });
+        }
+      }
+    } catch (_) {}
   });
 
   mvn.on('error', (err) => {
@@ -2079,6 +2095,45 @@ app.get('/api/recorder/output', (req, res) => {
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
+});
+
+// POST /api/apk/uninstall — uninstall app from device
+app.post('/api/apk/uninstall', (req, res) => {
+  const log = (line, level = '') => broadcast({ type: 'log', line, level });
+  log(`▶ Uninstalling ${APP_PACKAGE}…`, 'step');
+  res.json({ ok: true });
+
+  const proc = spawn('adb', adbArgs('uninstall', APP_PACKAGE), { shell: true });
+  proc.stdout.on('data', chunk => chunk.toString().split('\n').filter(Boolean).forEach(l => log(l)));
+  proc.stderr.on('data', chunk => chunk.toString().split('\n').filter(Boolean).forEach(l => log(l, 'error')));
+  proc.on('close', code => {
+    if (code === 0) {
+      log('✅ Uninstall successful', 'pass');
+    } else {
+      log(`❌ Uninstall failed (exit ${code})`, 'error');
+    }
+    broadcast({ type: 'apk_uninstall_done', success: code === 0 });
+  });
+  proc.on('error', e => log('Failed to start adb: ' + e.message, 'error'));
+});
+
+// ─── APK Upload ──────────────────────────────────────────────────────────────
+
+const apkUpload = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => cb(null, APK_DIR),
+    filename: (req, file, cb) => cb(null, 'pop-qaDebug.apk'),
+  }),
+  fileFilter: (req, file, cb) => {
+    if (!file.originalname.endsWith('.apk')) return cb(new Error('Only .apk files allowed'));
+    cb(null, true);
+  },
+  limits: { fileSize: 500 * 1024 * 1024 },
+});
+
+app.post('/api/upload-apk', apkUpload.single('apk'), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'No file received' });
+  res.json({ ok: true, path: req.file.path, size: req.file.size });
 });
 
 // ─── Start ───────────────────────────────────────────────────────────────────

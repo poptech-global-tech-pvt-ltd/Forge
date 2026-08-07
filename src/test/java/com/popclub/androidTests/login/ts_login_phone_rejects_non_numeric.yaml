@@ -1,0 +1,40 @@
+testName: Login - Phone Field Rejects Non-Numeric Characters
+platform: android
+noReset: false
+loginRequired: true
+testCaseIds:
+  - PO-12421
+
+features:
+  - login
+
+tags:
+  - login
+  - smoke
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: waitFor
+    element: login_input_phone
+
+  - action: enterText
+    element: login_input_phone
+    value: "abc!@#"
+
+  - action: captureText
+    element: login_input_phone
+    variable: phoneAfterInvalid
+
+  - action: enterText
+    element: login_input_phone
+    value: "9000000001"
+
+  - action: tapByText
+    value: "9000000001"
+    timeout: 5
+
+  - action: verifyElement
+    element: login_continue_button

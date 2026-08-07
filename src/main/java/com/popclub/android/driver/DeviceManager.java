@@ -111,10 +111,11 @@ public class DeviceManager {
         }
         busyDevices.add(serial);
 
-        // 3. Get the ADB-over-TCP address and connect
-        String remoteConnectUrl = stf.getRemoteConnectUrl(serial);
-        adbConnect(remoteConnectUrl);
-        cloudRemoteUrls.put(serial, remoteConnectUrl);
+        // 3. Extract the STF server host from the base URL (e.g. "10.25.11.224" from "https://10.25.11.224")
+        String stfHost = CloudConfig.getStfBaseUrl()
+                .replaceFirst("https?://", "")
+                .replaceAll("/.*", "")
+                .replaceAll(":\\d+$", "");
 
         // 4. Fetch platform info (platform name + version)
         String[] platformInfo = stf.getDevicePlatformInfo(serial);
@@ -125,17 +126,16 @@ public class DeviceManager {
 
         System.out.println("[STF] Cloud device ready → " + serial
                 + " | Platform: " + platformInfo[0] + " " + platformInfo[1]
-                + " | ADB: " + remoteConnectUrl + " | Appium port: " + port);
+                + " | ADB server: " + stfHost + ":5037 | Appium port: " + port);
 
-        return new DeviceInfo(serial, port, platformInfo[0], platformInfo[1]);
+        DeviceInfo info = new DeviceInfo(serial, port, platformInfo[0], platformInfo[1]);
+        info.adbHost       = stfHost;
+        info.adbServerPort = 5037;
+        return info;
     }
 
     private static void releaseCloudDevice(String serial) {
-        // ADB disconnect
-        String remoteUrl = cloudRemoteUrls.remove(serial);
-        if (remoteUrl != null) {
-            adbDisconnect(remoteUrl);
-        }
+        cloudRemoteUrls.remove(serial); // kept for backward compat; no TCP disconnect needed
 
         // Release reservation on STF
         STFClient stf = new STFClient(
@@ -198,6 +198,12 @@ public class DeviceManager {
     private static void adbConnect(String address) {
         runAdb("adb connect " + address,
                 "[ADB] Connected to " + address);
+    }
+
+    /** Re-connects to a cloud device after Appium's internal adb-server restart drops TCP links. */
+    public static void adbReconnect(String address) {
+        runAdb("adb connect " + address,
+                "[ADB] Reconnected to " + address);
     }
 
     private static void adbDisconnect(String address) {

@@ -1,0 +1,51 @@
+testName: Profile — Recharge & Bills navigation
+platform: android
+noReset: true
+loginRequired: true
+retry: 0
+
+testCaseIds:
+  - PO-15945
+
+features:
+  - common
+  - login
+  - home
+  - profile
+
+tags:
+  - regression
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561234"
+    text: "560102"
+
+  - action: tap
+    element: home_profile_icon
+
+  - action: swipe
+    direction: up
+  # ── PO-15945: Pay Bills navigation ─────────────────────────────────────
+  - action: tap
+    element: profile_pay_bills_button
+
+  - action: verifyElement
+    element: clp_section_row_0
+    testCaseId: PO-15945
+
+  - action: pressKey
+    value: back
+
+  # ── PO-15946: Rewards navigation ───────────────────────────────────────
+  - action: tap
+    element: profile_rewards_button
+
+  - action: verifyElement
+    element: toolbar_popcoin_button
+    testCaseId: PO-15946
+
+  - action: pressKey
+    value: back

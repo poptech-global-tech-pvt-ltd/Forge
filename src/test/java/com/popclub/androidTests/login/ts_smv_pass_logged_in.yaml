@@ -1,0 +1,36 @@
+testName: SMV Pass - Logged In
+platform: android
+noReset: false
+loginRequired: true
+testCaseIds:
+  - PO-15525
+
+features:
+  - login
+
+tags:
+  - smoke
+  - regression
+  - sanity
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: enterText
+    element: login_input_phone
+    value: "9538351687"
+
+  - action: tap
+    element: login_button
+
+  - action: waitFor
+    element: skip_tour
+    timeout: 120
+
+  - action: tap
+    element: skip_tour
+
+  - action: verifyElement
+    element: home_tab

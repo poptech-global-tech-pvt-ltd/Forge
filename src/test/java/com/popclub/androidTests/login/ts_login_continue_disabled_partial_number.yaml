@@ -1,0 +1,43 @@
+testName: Login - Continue Button Disabled Until 10 Digits Entered
+platform: android
+noReset: false
+loginRequired: true
+testCaseIds:
+  - PO-12422
+
+features:
+  - login
+
+tags:
+  - login
+  - smoke
+  - regression
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: waitFor
+    element: login_input_phone
+
+  - action: enterText
+    element: login_input_phone
+    value: "94817"
+
+  - action: tap
+    element: login_continue_button
+
+  - action: verifyElement
+    element: login_input_phone
+
+  - action: enterText
+    element: login_input_phone
+    value: "9538351687"
+
+  - action: tap
+    element: login_continue_button
+
+  - action: waitFor
+    element: login_merged_login_and_otp_screen_button
+    timeout: 30
