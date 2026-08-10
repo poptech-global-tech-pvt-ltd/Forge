@@ -9,63 +9,65 @@ import java.util.Map;
 
 public class TestDataRepository {
 
-    private static final String[] DATA_FILES = {
-            "src/test/resources/testdata/data/users.yaml",
-            "src/test/resources/testdata/data/products.yaml"
-    };
+    private static final String DATA_DIR = "src/test/resources/testdata/data/";
 
-    private static Map<String, Map<String, String>> data = new HashMap<>();
-    private static boolean loaded = false;
+    private static final Map<String, Map<String, Map<String, String>>> loadedFiles = new HashMap<>();
 
-    public static synchronized void loadIfNeeded() {
-        if (loaded) return;
+    private static synchronized Map<String, Map<String, String>> loadFile(String fileName) {
+        Map<String, Map<String, String>> cached = loadedFiles.get(fileName);
+        if (cached != null) return cached;
 
-        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-
-        for (String path : DATA_FILES) {
-            File file = new File(path);
-            if (!file.exists()) {
-                System.out.println("[TestDataRepository] Skipped missing file: " + path);
-                continue;
-            }
-            try {
-                Map<String, Map<String, String>> fileData = mapper.readValue(file, Map.class);
-                data.putAll(fileData);
-                System.out.println("[TestDataRepository] Loaded: " + path
-                        + " (" + fileData.size() + " entries)");
-            } catch (Exception e) {
-                throw new RuntimeException("Failed to load test data file: " + path, e);
-            }
+        File file = new File(DATA_DIR + fileName + ".yaml");
+        if (!file.exists()) {
+            throw new RuntimeException(
+                    "Failed to fetch test data — File: " + fileName + ".yaml (not found at " + file.getPath() + ")");
         }
-
-        loaded = true;
+        try {
+            ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+            Map<String, Map<String, String>> fileData = mapper.readValue(file, Map.class);
+            loadedFiles.put(fileName, fileData);
+            return fileData;
+        } catch (Exception e) {
+            throw new RuntimeException(
+                    "Failed to fetch test data — File: " + fileName + ".yaml (could not be parsed)", e);
+        }
     }
 
-    public static Map<String, String> resolveObject(String name) {
-        loadIfNeeded();
-        Map<String, String> entry = data.get(name);
-        if (entry == null) {
-            throw new RuntimeException("dataRef object not found in test data files: " + name);
+    public static Map<String, String> resolveObject(String dataRef) {
+        String[] parts = dataRef.split("\\.");
+        if (parts.length != 2) {
+            throw new RuntimeException(
+                    "Failed to fetch test data — Reference: " + dataRef
+                    + " (expected \"file.object\")");
         }
-        return entry;
+        return getObject(parts[0], parts[1]);
     }
 
     public static String resolve(String dataRef) {
-        int dot = dataRef.indexOf('.');
-        if (dot < 0) {
+        String[] parts = dataRef.split("\\.");
+        if (parts.length != 3) {
             throw new RuntimeException(
-                    "resolve() requires a dotted reference (e.g. \"name.field\"): " + dataRef);
+                    "Failed to fetch test data — Reference: " + dataRef
+                    + " (expected \"file.object.field\")");
         }
 
-        String objectName = dataRef.substring(0, dot);
-        String fieldName  = dataRef.substring(dot + 1);
-
-        Map<String, String> object = resolveObject(objectName);
-        String value = object.get(fieldName);
+        Map<String, String> object = getObject(parts[0], parts[1]);
+        String value = object.get(parts[2]);
         if (value == null) {
             throw new RuntimeException(
-                    "Field \"" + fieldName + "\" not found on \"" + objectName + "\": " + dataRef);
+                    "Failed to fetch test data — Key: " + parts[2] + ", Reference: " + parts[0] + "." + parts[1]);
         }
         return value;
+    }
+
+    private static Map<String, String> getObject(String fileName, String objectName) {
+        Map<String, Map<String, String>> fileData = loadFile(fileName);
+        Map<String, String> entry = fileData.get(objectName);
+        if (entry == null) {
+            throw new RuntimeException(
+                    "Failed to fetch test data — Object: " + objectName + ", File: " + fileName + ".yaml"
+                    + " (object not found)");
+        }
+        return entry;
     }
 }

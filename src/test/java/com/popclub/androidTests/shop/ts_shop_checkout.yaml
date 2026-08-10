@@ -1,7 +1,7 @@
 testName: Shop — Add to cart and checkout (E2E)
 platform: android
 noReset: true
-loginRequired: false
+loginRequired: true
 
 testCaseIds:
   - PO-15308
@@ -24,7 +24,7 @@ steps:
   - action: launchApp
 
   - action: loginIfNeeded
-    dataRef: test_user_default
+    dataRef: users.test_user_default
 
   - action: waitFor
     element: home_tab

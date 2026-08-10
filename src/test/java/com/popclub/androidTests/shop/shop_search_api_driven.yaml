@@ -23,7 +23,7 @@ steps:
   - action: launchApp
 
   - action: loginIfNeeded
-    dataRef: test_user_default
+    dataRef: users.test_user_default
 
   # ── 2. Search API — find first product deliverable to 560102 ──────────────────
   - action: call

@@ -14,61 +14,43 @@ tags:
   - smoke
   - login
 
-retry: 2   #  retry at test level
+retry: 1  
 
 steps:
   - action: launchApp
 
-  - action: scanTags
-
   - action: enterText
     element: login_input_phone
-    dataRef: test_user_default.login
+    dataRef: users.test_user_default.login
 
   - action: tap
     element: login_button
 
   - action: enterText
     element: otp_input
-    dataRef: test_user_default.otp
+    dataRef: users.test_user_default.otp
 
 
 #  - action: tap
 #    element: skip_tour
 
-  - action: scanTags
-
   - action: waitFor
     element: home_tab
-
-  - action: scanTags
 
   - action: verifyElement
     element: home_tab
 
   - action: tap
     element: shop_tab
-
-  - action: scanTags
-
-  - action: waitFor
-    element: shop_search_icon
-
+    
   - action: tap
     element: shop_search_icon
-
-  - action: scanTags
 
   - action: enterText
     element: search_input
-    dataRef: default_search.search_term
-
-  - action: scanTags
+    dataRef: products.default_search.search_term
 
   - action: tap
     element: search_input
-
-  - action: scanTags
-
 
 

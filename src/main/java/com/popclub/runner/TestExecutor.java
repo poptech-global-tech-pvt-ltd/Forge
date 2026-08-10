@@ -116,7 +116,12 @@ public class TestExecutor {
 
         for (Step step : testCase.steps) {
 
-            resolveDataRef(step);
+            try {
+                resolveDataRef(step);
+            } catch (Exception e) {
+                LoggerUtil.fail("Step " + stepIndex + " failed: " + e.getMessage());
+                throw e;
+            }
 
             // Resolve locators — priority: element → locator → resourceId → text → bounds/xy
             if (step.element != null) {
@@ -444,8 +449,12 @@ public class TestExecutor {
         // STOP KEEP-ALIVE + VIDEO
         DeviceKeepAlive.stop();
         AppiumDriver driver = DriverManager.getDriver();
-        File video = VideoUtil.stopAndSave(driver, testCase.testName);
-        TestContext.setVideoFile(video);
+        try {
+            File video = VideoUtil.stopAndSave(driver, testCase.testName);
+            TestContext.setVideoFile(video);
+        } catch (Exception e) {
+            System.out.println("[TestExecutor] ⚠️  Video save failed (non-fatal): " + e.getMessage());
+        }
 
         // YAML MODE RESULT
         if ("YAML".equals(TestContext.getExecutionMode())) {
@@ -539,15 +548,22 @@ public class TestExecutor {
     private static void resolveDataRef(Step step) {
         if (step.dataRef == null || step.dataRef.isBlank()) return;
 
-        if (step.dataRef.indexOf('.') >= 0) {
+        int dotCount = step.dataRef.length() - step.dataRef.replace(".", "").length();
+
+        if (dotCount == 2) {
             String val = TestDataRepository.resolve(step.dataRef);
 
-            String fieldName = step.dataRef.substring(step.dataRef.indexOf('.') + 1);
+            String fieldName = step.dataRef.substring(step.dataRef.lastIndexOf('.') + 1);
             TestContext.setScalarData(fieldName, val);
             if (step.value == null) step.value = val;
 
             System.out.printf("  ↩  dataRef: %s → \"%s\"%n", step.dataRef, val);
             return;
+        }
+
+        if (dotCount != 1) {
+            throw new RuntimeException(
+                    "Invalid dataRef (expected \"file.object\" or \"file.object.field\"): " + step.dataRef);
         }
 
         Map<String, String> resolved = TestDataRepository.resolveObject(step.dataRef);
@@ -611,7 +627,12 @@ public class TestExecutor {
     private void resolveAndRunSteps(List<Step> steps, int maxRetry, boolean isFlow) {
         int idx = 1;
         for (Step step : steps) {
-            resolveDataRef(step);
+            try {
+                resolveDataRef(step);
+            } catch (Exception e) {
+                LoggerUtil.fail("Step " + idx + " failed: " + e.getMessage());
+                throw e;
+            }
 
             // Resolve locators (same logic as the main loop)
             // Wrap in try-catch so a missing element key surfaces with a clear message

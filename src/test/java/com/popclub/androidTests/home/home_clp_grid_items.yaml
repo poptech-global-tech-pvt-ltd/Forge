@@ -25,17 +25,17 @@ steps:
 
   - action: enterText
     element: login_input_phone
-    dataRef: test_user_default.login
+    dataRef: users.test_user_default.login
 
   - action: tap
     element: login_button
 
   - action: enterText
     element: otp_input
-    dataRef: test_user_default.otp
+    dataRef: users.test_user_default.otp
 
   - action: captureToken
-    dataRef: test_user_default
+    dataRef: users.test_user_default
 
   - action: waitFor
     element: home_tab

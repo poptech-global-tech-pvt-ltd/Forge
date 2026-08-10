@@ -29,7 +29,7 @@ steps:
     element: skip_tour
 
   - action: loginIfNeeded
-    dataRef: test_user_default
+    dataRef: users.test_user_default
 
   - action: waitFor
     element: home_tab
