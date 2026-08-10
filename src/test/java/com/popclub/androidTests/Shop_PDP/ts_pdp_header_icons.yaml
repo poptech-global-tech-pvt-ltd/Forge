@@ -28,9 +28,6 @@ steps:
   - action: tap
     element: common_shop_tab
 
-  - action: tap
-    element: common_shop_tab
-
   - action: call
     flow: search_and_open_pdp
     params:
