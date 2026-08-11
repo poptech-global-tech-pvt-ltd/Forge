@@ -1,7 +1,9 @@
 package com.popclub.runner;
 
+import com.popclub.core.DeviceAwarePrintStream;
 import com.popclub.core.TestContext;
 import com.popclub.android.driver.AppiumDriverManager;
+import com.popclub.android.cloud.CloudConfig;
 import com.popclub.android.driver.AppiumServerManager;
 import com.popclub.model.TestCase;
 import com.popclub.parser.YamlParser;
@@ -156,9 +158,17 @@ public class TestRunnerTest {
 
 
 
+    @BeforeSuite
+    public void setUp() {
+        System.setOut(new DeviceAwarePrintStream(System.out));
+    }
+
     @AfterSuite
     public void tearDown() {
-        System.out.println("Stopping all Appium servers...");
-        AppiumServerManager.stopAll();
+        // Cloud Appium servers are pre-started externally on the STF Mac — never stop them.
+        if (!CloudConfig.isCloudEnabled()) {
+            System.out.println("Stopping all Appium servers...");
+            AppiumServerManager.stopAll();
+        }
     }
 }

@@ -8,11 +8,34 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class AppiumServerManager {
 
     private static final ConcurrentHashMap<String, AppiumDriverLocalService> services =
             new ConcurrentHashMap<>();
+
+    // Predefined Appium ports running on the STF Mac — one server per parallel slot.
+    // Configurable via appium.remote.ports in local.cloud.properties (comma-separated).
+    // Default matches appium_manager.py defaults: 4723, 4725, 4727, 4729, 4731.
+    private static final int[] CLOUD_APPIUM_PORTS = resolveCloudPorts();
+
+    // Slot counter — each parallel session claims the next slot (wraps around if > port count).
+    private static final AtomicInteger slotCounter = new AtomicInteger(0);
+
+    private static int[] resolveCloudPorts() {
+        String val = CloudConfig.getAppiumRemotePorts();
+        if (val != null && !val.isBlank()) {
+            String[] parts = val.split(",");
+            int[] ports = new int[parts.length];
+            for (int i = 0; i < parts.length; i++) {
+                ports[i] = Integer.parseInt(parts[i].trim());
+            }
+            System.out.println("[Appium] Cloud ports: " + java.util.Arrays.toString(ports));
+            return ports;
+        }
+        return new int[]{4723, 4725, 4727, 4729, 4731};
+    }
 
     /** Start (or reuse) a local Appium server for the given device + port. */
     public static synchronized AppiumDriverLocalService startServer(String udid, int port) {
@@ -86,5 +109,57 @@ public class AppiumServerManager {
         }
         services.clear();
         System.out.println("All Appium servers stopped");
+    }
+
+    /**
+     * Claims the next available parallel slot and returns [appiumPort, systemPort].
+     * Appium port: fixed per slot (4723, 4725, …) so each parallel session uses its own server.
+     * systemPort: random in 18200-19200 range — avoids collisions with stale ADB forwards
+     * from previous runs (which always reuse the same counter-based ports).
+     * Thread-safe.
+     */
+    public static int[] nextCloudSlot() {
+        int slot = slotCounter.getAndIncrement() % CLOUD_APPIUM_PORTS.length;
+        int appiumPort = CLOUD_APPIUM_PORTS[slot];
+        int systemPort = 18200 + java.util.concurrent.ThreadLocalRandom.current().nextInt(0, 1000);
+        System.out.println("[Appium] Cloud slot " + slot +
+                " → Appium port " + appiumPort + " | systemPort " + systemPort);
+        return new int[]{appiumPort, systemPort};
+    }
+
+    /**
+     * Checks that a remote Appium server is reachable on the STF host.
+     * Throws a clear error with startup instructions if it is not running.
+     * Appium must be started manually on the STF Mac before running tests:
+     *   ANDROID_HOME=<sdk-path> nohup appium --port 4723 --relaxed-security --allow-cors > ~/appium.log 2>&1 &
+     */
+    public static void ensureRemoteServer(String host, int port) {
+        String url = "http://" + host + ":" + port + "/status";
+
+        if (isRemoteAppiumUp(url)) {
+            System.out.println("[Appium] Remote server already running at " + url);
+            return;
+        }
+
+        throw new RuntimeException(
+            "[Appium] Remote Appium is not running at " + url + ".\n" +
+            "Start it on the STF Mac (" + host + ") before running tests:\n" +
+            "  ANDROID_HOME=<sdk-path> nohup appium --port " + port +
+            " --relaxed-security --allow-cors > ~/appium.log 2>&1 &\n" +
+            "Then verify with:  curl " + url
+        );
+    }
+
+    private static boolean isRemoteAppiumUp(String statusUrl) {
+        try {
+            java.net.HttpURLConnection conn = (java.net.HttpURLConnection)
+                    new java.net.URL(statusUrl).openConnection();
+            conn.setConnectTimeout(3000);
+            conn.setReadTimeout(3000);
+            conn.setRequestMethod("GET");
+            return conn.getResponseCode() == 200;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
