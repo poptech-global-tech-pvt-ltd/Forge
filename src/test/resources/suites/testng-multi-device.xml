@@ -1,22 +1,22 @@
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
 
-<suite name="Multi Device" parallel="false" thread-count="1">
+<suite name="Multi Device" parallel="tests" thread-count="2">
 
     <listeners>
         <listener class-name="com.popclub.listener.TestListener"/>
     </listeners>
 
-    <test name="Login — Device A">
-        <parameter name="deviceSerial" value="0D6511112820015E"/>
-        <parameter name="tag"          value="login"/>
+    <test name="Checkout — Device A">
+        <parameter name="deviceSerial" value="10BDCM0YJZ00043"/>
+        <parameter name="testFile"     value="ts_smv_pass_logged_in.yaml"/>
         <classes>
             <class name="com.popclub.runner.TestRunnerTest"/>
         </classes>
     </test>
 
     <test name="Checkout — Device B">
-        <parameter name="deviceSerial" value="10BDCM0YJZ00043"/>
-        <parameter name="testFile"     value="ts_shop_checkout.yaml"/>
+        <parameter name="deviceSerial" value="LVPRFYAEWOYTSWEI"/>
+        <parameter name="testFile"     value="ts_smv_pass_auto_request_id.yaml"/>
         <classes>
             <class name="com.popclub.runner.TestRunnerTest"/>
         </classes>
