@@ -5,11 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.popclub.android.driver.AppiumDriverManager;
 import com.popclub.core.TestContext;
 import com.popclub.model.Step;
-import io.appium.java_client.AppiumDriver;
-import org.openqa.selenium.logging.LogEntries;
-import org.openqa.selenium.logging.LogEntry;
 
-import java.util.List;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.Map;
 
 /**
@@ -18,15 +16,15 @@ import java.util.Map;
  * and stores them as TestContext variables.
  *
  * How it works:
- *   Polls Android logcat via Appium's log API. Debug (qaDebug) builds log all
- *   HTTP traffic via OkHttp's HttpLoggingInterceptor, which emits lines like:
+ *   Reads Android logcat via `adb -s <udid> logcat -d *:D` (DEBUG level).
+ *   Debug (qaDebug) builds log all HTTP traffic via OkHttp's HttpLoggingInterceptor:
  *
- *     D  OkHttp: <-- 200 https://...user-login/initiate (543ms)
- *     D  OkHttp: {"data":{"request_id":"abc123"},...}
- *     D  OkHttp: <-- END HTTP (77-byte body)
+ *     D/OkHttp: <-- 200 https://...user-login/initiate (543ms)
+ *     D/OkHttp: {"data":{"request_id":"abc123"},...}
+ *     D/OkHttp: <-- END HTTP (77-byte body)
  *
- *   The action searches for a "<-- NNN" response line whose URL contains
- *   {@code step.value}, then captures the first JSON body line after it.
+ *   NOTE: Appium's built-in logcat API only returns INFO+ entries and silently drops
+ *   DEBUG-level OkHttp logs — hence adb is used directly here.
  *
  * YAML syntax:
  *
@@ -52,17 +50,38 @@ public class CaptureNetworkValueAction implements Action {
         int timeout = step.timeout > 0 ? step.timeout : 15;
         System.out.println("[captureNetworkValue] waiting up to " + timeout + "s for: " + urlPattern);
 
-        AppiumDriver driver = AppiumDriverManager.getDriver();
-        long deadline = System.currentTimeMillis() + (long) timeout * 1000;
+        String udid = AppiumDriverManager.deviceInfo.get() != null
+            ? AppiumDriverManager.deviceInfo.get().udid
+            : null;
 
-        // Accumulate all logcat entries seen so far
+        long deadline = System.currentTimeMillis() + (long) timeout * 1000;
         StringBuilder allLogs = new StringBuilder();
+        long lastProgressAt = System.currentTimeMillis();
+        boolean responseLinesDumped = false;
 
         while (System.currentTimeMillis() < deadline) {
             try {
-                LogEntries entries = driver.manage().logs().get("logcat");
-                for (LogEntry entry : entries.getAll()) {
-                    allLogs.append(entry.getMessage()).append('\n');
+                String fresh = readLogcatViaAdb(udid);
+                allLogs.append(fresh);
+
+                long okHttpLines = fresh.lines().filter(l -> l.contains("OkHttp")).count();
+                long elapsed = (System.currentTimeMillis() - (deadline - (long) timeout * 1000)) / 1000;
+
+                // On first batch with OkHttp lines, dump all response URL lines so we can verify the pattern
+                if (!responseLinesDumped && okHttpLines > 0) {
+                    responseLinesDumped = true;
+                    System.out.println("[captureNetworkValue] OkHttp response lines found in logcat:");
+                    fresh.lines()
+                        .filter(l -> l.contains("OkHttp") && l.contains("<--"))
+                        .forEach(l -> System.out.println("  >> " + l));
+                }
+
+                // Print progress every 10s so the log doesn't go silent
+                if (System.currentTimeMillis() - lastProgressAt >= 10_000) {
+                    lastProgressAt = System.currentTimeMillis();
+                    long remaining = (deadline - System.currentTimeMillis()) / 1000;
+                    System.out.println("[captureNetworkValue] still waiting... " + elapsed + "s elapsed, "
+                        + remaining + "s left | OkHttp lines in last batch: " + okHttpLines);
                 }
 
                 String body = findResponseBody(allLogs.toString(), urlPattern);
@@ -74,7 +93,7 @@ public class CaptureNetworkValueAction implements Action {
                     return;
                 }
 
-                Thread.sleep(500);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 throw new RuntimeException("captureNetworkValue: interrupted");
@@ -84,35 +103,72 @@ public class CaptureNetworkValueAction implements Action {
             }
         }
 
+        // On timeout, dump a diagnostic snippet to help triage
+        String sample = allLogs.toString();
+        long okHttpLines = sample.lines().filter(l -> l.contains("OkHttp")).count();
+        System.out.println("[captureNetworkValue] timeout diagnostics — total logcat lines: "
+            + sample.lines().count() + ", OkHttp lines: " + okHttpLines);
+        if (okHttpLines == 0) {
+            System.out.println("[captureNetworkValue] ⚠️  No OkHttp lines in logcat.");
+            System.out.println("  → Is this a debug/qaDebug build with HttpLoggingInterceptor at BODY level?");
+            // Show a few lines so the user can see what tags are present
+            sample.lines().limit(10).forEach(l -> System.out.println("  logcat> " + l));
+        } else {
+            System.out.println("[captureNetworkValue] OkHttp lines found but URL pattern '" + urlPattern + "' not matched.");
+            sample.lines().filter(l -> l.contains("OkHttp")).limit(10)
+                .forEach(l -> System.out.println("  okhttp> " + l));
+        }
+
         throw new RuntimeException(
             "[captureNetworkValue] No response for '" + urlPattern + "' found in logcat within " + timeout + "s.\n"
             + "Ensure the app is a debug build with OkHttp HttpLoggingInterceptor at BODY level.");
     }
 
+    // ── ADB logcat reader ─────────────────────────────────────────────────────
+
+    /**
+     * Runs `adb [-s udid] logcat -d *:D` and returns all output as a string.
+     * Uses DEBUG level so OkHttp entries (logged at D) are included.
+     * `-d` dumps the buffer and exits (non-blocking).
+     */
+    private static String readLogcatViaAdb(String udid) throws Exception {
+        String[] cmd = udid != null
+            ? new String[]{"adb", "-s", udid, "logcat", "-d", "*:D"}
+            : new String[]{"adb", "logcat", "-d", "*:D"};
+
+        Process proc = Runtime.getRuntime().exec(cmd);
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(proc.getInputStream()))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                sb.append(line).append('\n');
+            }
+        }
+        proc.waitFor();
+        return sb.toString();
+    }
+
     // ── Logcat parsing ────────────────────────────────────────────────────────
 
     /**
-     * Searches the accumulated logcat text for an OkHttp response line that
-     * contains {@code urlPattern}, then returns the JSON body that follows it.
+     * Searches logcat text for an OkHttp response line containing {@code urlPattern},
+     * then returns the JSON body that follows it.
      *
-     * OkHttp BODY-level log format:
-     *   "<-- 200 https://...{urlPattern} (123ms)"   ← response header line
-     *   "{\"data\":{...}}"                           ← response body line
-     *   "<-- END HTTP (N-byte body)"
+     * OkHttp BODY-level format (as it appears in raw adb logcat):
+     *   "D/OkHttp  ( 1234): <-- 200 https://...{urlPattern} (123ms)"
+     *   "D/OkHttp  ( 1234): {\"data\":{...}}"
+     *   "D/OkHttp  ( 1234): <-- END HTTP (N-byte body)"
      */
     private static String findResponseBody(String logcat, String urlPattern) {
         String[] lines = logcat.split("\n");
         for (int i = 0; i < lines.length; i++) {
             String line = lines[i];
-            // Match OkHttp response header line: "<-- NNN ... url ... (NNms)"
             if (line.contains("<--") && line.contains(urlPattern)) {
-                // Next non-empty lines until "<-- END HTTP" are the body
-                for (int j = i + 1; j < Math.min(i + 30, lines.length); j++) {
-                    String next = stripLogPrefix(lines[j]);
-                    if (next.startsWith("<-- END") || next.startsWith("--> ")) break;
-                    if (next.isBlank()) continue;
-                    // Try to parse as JSON
-                    String json = tryParseJson(next);
+                for (int j = i + 1; j < Math.min(i + 50, lines.length); j++) {
+                    String payload = stripLogPrefix(lines[j]);
+                    if (payload.startsWith("<-- END") || payload.startsWith("--> ")) break;
+                    if (payload.isBlank()) continue;
+                    String json = tryParseJson(payload);
                     if (json != null) return json;
                 }
             }
@@ -121,16 +177,17 @@ public class CaptureNetworkValueAction implements Action {
     }
 
     /**
-     * Strips the logcat timestamp/tag prefix so we're left with the OkHttp message.
-     * Logcat lines look like: "07-23 16:45:01.123  1234  5678 D OkHttp  : <-- 200 ..."
+     * Strips the logcat tag prefix, leaving just the OkHttp message payload.
+     * Raw adb line: "08-12 10:23:01.123  1234  5678 D OkHttp  : <-- 200 ..."
+     * Brief format: "D/OkHttp ( 1234): <-- 200 ..."
      */
     private static String stripLogPrefix(String line) {
-        // Find the last ": " separator (after the tag) and take what follows
-        int sep = line.lastIndexOf(": ");
+        int sep = line.lastIndexOf("): ");
+        if (sep >= 0) return line.substring(sep + 3).trim();
+        sep = line.lastIndexOf(": ");
         return sep >= 0 ? line.substring(sep + 2).trim() : line.trim();
     }
 
-    /** Returns the input string if it is valid JSON, otherwise null. */
     private static String tryParseJson(String s) {
         String trimmed = s.trim();
         if (!trimmed.startsWith("{") && !trimmed.startsWith("[")) return null;
@@ -170,10 +227,6 @@ public class CaptureNetworkValueAction implements Action {
         }
     }
 
-    /**
-     * Traverses a JsonNode tree using dot-notation (e.g. "data.request_id").
-     * Returns "" if any segment is missing.
-     */
     private static String extractPath(JsonNode root, String dotPath) {
         JsonNode node = root;
         for (String key : dotPath.split("\\.")) {

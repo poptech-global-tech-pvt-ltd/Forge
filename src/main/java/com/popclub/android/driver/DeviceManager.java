@@ -168,7 +168,7 @@ public class DeviceManager {
                 }
             }
 
-            System.out.println("📱 Detected local devices: " + localDevices);
+            System.out.println("[Device] Local devices: " + localDevices);
 
         } catch (Exception e) {
             throw new RuntimeException("Failed to load devices from ADB", e);
@@ -184,7 +184,7 @@ public class DeviceManager {
             if (!busyDevices.contains(udid)) {
                 busyDevices.add(udid);
                 int port = devicePortMap.get(udid);
-                System.out.println("Allocated device → " + udid + " | port: " + port);
+                System.out.println("[Device] Allocated → " + udid);
                 return new DeviceInfo(udid, port);
             }
         }

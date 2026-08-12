@@ -231,7 +231,7 @@ public class CloudConfig {
      */
     public static String getNodePath() {
         String val = get("appium.node.path");
-        if (val != null && !val.isBlank()) return val;
+        if (val != null && !val.isBlank()) return expandHome(val);
         return autoDetect("node", "appium.node.path");
     }
 
@@ -253,12 +253,19 @@ public class CloudConfig {
      */
     public static String getAndroidHome() {
         String val = get("android.home");
-        if (val != null && !val.isBlank()) return val;
+        if (val != null && !val.isBlank()) return expandHome(val);
         val = System.getenv("ANDROID_HOME");
         if (val != null && !val.isBlank()) return val;
         val = System.getenv("ANDROID_SDK_ROOT");
         if (val != null && !val.isBlank()) return val;
         return null; // let Appium try to auto-detect
+    }
+
+    private static String expandHome(String path) {
+        if (path.startsWith("~/") || path.equals("~")) {
+            return System.getProperty("user.home") + path.substring(1);
+        }
+        return path;
     }
 
     // ── Auto-detection helpers ────────────────────────────────────────────────
@@ -298,18 +305,23 @@ public class CloudConfig {
             }
         } catch (Exception ignored) {}
 
-        // Strategy 2: derive from `which appium` → sibling lib/node_modules/
+        // Strategy 2: derive from `which appium`, following symlinks (handles Homebrew Cellar layout)
         try {
             Process p = Runtime.getRuntime().exec(new String[]{"which", "appium"});
             String appiumBin = new String(p.getInputStream().readAllBytes()).trim();
             if (!appiumBin.isBlank()) {
-                // appiumBin = /prefix/bin/appium → prefix = /prefix
-                String prefix = new java.io.File(appiumBin).getParentFile().getParent();
-                java.io.File candidate = new java.io.File(
-                        prefix + "/lib/node_modules/appium/build/lib/main.js");
-                if (candidate.exists()) {
-                    System.out.println("[CloudConfig] Auto-detected appium.js → " + candidate.getPath());
-                    return candidate.getPath();
+                // Follow symlinks so Homebrew's bin/appium → Cellar/.../libexec/bin/appium
+                java.nio.file.Path realBin = java.nio.file.Paths.get(appiumBin).toRealPath();
+                // realBin = .../libexec/bin/appium  →  prefix = .../libexec
+                String prefix = realBin.getParent().getParent().toString();
+                for (String rel : new String[]{
+                        "/lib/node_modules/appium/build/lib/main.js",
+                        "/node_modules/appium/build/lib/main.js"}) {
+                    java.io.File candidate = new java.io.File(prefix + rel);
+                    if (candidate.exists()) {
+                        System.out.println("[CloudConfig] Auto-detected appium.js → " + candidate.getPath());
+                        return candidate.getPath();
+                    }
                 }
             }
         } catch (Exception ignored) {}

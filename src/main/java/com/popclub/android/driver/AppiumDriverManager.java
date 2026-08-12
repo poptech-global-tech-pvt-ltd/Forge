@@ -31,12 +31,8 @@ public class AppiumDriverManager {
             String udid       = device.udid;
             int    port       = device.port;
 
-            System.out.println(
-                    "Thread: " + Thread.currentThread().getId() +
-                    " | Device: " + udid +
-                    " | Port: "   + port +
-                    " | Mode: "   + (CloudConfig.isCloudEnabled() ? "CLOUD" : "LOCAL")
-            );
+            System.out.println("[Appium] Mode: " + (CloudConfig.isCloudEnabled() ? "CLOUD" : "LOCAL")
+                    + " | Device: " + udid + " | Port: " + port);
 
             // 2. Start Appium server.
             //    • Local  → start a local Appium server on this machine
@@ -47,7 +43,7 @@ public class AppiumDriverManager {
                 cloudSlot = AppiumServerManager.nextCloudSlot();
                 AppiumServerManager.ensureRemoteServer(device.adbHost, cloudSlot[0]);
             } else {
-                AppiumServerManager.startServer(udid, port);
+                AppiumServerManager.startServer(udid, port); // starts or reuses local server
             }
 
             // 3. Build capabilities
@@ -146,6 +142,9 @@ public class AppiumDriverManager {
             // dialog for a permission that's already granted, so no watcher is needed.
             grantAllPermissions(device, "com.popclub.android");
 
+            // Unlock device before any test steps run
+            unlockDevice((AndroidDriver) driverInstance);
+
             return driverInstance;
 
         } catch (Exception e) {
@@ -183,6 +182,38 @@ public class AppiumDriverManager {
 
     public static DeviceInfo getDeviceInfo() {
         return deviceInfo.get();
+    }
+
+    private static void unlockDevice(io.appium.java_client.android.AndroidDriver driver) {
+        try {
+            if (!driver.isDeviceLocked()) return;
+
+            String pin = com.popclub.android.cloud.CloudConfig.getDeviceUnlockPin();
+            DeviceInfo device = deviceInfo.get();
+
+            // Wake screen
+            adbRun(device, "shell", "input", "keyevent", "26");
+            Thread.sleep(500);
+            // Dismiss keyguard / swipe up
+            adbRun(device, "shell", "input", "keyevent", "82");
+            Thread.sleep(500);
+
+            if (pin != null && !pin.isBlank()) {
+                adbRun(device, "shell", "input", "text", pin);
+                Thread.sleep(200);
+                adbRun(device, "shell", "input", "keyevent", "66"); // ENTER
+                Thread.sleep(500);
+                System.out.println("[Device] Unlocked with PIN.");
+            } else {
+                System.out.println("[Device] No PIN configured — swipe-unlock only.");
+            }
+        } catch (Exception e) {
+            System.out.println("[Device] Unlock skipped: " + e.getMessage());
+        }
+    }
+
+    private static void adbRun(DeviceInfo device, String... args) throws Exception {
+        Runtime.getRuntime().exec(adbBase(device, args)).waitFor(5, java.util.concurrent.TimeUnit.SECONDS);
     }
 
     /** Builds the adb base command with optional remote-server and serial flags. */
