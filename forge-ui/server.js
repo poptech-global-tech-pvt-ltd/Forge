@@ -29,6 +29,157 @@ const FLOWS_ROOT     = path.join(FORGE_ROOT, 'src/test/java/com/popclub/androidF
 const APK_DIR        = path.join(FORGE_ROOT, 'src/main/resources');
 const APP_PACKAGE    = 'com.popclub.android';
 
+// ─── TestSigma — create ONE run for a whole "Run Folder" batch ───────────────
+// Reads the same properties files the Java side uses, so there is a single
+// source of truth for the token/project id.
+function readProps(relPath) {
+  const full = path.join(FORGE_ROOT, relPath);
+  const out = {};
+  if (!fs.existsSync(full)) return out;
+  for (const line of fs.readFileSync(full, 'utf8').split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const idx = trimmed.indexOf('=');
+    if (idx < 0) continue;
+    out[trimmed.slice(0, idx).trim()] = trimmed.slice(idx + 1).trim();
+  }
+  return out;
+}
+
+function testSigmaConfig() {
+  const base  = readProps('src/test/resources/config/testsigma.properties');
+  const local = readProps('src/test/resources/config/testsigma-local.properties');
+  return {
+    baseUrl:   local['testsigma.base.url']   || base['testsigma.base.url'],
+    token:     local['testsigma.token']      || base['testsigma.token'],
+    projectId: local['testsigma.project.id'] || base['testsigma.project.id'],
+    runTags:   base['testsigma.run.tags']    || 'Automated',
+  };
+}
+
+// fetch() fails here on a cert error the Java side also hits (worked around there via
+// RestAssured's relaxedHTTPSValidation()) — https.request() lets us pass rejectUnauthorized: false.
+const https = require('https');
+
+function httpsJson(urlStr, { method = 'GET', headers = {}, body } = {}) {
+  return new Promise((resolve, reject) => {
+    const url = new URL(urlStr);
+    const req = https.request({
+      hostname: url.hostname,
+      path: url.pathname + url.search,
+      method,
+      headers,
+      rejectUnauthorized: false,
+    }, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try { resolve({ status: res.statusCode, body: JSON.parse(data) }); }
+        catch (e) { reject(new Error(`Non-JSON response (status ${res.statusCode}): ${data.slice(0, 200)}`)); }
+      });
+    });
+    req.on('error', reject);
+    if (body) req.write(body);
+    req.end();
+  });
+}
+
+async function resolveHumanIdToUuid(cfg, humanId) {
+  const url = `${cfg.baseUrl}/projects/${cfg.projectId}/test_cases?search=${encodeURIComponent(humanId)}`;
+  const { body: data } = await httpsJson(url, { headers: { Authorization: `Bearer ${cfg.token}` } });
+  const list = data?.data?.test_cases || [];
+  const match = list.find(tc => humanId.toLowerCase() === String(tc.human_id).toLowerCase());
+  return match ? match.id : null;
+}
+
+function collectTestCaseIdsForFiles(files) {
+  const ids = new Set();
+  for (const rel of files) {
+    const full = path.join(TESTDATA_ROOT, rel);
+    if (!fs.existsSync(full)) continue;
+    try {
+      const parsed = yaml.load(fs.readFileSync(full, 'utf8'));
+      for (const raw of (parsed?.testCaseIds || [])) {
+        for (const id of String(raw).split(',')) {
+          const trimmed = id.trim();
+          if (trimmed) ids.add(trimmed);
+        }
+      }
+    } catch (_) { /* skip unparsable file — already validated elsewhere */ }
+  }
+  return [...ids];
+}
+
+async function createTestSigmaBatchRun(folderLabel, files) {
+  const cfg = testSigmaConfig();
+  if (!cfg.token || !cfg.projectId) {
+    console.log('[TestSigma] Missing token/project id — skipping batch run creation');
+    return null;
+  }
+
+  const humanIds = collectTestCaseIdsForFiles(files);
+  if (!humanIds.length) {
+    console.log('[TestSigma] No testCaseIds found in folder — skipping batch run creation');
+    return null;
+  }
+
+  const uuids = [];
+  for (const id of humanIds) {
+    try {
+      const uuid = await resolveHumanIdToUuid(cfg, id);
+      if (uuid) uuids.push(uuid);
+    } catch (e) {
+      console.log(`[TestSigma] Could not resolve ${id}: ${e.message}`);
+    }
+  }
+  if (!uuids.length) {
+    console.log('[TestSigma] No resolvable test case ids — skipping batch run creation');
+    return null;
+  }
+
+  // TestSigma requires run titles to be unique per project — a plain
+  // "<Folder> Android Automation" collides on the second run of the same folder.
+  // toISOString() is always UTC — format in IST (Asia/Kolkata) so the title
+  // matches the wall-clock time everyone actually sees.
+  const startTime = Date.now();
+  const istParts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Kolkata',
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+    hour12: false,
+  }).formatToParts(new Date(startTime)).reduce((acc, p) => { acc[p.type] = p.value; return acc; }, {});
+  const stamp = `${istParts.year}-${istParts.month}-${istParts.day} ${istParts.hour}:${istParts.minute}:${istParts.second}`;
+  const title = folderLabel.charAt(0).toUpperCase() + folderLabel.slice(1)
+      + ' Android Automation - ' + stamp;
+  const endTime = startTime + 7 * 24 * 60 * 60 * 1000;
+
+  const body = {
+    title,
+    description: 'Automation Run',
+    status: 'ACTIVE',
+    project_id: cfg.projectId,
+    start_date: startTime,
+    end_date: endTime,
+    label_names: cfg.runTags.split(','),
+    selection_type: 'STATIC',
+    static_selection_filters: [{ field: 'id', operator: 'IN', values: uuids }],
+  };
+
+  const { body: data } = await httpsJson(`${cfg.baseUrl}/projects/${cfg.projectId}/test_runs`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${cfg.token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  const runId = data?.data?.test_run?.id;
+  const humanRunId = data?.data?.test_run?.human_id;
+  if (!runId) {
+    console.log('[TestSigma] Batch run creation failed:', JSON.stringify(data));
+    return null;
+  }
+  console.log(`[TestSigma] ✅ Batch run created: ${title} (${humanRunId})`);
+  return runId;
+}
+
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
 function walkYaml(dir, base = '') {
@@ -46,10 +197,13 @@ function walkYaml(dir, base = '') {
 }
 
 function suiteFor(testFile) {
-  // Pick the most appropriate testng suite based on file path
-  if (testFile.includes('shop') || testFile.includes('home') ||
-      testFile.includes('login') || testFile.includes('profile') ||
-      testFile.includes('card')) return 'testng-shop.xml';
+  // Always use the single-<test>-block suite for UI-triggered runs.
+  // testng-shop.xml has 4 separate <test> blocks (Smoke/Price/Cart/E2E), each
+  // with its own hardcoded testFile list — but -DtestFile= is a single global
+  // system property, so routing a targeted run there made TestNG execute the
+  // SAME filtered file once per block (up to 4x). testng-shop.xml is still
+  // valid for its own standalone "run the whole shop regression" invocation,
+  // just not for a single-file/-folder run from the UI.
   return 'testng.xml';
 }
 
@@ -853,7 +1007,14 @@ wss.on('connection', (ws) => {
     try { msg = JSON.parse(raw); } catch (_) { return; }
 
     if (msg.type === 'run') {
-      startTest(msg.file, msg.device, ws, msg.fromStep, msg.batchRun);
+      startTest(msg.file, msg.device, ws, msg.fromStep, msg.batchRun, msg.existingRunId, msg.finalizeRun);
+    } else if (msg.type === 'create_batch_run') {
+      createTestSigmaBatchRun(msg.folder, msg.files)
+        .then(runId => send(ws, { type: 'batch_run_created', runId, folder: msg.folder }))
+        .catch(e => {
+          console.log('[TestSigma] create_batch_run failed:', e.message);
+          send(ws, { type: 'batch_run_created', runId: null, folder: msg.folder });
+        });
     } else if (msg.type === 'stop') {
       stopTest(ws);
     } else if (msg.type === 'chat') {
@@ -911,7 +1072,7 @@ function stopTest(ws) {
   broadcast({ type: 'stopped' });
 }
 
-function startTest(file, deviceOverride, ws, fromStep, batchRun) {
+function startTest(file, deviceOverride, ws, fromStep, batchRun, existingRunId, finalizeRun) {
   if (currentRun) {
     try { process.kill(-currentRun.pid, 'SIGTERM'); } catch (_) {}
     try { exec('pkill -KILL -f "surefire\|DtestFile"', () => {}); } catch (_) {}
@@ -954,6 +1115,14 @@ function startTest(file, deviceOverride, ws, fromStep, batchRun) {
   // Only a "Run Folder" batch should create a TestSigma run.
   if (batchRun) {
     args.push('-DbatchRun=true');
+    if (existingRunId) {
+      // Multiple files in this folder all report into the ONE run created
+      // up front (see createTestSigmaBatchRun) instead of each spawning its own.
+      args.push(`-DexistingRunId=${existingRunId}`);
+    }
+    if (finalizeRun) {
+      args.push('-DfinalizeRun=true');
+    }
   }
 
   console.log(`Running: mvn ${args.join(' ')}`);

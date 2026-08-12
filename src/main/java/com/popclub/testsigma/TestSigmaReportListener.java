@@ -74,7 +74,7 @@ public class TestSigmaReportListener implements ISuiteListener, ITestListener {
         if (!enabled || runId == null) return;
 
         try {
-            TestSigmaClient.updateRunStatus(TestSigmaConfig.projectId(), runId, RunStatus.FINISHED);
+            TestSigmaClient.updateRunStatus(TestSigmaConfig.projectId(), runId, RunStatus.CLOSED);
             System.out.println("[TestSigma] Run marked FINISHED: " + runId);
         } catch (Exception e) {
             System.out.println("[TestSigma] Failed to finish run: " + e.getMessage());

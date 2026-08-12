@@ -48,4 +48,26 @@ public class TestSigmaService {
                 .redirects().follow(false)
                 .post(Routes.TESTSIGMA_TOKEN_EXCHANGE.testSigmaAppUrl());
     }
+
+    public static Response graphqlMultipart(String baseUrl, String sessionCookie,
+                                             String operations, String map, java.io.File file) {
+        return given()
+                .config(RELAXED_SSL_CONFIG)
+                .baseUri(baseUrl)
+                .header("Cookie", "X-TMS-SESSION-ID=" + sessionCookie)
+                .multiPart("operations", operations)
+                .multiPart("map", map)
+                .multiPart("0", file)
+                .post("/private/graphql");
+    }
+
+    public static Response graphqlMutation(String baseUrl, String sessionCookie, Map<String, Object> body) {
+        return given()
+                .config(RELAXED_SSL_CONFIG)
+                .baseUri(baseUrl)
+                .header("Cookie", "X-TMS-SESSION-ID=" + sessionCookie)
+                .contentType("application/json")
+                .body(body)
+                .post("/private/graphql");
+    }
 }

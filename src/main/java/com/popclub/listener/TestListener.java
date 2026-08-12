@@ -48,6 +48,13 @@ public class TestListener implements ITestListener, ISuiteListener {
             return;
         }
 
+        String existingRunId = System.getProperty("existingRunId");
+        if (existingRunId != null && !existingRunId.isBlank()) {
+            TestContext.setRunId(existingRunId);
+            System.out.println("[TestSigma] Joining existing run: " + existingRunId);
+            return;
+        }
+
         System.out.println("[TestSigma] Scanning for test cases to register in run...");
 
         java.util.Set<String> onlyFiles = new java.util.HashSet<>();
@@ -101,8 +108,9 @@ public class TestListener implements ITestListener, ISuiteListener {
             }
 
             String baseTitle = (title != null && !title.isBlank()) ? title : "Forge Run";
-            String runTitle = baseTitle + " - "
-                    + new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date());
+            java.text.SimpleDateFormat istFormat = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            istFormat.setTimeZone(java.util.TimeZone.getTimeZone("Asia/Kolkata"));
+            String runTitle = baseTitle + " - " + istFormat.format(new java.util.Date());
             String runTags  = (tags  != null && !tags.isBlank())  ? tags  : "Automated";
 
             String runId = TestSigmaClient.createRun(runTitle, projectId, runTags, uuidList);
@@ -123,14 +131,10 @@ public class TestListener implements ITestListener, ISuiteListener {
     @Override
     public void onFinish(ISuite suite) {
         if (TestContext.getRunId() == null) return;
-        try {
-            TestSigmaClient.updateRunStatus(projectId, TestContext.getRunId(), RunStatus.FINISHED);
-            System.out.println("[TestSigma] ✅ Run marked FINISHED: " + TestContext.getRunId());
-        } catch (Exception e) {
-            System.err.println("[TestSigma] ⚠️  Failed to mark run FINISHED: " + e.getMessage());
-        } finally {
-            TestContext.clear();
-        }
+
+        // Runs are intentionally left ACTIVE — no clear requirement yet for when
+        // a run should be closed, so we don't auto-close here.
+        TestContext.clear();
     }
 
     @Override
@@ -142,9 +146,7 @@ public class TestListener implements ITestListener, ISuiteListener {
     public void onTestSuccess(ITestResult result) {
         stopVideoQuietly(resolveTestName(result) + "_passed");
         updateStatus(result, TestCaseStatus.PASSED);
-
-        File log = TestLogCapture.stop();
-        uploadAttachments(TestCaseStatus.PASSED, log);
+        TestLogCapture.stop();
     }
 
     @Override

@@ -3,9 +3,7 @@ package com.popclub.api.actions;
 import com.popclub.api.dto.LoginResult;
 import com.popclub.api.impl.PopService;
 import com.popclub.api.impl.SearchService;
-import com.popclub.api.auth.TokenExtractor;
-import com.popclub.android.driver.AppiumDriverManager;
-import com.popclub.core.TestContext;
+import com.popclub.api.auth.AuthApiClient;
 import io.restassured.response.Response;
 
 import java.util.Map;
@@ -73,46 +71,20 @@ public class ServiceRegistry {
     /**
      * Auth for AppService-based services (SearchService etc.).
      *
-     * Token resolution order:
-     *   1. Already in TestContext (captured by loginIfNeeded right after login)
-     *   2. Retry TokenExtractor from logcat now — works if other app requests have
-     *      run since login and their X-Access-Token header appeared in logcat
-     *
-     * Throws only if both attempts fail.
+     * AppService.buildSpec() requires BOTH the legacy Authorization token and the
+     * X-Access-Token JWT — device/logcat capture (TokenExtractor) only ever grabs
+     * the JWT, so requests built from it were missing Authorization entirely and
+     * got rejected with 401. AuthApiClient.loginFull() fetches both tokens from the
+     * same VERIFY_OTP response, same as the working AppService-based API tests do.
      */
     private static LoginResult appAuth(Map<String, String> params) {
-        String token = TestContext.getUserToken();
-
-        if (token == null || token.isBlank()) {
-            System.out.println("[ServiceRegistry] Token not in TestContext — retrying from logcat…");
-            token = fetchTokenFromLogcat();
-            if (token != null && !token.isBlank()) {
-                TestContext.setUserToken(token);
-                TestContext.setScalarData("auth_token", token);
-                System.out.println("[ServiceRegistry] Token captured from logcat on retry ✓");
-            }
-        }
-
-        if (token == null || token.isBlank())
-            throw new RuntimeException(
-                "callService: no auth token found.\n"
-                + "Ensure 'action: loginIfNeeded' ran before this step.");
-
-        return new LoginResult(null, token);   // JWT → X-Access-Token header
-    }
-
-    private static String fetchTokenFromLogcat() {
-        try {
-            String deviceSerial = "";
-            try {
-                var info = AppiumDriverManager.getDeviceInfo();
-                if (info != null) deviceSerial = info.udid;
-            } catch (Exception ignored) {}
-            return TokenExtractor.get(deviceSerial);
-        } catch (Exception e) {
-            System.out.println("[ServiceRegistry] Logcat token retry failed: " + e.getMessage());
-            return null;
-        }
+        String phone = params.get("phone");
+        String otp   = params.get("otp");
+        // Unresolved "${...}" placeholders (variable not passed by the caller)
+        // are left as-is by interpolate() — treat those the same as absent.
+        if (phone == null || phone.isBlank() || phone.contains("${")) phone = "1234561122";
+        if (otp   == null || otp.isBlank()   || otp.contains("${"))   otp   = "560102";
+        return AuthApiClient.loginFull(phone, otp);
     }
 
     // ── Param helpers ─────────────────────────────────────────────────────────
