@@ -4,7 +4,6 @@
 
     <listeners>
         <listener class-name="com.popclub.listener.TestListener"/>
-        <listener class-name="com.popclub.testsigma.TestSigmaYamlListener"/>
     </listeners>
 
     <!-- Default file to run when -DtestFile is not passed on the mvn command line.

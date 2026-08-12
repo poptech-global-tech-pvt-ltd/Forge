@@ -1,5 +1,6 @@
 package com.popclub.testsigma;
 
+import com.popclub.api.impl.TestSigmaService;
 import com.popclub.api.util.ApiConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
@@ -28,7 +29,8 @@ public class TestSigmaClient {
                                    String tags,
                                    List<String> testCaseIds) {
 
-        long startTime = System.currentTimeMillis() / 1000;
+        long startTime = System.currentTimeMillis();
+        long endTime = startTime + (7L * 24 * 60 * 60 * 1000);
 
         Map<String, Object> body = new HashMap<>();
         body.put("title", title);
@@ -36,6 +38,7 @@ public class TestSigmaClient {
         body.put("status", RunStatus.ACTIVE.value());
         body.put("project_id", projectId);
         body.put("start_date", startTime);
+        body.put("end_date", endTime);
         body.put("label_names", Arrays.asList(tags.split(",")));
         body.put("selection_type", "STATIC");
         body.put("static_selection_filters", List.of(
@@ -79,11 +82,16 @@ public class TestSigmaClient {
         Map<String, Object> body = new HashMap<>();
         body.put("status", status.value());
 
-        given()
+        Response response = given()
                 .header("Authorization", authHeader())
                 .contentType("application/json")
                 .body(body)
-                .patch("/projects/" + projectId + "/test_runs/" + runId);
+                .put("/projects/" + projectId + "/test_runs/" + runId);
+
+        if (response.getStatusCode() >= 400) {
+            throw new RuntimeException(
+                    "updateRunStatus failed [" + response.getStatusCode() + "]: " + response.getBody().asString());
+        }
     }
 
     public static String getTestCaseIdByHumanId(String projectId, String humanId) {
@@ -194,13 +202,8 @@ public class TestSigmaClient {
         String map = "{\"0\":[\"variables.input.0.attachments.0.attachment\"]}";
 
         for (int attempt = 1; attempt <= 4; attempt++) {
-            Response response = given()
-                    .baseUri(ApiConstants.TESTSIGMA_APP_BASE_URL)
-                    .header("Cookie", "X-TMS-SESSION-ID=" + sessionCookie)
-                    .multiPart("operations", operations)
-                    .multiPart("map", map)
-                    .multiPart("0", file)
-                    .post("/private/graphql");
+            Response response = TestSigmaService.graphqlMultipart(
+                    ApiConstants.TESTSIGMA_APP_BASE_URL, sessionCookie, operations, map, file);
 
             System.out.println("[TestSigma] 🔍 Upload response for " + file.getName() + " (testCaseId="
                     + testCaseId + ", testRunId=" + testRunId + "): " + response.getBody().asString());
@@ -271,12 +274,8 @@ public class TestSigmaClient {
             body.put("variables", Map.of("input", List.of(input)));
 
             for (int attempt = 1; attempt <= 4; attempt++) {
-                Response response = given()
-                        .baseUri(ApiConstants.TESTSIGMA_APP_BASE_URL)
-                        .header("Cookie", "X-TMS-SESSION-ID=" + sessionCookie)
-                        .contentType("application/json")
-                        .body(body)
-                        .post("/private/graphql");
+                Response response = TestSigmaService.graphqlMutation(
+                        ApiConstants.TESTSIGMA_APP_BASE_URL, sessionCookie, body);
 
                 Object mutationResult = response.jsonPath().get("data.updateTestRunCaseStatus");
                 if (mutationResult == null) {
