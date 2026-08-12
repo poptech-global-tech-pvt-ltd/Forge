@@ -3,7 +3,6 @@ package com.popclub.android.driver;
 import com.popclub.android.cloud.CloudConfig;
 import io.appium.java_client.service.local.AppiumDriverLocalService;
 import io.appium.java_client.service.local.AppiumServiceBuilder;
-import io.appium.java_client.service.local.flags.GeneralServerFlag;
 
 import java.io.File;
 import java.util.HashMap;
@@ -33,8 +32,7 @@ public class AppiumServerManager {
                         .usingDriverExecutable(new File(nodePath))
                         .withAppiumJS(new File(appiumPath))
                         .usingPort(port)
-                        .withIPAddress("127.0.0.1")
-                        .withArgument(GeneralServerFlag.ALLOW_INSECURE, "uiautomator2:adb_shell");
+                        .withIPAddress("127.0.0.1");
 
         // Pass ANDROID_HOME / ANDROID_SDK_ROOT so Appium can locate aapt2
         String androidHome = CloudConfig.getAndroidHome();

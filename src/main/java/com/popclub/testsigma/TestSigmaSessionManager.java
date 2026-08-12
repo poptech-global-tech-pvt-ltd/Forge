@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 public class TestSigmaSessionManager {
 
-    private static final String APP_HOST = "https://arcus.testsigma.com";
+    private static final String APP_HOST = "https://test-management.testsigma.com";
     private static final String REDIRECT_TO = APP_HOST + "/ui/test_cases?generateTestCases=false";
     private static final String LOCAL_PROPS_PATH = "src/test/resources/config/testsigma-local.properties";
 

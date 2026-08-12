@@ -7,8 +7,6 @@ import com.popclub.android.driver.DriverManager;
 import com.popclub.model.Step;
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.android.AndroidDriver;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -63,10 +61,6 @@ public class LoginIfNeededAction implements Action {
             captureTokenFromDevice();
         }
 
-        // Runtime permission prompts (e.g. notifications) can cover the home screen
-        // on either path above — dismiss so the next waitFor/tap isn't blocked.
-        dismissPermissionDialog(driver);
-
         System.out.println("[loginIfNeeded] ✅ Login step complete");
     }
 
@@ -88,30 +82,6 @@ public class LoginIfNeededAction implements Action {
         System.out.println("[loginIfNeeded] ✅ Login succeeded — home screen visible");
     }
 
-    /** Dismisses a runtime permission dialog if one appears; package name varies by device/OS build. */
-    private void dismissPermissionDialog(AppiumDriver driver) {
-        for (String pkg : new String[]{"com.android.permissioncontroller", "com.google.android.permissioncontroller"}) {
-            try {
-                List<WebElement> found = driver.findElements(AppiumBy.androidUIAutomator(
-                        "new UiSelector().resourceId(\"" + pkg + ":id/permission_deny_button\")"));
-                if (!found.isEmpty() && found.get(0).isDisplayed()) {
-                    found.get(0).click();
-                    System.out.println("[loginIfNeeded] Dismissed runtime permission dialog (" + pkg + ")");
-                    return;
-                }
-            } catch (Exception ignored) {}
-        }
-        // resourceId naming varies by OS build — fall back to the visible button text.
-        try {
-            List<WebElement> found = driver.findElements(AppiumBy.androidUIAutomator(
-                    "new UiSelector().textMatches(\"(?i)don.t allow\")"));
-            if (!found.isEmpty() && found.get(0).isDisplayed()) {
-                found.get(0).click();
-                System.out.println("[loginIfNeeded] Dismissed runtime permission dialog (text match)");
-            }
-        } catch (Exception ignored) {}
-    }
-
     /** Types into the focused field; falls back to mobile: type for Compose TextFields. */
     private void typeIntoFocusedField(AppiumDriver driver, String text) {
         try {
@@ -124,13 +94,7 @@ public class LoginIfNeededAction implements Action {
             driver.executeScript("mobile: type", java.util.Map.of("text", text));
         }
         try {
-            // mobile: hideKeyboard falls back to a raw KEYCODE_BACK press when no
-            // keyboard is actually showing (e.g. it already auto-dismissed after a
-            // 6-digit OTP auto-submits) — that stray back-press can land on the
-            // now-loaded Home screen and trigger the app's "Exit App?" dialog.
-            if (((AndroidDriver) driver).isKeyboardShown()) {
-                driver.executeScript("mobile: hideKeyboard");
-            }
+            driver.executeScript("mobile: hideKeyboard");
         } catch (Exception ignored) {}
     }
 
@@ -139,15 +103,6 @@ public class LoginIfNeededAction implements Action {
         long deadline = System.currentTimeMillis() + timeoutMs;
         while (System.currentTimeMillis() < deadline) {
             try {
-                // Google's phone-number-hint bottom sheet ("Choose a phone number") can pop up
-                // over the login screen while it's still loading, covering login_phone_input and
-                // making it undetectable — dismiss it so the real login field becomes visible.
-                List<WebElement> gmsCancel = driver.findElements(By.id("com.google.android.gms:id/cancel"));
-                if (!gmsCancel.isEmpty() && gmsCancel.get(0).isDisplayed()) {
-                    gmsCancel.get(0).click();
-                    System.out.println("[loginIfNeeded] Dismissed phone-number-hint bottom sheet");
-                }
-
                 List<WebElement> found = driver.findElements(AppiumBy.accessibilityId(tag));
                 if (!found.isEmpty() && found.get(0).isDisplayed()) return true;
             } catch (Exception ignored) {}

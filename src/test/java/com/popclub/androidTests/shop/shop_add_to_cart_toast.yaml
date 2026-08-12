@@ -10,7 +10,7 @@ testCaseIds:
 features:
   - common
   - shop
-  - login
+  - LOG
 
 tags:
   - smoke

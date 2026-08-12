@@ -217,7 +217,7 @@ public class TestSigmaYamlListener implements ISuiteListener, ITestListener {
     public void onFinish(ISuite suite) {
         if (!enabled || runId == null) return;
         try {
-            TestSigmaClient.updateRunStatus(projectId, runId, RunStatus.CLOSED);
+            TestSigmaClient.updateRunStatus(projectId, runId, RunStatus.FINISHED);
             System.out.println("[TestSigma] Run marked FINISHED: " + runId);
         } catch (Exception e) {
             System.out.println("[TestSigma] Failed to finish run: " + e.getMessage());

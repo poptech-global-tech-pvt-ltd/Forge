@@ -3,7 +3,7 @@ package com.popclub.testsigma;
 public enum RunStatus {
     ACTIVE,
     RUNNING,
-    CLOSED,
+    FINISHED,
     ABORTED;
 
     public String value() {

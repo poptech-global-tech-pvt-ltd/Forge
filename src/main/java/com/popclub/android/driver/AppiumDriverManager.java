@@ -67,11 +67,6 @@ public class AppiumDriverManager {
                 // Do NOT set `app` — that triggers install + launch.
                 // Do NOT autoLaunch — keep whatever is on screen.
                 options.setAppPackage("com.popclub.android");
-                // The manifest lists two launcher activities (LauncherFresh, LauncherClassic),
-                // so Appium's auto-resolution is ambiguous even with autoLaunch=false — it still
-                // needs appActivity to build the session. LauncherClassic's activity class no
-                // longer exists in this build, so LauncherFresh is the one that works.
-                options.setAppActivity("com.popclub.android.LauncherFresh");
                 options.setCapability("appium:autoLaunch", false);
                 options.setNoReset(true);
                 System.out.println("[Driver] Resume mode — attaching to running app (no install, no launch)");

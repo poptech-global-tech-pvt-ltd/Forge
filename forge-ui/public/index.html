@@ -2107,10 +2107,6 @@ function connectWS() {
 function handleMessage(msg) {
   switch (msg.type) {
 
-    case 'batch_run_created':
-      if (_batchRunIdResolver) { _batchRunIdResolver(msg.runId); _batchRunIdResolver = null; }
-      break;
-
     case 'network_call':
       addNetworkCall(msg);
       break;
@@ -5582,39 +5578,19 @@ let _batchQueue   = [];
 let _batchIdx     = 0;
 let _batchResults = [];
 
-let _batchRunId = null;
-let _batchRunIdResolver = null;
-
-function requestBatchRunId(folder, files) {
-  return new Promise((resolve) => {
-    _batchRunIdResolver = resolve;
-    ws.send(JSON.stringify({ type: 'create_batch_run', folder, files }));
-  });
-}
-
-async function runFolder() {
+function runFolder() {
   const folder = document.getElementById('folder-select').value;
   if (!folder) return;
   const files = (_testTree[folder] || []).map(t => t.value);
   if (!files.length) { appendLog('No tests in this folder', 'warn'); return; }
   if (!confirm(`Run all ${files.length} test(s) in "${folder}"?`)) return;
-
-  appendLog(`Creating one TestSigma run for folder "${folder}"…`, 'step');
-  const runId = await requestBatchRunId(folder, files);
-  if (runId) {
-    appendLog(`✅ TestSigma run ready — all ${files.length} test(s) will report into it`, 'pass');
-  } else {
-    appendLog('⚠️ Could not create a TestSigma run for this folder — continuing without reporting', 'warn');
-  }
-
-  startBatch(files, `folder: ${folder}`, runId);
+  startBatch(files, `folder: ${folder}`);
 }
 
-function startBatch(files, label, runId) {
+function startBatch(files, label) {
   _batchQueue   = [...files];
   _batchIdx     = 0;
   _batchResults = [];
-  _batchRunId   = runId || null;
   appendLog(`▶ Batch (${label}): ${files.length} test(s) queued`, 'step');
   updateBatchBadge();
   runNextInBatch();
@@ -5630,16 +5606,8 @@ function runNextInBatch() {
     renderSteps();
     updateStats();
     document.getElementById('result-badge').className = 'result-badge';
-    // Marks this as a "Run Folder" batch so the Java side reports to TestSigma.
-    // All files in the batch share the ONE run created up front (_batchRunId).
-    // Runs are intentionally left ACTIVE (not auto-closed) until there's a
-    // clear requirement for when a run should be closed.
-    ws.send(JSON.stringify({
-      type: 'run',
-      file,
-      batchRun: true,
-      existingRunId: _batchRunId,
-    }));
+    // Marks this as a "Run Folder" batch so the Java side creates a TestSigma run.
+    ws.send(JSON.stringify({ type: 'run', file, batchRun: true }));
     startScreenPoll();
     updateBatchBadge();
   }, 600);

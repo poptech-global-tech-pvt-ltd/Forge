@@ -1,6 +1,5 @@
 package com.popclub.core;
 
-import io.appium.java_client.AppiumBy;
 import io.appium.java_client.AppiumDriver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -50,10 +49,6 @@ public class WaitUtil {
                 }
 
                 if (pageSource != null) {
-                    // Runtime permission dialogs (e.g. notifications) can pop up mid-test
-                    // on a reused (noReset:true) app — dismiss them so polling can continue.
-                    dismissPermissionDialogIfPresent(driver, pageSource);
-
                     // Search in-memory — no HTTP calls
                     for (Locator locator : locators) {
                         if (isPresentInSource(pageSource, locator)) {
@@ -99,34 +94,6 @@ public class WaitUtil {
 
         throw new RuntimeException(
                 "Element not found after polling " + timeoutSeconds + "s — locators: " + locators);
-    }
-
-    /** Known system-dialog dismiss buttons that can pop up mid-test on a reused (noReset:true) app. */
-    private static final String[] BLOCKING_DIALOG_BUTTON_IDS = {
-            "com.android.permissioncontroller:id/permission_deny_button", // "Allow notifications?" — Don't allow
-            "com.google.android.gms:id/cancel",                          // Google phone-number chooser — Cancel
-    };
-
-    /**
-     * Dismisses known system dialogs (permission prompts, Google account/phone choosers) if
-     * one is currently on screen, so it doesn't block subsequent element polling.
-     */
-    private static void dismissPermissionDialogIfPresent(AppiumDriver driver, String pageSource) {
-        for (String buttonId : BLOCKING_DIALOG_BUTTON_IDS) {
-            if (!pageSource.contains(buttonId)) continue;
-            try {
-                // By.id() only searches the foreground app's window — these dialogs are separate
-                // system overlay windows, so they need a UiSelector-based lookup instead, which
-                // searches across all windows (same engine `adb shell uiautomator dump` uses).
-                List<WebElement> buttons = driver.findElements(AppiumBy.androidUIAutomator(
-                        "new UiSelector().resourceId(\"" + buttonId + "\")"));
-                if (!buttons.isEmpty()) {
-                    buttons.get(0).click();
-                    System.out.println("  ⚠️  Dismissed blocking dialog mid-poll: " + buttonId);
-                    return;
-                }
-            } catch (Exception ignored) {}
-        }
     }
 
     /**
