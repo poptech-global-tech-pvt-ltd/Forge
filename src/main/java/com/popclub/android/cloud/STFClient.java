@@ -18,6 +18,8 @@ import java.util.List;
 public class STFClient {
 
     private final String baseUrl;
+    private final String authEmail;
+    private final String authName;
     private String token;
     private final HttpClient http;
     private final ObjectMapper mapper = new ObjectMapper();
@@ -37,6 +39,8 @@ public class STFClient {
 
     public STFClient(String baseUrl, String authEmail, String authName) {
         this.baseUrl = baseUrl.replaceAll("/$", "");
+        this.authEmail = authEmail;
+        this.authName = authName;
         System.setProperty("jdk.internal.httpclient.disableHostnameVerification", "true");
         this.http = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(30))
@@ -309,6 +313,15 @@ public class STFClient {
 
     private void assertOk(HttpResponse<String> response, String url) {
         int code = response.statusCode();
+        if (code == 401) {
+            // Token expired — clear cache and disk so next call fetches a fresh one
+            String cacheKey = this.baseUrl + "|" + this.authEmail;
+            TOKEN_CACHE.remove(cacheKey);
+            tokenCacheFile(cacheKey).delete();
+            this.token = acquireToken(this.authEmail, this.authName);
+            throw new RuntimeException(
+                    "[STF] Token expired (HTTP 401) — cleared cache, retry the operation");
+        }
         if (code < 200 || code >= 300) {
             throw new RuntimeException(
                     "[STF] HTTP " + code + " from " + url + " → " + response.body());
