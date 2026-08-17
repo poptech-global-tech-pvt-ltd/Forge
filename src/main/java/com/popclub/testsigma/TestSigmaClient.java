@@ -78,9 +78,10 @@ public class TestSigmaClient {
         }
     }
 
-    public static void updateRunStatus(String projectId, String runId, RunStatus status) {
+    public static void closeRun(String projectId, String runId) {
         Map<String, Object> body = new HashMap<>();
-        body.put("status", status.value());
+        body.put("status", RunStatus.CLOSED.value());
+        body.put("end_date", System.currentTimeMillis());
 
         Response response = given()
                 .header("Authorization", authHeader())
@@ -90,7 +91,7 @@ public class TestSigmaClient {
 
         if (response.getStatusCode() >= 400) {
             throw new RuntimeException(
-                    "updateRunStatus failed [" + response.getStatusCode() + "]: " + response.getBody().asString());
+                    "closeRun failed [" + response.getStatusCode() + "]: " + response.getBody().asString());
         }
     }
 

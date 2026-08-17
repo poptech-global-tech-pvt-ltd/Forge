@@ -31,7 +31,7 @@ public class TestListener implements ITestListener, ISuiteListener {
 
         projectId = suite.getParameter("projectId");
         tags = suite.getParameter("tag");
-        title = suite.getParameter("runTitle");
+        title = suite.getName();
 
         CloudConfig.setDeviceSerialFromTestNG(suite.getParameter("deviceSerial"));
 
@@ -107,10 +107,9 @@ public class TestListener implements ITestListener, ISuiteListener {
                 return;
             }
 
-            String baseTitle = (title != null && !title.isBlank()) ? title : "Forge Run";
             java.text.SimpleDateFormat istFormat = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             istFormat.setTimeZone(java.util.TimeZone.getTimeZone("Asia/Kolkata"));
-            String runTitle = baseTitle + " - " + istFormat.format(new java.util.Date());
+            String runTitle = title + " - " + istFormat.format(new java.util.Date());
             String runTags  = (tags  != null && !tags.isBlank())  ? tags  : "Automated";
 
             String runId = TestSigmaClient.createRun(runTitle, projectId, runTags, uuidList);
@@ -130,11 +129,17 @@ public class TestListener implements ITestListener, ISuiteListener {
 
     @Override
     public void onFinish(ISuite suite) {
-        if (TestContext.getRunId() == null) return;
+        String runId = TestContext.getRunId();
+        if (runId == null) return;
 
-        // Runs are intentionally left ACTIVE — no clear requirement yet for when
-        // a run should be closed, so we don't auto-close here.
-        TestContext.clear();
+        try {
+            TestSigmaClient.closeRun(projectId, runId);
+            System.out.println("[TestSigma] Run closed: " + runId);
+        } catch (Exception e) {
+            System.err.println("[TestSigma] Failed to close run: " + e.getMessage());
+        } finally {
+            TestContext.clear();
+        }
     }
 
     @Override
