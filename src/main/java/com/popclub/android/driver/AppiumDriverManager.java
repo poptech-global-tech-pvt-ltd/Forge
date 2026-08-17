@@ -28,27 +28,31 @@ public class AppiumDriverManager {
         try {
             // 1. Obtain a device (local ADB pool  OR  STF cloud reservation)
             device = DeviceManager.getDevice();
-            String udid = device.udid;
-            int    port = device.port;
+            String udid       = device.udid;
+            int    port       = device.port;
 
-            System.out.println(
-                    "Thread: " + Thread.currentThread().getId() +
-                    " | Device: " + udid +
-                    " | Port: "   + port +
-                    " | Mode: "   + (CloudConfig.isCloudEnabled() ? "CLOUD" : "LOCAL")
-            );
+            System.out.println("[Appium] Mode: " + (CloudConfig.isCloudEnabled() ? "CLOUD" : "LOCAL")
+                    + " | Device: " + udid + " | Port: " + port);
 
-            // 2. Start a local Appium server that will drive the device.
-            //    Works for both modes:
-            //      • Local  → device was already connected via USB/emulator
-            //      • Cloud  → device was just ADB-connected over TCP by DeviceManager
-            AppiumServerManager.startServer(udid, port);
+            // 2. Start Appium server.
+            //    • Local  → start a local Appium server on this machine
+            //    • Cloud  → one pre-started Appium per parallel slot on the STF Mac;
+            //               claim a slot (unique appium port + systemPort), then verify it's up
+            int[] cloudSlot = null;
+            if (device.adbHost != null) {
+                cloudSlot = AppiumServerManager.nextCloudSlot();
+                AppiumServerManager.ensureRemoteServer(device.adbHost, cloudSlot[0]);
+            } else {
+                AppiumServerManager.startServer(udid, port); // starts or reuses local server
+            }
 
             // 3. Build capabilities
             UiAutomator2Options options = new UiAutomator2Options();
             options.setPlatformName(device.platformName != null ? device.platformName : "Android");
             options.setDeviceName(udid);
             options.setUdid(udid);
+            // No remoteAdbHost — for cloud the Appium server runs on the STF host and has
+            // direct local ADB access to the device (serial is known to that ADB daemon).
             options.setAutomationName("UiAutomator2");
             if (device.platformVersion != null && !device.platformVersion.isEmpty()) {
                 options.setPlatformVersion(device.platformVersion);
@@ -60,7 +64,7 @@ public class AppiumDriverManager {
             boolean resumeMode = TestContext.isNoReset();
             // Even in noReset/resume mode, install the app if it is not present on the device.
             // This handles first-run on a fresh device without requiring the user to change the flag.
-            boolean appInstalled = resumeMode && isAppInstalled(udid, "com.popclub.android");
+            boolean appInstalled = resumeMode && isAppInstalled(device, "com.popclub.android");
 
             if (resumeMode && appInstalled) {
                 // Resume mode (run-from-step): attach to the already-running app.
@@ -79,8 +83,12 @@ public class AppiumDriverManager {
                 if (resumeMode) {
                     System.out.println("[Driver] noReset=true but app not installed — falling back to fresh install");
                 }
-                options.setApp(System.getProperty("user.dir") +
-                        "/src/main/resources/pop-qaDebug.apk");
+                // Cloud: Appium runs on the STF Mac and cannot read local file paths.
+                // Serve the APK over HTTP from this machine so Appium can download it.
+                String appPath = (device.adbHost != null)
+                        ? ApkHttpServer.getApkUrl("pop-qaDebug.apk")
+                        : System.getProperty("user.dir") + "/src/main/resources/pop-qaDebug.apk";
+                options.setApp(appPath);
                 // Explicitly set package + main activity so Appium resolves the
                 // correct entry point when the APK declares multiple launcher activities.
                 options.setAppPackage("com.popclub.android");
@@ -89,38 +97,65 @@ public class AppiumDriverManager {
             }
 
             options.setNewCommandTimeout(Duration.ofSeconds(300));
-            // Keep the screen on throughout the test run — prevents mid-test lock/sleep
             options.setCapability("appium:keepScreenOn", true);
+            if (device.adbHost != null) {
+                // Cloud: Appium is co-located with the device, but ADB over network is still
+                // slower than USB — give extra time for installs and server launch.
+                options.setCapability("appium:uiautomator2ServerLaunchTimeout", 120000);
+                options.setCapability("appium:uiautomator2ServerInstallTimeout", 120000);
+                options.setCapability("appium:androidInstallTimeout", 120000);
+                // Unlock the device screen using the PIN configured for the farm devices.
+                String unlockPin = CloudConfig.getDeviceUnlockPin();
+                if (unlockPin != null) {
+                    options.setCapability("appium:unlockType", "pin");
+                    options.setCapability("appium:unlockKey", unlockPin);
+                } else {
+                    options.setCapability("appium:skipUnlock", true);
+                }
+            }
             TestContext.setFreshLaunch(!resumeMode);
 
-            // Unique UiAutomator2 system port to avoid stale-session collisions
+            // Unique systemPort per parallel session to avoid ADB-forward conflicts.
+            // Local:  free random port on this machine (no firewall constraint).
+            // Cloud:  systemPort comes from the slot claimed above (8200, 8201, …).
             int systemPort;
-            try (ServerSocket socket = new ServerSocket(0)) {
-                systemPort = socket.getLocalPort();
-            } catch (IOException e) {
-                systemPort = 8200 + port;
+            if (device.adbHost != null) {
+                systemPort = cloudSlot[1];
+            } else {
+                try (ServerSocket socket = new ServerSocket(0)) {
+                    systemPort = socket.getLocalPort();
+                } catch (IOException e) {
+                    systemPort = 8200 + port;
+                }
             }
             options.setSystemPort(systemPort);
 
-            // 4. Connect to the local Appium server
-            AppiumDriver driverInstance = new AndroidDriver(
-                    new URL("http://127.0.0.1:" + port),
-                    options
-            );
+            // 4. Connect to Appium server
+            //    • Local  → local Appium we just started on port `port`
+            //    • Cloud  → the slot-specific Appium server on the STF host
+            String appiumUrl = (device.adbHost != null)
+                    ? "http://" + device.adbHost + ":" + cloudSlot[0]
+                    : "http://127.0.0.1:" + port;
+
+            AppiumDriver driverInstance = new AndroidDriver(new URL(appiumUrl), options);
 
             deviceInfo.set(device);
 
             // Grant all dangerous permissions declared in the manifest upfront via ADB.
             // pm grant marks them as granted at system level — Android never shows a runtime
             // dialog for a permission that's already granted, so no watcher is needed.
-            grantAllPermissions(udid, "com.popclub.android");
+            grantAllPermissions(device, "com.popclub.android");
+
+            // Unlock device before any test steps run
+            unlockDevice((AndroidDriver) driverInstance);
 
             return driverInstance;
 
         } catch (Exception e) {
-            // Release the device if it was allocated but session creation failed
             if (device != null) {
-                try { AppiumServerManager.stopServer(device.udid); } catch (Exception ignored) {}
+                if (device.adbHost == null) {
+                    try { AppiumServerManager.stopServer(device.udid); } catch (Exception ignored) {}
+                }
                 DeviceManager.release(device.udid);
             }
             e.printStackTrace();
@@ -136,9 +171,10 @@ public class AppiumDriverManager {
 
             DeviceInfo device = deviceInfo.get();
             if (device != null) {
-                // Stop local Appium server for this device
-                AppiumServerManager.stopServer(device.udid);
-                // Release device (local pool or STF reservation)
+                // Stop local Appium server only in local mode — cloud uses the STF-hosted server
+                if (device.adbHost == null) {
+                    AppiumServerManager.stopServer(device.udid);
+                }
                 DeviceManager.release(device.udid);
             }
 
@@ -147,19 +183,65 @@ public class AppiumDriverManager {
         }
     }
 
+
     public static DeviceInfo getDeviceInfo() {
         return deviceInfo.get();
+    }
+
+    private static void unlockDevice(io.appium.java_client.android.AndroidDriver driver) {
+        try {
+            if (!driver.isDeviceLocked()) return;
+
+            String pin = com.popclub.android.cloud.CloudConfig.getDeviceUnlockPin();
+            DeviceInfo device = deviceInfo.get();
+
+            // Wake screen
+            adbRun(device, "shell", "input", "keyevent", "26");
+            Thread.sleep(500);
+            // Dismiss keyguard / swipe up
+            adbRun(device, "shell", "input", "keyevent", "82");
+            Thread.sleep(500);
+
+            if (pin != null && !pin.isBlank()) {
+                adbRun(device, "shell", "input", "text", pin);
+                Thread.sleep(200);
+                adbRun(device, "shell", "input", "keyevent", "66"); // ENTER
+                Thread.sleep(500);
+                System.out.println("[Device] Unlocked with PIN.");
+            } else {
+                System.out.println("[Device] No PIN configured — swipe-unlock only.");
+            }
+        } catch (Exception e) {
+            System.out.println("[Device] Unlock skipped: " + e.getMessage());
+        }
+    }
+
+    private static void adbRun(DeviceInfo device, String... args) throws Exception {
+        Runtime.getRuntime().exec(adbBase(device, args)).waitFor(5, java.util.concurrent.TimeUnit.SECONDS);
+    }
+
+    /** Builds the adb base command with optional remote-server and serial flags. */
+    private static String[] adbBase(DeviceInfo device, String... args) {
+        java.util.List<String> cmd = new java.util.ArrayList<>();
+        cmd.add("adb");
+        if (device.adbHost != null) {
+            cmd.add("-H"); cmd.add(device.adbHost);
+            cmd.add("-P"); cmd.add(String.valueOf(device.adbServerPort));
+        }
+        if (device.udid != null && !device.udid.isBlank()) {
+            cmd.add("-s"); cmd.add(device.udid);
+        }
+        for (String a : args) cmd.add(a);
+        return cmd.toArray(new String[0]);
     }
 
     /**
      * Returns true if the given package is installed on the device.
      * Uses {@code adb shell pm list packages} — fast, no app launch needed.
      */
-    private static boolean isAppInstalled(String serial, String packageName) {
+    private static boolean isAppInstalled(DeviceInfo device, String packageName) {
         try {
-            String[] cmd = (serial != null && !serial.isBlank())
-                ? new String[]{"adb", "-s", serial, "shell", "pm", "list", "packages", packageName}
-                : new String[]{"adb", "shell", "pm", "list", "packages", packageName};
+            String[] cmd = adbBase(device, "shell", "pm", "list", "packages", packageName);
             Process p = Runtime.getRuntime().exec(cmd);
             p.waitFor(5, java.util.concurrent.TimeUnit.SECONDS);
             try (java.io.BufferedReader br = new java.io.BufferedReader(
@@ -187,7 +269,7 @@ public class AppiumDriverManager {
      * which only fires at Appium session creation.  Some permissions (especially
      * on Android 13+ fine-grained media permissions) can slip through.
      */
-    private static void grantAllPermissions(String serial, String packageName) {
+    private static void grantAllPermissions(DeviceInfo device, String packageName) {
         // Full list of dangerous permissions that the POP app might request
         String[] permissions = {
             "android.permission.CAMERA",
@@ -210,16 +292,10 @@ public class AppiumDriverManager {
             "android.permission.USE_FINGERPRINT",
         };
 
-        String[] adbBase = (serial != null && !serial.isBlank())
-            ? new String[]{"adb", "-s", serial, "shell", "pm", "grant", packageName}
-            : new String[]{"adb", "shell", "pm", "grant", packageName};
-
         int granted = 0;
         for (String perm : permissions) {
             try {
-                String[] cmd = new String[adbBase.length + 1];
-                System.arraycopy(adbBase, 0, cmd, 0, adbBase.length);
-                cmd[adbBase.length] = perm;
+                String[] cmd = adbBase(device, "shell", "pm", "grant", packageName, perm);
                 Process p = Runtime.getRuntime().exec(cmd);
                 p.waitFor(3, java.util.concurrent.TimeUnit.SECONDS);
                 granted++;

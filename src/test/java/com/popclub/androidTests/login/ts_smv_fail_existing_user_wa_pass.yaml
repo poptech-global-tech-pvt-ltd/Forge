@@ -1,0 +1,36 @@
+testName: SMV Fail - Existing User - WA Pass - Logged In
+platform: android
+noReset: false
+loginRequired: true
+testCaseIds:
+  - PO-15535
+
+features:
+  - login
+  - common
+
+tags:
+  - login
+  - smv
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: enterText
+    element: login_input_phone
+    value: "9481781677"
+
+  - action: tap
+    element: login_continue_button
+
+  - action: waitFor
+    element: login_merged_login_and_otp_screen_button
+    timeout: 60
+
+  - action: waitFor
+    element: home_tab
+
+  - action: verifyElement
+    element: home_tab

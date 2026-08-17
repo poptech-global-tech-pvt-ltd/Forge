@@ -48,6 +48,9 @@ public class LaunchAppAction implements Action {
         // 4. Wait until *something* is visible (app loaded past splash screen)
         waitForAppReady(driver);
 
+        // Re-unlock in case the screen locked again during app restart
+        wakeDevice((AndroidDriver) driver);
+
         if (TestContext.isLoginRequired()) {
             // 5a. Login flow — dismiss Google/GMS overlays that can block the login screen
             dismissSystemDialogs(driver);
@@ -62,15 +65,6 @@ public class LaunchAppAction implements Action {
     }
 
     private void wakeDevice(AndroidDriver driver) {
-        try {
-            if (driver.isDeviceLocked()) {
-                driver.unlockDevice();
-                System.out.println("[LaunchApp] Device was locked — unlocked.");
-            }
-        } catch (Exception e) {
-            System.out.println("[LaunchApp] Wake/unlock skipped: " + e.getMessage());
-        }
-
         try {
             driver.executeScript("mobile: shell", java.util.Map.of(
                     "command", "settings",

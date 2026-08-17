@@ -1,0 +1,45 @@
+testName: Login - Edit Phone Number From OTP Screen
+platform: android
+noReset: false
+loginRequired: true
+testCaseIds:
+  - PO-15633
+
+features:
+  - login
+
+tags:
+  - login
+  - regression
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: waitFor
+    element: login_input_phone
+
+  - action: enterText
+    element: login_input_phone
+    value: "9481781677"
+
+  - action: tap
+    element: login_continue_button
+
+  - action: pressKey
+    value: BACK
+
+  - action: waitFor
+    element: login_input_phone
+    timeout: 10
+
+  - action: tap
+    element: login_continue_button
+
+  - action: tapByText
+    value: "Edit"
+    timeout: 30
+
+  - action: waitFor
+    element: login_input_phone

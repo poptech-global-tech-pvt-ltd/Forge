@@ -18,6 +18,8 @@ import java.util.List;
 public class STFClient {
 
     private final String baseUrl;
+    private final String authEmail;
+    private final String authName;
     private String token;
     private final HttpClient http;
     private final ObjectMapper mapper = new ObjectMapper();
@@ -30,17 +32,69 @@ public class STFClient {
      * @param authEmail e.g. testdevices@popclub.co
      * @param authName  e.g. Forge
      */
+    // Token cache: keyed by "baseUrl|email" — shared across all STFClient instances in the JVM
+    // and persisted to disk so the same token is reused across Maven test runs.
+    private static final java.util.concurrent.ConcurrentHashMap<String, String> TOKEN_CACHE =
+            new java.util.concurrent.ConcurrentHashMap<>();
+
     public STFClient(String baseUrl, String authEmail, String authName) {
         this.baseUrl = baseUrl.replaceAll("/$", "");
+        this.authEmail = authEmail;
+        this.authName = authName;
         System.setProperty("jdk.internal.httpclient.disableHostnameVerification", "true");
         this.http = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(30))
                 .sslContext(trustAllSslContext())
                 .build();
-        this.token = fetchToken(authEmail, authName);
+        this.token = acquireToken(authEmail, authName);
     }
 
-    /** Obtains a fresh JWT from the mock-auth endpoint. Called once per client instance. */
+    /**
+     * Returns a cached token if available (in-memory or on-disk), otherwise fetches a new one.
+     * Persisting to disk lets the same STF session release devices reserved by a previous run.
+     */
+    private String acquireToken(String email, String name) {
+        String cacheKey = this.baseUrl + "|" + email;
+
+        // 1. In-memory cache (same JVM / parallel threads)
+        String cached = TOKEN_CACHE.get(cacheKey);
+        if (cached != null) return cached;
+
+        // 2. Disk cache — reuse across Maven test runs so we keep the same STF session
+        java.io.File tokenFile = tokenCacheFile(cacheKey);
+        if (tokenFile.exists()) {
+            try {
+                String saved = new String(java.nio.file.Files.readAllBytes(tokenFile.toPath())).trim();
+                if (!saved.isBlank() && isTokenValid(saved)) {
+                    System.out.println("[STF] Reusing saved session token for " + email);
+                    TOKEN_CACHE.put(cacheKey, saved);
+                    return saved;
+                }
+            } catch (Exception ignored) {}
+        }
+
+        // 3. Fetch a fresh token and persist it
+        String fresh = fetchToken(email, name);
+        TOKEN_CACHE.put(cacheKey, fresh);
+        try {
+            tokenFile.getParentFile().mkdirs();
+            java.nio.file.Files.write(tokenFile.toPath(), fresh.getBytes());
+        } catch (Exception ignored) {}
+        return fresh;
+    }
+
+    private java.io.File tokenCacheFile(String cacheKey) {
+        // Safe filename: replace non-alphanumeric with underscore
+        String safeName = cacheKey.replaceAll("[^a-zA-Z0-9]", "_");
+        return new java.io.File(System.getProperty("java.io.tmpdir"), "stf_token_" + safeName + ".txt");
+    }
+
+    /** Quick validity check: a JWT has 3 parts separated by dots. */
+    private boolean isTokenValid(String token) {
+        return token.split("\\.").length == 3;
+    }
+
+    /** Obtains a fresh JWT from the mock-auth endpoint. */
     private String fetchToken(String email, String name) {
         try {
             String body = String.format("{\"email\":\"%s\",\"name\":\"%s\"}", email, name);
@@ -259,6 +313,15 @@ public class STFClient {
 
     private void assertOk(HttpResponse<String> response, String url) {
         int code = response.statusCode();
+        if (code == 401) {
+            // Token expired — clear cache and disk so next call fetches a fresh one
+            String cacheKey = this.baseUrl + "|" + this.authEmail;
+            TOKEN_CACHE.remove(cacheKey);
+            tokenCacheFile(cacheKey).delete();
+            this.token = acquireToken(this.authEmail, this.authName);
+            throw new RuntimeException(
+                    "[STF] Token expired (HTTP 401) — cleared cache, retry the operation");
+        }
         if (code < 200 || code >= 300) {
             throw new RuntimeException(
                     "[STF] HTTP " + code + " from " + url + " → " + response.body());

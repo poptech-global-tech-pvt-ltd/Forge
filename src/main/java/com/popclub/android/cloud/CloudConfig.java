@@ -134,22 +134,93 @@ public class CloudConfig {
      * Returns null when not set — DeviceManager will auto-pick any free device.
      */
     public static String getDeviceSerial() {
+        // Thread-local wins (set per-thread from testng.xml in parallel runs)
+        String local = THREAD_DEVICE_SERIAL.get();
+        if (local != null) return local;
+        // Fall back to global -D flag or properties file (single-device runs)
         String val = get("stf.device.serial");
         return (val != null && !val.isBlank()) ? val : null;
     }
 
+    // Per-thread serial so parallel tests each target their own device.
+    // System.setProperty would be a global write and cause both threads to fight over the same device.
+    private static final ThreadLocal<String> THREAD_DEVICE_SERIAL = new ThreadLocal<>();
+
     /**
      * Called by TestRunnerTest to forward the testng.xml "deviceSerial" parameter.
-     * Only takes effect if stf.device.serial is not already set via file/system-prop.
+     * Stored in a ThreadLocal so parallel tests don't overwrite each other's serial.
      */
     public static void setDeviceSerialFromTestNG(String serial) {
         if (serial != null && !serial.isBlank()) {
-            // Only set if not already overridden by file or -D flag
-            if (get("stf.device.serial") == null) {
-                System.setProperty("stf.device.serial", serial.trim());
-                System.out.println("[CloudConfig] Device serial set from testng.xml: " + serial.trim());
+            THREAD_DEVICE_SERIAL.set(serial.trim());
+            System.out.println("[CloudConfig] Device serial set for thread "
+                    + Thread.currentThread().getId() + ": " + serial.trim());
+        }
+    }
+
+    // ── Cloud Appium server ───────────────────────────────────────────────────
+
+    /**
+     * PIN used to unlock STF farm devices at session start.
+     * Set appium.device.unlock.pin in local.cloud.properties.
+     * Returns null when not set — Appium will skip unlock.
+     */
+    public static String getDeviceUnlockPin() {
+        return get("appium.device.unlock.pin");
+    }
+
+    /**
+     * Comma-separated list of Appium ports running on the STF Mac
+     * (started by appium_manager.py).  Set appium.remote.ports in
+     * local.cloud.properties.  Returns null when not configured —
+     * AppiumServerManager will fall back to the built-in defaults.
+     */
+    public static String getAppiumRemotePorts() {
+        return get("appium.remote.ports");
+    }
+
+    /**
+     * Port on which Appium is running on the STF server.
+     * Set appium.remote.port in local.cloud.properties to override (default 4723).
+     * Only used when cloud.enabled=true.
+     */
+    public static int getAppiumRemotePort() {
+        String val = get("appium.remote.port");
+        try {
+            return (val != null && !val.isBlank()) ? Integer.parseInt(val.trim()) : 4723;
+        } catch (NumberFormatException e) {
+            return 4723;
+        }
+    }
+
+    /**
+     * SSH username for starting remote Appium on the STF server.
+     * Set appium.remote.ssh.user in local.cloud.properties.
+     * Returns null if not configured (remote Appium must be started manually).
+     */
+    public static String getAppiumSshUser() {
+        return get("appium.remote.ssh.user");
+    }
+
+    /**
+     * Path to the SSH private key for starting remote Appium.
+     * Uses appium.remote.ssh.key if set; otherwise auto-detects the first key
+     * found in ~/.ssh (id_rsa, id_ed25519, id_ecdsa).
+     * Returns null if no key is found.
+     */
+    public static String getAppiumSshKey() {
+        String val = get("appium.remote.ssh.key");
+        if (val != null && !val.isBlank()) return val;
+
+        String home = System.getProperty("user.home");
+        for (String name : new String[]{"id_ed25519", "id_rsa", "id_ecdsa"}) {
+            java.io.File key = new java.io.File(home + "/.ssh/" + name);
+            if (key.exists()) {
+                System.out.println("[CloudConfig] Auto-detected SSH key → " + key.getPath());
+                return key.getPath();
             }
         }
+        return null;
     }
 
     // ── Local Appium path settings ────────────────────────────────────────────
@@ -160,7 +231,7 @@ public class CloudConfig {
      */
     public static String getNodePath() {
         String val = get("appium.node.path");
-        if (val != null && !val.isBlank()) return val;
+        if (val != null && !val.isBlank()) return expandHome(val);
         return autoDetect("node", "appium.node.path");
     }
 
@@ -182,12 +253,19 @@ public class CloudConfig {
      */
     public static String getAndroidHome() {
         String val = get("android.home");
-        if (val != null && !val.isBlank()) return val;
+        if (val != null && !val.isBlank()) return expandHome(val);
         val = System.getenv("ANDROID_HOME");
         if (val != null && !val.isBlank()) return val;
         val = System.getenv("ANDROID_SDK_ROOT");
         if (val != null && !val.isBlank()) return val;
         return null; // let Appium try to auto-detect
+    }
+
+    private static String expandHome(String path) {
+        if (path.startsWith("~/") || path.equals("~")) {
+            return System.getProperty("user.home") + path.substring(1);
+        }
+        return path;
     }
 
     // ── Auto-detection helpers ────────────────────────────────────────────────
@@ -227,18 +305,23 @@ public class CloudConfig {
             }
         } catch (Exception ignored) {}
 
-        // Strategy 2: derive from `which appium` → sibling lib/node_modules/
+        // Strategy 2: derive from `which appium`, following symlinks (handles Homebrew Cellar layout)
         try {
             Process p = Runtime.getRuntime().exec(new String[]{"which", "appium"});
             String appiumBin = new String(p.getInputStream().readAllBytes()).trim();
             if (!appiumBin.isBlank()) {
-                // appiumBin = /prefix/bin/appium → prefix = /prefix
-                String prefix = new java.io.File(appiumBin).getParentFile().getParent();
-                java.io.File candidate = new java.io.File(
-                        prefix + "/lib/node_modules/appium/build/lib/main.js");
-                if (candidate.exists()) {
-                    System.out.println("[CloudConfig] Auto-detected appium.js → " + candidate.getPath());
-                    return candidate.getPath();
+                // Follow symlinks so Homebrew's bin/appium → Cellar/.../libexec/bin/appium
+                java.nio.file.Path realBin = java.nio.file.Paths.get(appiumBin).toRealPath();
+                // realBin = .../libexec/bin/appium  →  prefix = .../libexec
+                String prefix = realBin.getParent().getParent().toString();
+                for (String rel : new String[]{
+                        "/lib/node_modules/appium/build/lib/main.js",
+                        "/node_modules/appium/build/lib/main.js"}) {
+                    java.io.File candidate = new java.io.File(prefix + rel);
+                    if (candidate.exists()) {
+                        System.out.println("[CloudConfig] Auto-detected appium.js → " + candidate.getPath());
+                        return candidate.getPath();
+                    }
                 }
             }
         } catch (Exception ignored) {}

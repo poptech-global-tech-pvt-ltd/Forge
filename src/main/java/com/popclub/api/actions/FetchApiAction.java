@@ -72,12 +72,27 @@ public class FetchApiAction implements Action {
             }
         }
 
+        // Resolve caller-specified Content-Type (needed for form-urlencoded, etc.)
+        String contentType = "application/json";
+        if (step.headers != null) {
+            for (Map.Entry<String, String> h : step.headers.entrySet()) {
+                if (h.getKey().equalsIgnoreCase("Content-Type")) {
+                    contentType = interpolate(h.getValue());
+                    break;
+                }
+            }
+        }
+
         if (bodyStr != null) {
-            req.contentType("application/json").body(bodyStr);
+            req.contentType(contentType).body(bodyStr);
         }
 
         if (step.headers != null) {
-            step.headers.forEach((k, v) -> req.header(k, interpolate(v)));
+            final String resolvedCT = contentType;
+            step.headers.forEach((k, v) -> {
+                if (!k.equalsIgnoreCase("Content-Type")) req.header(k, interpolate(v));
+                else req.header(k, resolvedCT); // already set via contentType() — keep header consistent
+            });
         }
 
         // Execute
