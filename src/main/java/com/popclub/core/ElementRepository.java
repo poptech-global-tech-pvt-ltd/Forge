@@ -48,6 +48,13 @@ public class ElementRepository {
 
         Object raw = elements.get(element).get(platform);
 
+        // Platform fallback: if no ios: entry defined, reuse android: locators.
+        // iOS and Android share the same QA tag names — only override in ios/ YAML
+        // when the accessibility ID genuinely differs on iOS.
+        if (raw == null && "ios".equalsIgnoreCase(platform)) {
+            raw = elements.get(element).get("android");
+        }
+
         List<Map<String, String>> locatorMaps = (List<Map<String, String>>) raw;
 
         List<Locator> locators = new ArrayList<>();

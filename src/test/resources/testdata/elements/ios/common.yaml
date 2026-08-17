@@ -1,0 +1,21 @@
+# iOS-specific common element overrides.
+# Only define elements here when the iOS accessibility ID differs from Android.
+# All other common elements fall back to android: values automatically.
+
+# iOS keyboard dismiss button (Android uses pressKey: back)
+ios_keyboard_dismiss:
+  ios:
+    - type: accessibilityId
+      value: Return
+
+# iOS back button (navigation bar back — label varies by screen title)
+ios_nav_back_button:
+  ios:
+    - type: accessibilityId
+      value: Back
+
+# iOS share sheet dismiss
+ios_share_sheet_cancel:
+  ios:
+    - type: accessibilityId
+      value: Cancel

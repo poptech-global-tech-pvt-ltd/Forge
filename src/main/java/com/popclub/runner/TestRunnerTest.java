@@ -34,7 +34,11 @@ public class TestRunnerTest {
     @DataProvider(name = "testData", parallel = false)
     public Object[][] getTestData(ITestContext context) {
 
-        File root = new File("src/test/java/com/popclub/androidTests");
+        String platformParam = context.getCurrentXmlTest().getParameter("platform");
+        String testsDir = "ios".equalsIgnoreCase(platformParam)
+                ? "src/test/java/com/popclub/iOSTests"
+                : "src/test/java/com/popclub/androidTests";
+        File root = new File(testsDir);
 
         // Collect all .yaml files recursively (root + all subfolders)
         List<File> allFiles = new ArrayList<>();

@@ -1,0 +1,25 @@
+testName: iOS Login via OTP
+platform: ios
+noReset: true
+loginRequired: true
+
+features:
+  - common
+  - login
+
+tags:
+  - smoke
+  - login
+  - ios
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab

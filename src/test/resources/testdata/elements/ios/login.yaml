@@ -1,0 +1,19 @@
+# iOS-specific login element overrides.
+# Only define elements here when the iOS accessibility ID differs from Android.
+# All other login elements fall back to android: values automatically.
+
+# iOS system alert buttons — shown during login if phone/notification permission is requested
+ios_alert_allow_button:
+  ios:
+    - type: accessibilityId
+      value: Allow
+
+ios_alert_dont_allow_button:
+  ios:
+    - type: accessibilityId
+      value: Don't Allow
+
+ios_alert_ok_button:
+  ios:
+    - type: accessibilityId
+      value: OK
