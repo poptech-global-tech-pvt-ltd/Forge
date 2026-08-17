@@ -3,6 +3,8 @@ package com.popclub.android.actions;
 import com.popclub.api.actions.CallServiceAction;
 import com.popclub.api.actions.CaptureTokenAction;
 import com.popclub.api.actions.FetchApiAction;
+import com.popclub.core.TestContext;
+import com.popclub.ios.actions.IOSLaunchAppAction;
 
 public class ActionFactory {
 
@@ -11,7 +13,7 @@ public class ActionFactory {
             // ── Core gestures ──────────────────────────────────────────────────
             case "tap":               return new TapAction();
             case "enterText":         return new EnterTextAction();
-            case "launchApp":         return new LaunchAppAction();
+            case "launchApp":         return isIOS() ? new IOSLaunchAppAction() : new LaunchAppAction();
             case "tapIfPresent":      return new TapIfPresentAction();
             case "waitFor":           return new WaitForAction();
             case "waitForGone":       return new WaitForGoneAction();
@@ -90,5 +92,10 @@ public class ActionFactory {
 
             default: throw new RuntimeException("Unknown action: " + action);
         }
+    }
+
+    private static boolean isIOS() {
+        String platform = TestContext.getPlatform();
+        return platform != null && platform.equalsIgnoreCase("ios");
     }
 }

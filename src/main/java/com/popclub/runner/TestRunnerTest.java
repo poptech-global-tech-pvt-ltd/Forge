@@ -5,6 +5,8 @@ import com.popclub.core.TestContext;
 import com.popclub.android.driver.AppiumDriverManager;
 import com.popclub.android.cloud.CloudConfig;
 import com.popclub.android.driver.AppiumServerManager;
+import com.popclub.ios.driver.IOSDriverManager;
+import com.popclub.ios.driver.IOSAppiumServerManager;
 import com.popclub.model.TestCase;
 import com.popclub.parser.YamlParser;
 import com.popclub.testsigma.TestSigmaClient;
@@ -146,8 +148,12 @@ public class TestRunnerTest {
 
     @AfterMethod(alwaysRun = true)
     public void quitDriverAfterTest() {
-        //  ALWAYS CLEAN DRIVER
-        AppiumDriverManager.quitDriver();
+        String platform = TestContext.getPlatform();
+        if ("ios".equalsIgnoreCase(platform)) {
+            IOSDriverManager.quitDriver();
+        } else {
+            AppiumDriverManager.quitDriver();
+        }
     }
 
     // TODO: Re-enable once TestSigma token is refreshed
@@ -165,8 +171,11 @@ public class TestRunnerTest {
 
     @AfterSuite
     public void tearDown() {
-        // Cloud Appium servers are pre-started externally on the STF Mac — never stop them.
-        if (!CloudConfig.isCloudEnabled()) {
+        String platform = TestContext.getPlatform();
+        if ("ios".equalsIgnoreCase(platform)) {
+            IOSAppiumServerManager.stopAll();
+        } else if (!CloudConfig.isCloudEnabled()) {
+            // Cloud Appium servers are pre-started externally on the STF Mac — never stop them.
             System.out.println("Stopping all Appium servers...");
             AppiumServerManager.stopAll();
         }
