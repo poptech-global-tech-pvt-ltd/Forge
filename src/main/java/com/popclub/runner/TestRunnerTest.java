@@ -169,8 +169,13 @@ public class TestRunnerTest {
 
 
     @BeforeSuite
-    public void setUp() {
+    @org.testng.annotations.Parameters({"deviceUdid", "platform"})
+    public void setUp(@org.testng.annotations.Optional("") String deviceUdid,
+                      @org.testng.annotations.Optional("android") String platform) {
         System.setOut(new DeviceAwarePrintStream(System.out));
+        if ("ios".equalsIgnoreCase(platform) && !deviceUdid.isBlank()) {
+            IOSDeviceManager.setFixedUdid(deviceUdid);
+        }
     }
 
     @AfterSuite

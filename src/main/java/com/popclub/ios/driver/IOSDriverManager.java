@@ -47,8 +47,11 @@ public class IOSDriverManager {
             XCUITestOptions options = new XCUITestOptions();
             options.setPlatformName("iOS");
             options.setUdid(device.udid);
-            options.setDeviceName(device.udid);
+            options.setDeviceName("Admin's iPhone");
             options.setAutomationName("XCUITest");
+            if (device.platformVersion != null && !device.platformVersion.isEmpty()) {
+                options.setPlatformVersion(device.platformVersion);
+            }
             options.setBundleId(BUNDLE_ID);
 
             boolean resumeMode = TestContext.isNoReset();

@@ -7,8 +7,9 @@
     </listeners>
 
     <test name="iOS — Single Device">
-        <parameter name="platform"  value="ios"/>
-        <parameter name="testFile"  value="ts_login_ios.yaml"/>
+        <parameter name="platform"   value="ios"/>
+        <parameter name="testFile"   value="ts_login_ios.yaml"/>
+        <parameter name="deviceUdid" value="00008110-000469E636E8401E"/>
         <classes>
             <class name="com.popclub.runner.TestRunnerTest"/>
         </classes>

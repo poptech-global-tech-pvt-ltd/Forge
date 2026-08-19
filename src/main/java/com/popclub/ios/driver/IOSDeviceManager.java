@@ -21,6 +21,13 @@ public class IOSDeviceManager {
 
     private static final ConcurrentHashMap<String, Boolean> pool = new ConcurrentHashMap<>();
     private static volatile boolean initialized = false;
+    private static volatile String fixedUdid = null;
+
+    /** Call from TestRunnerTest when deviceUdid is specified in testng.xml. */
+    public static void setFixedUdid(String udid) {
+        fixedUdid = udid;
+        System.out.println("[IOSDevice] Fixed UDID set: " + udid);
+    }
 
     public static synchronized DeviceInfo getDevice() {
         if (!initialized) {
@@ -45,8 +52,12 @@ public class IOSDeviceManager {
 
     private static void initialize() {
         List<String> udids = new ArrayList<>();
-        udids.addAll(discoverPhysicalDevices());
-        udids.addAll(discoverBootedSimulators());
+        if (fixedUdid != null && !fixedUdid.isBlank()) {
+            udids.add(fixedUdid);
+        } else {
+            udids.addAll(discoverPhysicalDevices());
+            udids.addAll(discoverBootedSimulators());
+        }
 
         if (udids.isEmpty()) {
             throw new RuntimeException("[IOSDevice] No iOS devices or booted simulators found. " +
