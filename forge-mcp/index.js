@@ -244,6 +244,66 @@ function getScreenName(deviceId) {
 const server = new McpServer({ name: "forge-mcp", version: "1.5.0" });
 
 server.tool(
+  "forge_list_devices",
+  "List all connected Android devices (via ADB) and iOS devices/simulators (via xcrun). " +
+  "Returns platform, name, UDID, and status for each device.",
+  {},
+  async () => {
+    const devices = [];
+
+    // Android — ADB
+    try {
+      const { spawnSync } = require("child_process");
+      const adbOut = spawnSync("adb", ["devices", "-l"], { encoding: "utf8", timeout: 5000 }).stdout || "";
+      for (const line of adbOut.split("\n")) {
+        if (!line.endsWith("device") && !line.includes(" device ")) continue;
+        if (line.startsWith("List")) continue;
+        const parts = line.trim().split(/\s+/);
+        const udid = parts[0];
+        const model = (line.match(/model:(\S+)/) || [])[1] || "Android Device";
+        devices.push({ platform: "android", name: model.replace(/_/g, " "), udid, status: "online" });
+      }
+    } catch (e) {
+      devices.push({ platform: "android", name: "ADB error", udid: "", status: e.message });
+    }
+
+    // iOS — xcrun (physical + simulators)
+    try {
+      const { spawnSync } = require("child_process");
+      const xcOut = spawnSync("xcrun", ["xctrace", "list", "devices"], { encoding: "utf8", timeout: 8000 }).stdout || "";
+      let section = "";
+      for (const line of xcOut.split("\n")) {
+        if (line.startsWith("== Devices =="))         { section = "online";  continue; }
+        if (line.startsWith("== Devices Offline ==")) { section = "offline"; continue; }
+        if (line.startsWith("== Simulators =="))      { section = "sim";     continue; }
+        const m = line.match(/^(.+?)\s+\(([^)]+)\)\s+\(([0-9A-Fa-f-]{36})\)/);
+        if (!m) continue;
+        const [, name, version, udid] = m;
+        if (name.includes("Mac") && !name.includes("iPhone") && !name.includes("iPad")) continue;
+        devices.push({
+          platform: section === "sim" ? "ios-simulator" : "ios",
+          name: `${name.trim()} (${version})`,
+          udid,
+          status: section === "offline" ? "offline" : "online"
+        });
+      }
+    } catch (e) {
+      devices.push({ platform: "ios", name: "xcrun error", udid: "", status: e.message });
+    }
+
+    if (devices.length === 0) {
+      return { content: [{ type: "text", text: "No devices found. Connect a device or boot a simulator." }] };
+    }
+
+    const lines = devices.map(d =>
+      `[${d.platform.toUpperCase()}] ${d.name}\n  UDID: ${d.udid || "n/a"}\n  Status: ${d.status}`
+    ).join("\n\n");
+
+    return { content: [{ type: "text", text: lines }] };
+  }
+);
+
+server.tool(
   "forge_get_hierarchy",
 
   "Dump the live Android screen UI (Jetpack Compose app) and return every " +
