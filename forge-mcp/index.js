@@ -253,7 +253,6 @@ server.tool(
 
     // Android — ADB
     try {
-      const { spawnSync } = require("child_process");
       const adbOut = spawnSync("adb", ["devices", "-l"], { encoding: "utf8", timeout: 5000 }).stdout || "";
       for (const line of adbOut.split("\n")) {
         if (!line.endsWith("device") && !line.includes(" device ")) continue;
@@ -269,7 +268,6 @@ server.tool(
 
     // iOS — xcrun (physical + simulators)
     try {
-      const { spawnSync } = require("child_process");
       const xcOut = spawnSync("xcrun", ["xctrace", "list", "devices"], { encoding: "utf8", timeout: 8000 }).stdout || "";
       let section = "";
       for (const line of xcOut.split("\n")) {
