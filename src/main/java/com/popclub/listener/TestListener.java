@@ -132,14 +132,19 @@ public class TestListener implements ITestListener, ISuiteListener {
         String runId = TestContext.getRunId();
         if (runId == null) return;
 
-        try {
-            TestSigmaClient.closeRun(projectId, runId);
-            System.out.println("[TestSigma] Run closed: " + runId);
-        } catch (Exception e) {
-            System.err.println("[TestSigma] Failed to close run: " + e.getMessage());
-        } finally {
-            TestContext.clear();
+        boolean partOfBatch = System.getProperty("existingRunId") != null;
+        boolean shouldClose = !partOfBatch || Boolean.parseBoolean(System.getProperty("finalizeRun", "false"));
+
+        if (shouldClose) {
+            try {
+                TestSigmaClient.closeRun(projectId, runId);
+                System.out.println("[TestSigma] Run closed: " + runId);
+            } catch (Exception e) {
+                System.err.println("[TestSigma] Failed to close run: " + e.getMessage());
+            }
         }
+
+        TestContext.clear();
     }
 
     @Override

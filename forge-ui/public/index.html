@@ -2803,41 +2803,7 @@ function showResult(success) {
   badge.textContent = success ? '✓ Passed' : '✗ Failed';
   document.getElementById('btn-fix-claude').style.display = success ? 'none' : 'inline-block';
 
-  const card = document.getElementById('failure-card');
-  if (!steps.length) { card.style.display = 'none'; return; }
-
-  document.querySelector('#failure-card .fc-header').textContent = success ? '✓ Test Summary' : '✗ Test Summary';
-  card.style.background    = success ? 'rgba(34,197,94,.06)'  : 'rgba(239,68,68,.06)';
-  card.style.borderColor   = success ? 'rgba(34,197,94,.25)'  : 'rgba(239,68,68,.25)';
-  document.querySelector('#failure-card .fc-header').style.background = success ? 'rgba(34,197,94,.12)' : 'rgba(239,68,68,.12)';
-  document.querySelector('#failure-card .fc-header').style.color      = success ? 'var(--green)'        : 'var(--red)';
-
-  const rows = steps.map((step, i) => {
-    const s      = stepStates[i] || {};
-    const status = s.status || 'pending';
-    const act    = step.action || '—';
-    const el     = step.element || step.locator || step.value || '';
-    const err    = (s.error || '').replace(/\n[\s\S]*/m, '').trim();
-    const isFail = status === 'failed';
-    const statusIcon  = status === 'passed' ? '<span class="fc-status-pass">✓</span>'
-                      : status === 'failed' ? '<span class="fc-status-fail">✗</span>'
-                      : status === 'skipped' ? '<span class="fc-status-skip">⤷</span>'
-                      : '<span class="fc-status-skip">—</span>';
-    const detail = isFail && err
-      ? `<span class="fc-detail fc-err" title="${err}">${err}</span>`
-      : el ? `<span class="fc-detail fc-el" title="${el}">${el}</span>`
-           : `<span class="fc-detail">—</span>`;
-    return `<div class="fc-row${isFail ? ' fc-failed' : ''}" onclick="jumpToStepLog(${i})">
-      <span class="fc-step">Step ${i + 1}</span>
-      ${statusIcon}
-      <span class="fc-action">${act}</span>
-      ${detail}
-      <span class="fc-jump">↗</span>
-    </div>`;
-  }).join('');
-
-  document.getElementById('failure-card-rows').innerHTML = rows;
-  card.style.display = 'block';
+  document.getElementById('failure-card').style.display = 'none';
 }
 
 function showTestSigmaLink(msg) {
@@ -5857,13 +5823,12 @@ function runNextInBatch() {
     updateStats();
     document.getElementById('result-badge').className = 'result-badge';
     document.getElementById('failure-card').style.display = 'none';
-    // Marks this as a "Run Folder" batch so the Java side reports to TestSigma.
-    // All files in the batch share the ONE run created up front (_batchRunId).
     ws.send(JSON.stringify({
       type: 'run',
       file,
       batchRun: true,
       existingRunId: _batchRunId,
+      finalizeRun: _batchIdx === _batchQueue.length - 1,
     }));
     startScreenPoll();
     updateBatchBadge();

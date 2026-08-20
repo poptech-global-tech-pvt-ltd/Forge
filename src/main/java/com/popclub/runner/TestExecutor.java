@@ -449,8 +449,12 @@ public class TestExecutor {
         // STOP KEEP-ALIVE + VIDEO
         DeviceKeepAlive.stop();
         AppiumDriver driver = DriverManager.getDriver();
-        File video = VideoUtil.stopAndSave(driver, testCase.testName);
-        TestContext.setVideoFile(video);
+        try {
+            File video = VideoUtil.stopAndSave(driver, testCase.testName);
+            TestContext.setVideoFile(video);
+        } catch (Exception e) {
+            System.out.println("[TestExecutor] ⚠️  Video save failed (non-fatal): " + e.getMessage());
+        }
 
         // YAML MODE RESULT
         if ("YAML".equals(TestContext.getExecutionMode())) {
