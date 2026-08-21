@@ -31,7 +31,7 @@ public class TestListener implements ITestListener, ISuiteListener {
 
         projectId = suite.getParameter("projectId");
         tags = suite.getParameter("tag");
-        title = suite.getParameter("runTitle");
+        title = suite.getName();
 
         CloudConfig.setDeviceSerialFromTestNG(suite.getParameter("deviceSerial"));
 
@@ -45,6 +45,13 @@ public class TestListener implements ITestListener, ISuiteListener {
             System.out.println("[TestSigma] Single-file run — skipping TestSigma run creation "
                     + "(pass -DbatchRun=true, use -Dtag=..., or use Forge UI's \"Run Folder\", to report to TestSigma).");
             TestContext.setRunId(null);
+            return;
+        }
+
+        String existingRunId = System.getProperty("existingRunId");
+        if (existingRunId != null && !existingRunId.isBlank()) {
+            TestContext.setRunId(existingRunId);
+            System.out.println("[TestSigma] Joining existing run: " + existingRunId);
             return;
         }
 
@@ -100,9 +107,9 @@ public class TestListener implements ITestListener, ISuiteListener {
                 return;
             }
 
-            String baseTitle = (title != null && !title.isBlank()) ? title : "Forge Run";
-            String runTitle = baseTitle + " - "
-                    + new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date());
+            java.text.SimpleDateFormat istFormat = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            istFormat.setTimeZone(java.util.TimeZone.getTimeZone("Asia/Kolkata"));
+            String runTitle = title + " - " + istFormat.format(new java.util.Date());
             String runTags  = (tags  != null && !tags.isBlank())  ? tags  : "Automated";
 
             String runId = TestSigmaClient.createRun(runTitle, projectId, runTags, uuidList);
@@ -122,15 +129,22 @@ public class TestListener implements ITestListener, ISuiteListener {
 
     @Override
     public void onFinish(ISuite suite) {
-        if (TestContext.getRunId() == null) return;
-        try {
-            TestSigmaClient.updateRunStatus(projectId, TestContext.getRunId(), RunStatus.FINISHED);
-            System.out.println("[TestSigma] ✅ Run marked FINISHED: " + TestContext.getRunId());
-        } catch (Exception e) {
-            System.err.println("[TestSigma] ⚠️  Failed to mark run FINISHED: " + e.getMessage());
-        } finally {
-            TestContext.clear();
+        String runId = TestContext.getRunId();
+        if (runId == null) return;
+
+        boolean partOfBatch = System.getProperty("existingRunId") != null;
+        boolean shouldClose = !partOfBatch || Boolean.parseBoolean(System.getProperty("finalizeRun", "false"));
+
+        if (shouldClose) {
+            try {
+                TestSigmaClient.closeRun(projectId, runId);
+                System.out.println("[TestSigma] Run closed: " + runId);
+            } catch (Exception e) {
+                System.err.println("[TestSigma] Failed to close run: " + e.getMessage());
+            }
         }
+
+        TestContext.clear();
     }
 
     @Override
@@ -142,9 +156,7 @@ public class TestListener implements ITestListener, ISuiteListener {
     public void onTestSuccess(ITestResult result) {
         stopVideoQuietly(resolveTestName(result) + "_passed");
         updateStatus(result, TestCaseStatus.PASSED);
-
-        File log = TestLogCapture.stop();
-        uploadAttachments(TestCaseStatus.PASSED, log);
+        TestLogCapture.stop();
     }
 
     @Override

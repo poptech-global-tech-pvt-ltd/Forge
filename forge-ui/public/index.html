@@ -2160,6 +2160,10 @@ function connectWS() {
 function handleMessage(msg) {
   switch (msg.type) {
 
+    case 'batch_run_created':
+      if (_batchRunIdResolver) { _batchRunIdResolver(msg.runId); _batchRunIdResolver = null; }
+      break;
+
     case 'network_call':
       addNetworkCall(msg);
       break;
@@ -2799,41 +2803,7 @@ function showResult(success) {
   badge.textContent = success ? '✓ Passed' : '✗ Failed';
   document.getElementById('btn-fix-claude').style.display = success ? 'none' : 'inline-block';
 
-  const card = document.getElementById('failure-card');
-  if (!steps.length) { card.style.display = 'none'; return; }
-
-  document.querySelector('#failure-card .fc-header').textContent = success ? '✓ Test Summary' : '✗ Test Summary';
-  card.style.background    = success ? 'rgba(34,197,94,.06)'  : 'rgba(239,68,68,.06)';
-  card.style.borderColor   = success ? 'rgba(34,197,94,.25)'  : 'rgba(239,68,68,.25)';
-  document.querySelector('#failure-card .fc-header').style.background = success ? 'rgba(34,197,94,.12)' : 'rgba(239,68,68,.12)';
-  document.querySelector('#failure-card .fc-header').style.color      = success ? 'var(--green)'        : 'var(--red)';
-
-  const rows = steps.map((step, i) => {
-    const s      = stepStates[i] || {};
-    const status = s.status || 'pending';
-    const act    = step.action || '—';
-    const el     = step.element || step.locator || step.value || '';
-    const err    = (s.error || '').replace(/\n[\s\S]*/m, '').trim();
-    const isFail = status === 'failed';
-    const statusIcon  = status === 'passed' ? '<span class="fc-status-pass">✓</span>'
-                      : status === 'failed' ? '<span class="fc-status-fail">✗</span>'
-                      : status === 'skipped' ? '<span class="fc-status-skip">⤷</span>'
-                      : '<span class="fc-status-skip">—</span>';
-    const detail = isFail && err
-      ? `<span class="fc-detail fc-err" title="${err}">${err}</span>`
-      : el ? `<span class="fc-detail fc-el" title="${el}">${el}</span>`
-           : `<span class="fc-detail">—</span>`;
-    return `<div class="fc-row${isFail ? ' fc-failed' : ''}" onclick="jumpToStepLog(${i})">
-      <span class="fc-step">Step ${i + 1}</span>
-      ${statusIcon}
-      <span class="fc-action">${act}</span>
-      ${detail}
-      <span class="fc-jump">↗</span>
-    </div>`;
-  }).join('');
-
-  document.getElementById('failure-card-rows').innerHTML = rows;
-  card.style.display = 'block';
+  document.getElementById('failure-card').style.display = 'none';
 }
 
 function showTestSigmaLink(msg) {
@@ -5804,19 +5774,39 @@ let _batchQueue   = [];
 let _batchIdx     = 0;
 let _batchResults = [];
 
-function runFolder() {
+let _batchRunId = null;
+let _batchRunIdResolver = null;
+
+function requestBatchRunId(folder, files) {
+  return new Promise((resolve) => {
+    _batchRunIdResolver = resolve;
+    ws.send(JSON.stringify({ type: 'create_batch_run', folder, files }));
+  });
+}
+
+async function runFolder() {
   const folder = document.getElementById('folder-select').value;
   if (!folder) return;
   const files = (_testTree[folder] || []).map(t => t.value);
   if (!files.length) { appendLog('No tests in this folder', 'warn'); return; }
   if (!confirm(`Run all ${files.length} test(s) in "${folder}"?`)) return;
-  startBatch(files, `folder: ${folder}`);
+
+  appendLog(`Creating one TestSigma run for folder "${folder}"…`, 'step');
+  const runId = await requestBatchRunId(folder, files);
+  if (runId) {
+    appendLog(`✅ TestSigma run ready — all ${files.length} test(s) will report into it`, 'pass');
+  } else {
+    appendLog('⚠️ Could not create a TestSigma run for this folder — continuing without reporting', 'warn');
+  }
+
+  startBatch(files, `folder: ${folder}`, runId);
 }
 
-function startBatch(files, label) {
+function startBatch(files, label, runId) {
   _batchQueue   = [...files];
   _batchIdx     = 0;
   _batchResults = [];
+  _batchRunId   = runId || null;
   appendLog(`▶ Batch (${label}): ${files.length} test(s) queued`, 'step');
   updateBatchBadge();
   runNextInBatch();
@@ -5832,9 +5822,14 @@ function runNextInBatch() {
     renderSteps();
     updateStats();
     document.getElementById('result-badge').className = 'result-badge';
-  document.getElementById('failure-card').style.display = 'none';
-    // Marks this as a "Run Folder" batch so the Java side creates a TestSigma run.
-    ws.send(JSON.stringify({ type: 'run', file, batchRun: true }));
+    document.getElementById('failure-card').style.display = 'none';
+    ws.send(JSON.stringify({
+      type: 'run',
+      file,
+      batchRun: true,
+      existingRunId: _batchRunId,
+      finalizeRun: _batchIdx === _batchQueue.length - 1,
+    }));
     startScreenPoll();
     updateBatchBadge();
   }, 600);

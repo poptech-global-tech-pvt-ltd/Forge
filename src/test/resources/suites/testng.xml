@@ -4,7 +4,6 @@
 
     <listeners>
         <listener class-name="com.popclub.listener.TestListener"/>
-        <listener class-name="com.popclub.testsigma.TestSigmaYamlListener"/>
     </listeners>
 
     <!-- Default file to run when -DtestFile is not passed on the mvn command line.
@@ -13,7 +12,6 @@
          or pass -DtestFile="" -->
     <parameter name="testFile" value="login.yaml"/>
     <parameter name="deviceSerial" value="emulator-5554"/>
-    <parameter name="runTitle" value="POP Android Automation"/>
     <parameter name="projectId" value="d8f4a221-bc6d-47d8-9448-0834f5d012ec"/>
 
     <test name="Mobile Tests">
