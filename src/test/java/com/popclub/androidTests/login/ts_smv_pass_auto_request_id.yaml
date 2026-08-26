@@ -19,11 +19,11 @@ steps:
   - action: launchApp
 
   - action: waitFor
-    element: login_input_phone
+    element: login_phone_input
 
   - action: enterText
-    element: login_input_phone
-    value: "1234567740"
+    element: login_phone_input
+    value: "1234567741"
 
   - action: tap
     element: login_continue_button
@@ -35,7 +35,7 @@ steps:
     timeout: 120
 
   - action: waitFor
-    element: login_merged_login_and_otp_screen_button
+    element: login_merged_login_and_otp_screen_button_3  # healed from: login_merged_login_and_otp_screen_button
     timeout: 30
 
   - action: tap
@@ -56,16 +56,16 @@ steps:
     headers:
       Authorization: "Bearer ${smv_admin_token}"
       Content-Type: "application/json"
-    body: '{"request_id": "${smv_request_id}", "comments": "+911234567740", "status": "PASSED"}'
+    body: '{"request_id": "${smv_request_id}", "comments": "+911234567741", "status": "PASSED"}'
 
   - action: launchApp
 
   - action: waitFor
-    element: login_input_phone
+    element: login_phone_input
 
   - action: enterText
-    element: login_input_phone
-    value: "1234567740"
+    element: login_phone_input
+    value: "1234567741"
 
   - action: tap
     element: login_continue_button

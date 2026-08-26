@@ -126,6 +126,7 @@
                         <suiteXmlFile>src/test/resources/suites/testng.xml</suiteXmlFile>
                     </suiteXmlFiles>
                     <redirectTestOutputToFile>false</redirectTestOutputToFile>
+                    <argLine>-Xmx512m</argLine>
                 </configuration>
             </plugin>
             <!-- Add src/test/resources as an additional test source root

@@ -766,6 +766,11 @@
     border-radius: 4px;
   }
   .log-clear:hover { color: var(--text); background: var(--surface2); }
+  .log-copy-all { background: none; border: 1px solid var(--border); color: var(--muted); font-size: 11px; cursor: pointer; padding: 2px 8px; border-radius: 4px; }
+  .log-copy-all:hover { color: var(--text); background: var(--surface2); }
+  .step-copy-log { background: none; border: 1px solid transparent; color: var(--muted); font-size: 10px; padding: 2px 6px; border-radius: 4px; cursor: pointer; opacity: 0; transition: all .15s; flex-shrink: 0; white-space: nowrap; }
+  .step-item:hover .step-copy-log { opacity: 1; border-color: var(--border); }
+  .step-copy-log:hover { background: var(--surface2); color: var(--text); opacity: 1; }
 
   /* Inspector toggle */
   .btn-inspect {
@@ -2117,6 +2122,7 @@
       <div class="log-panel" id="log-panel">
         <div class="panel-title">
           <span>Log</span>
+          <button class="log-copy-all" onclick="copyAllLogs(this)" title="Copy all logs">Copy</button>
           <button class="log-clear" onclick="clearLog()">Clear</button>
         </div>
         <div style="padding:6px 10px;border-bottom:1px solid var(--border);flex-shrink:0">
@@ -2646,6 +2652,7 @@ function stepHTML(s) {
         ${shotHTML}
       </div>
       <button class="step-dup-btn" onclick="event.stopPropagation();duplicateStep(${s.index})" title="Duplicate step">⎘ dup</button>
+      <button class="step-copy-log" onclick="event.stopPropagation();copyStepLogs(${s.index}, this)" title="Copy logs for this step">⎘ logs</button>
       ${status !== 'skipped' ? `<button class="step-run-from" onclick="event.stopPropagation();runFromStep(${s.index})" title="Run from step ${s.index + 1}">▶ from here</button>` : ''}
     </div>`;
 }
@@ -2965,6 +2972,31 @@ function filterLog(query) {
 function clearLog() {
   document.getElementById('log-body').innerHTML = '';
   document.getElementById('log-search').value = '';
+}
+
+function copyAllLogs(btn) {
+  const lines = document.getElementById('log-body').querySelectorAll('.log-line');
+  const text = Array.from(lines).map(l => l.textContent).join('\n');
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = orig; }, 1500);
+  });
+}
+
+function copyStepLogs(stepIndex, btn) {
+  const lines = document.getElementById('log-body').querySelectorAll(`.log-line[data-step-index="${stepIndex}"]`);
+  const text = Array.from(lines).map(l => l.textContent).join('\n');
+  if (!text) {
+    btn.textContent = 'No logs';
+    setTimeout(() => { btn.textContent = '⎘ logs'; }, 1500);
+    return;
+  }
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = orig; }, 1500);
+  });
 }
 
 // ── Timer ─────────────────────────────────────────────────────────────────

@@ -19,30 +19,44 @@ steps:
   - action: launchApp
 
   - action: waitFor
-    element: login_input_phone
+    element: login_phone_input  # healed from: login_input_phone
 
   - action: enterText
-    element: login_input_phone
-    value: "9538351687"
+    element: login_phone_input
+    value: "8722249451"
 
   - action: tap
     element: login_continue_button
 
-  - action: tapByText
-    value: "Open settings"
-    timeout: 10
+  - action: waitFor
+    element: login_merged_login_and_otp_screen_button  # healed locator → login_merged_login_and_otp_screen_button
+    timeout: 20
+
+  - action: tap
+    element: login_merged_login_and_otp_screen_button
 
   - action: pressKey
     value: BACK
 
-  - action: tapByText
-    value: "Try again"
-    timeout: 15
+  - action: tap
+    element: login_continue_button
+
+  - action: waitFor
+    element: login_merged_login_and_otp_screen_button  # healed locator → login_merged_login_and_otp_screen_button
+    timeout: 20
+
+  - action: tap
+    element: login_merged_login_and_otp_screen_button
+
+  - action: pressKey
+    value: BACK
+
+  - action: tap
+    element: login_continue_button
 
   - action: waitFor
     element: login_merged_login_and_otp_screen_button
-    timeout: 30
-
-  - action: tapByText
-    value: "Try again"
     timeout: 60
+
+  - action: tap
+    element: login_merged_login_and_otp_screen_button

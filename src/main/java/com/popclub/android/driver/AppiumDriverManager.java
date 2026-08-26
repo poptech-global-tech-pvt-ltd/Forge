@@ -10,16 +10,61 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.URL;
 import java.time.Duration;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class AppiumDriverManager {
 
     private static ThreadLocal<AppiumDriver> driver     = new ThreadLocal<>();
     public  static ThreadLocal<DeviceInfo>   deviceInfo = new ThreadLocal<>();
 
+    // One lock per device serial — prevents two tests from creating sessions on the same device simultaneously.
+    private static final ConcurrentHashMap<String, ReentrantLock> DEVICE_LOCKS   = new ConcurrentHashMap<>();
+    private static final ThreadLocal<String>                      LOCKED_SERIAL  = new ThreadLocal<>();
+
+    // Remaining test count per device — session is kept alive until this hits 0.
+    private static final ConcurrentHashMap<String, AtomicInteger> DEVICE_TEST_COUNTERS = new ConcurrentHashMap<>();
+
+    private static ReentrantLock lockFor(String serial) {
+        return DEVICE_LOCKS.computeIfAbsent(serial, k -> new ReentrantLock(true));
+    }
+
+    /**
+     * Register how many tests will run on a device before they start.
+     * Called once from TestRunnerTest's @DataProvider after the test list is built.
+     */
+    public static void setExpectedTestCount(String serial, int count) {
+        if (serial == null || serial.isBlank()) return;
+        DEVICE_TEST_COUNTERS.put(serial, new AtomicInteger(count));
+        System.out.println("[Device] Expected test count for " + serial + ": " + count);
+    }
+
     public static AppiumDriver getDriver() {
-        if (driver.get() == null) {
-            driver.set(createDriver());
+        // Reuse an existing live session if one is held for this device.
+        if (driver.get() != null) {
+            try {
+                driver.get().getSessionId(); // lightweight liveness check
+                return driver.get();
+            } catch (Exception e) {
+                System.out.println("[Device] Session dead — will create a new one: " + e.getMessage());
+                driver.remove();
+                deviceInfo.remove();
+                // Don't release the STF device or unlock — we still own it, just need a new session.
+            }
         }
+        String serial = CloudConfig.getDeviceSerial();
+        if (serial != null && !serial.isBlank()) {
+            ReentrantLock lock = lockFor(serial);
+            // Only acquire the lock if we don't already hold it (i.e. first test on this device).
+            if (!lock.isHeldByCurrentThread()) {
+                System.out.println("[Device] Waiting for device lock: " + serial);
+                lock.lock();
+                LOCKED_SERIAL.set(serial);
+                System.out.println("[Device] Acquired device lock: " + serial);
+            }
+        }
+        driver.set(createDriver());
         return driver.get();
     }
 
@@ -104,9 +149,13 @@ public class AppiumDriverManager {
                 options.setCapability("appium:uiautomator2ServerLaunchTimeout", 120000);
                 options.setCapability("appium:uiautomator2ServerInstallTimeout", 120000);
                 options.setCapability("appium:androidInstallTimeout", 120000);
-                // Unlock the device screen using the PIN configured for the farm devices.
-                String unlockPin = CloudConfig.getDeviceUnlockPin();
-                if (unlockPin != null) {
+                // Unlock the device using password, PIN, or skip if neither is configured.
+                String unlockPassword = CloudConfig.getDeviceUnlockPassword();
+                String unlockPin     = CloudConfig.getDeviceUnlockPin();
+                if (unlockPassword != null && !unlockPassword.isBlank()) {
+                    options.setCapability("appium:unlockType", "password");
+                    options.setCapability("appium:unlockKey", unlockPassword);
+                } else if (unlockPin != null && !unlockPin.isBlank()) {
                     options.setCapability("appium:unlockType", "pin");
                     options.setCapability("appium:unlockKey", unlockPin);
                 } else {
@@ -153,9 +202,7 @@ public class AppiumDriverManager {
 
         } catch (Exception e) {
             if (device != null) {
-                if (device.adbHost == null) {
-                    try { AppiumServerManager.stopServer(device.udid); } catch (Exception ignored) {}
-                }
+                // Don't stop the Appium server on session failure — keep it alive for next test.
                 DeviceManager.release(device.udid);
             }
             e.printStackTrace();
@@ -164,6 +211,22 @@ public class AppiumDriverManager {
     }
 
     public static void quitDriver() {
+        String serial = LOCKED_SERIAL.get();
+
+        // Decrement the counter for this device. If tests remain, keep the session alive.
+        if (serial != null) {
+            AtomicInteger counter = DEVICE_TEST_COUNTERS.get(serial);
+            if (counter != null) {
+                int remaining = counter.decrementAndGet();
+                if (remaining > 0) {
+                    System.out.println("[Device] " + remaining + " test(s) remaining on " + serial
+                            + " — keeping session alive.");
+                    return; // lock stays held, driver stays alive, STF stays reserved
+                }
+            }
+        }
+
+        // Last test (or no counter registered) — do the full teardown.
         if (driver.get() != null) {
             try {
                 driver.get().quit();
@@ -171,15 +234,21 @@ public class AppiumDriverManager {
 
             DeviceInfo device = deviceInfo.get();
             if (device != null) {
-                // Stop local Appium server only in local mode — cloud uses the STF-hosted server
-                if (device.adbHost == null) {
-                    AppiumServerManager.stopServer(device.udid);
-                }
                 DeviceManager.release(device.udid);
             }
 
             driver.remove();
             deviceInfo.remove();
+        }
+
+        // Release the per-device lock.
+        if (serial != null) {
+            ReentrantLock lock = DEVICE_LOCKS.get(serial);
+            if (lock != null && lock.isHeldByCurrentThread()) {
+                lock.unlock();
+                System.out.println("[Device] Released device lock: " + serial);
+            }
+            LOCKED_SERIAL.remove();
         }
     }
 

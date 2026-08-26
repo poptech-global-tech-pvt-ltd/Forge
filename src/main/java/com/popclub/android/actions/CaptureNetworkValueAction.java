@@ -132,9 +132,17 @@ public class CaptureNetworkValueAction implements Action {
      * `-d` dumps the buffer and exits (non-blocking).
      */
     private static String readLogcatViaAdb(String udid) throws Exception {
-        String[] cmd = udid != null
-            ? new String[]{"adb", "-s", udid, "logcat", "-d", "*:D"}
-            : new String[]{"adb", "logcat", "-d", "*:D"};
+        com.popclub.android.driver.DeviceInfo deviceInfo = AppiumDriverManager.getDeviceInfo();
+        String adbHost = deviceInfo != null ? deviceInfo.adbHost : null;
+
+        String[] cmd;
+        if (adbHost != null && udid != null) {
+            cmd = new String[]{"adb", "-H", adbHost, "-P", "5037", "-s", udid, "logcat", "-d", "*:D"};
+        } else if (udid != null) {
+            cmd = new String[]{"adb", "-s", udid, "logcat", "-d", "*:D"};
+        } else {
+            cmd = new String[]{"adb", "logcat", "-d", "*:D"};
+        }
 
         Process proc = Runtime.getRuntime().exec(cmd);
         StringBuilder sb = new StringBuilder();

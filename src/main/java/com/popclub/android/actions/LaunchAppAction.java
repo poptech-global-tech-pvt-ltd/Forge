@@ -151,9 +151,31 @@ public class LaunchAppAction implements Action {
     private void waitForAppReady(AppiumDriver driver) {
         try {
             new WebDriverWait(driver, Duration.ofSeconds(APP_READY_TIMEOUT_SEC))
-                    .until(d -> !d.findElements(By.xpath("//*[@displayed='true']")).isEmpty());
+                    .until(d -> {
+                        try {
+                            AppiumDriver ad = (AppiumDriver) d;
+                            // Dismiss GMS/system overlays that block the app from reaching foreground
+                            tapIfPresent(ad, By.id("com.google.android.gms:id/cancel"),
+                                    "Google account chooser — Cancel");
+                            tapIfPresent(ad, By.id("com.google.android.gms:id/decline_button"),
+                                    "Google sign-in — Decline");
+                            tapIfPresent(ad, By.id("android:id/button2"),
+                                    "System dialog — Cancel/Deny");
+
+                            String pkg = ((AndroidDriver) ad).getCurrentPackage();
+                            if (APP_PACKAGE.equals(pkg)) return true;
+
+                            // If we dismissed a dialog but the app isn't foreground yet, re-activate
+                            ((AndroidDriver) ad).activateApp(APP_PACKAGE);
+                            return false;
+                        } catch (Exception e) {
+                            return false;
+                        }
+                    });
+            System.out.println("[LaunchApp] POP app is in foreground — proceeding.");
         } catch (Exception e) {
-            System.out.println("[LaunchApp] ⚠️  App-ready wait timed out: " + e.getMessage());
+            System.out.println("[LaunchApp] ⚠️  POP app did not come to foreground after "
+                    + APP_READY_TIMEOUT_SEC + "s: " + e.getMessage());
         }
     }
 
@@ -190,6 +212,11 @@ public class LaunchAppAction implements Action {
             dismissed |= tapIfPresent(driver,
                     AppiumBy.accessibilityId("app_update_later_button"),
                     "App update — Later");
+
+            // App onboarding / tour screen — "Close" button
+            dismissed |= tapIfPresent(driver,
+                    AppiumBy.accessibilityId("Close"),
+                    "App tour — Close/Skip");
 
             if (!dismissed) {
                 // No dialogs this round — we're clear

@@ -43,12 +43,12 @@ public class AppiumServerManager {
             return;
         }
 
-        // Kill any externally-started Appium on this port so we own the process and can stream its logs.
-        // Only in local mode — never kill a cloud/STF Appium server.
-        if (!CloudConfig.isCloudEnabled() && isLocalAppiumUp(port)) {
-            System.out.println("[Appium] Found external server on port " + port + " — restarting to capture logs...");
+        // Always kill whatever is on this port before starting — stale Appium processes from
+        // previous runs don't always respond to /status in time, so a health-check-gated kill
+        // misses them and causes EADDRINUSE.
+        if (!CloudConfig.isCloudEnabled()) {
             killPortProcess(port);
-            try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
+            try { Thread.sleep(500); } catch (InterruptedException ignored) {}
         }
 
         System.out.println("[Appium] Starting server on port " + port + "...");

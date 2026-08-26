@@ -33,8 +33,6 @@ public class TestListener implements ITestListener, ISuiteListener {
         tags = suite.getParameter("tag");
         title = suite.getName();
 
-        CloudConfig.setDeviceSerialFromTestNG(suite.getParameter("deviceSerial"));
-
         long start = System.currentTimeMillis() / 1000;
         TestContext.setStartTime(start);
 
@@ -154,6 +152,7 @@ public class TestListener implements ITestListener, ISuiteListener {
 
     @Override
     public void onTestSuccess(ITestResult result) {
+        System.out.println("✅ Test PASSED: " + resolveTestName(result));
         stopVideoQuietly(resolveTestName(result) + "_passed");
         updateStatus(result, TestCaseStatus.PASSED);
         TestLogCapture.stop();
@@ -161,6 +160,7 @@ public class TestListener implements ITestListener, ISuiteListener {
 
     @Override
     public void onTestFailure(ITestResult result) {
+        System.out.println("❌ Test FAILED: " + resolveTestName(result));
         DeviceKeepAlive.stop();
 
         String safeName = resolveTestName(result).replaceAll("[^a-zA-Z0-9_-]", "_");

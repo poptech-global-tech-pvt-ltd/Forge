@@ -163,10 +163,19 @@ public class CloudConfig {
     /**
      * PIN used to unlock STF farm devices at session start.
      * Set appium.device.unlock.pin in local.cloud.properties.
-     * Returns null when not set — Appium will skip unlock.
+     * Returns null when not set.
      */
     public static String getDeviceUnlockPin() {
         return get("appium.device.unlock.pin");
+    }
+
+    /**
+     * Password used to unlock STF farm devices at session start.
+     * Set appium.device.unlock.password in local.cloud.properties.
+     * Returns null when not set.
+     */
+    public static String getDeviceUnlockPassword() {
+        return get("appium.device.unlock.password");
     }
 
     /**

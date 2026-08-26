@@ -42,6 +42,11 @@ public class TestRunnerTest {
             throw new RuntimeException("No YAML files found in androidTests folder (including subfolders)");
         }
 
+        // Wire per-<test> deviceSerial into the ThreadLocal so DeviceManager picks the right device.
+        // Must happen on the test thread (not the suite listener) so parallel runs don't collide.
+        CloudConfig.setDeviceSerialFromTestNG(
+                context.getCurrentXmlTest().getParameter("deviceSerial"));
+
         String tagParam      = System.getProperty("tag",
                                 context.getCurrentXmlTest().getParameter("tag"));
         // -DtestFile=shop_clp_full.yaml on the mvn command line takes priority
@@ -110,6 +115,13 @@ public class TestRunnerTest {
 
         if (filtered.isEmpty()) {
             throw new RuntimeException("No tests matched given tags");
+        }
+
+        // Register the total test count for this device so AppiumDriverManager
+        // knows to keep the session alive until the last test completes.
+        String serial = context.getCurrentXmlTest().getParameter("deviceSerial");
+        if (serial != null && !serial.isBlank()) {
+            AppiumDriverManager.setExpectedTestCount(serial, filtered.size());
         }
 
         return filtered.toArray(new Object[0][0]);

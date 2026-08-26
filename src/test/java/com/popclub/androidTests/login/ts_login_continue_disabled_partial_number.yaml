@@ -19,25 +19,37 @@ steps:
   - action: launchApp
 
   - action: waitFor
-    element: login_input_phone
+    element: login_phone_input
 
   - action: enterText
-    element: login_input_phone
+    element: login_phone_input
     value: "94817"
 
   - action: tap
+    element: login_phone_input
+
+  - action: tapIfPresent
     element: login_continue_button
 
   - action: verifyElement
-    element: login_input_phone
+    element: login_phone_input
 
   - action: enterText
-    element: login_input_phone
+    element: login_phone_input
     value: "9538351687"
+
+  - action: tap
+    element: login_phone_input
 
   - action: tap
     element: login_continue_button
 
   - action: waitFor
-    element: login_merged_login_and_otp_screen_button
-    timeout: 30
+    element: skip_tour
+    timeout: 120
+
+  - action: tap
+    element: skip_tour
+
+  - action: verifyElement
+    element: home_tab
