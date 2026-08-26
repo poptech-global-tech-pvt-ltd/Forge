@@ -29,7 +29,14 @@ public class TestListener implements ITestListener, ISuiteListener {
 
         TestSigmaSessionManager.refreshSessionCookie();
 
+        // projectId may be at suite level or test level — collect from all tests as fallback
         projectId = suite.getParameter("projectId");
+        if (projectId == null || projectId.isEmpty()) {
+            for (org.testng.xml.XmlTest xmlTest : suite.getXmlSuite().getTests()) {
+                String val = xmlTest.getParameter("projectId");
+                if (val != null && !val.isEmpty()) { projectId = val; break; }
+            }
+        }
         tags = suite.getParameter("tag");
         title = suite.getName();
 
@@ -59,6 +66,18 @@ public class TestListener implements ITestListener, ISuiteListener {
         String testFileParam = System.getProperty("testFile");
         if (testFileParam == null || testFileParam.isEmpty()) {
             try { testFileParam = suite.getParameter("testFile"); } catch (Exception ignored) {}
+        }
+        // For multi-device suites, collect testFile from each <test> block
+        if (testFileParam == null || testFileParam.isEmpty()) {
+            StringBuilder combined = new StringBuilder();
+            for (org.testng.xml.XmlTest xmlTest : suite.getXmlSuite().getTests()) {
+                String val = xmlTest.getParameter("testFile");
+                if (val != null && !val.isEmpty()) {
+                    if (combined.length() > 0) combined.append(",");
+                    combined.append(val);
+                }
+            }
+            if (combined.length() > 0) testFileParam = combined.toString();
         }
         if (testFileParam != null && !testFileParam.isEmpty()) {
             for (String name : testFileParam.split(",")) {
