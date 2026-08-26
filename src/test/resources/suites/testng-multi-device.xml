@@ -8,20 +8,20 @@
 
     <!-- ═══════════════════════════════════════════════════════════════════
          Device A — Standard, WhatsApp installed, mobile data ON (7 tests)
-         Serial: LVPRFYAEWOYTSWEI
+         Serial:
     ════════════════════════════════════════════════════════════════════ -->
     <test name="Login — Device A">
-        <parameter name="deviceSerial" value="LVPRFYAEWOYTSWEI"/>
+        <parameter name="deviceSerial" value=""/>
         <parameter name="testFile"     value="ts_login_continue_disabled_partial_number.yaml,ts_login_edit_phone_from_otp_screen.yaml,ts_login_phone_rejects_non_numeric.yaml,ts_smv_pass_auto_request_id.yaml,ts_smv_pass_logged_in.yaml"/>
         <classes><class name="com.popclub.runner.TestRunnerTest"/></classes>
     </test>
 
     <!-- ═══════════════════════════════════════════════════════════════════
          Device B — Standard, WhatsApp installed, mobile data ON (7 tests)
-         Serial: LVPRFYAEWOYTSWEI
+         Serial:
     ════════════════════════════════════════════════════════════════════ -->
 <!--    <test name="Login — Device B">-->
-<!--        <parameter name="deviceSerial" value="LVPRFYAEWOYTSWEI"/>-->
+<!--        <parameter name="deviceSerial" value=""/>-->
 <!--        <parameter name="testFile"     value="ts_login_continue_disabled_partial_number.yaml,ts_login_edit_phone_from_otp_screen.yaml,ts_login_phone_rejects_non_numeric.yaml,ts_smv_pass_auto_request_id.yaml,ts_smv_pass_logged_in.yaml"/>-->
 <!--        <classes><class name="com.popclub.runner.TestRunnerTest"/></classes>-->
 <!--    </test>-->
