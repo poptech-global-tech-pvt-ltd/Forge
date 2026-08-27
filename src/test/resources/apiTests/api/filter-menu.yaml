@@ -4,9 +4,6 @@ platform: android
 noReset: true
 loginRequired: true
 
-testCaseIds:
-  - PO-API-FILTERS-MENU-LIST-001
-
 features:
   - common
   - login
@@ -27,7 +24,7 @@ steps:
     value: "1234561122"
     text: "560102"
 
-  # loginIfNeeded auto-captures the JWT into ${auth_token}
+  # loginIfNeeded auto-captures the JWT into ${auth_token} and userId into ${user_id}
 
   # ── 2. Filters-menu-list — POST https://sherlock.popclub.co.in/api/v4/filters-menu-list ─
   - action: fetchApi
@@ -37,9 +34,12 @@ steps:
     headers:
       Content-Type: "application/json"
       Authorization: "Token ${auth_token}"
-      X-Userid: "${user_id}"  # same open item as the other 2 API tests
+      X-Userid: "${user_id}"
     variable: filters_menu_list_response
-
-  # ── 3. Extract fields — schema unconfirmed, no sample response seen yet ───────
-  # TODO: run step 2 once, inspect filters_menu_list_response in logs, then fill in
-  # real JsonPath keys here instead of guessing.
+    extract:
+      is_success:            "is_success"
+      menu_item_count:       "data[0].menu_items.length()"
+      menu_item_0_id:        "data[0].menu_items[0].id"
+      menu_item_0_name:      "data[0].menu_items[0].name"
+      menu_item_0_type:      "data[0].menu_items[0].type"
+      response_time_ms:      "data[0].response_time_ms"
