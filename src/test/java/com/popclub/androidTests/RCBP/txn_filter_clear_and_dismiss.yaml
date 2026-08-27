@@ -1,0 +1,81 @@
+# D — ts_rcbp_category_filter_clear_and_dismiss.yaml
+# Covers: clear-all inside category panel (stays open) + applied chip dismiss via X
+testName: Category filter clear-all and chip dismiss behavior
+platform: android
+noReset: true
+loginRequired: false
+testCaseIds: PO-13265
+features: [common, billpay]
+tags: 
+  - regression
+  - rcbp 
+
+
+retry: 0
+
+steps:
+  - action: launchApp
+  
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+    
+  - action: tap
+    element: bills_tab  
+ 
+  # CONFIRM: entry point to RCBP transaction history
+  - action: scrollTo
+    element: edge_image_banner_image_8  
+   
+  - action: tap
+    element: edge_image_banner_image_8
+   
+  - action: tap
+    element: month
+
+  - action: tap
+    element: bill_pay_txn_history_filter_option_0
+    
+  - action: tap
+    element: bill_pay_txn_history_filter_option_1
+
+  # PO-13264 — clear-all deselects, panel stays open
+  - action: tap
+    element: bill_pay_txn_history_filter_clear_button
+    testCaseId: PO-13264
+    
+  - action: verifyElement
+    element: bill_pay_txn_history_filter_bottom_sheet_title
+    
+  - action: verifyElement
+    element: bill_pay_txn_history_filter_apply_button
+    
+  - action: tap
+    element: bill_pay_txn_history_filter_option_0
+    
+  - action: tap
+    element: bill_pay_txn_history_filter_option_1
+    
+  - action: tap
+    element: bill_pay_txn_history_filter_apply_button
+  
+  - action: verifyElement
+    element: bill_pay_txn_history_month_title_0
+    
+  - action: verifyElement
+    element: bill_pay_txn_history_month_title_1
+    testCaseId: PO-13266
+    
+  # PO-13265 — dismiss chip via X
+  - action: tap
+    element: skip_tour
+    
+  - action: tap
+    element: month
+    
+  - action: tap
+    element: skip_tour
+    
+  - action: assertNotVisible
+    element: bill_pay_txn_history_filter_bottom_sheet_title
+    testCaseId: PO-13265

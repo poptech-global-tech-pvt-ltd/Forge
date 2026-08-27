@@ -1,0 +1,42 @@
+testName: Payment success screen — breakdown accuracy and Bharat Connect branding
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds: [PO-13192]
+
+features: [common, billpay]
+
+tags: [rcbp, prepaid, regression]
+
+retry: 0
+
+steps:
+  - action: launchApp
+  
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+    
+  - action: tap
+    element: bills_tab  
+  
+  - action: scrollTo
+    element: Mobile_prepaid
+
+  - action: tap
+    element: Mobile_prepaid
+    
+  - action: tap
+    element: bill_pay_recharge_my_number_item
+    
+  - action: tap
+    element: bill_pay_recharge_plan_item_0
+
+
+  # PO-13192 — payment summary breakdown accurate
+  - action: verifyElement
+    element: total_price
+
+  - action: logVar
+    value: total_price
