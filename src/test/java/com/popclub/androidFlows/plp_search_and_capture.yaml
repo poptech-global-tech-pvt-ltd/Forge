@@ -1,0 +1,106 @@
+# Reusable flow: navigate to shop search results for a given query,
+# scroll to the first qualifying product, and capture all PLP UI price values.
+#
+# Pre-condition: caller must already be on the Shop CLP screen.
+#
+# Inputs (set via `params:` in the calling test):
+#   search_query   — search text shown in the search input   (required)
+#   search_pincode — delivery pincode for API filter         (required)
+#   search_phone   — phone for API auth   (optional — default: "1234561122")
+#   search_otp     — OTP for API auth     (optional — default: "560102")
+#
+# Outputs stored in TestContext:
+#   — all vars from search_get_product (product_title, product_id, product_index,
+#     product_size, product_brand, api_product_list_item_price, etc.)
+#   — product_list_item_price
+#   — product_list_item_strikethrough_price
+#   — product_list_item_price_with_popcoin  (empty when coin_burn_rules is null)
+#   — product_list_item_popcoin             (empty when coin_burn_rules is null)
+
+steps:
+  # ── API: fetch product + price data ──────────────────────────────────────
+  - action: call
+    flow: search_get_product
+    params:
+      search_query:   "${search_query}"
+      search_pincode: "${search_pincode}"
+      search_phone:   "${search_phone}"
+      search_otp:     "${search_otp}"
+
+  - action: logVar
+    variable: product_title
+    value: |
+      [plp_search_and_capture] API data
+      product_title           - ${product_title}
+      product_id              - ${product_id}
+      product_brand           - ${product_brand}
+      product_size            - ${product_size}
+      product_index           - ${product_index}
+      api_price               - ${api_product_list_item_price}
+      api_strikethrough       - ${api_product_list_item_strikethrough_price}
+      api_price_with_popcoin  - ${api_product_list_item_price_with_popcoin}
+      api_popcoin             - ${api_product_list_item_popcoin}
+      api_discount_pct        - ${api_product_list_item_discount_pct}
+      api_special_pricing     - ${api_product_list_item_special_pricing}
+      api_coin_burn_limit     - ${api_product_list_item_coin_burn_limit_default}
+
+  # ── UI: search and navigate to results ───────────────────────────────────
+  - action: waitFor
+    element: shop_search_button
+
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: enterText
+    element: search_products_search_input
+    value: "${search_query}"
+
+  - action: pressKey
+    value: search
+
+  - action: waitFor
+    element: product_list_item_0
+
+  - action: scrollTo
+    element: product_list_item_${product_index}
+
+  # ── UI: capture PLP prices for the qualifying product ────────────────────
+  - action: captureText
+    element: product_list_item_price_${product_index}
+    variable: product_list_item_price
+
+  - action: ifVarNotEquals
+    variable: api_product_list_item_price
+    value: "${api_product_list_item_strikethrough_price}"
+    steps:
+      - action: captureText
+        element: product_list_item_strikethrough_price_${product_index}
+        variable: product_list_item_strikethrough_price
+
+  - action: captureText
+    element: plp_item_price_with_popcoin_${product_index}
+    variable: product_list_item_price_with_popcoin
+
+  # Popcoin coin count: only present when special_pricing = true
+  - action: ifVarEquals
+    variable: api_product_list_item_special_pricing
+    value: "true"
+    steps:
+      - action: captureText
+        element: plp_item_price_with_popcoin_${product_index}
+        variable: product_list_item_price_with_popcoin
+      - action: captureText
+        element: plp_item_popcoin_${product_index}
+        variable: product_list_item_popcoin
+
+  - action: logVar
+    variable: product_list_item_price
+    value: |
+      [plp_search_and_capture] PLP UI prices
+      product_list_item_price               - ${product_list_item_price}
+      product_list_item_strikethrough_price - ${product_list_item_strikethrough_price}
+      product_list_item_price_with_popcoin  - ${product_list_item_price_with_popcoin}
+      product_list_item_popcoin             - ${product_list_item_popcoin}

@@ -1,0 +1,1716 @@
+activate_lite_add_money_bottom_section_row:
+  android:
+    - type: accessibilityId
+      value: activate_lite_add_money_bottom_section_row
+activate_lite_add_money_bottom_section_row_1:
+  android:
+    - type: accessibilityId
+      value: activate_lite_add_money_bottom_section_row_1
+activate_lite_add_money_button:
+  android:
+    - type: accessibilityId
+      value: activate_lite_add_money_button
+activate_lite_amount_chip_0:
+  android:
+    - type: accessibilityId
+      value: activate_lite_amount_chip_0
+activate_lite_amount_chip_1:
+  android:
+    - type: accessibilityId
+      value: activate_lite_amount_chip_1
+activate_lite_amount_input:
+  android:
+    - type: accessibilityId
+      value: activate_lite_amount_input
+activate_lite_proceed_button:
+  android:
+    - type: accessibilityId
+      value: activate_lite_proceed_button
+activate_lite_upi_lite_bank_selection_list_button:
+  android:
+    - type: accessibilityId
+      value: activate_lite_upi_lite_bank_selection_list_button
+activate_lite_upi_lite_bank_selection_list_item_item_0:
+  android:
+    - type: accessibilityId
+      value: activate_lite_upi_lite_bank_selection_list_item_item_0
+activate_lite_upi_lite_bank_selection_list_item_item_1:
+  android:
+    - type: accessibilityId
+      value: activate_lite_upi_lite_bank_selection_list_item_item_1
+activate_lite_upi_lite_bank_selection_list_radio:
+  android:
+    - type: accessibilityId
+      value: activate_lite_upi_lite_bank_selection_list_radio
+activate_lite_upi_lite_bank_selection_list_row:
+  android:
+    - type: accessibilityId
+      value: activate_lite_upi_lite_bank_selection_list_row
+add_address_confirm_location_button:
+  android:
+    - type: accessibilityId
+      value: add_address_confirm_location_button
+add_address_email_input:
+  android:
+    - type: accessibilityId
+      value: add_address_email_input
+add_address_first_name_input:
+  android:
+    - type: accessibilityId
+      value: add_address_first_name_input
+add_address_house_no_input:
+  android:
+    - type: accessibilityId
+      value: add_address_house_no_input
+add_address_last_name_input:
+  android:
+    - type: accessibilityId
+      value: add_address_last_name_input
+add_address_phone_input:
+  android:
+    - type: accessibilityId
+      value: add_address_phone_input
+add_address_save_button:
+  android:
+    - type: accessibilityId
+      value: add_address_save_button
+add_address_screen_button:
+  android:
+    - type: accessibilityId
+      value: add_address_screen_button
+add_address_screen_button_1:
+  android:
+    - type: accessibilityId
+      value: add_address_screen_button_1
+add_address_screen_item_item_0:
+  android:
+    - type: accessibilityId
+      value: add_address_screen_item_item_0
+add_address_screen_item_item_1:
+  android:
+    - type: accessibilityId
+      value: add_address_screen_item_item_1
+add_address_screen_row:
+  android:
+    - type: accessibilityId
+      value: add_address_screen_row
+add_address_search_input:
+  android:
+    - type: accessibilityId
+      value: add_address_search_input
+add_faves_contact_item_0:
+  android:
+    - type: accessibilityId
+      value: add_faves_contact_item_0
+add_faves_contact_item_1:
+  android:
+    - type: accessibilityId
+      value: add_faves_contact_item_1
+add_faves_filtered_contact_item_0:
+  android:
+    - type: accessibilityId
+      value: add_faves_filtered_contact_item_0
+add_faves_filtered_contact_item_1:
+  android:
+    - type: accessibilityId
+      value: add_faves_filtered_contact_item_1
+add_faves_search_input:
+  android:
+    - type: accessibilityId
+      value: add_faves_search_input
+additional_details_content_item_item_0:
+  android:
+    - type: accessibilityId
+      value: additional_details_content_item_item_0
+additional_details_content_item_item_1:
+  android:
+    - type: accessibilityId
+      value: additional_details_content_item_item_1
+additional_details_selection_chip_row:
+  android:
+    - type: accessibilityId
+      value: additional_details_selection_chip_row
+additional_details_tnc_checkbox_row_with_bottom_sheet_checkbox:
+  android:
+    - type: accessibilityId
+      value: additional_details_tnc_checkbox_row_with_bottom_sheet_checkbox
+additional_details_tnc_checkbox_row_with_bottom_sheet_row:
+  android:
+    - type: accessibilityId
+      value: additional_details_tnc_checkbox_row_with_bottom_sheet_row
+additional_details_user_details_error_bottom_sheet_button:
+  android:
+    - type: accessibilityId
+      value: additional_details_user_details_error_bottom_sheet_button
+additional_details_user_details_error_bottom_sheet_input:
+  android:
+    - type: accessibilityId
+      value: additional_details_user_details_error_bottom_sheet_input
+additional_details_user_details_error_bottom_sheet_input_1:
+  android:
+    - type: accessibilityId
+      value: additional_details_user_details_error_bottom_sheet_input_1
+additional_details_user_details_error_bottom_sheet_input_2:
+  android:
+    - type: accessibilityId
+      value: additional_details_user_details_error_bottom_sheet_input_2
+additional_details_user_details_error_bottom_sheet_input_3:
+  android:
+    - type: accessibilityId
+      value: additional_details_user_details_error_bottom_sheet_input_3
+additional_details_user_details_error_bottom_sheet_row:
+  android:
+    - type: accessibilityId
+      value: additional_details_user_details_error_bottom_sheet_row
+app_update_later_button:
+  android:
+    - type: accessibilityId
+      value: app_update_later_button
+app_update_title_text:
+  android:
+    - type: accessibilityId
+      value: app_update_title_text
+app_update_update_button:
+  android:
+    - type: accessibilityId
+      value: app_update_update_button
+approve_mandate_amount_text:
+  android:
+    - type: accessibilityId
+      value: approve_mandate_amount_text
+approve_mandate_approve_button:
+  android:
+    - type: accessibilityId
+      value: approve_mandate_approve_button
+approve_mandate_bottom_view_row:
+  android:
+    - type: accessibilityId
+      value: approve_mandate_bottom_view_row
+approve_mandate_bottom_view_row_1:
+  android:
+    - type: accessibilityId
+      value: approve_mandate_bottom_view_row_1
+approve_mandate_bottom_view_row_2:
+  android:
+    - type: accessibilityId
+      value: approve_mandate_bottom_view_row_2
+approve_mandate_bottom_view_row_3:
+  android:
+    - type: accessibilityId
+      value: approve_mandate_bottom_view_row_3
+approve_mandate_bottom_view_row_4:
+  android:
+    - type: accessibilityId
+      value: approve_mandate_bottom_view_row_4
+approve_mandate_bottom_view_row_5:
+  android:
+    - type: accessibilityId
+      value: approve_mandate_bottom_view_row_5
+approve_mandate_decline_button:
+  android:
+    - type: accessibilityId
+      value: approve_mandate_decline_button
+approve_mandate_mandate_row_icon_button:
+  android:
+    - type: accessibilityId
+      value: approve_mandate_mandate_row_icon_button
+approve_mandate_screen_button:
+  android:
+    - type: accessibilityId
+      value: approve_mandate_screen_button
+approve_mandate_screen_button_1:
+  android:
+    - type: accessibilityId
+      value: approve_mandate_screen_button_1
+approve_mandate_screen_button_2:
+  android:
+    - type: accessibilityId
+      value: approve_mandate_screen_button_2
+approve_mandate_screen_button_3:
+  android:
+    - type: accessibilityId
+      value: approve_mandate_screen_button_3
+approve_mandate_screen_button_4:
+  android:
+    - type: accessibilityId
+      value: approve_mandate_screen_button_4
+approve_mandate_screen_button_5:
+  android:
+    - type: accessibilityId
+      value: approve_mandate_screen_button_5
+banks_list_bank_item_0:
+  android:
+    - type: accessibilityId
+      value: banks_list_bank_item_0
+banks_list_bank_item_1:
+  android:
+    - type: accessibilityId
+      value: banks_list_bank_item_1
+banks_list_search_input:
+  android:
+    - type: accessibilityId
+      value: banks_list_search_input
+banks_list_upi_error_view_button:
+  android:
+    - type: accessibilityId
+      value: banks_list_upi_error_view_button
+banks_list_upi_error_view_button_1:
+  android:
+    - type: accessibilityId
+      value: banks_list_upi_error_view_button_1
+blocked_vpa_empty_state:
+  android:
+    - type: accessibilityId
+      value: blocked_vpa_empty_state
+blocked_vpa_item_0:
+  android:
+    - type: accessibilityId
+      value: blocked_vpa_item_0
+blocked_vpa_item_1:
+  android:
+    - type: accessibilityId
+      value: blocked_vpa_item_1
+blocked_vpa_unblock_button:
+  android:
+    - type: accessibilityId
+      value: blocked_vpa_unblock_button
+browser_end_chat_button:
+  android:
+    - type: accessibilityId
+      value: browser_end_chat_button
+browser_title_text:
+  android:
+    - type: accessibilityId
+      value: browser_title_text
+browser_webview:
+  android:
+    - type: accessibilityId
+      value: browser_webview
+camera_permission_allow_button:
+  android:
+    - type: accessibilityId
+      value: camera_permission_allow_button
+card_delivery_address_delivery_address_card_radio:
+  android:
+    - type: accessibilityId
+      value: card_delivery_address_delivery_address_card_radio
+card_delivery_address_delivery_address_card_row:
+  android:
+    - type: accessibilityId
+      value: card_delivery_address_delivery_address_card_row
+card_delivery_address_delivery_address_card_row_1:
+  android:
+    - type: accessibilityId
+      value: card_delivery_address_delivery_address_card_row_1
+card_delivery_address_invalid_email_bottom_sheet_button:
+  android:
+    - type: accessibilityId
+      value: card_delivery_address_invalid_email_bottom_sheet_button
+card_delivery_address_invalid_email_bottom_sheet_input:
+  android:
+    - type: accessibilityId
+      value: card_delivery_address_invalid_email_bottom_sheet_input
+common_back_button:
+  android:
+    - type: accessibilityId
+      value: common_back_button
+common_card_tab:
+  android:
+    - type: accessibilityId
+      value: common_card_tab
+common_history_tab:
+  android:
+    - type: accessibilityId
+      value: common_history_tab
+common_home_tab:
+  android:
+    - type: accessibilityId
+      value: common_shop_tab
+common_shop_tab:
+  android:
+    - type: accessibilityId
+      value: common_shop_tab
+complete_profile_button:
+  android:
+    - type: accessibilityId
+      value: complete_profile_button
+components_external_link_bottom_sheet_button:
+  android:
+    - type: accessibilityId
+      value: components_external_link_bottom_sheet_button
+components_external_link_bottom_sheet_button_1:
+  android:
+    - type: accessibilityId
+      value: components_external_link_bottom_sheet_button_1
+components_invalid_qr_bottom_sheet_button:
+  android:
+    - type: accessibilityId
+      value: components_invalid_qr_bottom_sheet_button
+create_upi_account_skip_button:
+  android:
+    - type: accessibilityId
+      value: create_upi_account_skip_button
+create_upi_account_submit_button:
+  android:
+    - type: accessibilityId
+      value: create_upi_account_submit_button
+create_upi_number_bottom_sheet_v2_select_upiid_item_item_0:
+  android:
+    - type: accessibilityId
+      value: create_upi_number_bottom_sheet_v2_select_upiid_item_item_0
+create_upi_number_bottom_sheet_v2_select_upiid_item_item_1:
+  android:
+    - type: accessibilityId
+      value: create_upi_number_bottom_sheet_v2_select_upiid_item_item_1
+create_upi_number_bottom_sheet_v2_select_upiid_item1_item_0:
+  android:
+    - type: accessibilityId
+      value: create_upi_number_bottom_sheet_v2_select_upiid_item1_item_0
+create_upi_number_bottom_sheet_v2_select_upiid_item1_item_1:
+  android:
+    - type: accessibilityId
+      value: create_upi_number_bottom_sheet_v2_select_upiid_item1_item_1
+create_upi_number_confirm_button:
+  android:
+    - type: accessibilityId
+      value: create_upi_number_confirm_button
+create_upi_number_input:
+  android:
+    - type: accessibilityId
+      value: create_upi_number_input
+create_upi_number_upi_id_selector:
+  android:
+    - type: accessibilityId
+      value: create_upi_number_upi_id_selector
+delete_lite_cancel_button:
+  android:
+    - type: accessibilityId
+      value: delete_lite_cancel_button
+delete_lite_confirm_button:
+  android:
+    - type: accessibilityId
+      value: delete_lite_confirm_button
+delete_lite_got_it_button:
+  android:
+    - type: accessibilityId
+      value: delete_lite_got_it_button
+delete_lite_success_title_text:
+  android:
+    - type: accessibilityId
+      value: delete_lite_success_title_text
+delete_lite_title_text:
+  android:
+    - type: accessibilityId
+      value: delete_lite_title_text
+dotted_underline_text_row:
+  android:
+    - type: accessibilityId
+      value: dotted_underline_text_row
+edge_image_banner_widget_row:
+  android:
+    - type: accessibilityId
+      value: edge_image_banner_widget_row
+edge_image_banner_widget_row_1:
+  android:
+    - type: accessibilityId
+      value: edge_image_banner_widget_row_1
+edge_image_banner_widget_row_2:
+  android:
+    - type: accessibilityId
+      value: edge_image_banner_widget_row_2
+edge_image_banner_widget_row_3:
+  android:
+    - type: accessibilityId
+      value: edge_image_banner_widget_row_3
+edit_profile_avatar_button:
+  android:
+    - type: accessibilityId
+      value: edit_profile_avatar_button
+edit_profile_camera_permission_sheet_content_button:
+  android:
+    - type: accessibilityId
+      value: edit_profile_camera_permission_sheet_content_button
+edit_profile_camera_permission_sheet_content_button_1:
+  android:
+    - type: accessibilityId
+      value: edit_profile_camera_permission_sheet_content_button_1
+edit_profile_email_input:
+  android:
+    - type: accessibilityId
+      value: edit_profile_email_input
+edit_profile_first_name_input:
+  android:
+    - type: accessibilityId
+      value: edit_profile_first_name_input
+edit_profile_gender_female_chip:
+  android:
+    - type: accessibilityId
+      value: edit_profile_gender_female_chip
+edit_profile_gender_male_chip:
+  android:
+    - type: accessibilityId
+      value: edit_profile_gender_male_chip
+edit_profile_gender_others_chip:
+  android:
+    - type: accessibilityId
+      value: edit_profile_gender_others_chip
+edit_profile_last_name_input:
+  android:
+    - type: accessibilityId
+      value: edit_profile_last_name_input
+edit_profile_save_button:
+  android:
+    - type: accessibilityId
+      value: edit_profile_save_button
+edit_profile_screen_input:
+  android:
+    - type: accessibilityId
+      value: edit_profile_screen_input
+enter_more_details_bottom_sheet_content_input:
+  android:
+    - type: accessibilityId
+      value: enter_more_details_bottom_sheet_content_input
+enter_more_details_bottom_sheet_content_radio:
+  android:
+    - type: accessibilityId
+      value: enter_more_details_bottom_sheet_content_radio
+enter_more_details_bottom_sheet_content_radio_1:
+  android:
+    - type: accessibilityId
+      value: enter_more_details_bottom_sheet_content_radio_1
+enter_more_details_bottom_sheet_content_radio_2:
+  android:
+    - type: accessibilityId
+      value: enter_more_details_bottom_sheet_content_radio_2
+enter_more_details_bottom_sheet_content_row:
+  android:
+    - type: accessibilityId
+      value: enter_more_details_bottom_sheet_content_row
+enter_more_details_bottom_sheet_content_row_1:
+  android:
+    - type: accessibilityId
+      value: enter_more_details_bottom_sheet_content_row_1
+enter_more_details_bottom_sheet_content_row_2:
+  android:
+    - type: accessibilityId
+      value: enter_more_details_bottom_sheet_content_row_2
+enter_more_details_bottom_sheet_content_row_3:
+  android:
+    - type: accessibilityId
+      value: enter_more_details_bottom_sheet_content_row_3
+faq_category_item_0:
+  android:
+    - type: accessibilityId
+      value: faq_category_item_0
+faq_category_item_1:
+  android:
+    - type: accessibilityId
+      value: faq_category_item_1
+faq_details_answer_text:
+  android:
+    - type: accessibilityId
+      value: faq_details_answer_text
+faq_details_question_text:
+  android:
+    - type: accessibilityId
+      value: faq_details_question_text
+faq_email_close_button:
+  android:
+    - type: accessibilityId
+      value: faq_email_close_button
+faq_email_details_input:
+  android:
+    - type: accessibilityId
+      value: faq_email_details_input
+faq_email_input:
+  android:
+    - type: accessibilityId
+      value: faq_email_input
+faq_email_send_button:
+  android:
+    - type: accessibilityId
+      value: faq_email_send_button
+faq_email_subject_input:
+  android:
+    - type: accessibilityId
+      value: faq_email_subject_input
+faq_search_input:
+  android:
+    - type: accessibilityId
+      value: faq_search_input
+faq_search_item_0:
+  android:
+    - type: accessibilityId
+      value: faq_search_item_0
+faq_search_item_1:
+  android:
+    - type: accessibilityId
+      value: faq_search_item_1
+faq_send_email_bottom_sheet_upload_image_item_row:
+  android:
+    - type: accessibilityId
+      value: faq_send_email_bottom_sheet_upload_image_item_row
+faq_send_email_bottom_sheet_upload_video_item_row:
+  android:
+    - type: accessibilityId
+      value: faq_send_email_bottom_sheet_upload_video_item_row
+faq_send_email_bottom_sheet_uploaded_media_item_row:
+  android:
+    - type: accessibilityId
+      value: faq_send_email_bottom_sheet_uploaded_media_item_row
+fetched_accounts_account_item_radio:
+  android:
+    - type: accessibilityId
+      value: fetched_accounts_account_item_radio
+fetched_accounts_item_0:
+  android:
+    - type: accessibilityId
+      value: fetched_accounts_item_0
+fetched_accounts_item_1:
+  android:
+    - type: accessibilityId
+      value: fetched_accounts_item_1
+fetched_accounts_link_button:
+  android:
+    - type: accessibilityId
+      value: fetched_accounts_link_button
+filter_selection_category_tab_row:
+  android:
+    - type: accessibilityId
+      value: filter_selection_category_tab_row
+filter_selection_sub_filter_item_checkbox:
+  android:
+    - type: accessibilityId
+      value: filter_selection_sub_filter_item_checkbox
+filter_selection_sub_filter_item_row:
+  android:
+    - type: accessibilityId
+      value: filter_selection_sub_filter_item_row
+help_and_support_latest_queries_section_row:
+  android:
+    - type: accessibilityId
+      value: help_and_support_latest_queries_section_row
+help_and_support_latest_ticket_card_row:
+  android:
+    - type: accessibilityId
+      value: help_and_support_latest_ticket_card_row
+help_and_support_top_question_item_row:
+  android:
+    - type: accessibilityId
+      value: help_and_support_top_question_item_row
+help_support_chat_button:
+  android:
+    - type: accessibilityId
+      value: help_support_chat_button
+help_support_email_button:
+  android:
+    - type: accessibilityId
+      value: help_support_email_button
+help_support_item_0:
+  android:
+    - type: accessibilityId
+      value: help_support_item_0
+help_support_item_1:
+  android:
+    - type: accessibilityId
+      value: help_support_item_1
+help_support_search_button:
+  android:
+    - type: accessibilityId
+      value: help_support_search_button
+help_support_top_question_item_0:
+  android:
+    - type: accessibilityId
+      value: help_support_top_question_item_0
+help_support_top_question_item_1:
+  android:
+    - type: accessibilityId
+      value: help_support_top_question_item_1
+invalid_qr_scan_again_button:
+  android:
+    - type: accessibilityId
+      value: invalid_qr_scan_again_button
+link_detected_open_button:
+  android:
+    - type: accessibilityId
+      value: link_detected_open_button
+link_upi_checkout_link_button:
+  android:
+    - type: accessibilityId
+      value: link_upi_checkout_link_button
+link_upi_checkout_other_options:
+  android:
+    - type: accessibilityId
+      value: link_upi_checkout_other_options
+link_upi_checkout_pop_upi_option:
+  android:
+    - type: accessibilityId
+      value: link_upi_checkout_pop_upi_option
+link_upi_checkout_title_text:
+  android:
+    - type: accessibilityId
+      value: link_upi_checkout_title_text
+link_upi_from_checkout_bottom_sheet_radio:
+  android:
+    - type: accessibilityId
+      value: link_upi_from_checkout_bottom_sheet_radio
+link_upi_from_checkout_bottom_sheet_radio_1:
+  android:
+    - type: accessibilityId
+      value: link_upi_from_checkout_bottom_sheet_radio_1
+link_upi_from_checkout_bottom_sheet_row:
+  android:
+    - type: accessibilityId
+      value: link_upi_from_checkout_bottom_sheet_row
+linked_bank_accounts_check_balance_column_button:
+  android:
+    - type: accessibilityId
+      value: linked_bank_accounts_check_balance_column_button
+linked_bank_accounts_check_balance_column_row:
+  android:
+    - type: accessibilityId
+      value: linked_bank_accounts_check_balance_column_row
+linked_bank_accounts_check_balance_column_row_1:
+  android:
+    - type: accessibilityId
+      value: linked_bank_accounts_check_balance_column_row_1
+linked_bank_accounts_check_balance_column_row_2:
+  android:
+    - type: accessibilityId
+      value: linked_bank_accounts_check_balance_column_row_2
+linked_bank_accounts_check_balance_column_row_3:
+  android:
+    - type: accessibilityId
+      value: linked_bank_accounts_check_balance_column_row_3
+linked_bank_accounts_delete_account_pop_bottom_sheet_button:
+  android:
+    - type: accessibilityId
+      value: linked_bank_accounts_delete_account_pop_bottom_sheet_button
+linked_bank_accounts_delete_account_pop_bottom_sheet_button_1:
+  android:
+    - type: accessibilityId
+      value: linked_bank_accounts_delete_account_pop_bottom_sheet_button_1
+linked_bank_accounts_upi_error_pop_bottom_sheet_button:
+  android:
+    - type: accessibilityId
+      value: linked_bank_accounts_upi_error_pop_bottom_sheet_button
+linked_bank_accounts_upi_id_block_item_item_0:
+  android:
+    - type: accessibilityId
+      value: linked_bank_accounts_upi_id_block_item_item_0
+linked_bank_accounts_upi_id_block_item_item_1:
+  android:
+    - type: accessibilityId
+      value: linked_bank_accounts_upi_id_block_item_item_1
+linked_bank_accounts_upi_id_block_radio:
+  android:
+    - type: accessibilityId
+      value: linked_bank_accounts_upi_id_block_radio
+linked_bank_accounts_upi_id_block_row:
+  android:
+    - type: accessibilityId
+      value: linked_bank_accounts_upi_id_block_row
+linked_bank_accounts_upi_id_block_row_1:
+  android:
+    - type: accessibilityId
+      value: linked_bank_accounts_upi_id_block_row_1
+linked_banks_account_item_0:
+  android:
+    - type: accessibilityId
+      value: linked_banks_account_item_0
+linked_banks_account_item_1:
+  android:
+    - type: accessibilityId
+      value: linked_banks_account_item_1
+linked_banks_add_button:
+  android:
+    - type: accessibilityId
+      value: linked_banks_add_button
+linking_success_coins_chip_header_row:
+  android:
+    - type: accessibilityId
+      value: linking_success_coins_chip_header_row
+linking_success_continue_button:
+  android:
+    - type: accessibilityId
+      value: linking_success_continue_button
+linking_success_done_button:
+  android:
+    - type: accessibilityId
+      value: linking_success_done_button
+linking_success_link_account_button:
+  android:
+    - type: accessibilityId
+      value: linking_success_link_account_button
+linking_success_more_circle_row:
+  android:
+    - type: accessibilityId
+      value: linking_success_more_circle_row
+linking_success_other_linked_accounts_item_item_0:
+  android:
+    - type: accessibilityId
+      value: linking_success_other_linked_accounts_item_item_0
+linking_success_other_linked_accounts_item_item_1:
+  android:
+    - type: accessibilityId
+      value: linking_success_other_linked_accounts_item_item_1
+linking_success_share_circle_row:
+  android:
+    - type: accessibilityId
+      value: linking_success_share_circle_row
+lite_success_amount_text:
+  android:
+    - type: accessibilityId
+      value: lite_success_amount_text
+lite_success_status_text:
+  android:
+    - type: accessibilityId
+      value: lite_success_status_text
+manage_autopay_mandate_item_0:
+  android:
+    - type: accessibilityId
+      value: manage_autopay_mandate_item_0
+manage_autopay_mandate_item_1:
+  android:
+    - type: accessibilityId
+      value: manage_autopay_mandate_item_1
+manage_autopay_mandate_pending_requestitem_button:
+  android:
+    - type: accessibilityId
+      value: manage_autopay_mandate_pending_requestitem_button
+manage_autopay_mandate_pending_requestitem_button_1:
+  android:
+    - type: accessibilityId
+      value: manage_autopay_mandate_pending_requestitem_button_1
+manage_autopay_mandate_pending_requestitem_button_2:
+  android:
+    - type: accessibilityId
+      value: manage_autopay_mandate_pending_requestitem_button_2
+manage_autopay_mandate_pending_requestitem_button_3:
+  android:
+    - type: accessibilityId
+      value: manage_autopay_mandate_pending_requestitem_button_3
+manage_autopay_mandate_pending_requestitem_button_4:
+  android:
+    - type: accessibilityId
+      value: manage_autopay_mandate_pending_requestitem_button_4
+manage_autopay_mandate_pending_requestitem_button_5:
+  android:
+    - type: accessibilityId
+      value: manage_autopay_mandate_pending_requestitem_button_5
+manage_autopay_mandate_pending_requestitem_row:
+  android:
+    - type: accessibilityId
+      value: manage_autopay_mandate_pending_requestitem_row
+manage_autopay_pause_button:
+  android:
+    - type: accessibilityId
+      value: manage_autopay_pause_button
+manage_autopay_pending_item_0:
+  android:
+    - type: accessibilityId
+      value: manage_autopay_pending_item_0
+manage_autopay_pending_item_1:
+  android:
+    - type: accessibilityId
+      value: manage_autopay_pending_item_1
+manage_autopay_resume_button:
+  android:
+    - type: accessibilityId
+      value: manage_autopay_resume_button
+media_upload_v2_upload_media_card_v2_row:
+  android:
+    - type: accessibilityId
+      value: media_upload_v2_upload_media_card_v2_row
+media_upload_v2_upload_media_card_v2_row_1:
+  android:
+    - type: accessibilityId
+      value: media_upload_v2_upload_media_card_v2_row_1
+media_upload_v2_upload_video_card_v2_row:
+  android:
+    - type: accessibilityId
+      value: media_upload_v2_upload_video_card_v2_row
+media_upload_v2_uploaded_media_display_v2_row:
+  android:
+    - type: accessibilityId
+      value: media_upload_v2_uploaded_media_display_v2_row
+my_qr_account_selection_bottom_sheet_content_button:
+  android:
+    - type: accessibilityId
+      value: my_qr_account_selection_bottom_sheet_content_button
+my_qr_account_selection_bottom_sheet_content_button_1:
+  android:
+    - type: accessibilityId
+      value: my_qr_account_selection_bottom_sheet_content_button_1
+my_qr_amount_display_section_row:
+  android:
+    - type: accessibilityId
+      value: my_qr_amount_display_section_row
+my_qr_bank_information_section_row:
+  android:
+    - type: accessibilityId
+      value: my_qr_bank_information_section_row
+my_qr_bank_information_section_row_1:
+  android:
+    - type: accessibilityId
+      value: my_qr_bank_information_section_row_1
+my_qr_bank_information_section_row_2:
+  android:
+    - type: accessibilityId
+      value: my_qr_bank_information_section_row_2
+my_qr_download_button:
+  android:
+    - type: accessibilityId
+      value: my_qr_download_button
+my_qr_set_amount_button:
+  android:
+    - type: accessibilityId
+      value: my_qr_set_amount_button
+my_qr_set_custom_amount_bottom_sheet_button:
+  android:
+    - type: accessibilityId
+      value: my_qr_set_custom_amount_bottom_sheet_button
+my_qr_set_custom_amount_bottom_sheet_input:
+  android:
+    - type: accessibilityId
+      value: my_qr_set_custom_amount_bottom_sheet_input
+my_qr_set_custom_amount_bottom_sheet_input_1:
+  android:
+    - type: accessibilityId
+      value: my_qr_set_custom_amount_bottom_sheet_input_1
+my_qr_set_custom_amount_bottom_sheet_row:
+  android:
+    - type: accessibilityId
+      value: my_qr_set_custom_amount_bottom_sheet_row
+my_qr_set_custom_amount_bottom_sheet_row_1:
+  android:
+    - type: accessibilityId
+      value: my_qr_set_custom_amount_bottom_sheet_row_1
+my_qr_share_button:
+  android:
+    - type: accessibilityId
+      value: my_qr_share_button
+my_qr_upi_id_selection_bottom_sheet_content_item_item_0:
+  android:
+    - type: accessibilityId
+      value: my_qr_upi_id_selection_bottom_sheet_content_item_item_0
+my_qr_upi_id_selection_bottom_sheet_content_item_item_1:
+  android:
+    - type: accessibilityId
+      value: my_qr_upi_id_selection_bottom_sheet_content_item_item_1
+my_qr_upi_id_selection_bottom_sheet_content_radio:
+  android:
+    - type: accessibilityId
+      value: my_qr_upi_id_selection_bottom_sheet_content_radio
+my_queries_empty_state:
+  android:
+    - type: accessibilityId
+      value: my_queries_empty_state
+my_queries_item_0:
+  android:
+    - type: accessibilityId
+      value: my_queries_item_0
+my_queries_item_1:
+  android:
+    - type: accessibilityId
+      value: my_queries_item_1
+my_rewards_brand_name_text:
+  android:
+    - type: accessibilityId
+      value: my_rewards_brand_name_text
+my_rewards_item_0:
+  android:
+    - type: accessibilityId
+      value: my_rewards_item_0
+my_rewards_item_1:
+  android:
+    - type: accessibilityId
+      value: my_rewards_item_1
+my_upi_id_cancel_button:
+  android:
+    - type: accessibilityId
+      value: my_upi_id_cancel_button
+my_upi_id_deregister_button:
+  android:
+    - type: accessibilityId
+      value: my_upi_id_deregister_button
+my_upi_id_error_sheet_content_button:
+  android:
+    - type: accessibilityId
+      value: my_upi_id_error_sheet_content_button
+my_upi_id_item_0:
+  android:
+    - type: accessibilityId
+      value: my_upi_id_item_0
+my_upi_id_item_1:
+  android:
+    - type: accessibilityId
+      value: my_upi_id_item_1
+my_upi_id_remove_button:
+  android:
+    - type: accessibilityId
+      value: my_upi_id_remove_button
+my_upi_ids_item_0:
+  android:
+    - type: accessibilityId
+      value: my_upi_ids_item_0
+my_upi_ids_item_1:
+  android:
+    - type: accessibilityId
+      value: my_upi_ids_item_1
+my_upi_ids_remove_button:
+  android:
+    - type: accessibilityId
+      value: my_upi_ids_remove_button
+office_address_form_bottom_sheet_button:
+  android:
+    - type: accessibilityId
+      value: office_address_form_bottom_sheet_button
+office_address_office_city_selection_bottom_sheet_button:
+  android:
+    - type: accessibilityId
+      value: office_address_office_city_selection_bottom_sheet_button
+office_address_office_city_selection_bottom_sheet_item_item_0:
+  android:
+    - type: accessibilityId
+      value: office_address_office_city_selection_bottom_sheet_item_item_0
+office_address_office_city_selection_bottom_sheet_item_item_1:
+  android:
+    - type: accessibilityId
+      value: office_address_office_city_selection_bottom_sheet_item_item_1
+office_address_office_city_selection_bottom_sheet_item1_item_0:
+  android:
+    - type: accessibilityId
+      value: office_address_office_city_selection_bottom_sheet_item1_item_0
+office_address_office_city_selection_bottom_sheet_item1_item_1:
+  android:
+    - type: accessibilityId
+      value: office_address_office_city_selection_bottom_sheet_item1_item_1
+office_address_office_city_selector_input:
+  android:
+    - type: accessibilityId
+      value: office_address_office_city_selector_input
+office_address_office_city_selector_row:
+  android:
+    - type: accessibilityId
+      value: office_address_office_city_selector_row
+office_address_read_only_address_card_radio:
+  android:
+    - type: accessibilityId
+      value: office_address_read_only_address_card_radio
+office_address_selectable_address_card_radio:
+  android:
+    - type: accessibilityId
+      value: office_address_selectable_address_card_radio
+office_address_selectable_address_card_row:
+  android:
+    - type: accessibilityId
+      value: office_address_selectable_address_card_row
+office_address_selectable_address_card_row_1:
+  android:
+    - type: accessibilityId
+      value: office_address_selectable_address_card_row_1
+operator_state_selection_screen_error_bottom_sheet_content_button:
+  android:
+    - type: accessibilityId
+      value: operator_state_selection_screen_error_bottom_sheet_content_button
+operator_state_selection_screen_error_bottom_sheet_content_button_1:
+  android:
+    - type: accessibilityId
+      value: operator_state_selection_screen_error_bottom_sheet_content_button_1
+operator_state_selection_screen_error_bottom_sheet_content_button_2:
+  android:
+    - type: accessibilityId
+      value: operator_state_selection_screen_error_bottom_sheet_content_button_2
+operator_state_selection_screen_error_bottom_sheet_content_button_3:
+  android:
+    - type: accessibilityId
+      value: operator_state_selection_screen_error_bottom_sheet_content_button_3
+operator_state_selection_screen_error_bottom_sheet_content_button_4:
+  android:
+    - type: accessibilityId
+      value: operator_state_selection_screen_error_bottom_sheet_content_button_4
+operator_state_selection_screen_row:
+  android:
+    - type: accessibilityId
+      value: operator_state_selection_screen_row
+orders_item_0:
+  android:
+    - type: accessibilityId
+      value: orders_item_0
+orders_item_1:
+  android:
+    - type: accessibilityId
+      value: orders_item_1
+orders_order_items_container_input:
+  android:
+    - type: accessibilityId
+      value: orders_order_items_container_input
+orders_screen_row:
+  android:
+    - type: accessibilityId
+      value: orders_screen_row
+orders_screen_row_1:
+  android:
+    - type: accessibilityId
+      value: orders_screen_row_1
+orders_select_order_filter_bottom_sheet_button:
+  android:
+    - type: accessibilityId
+      value: orders_select_order_filter_bottom_sheet_button
+orders_select_order_filter_bottom_sheet_button_1:
+  android:
+    - type: accessibilityId
+      value: orders_select_order_filter_bottom_sheet_button_1
+orders_select_order_filter_bottom_sheet_item_item_0:
+  android:
+    - type: accessibilityId
+      value: orders_select_order_filter_bottom_sheet_item_item_0
+orders_select_order_filter_bottom_sheet_item_item_1:
+  android:
+    - type: accessibilityId
+      value: orders_select_order_filter_bottom_sheet_item_item_1
+orders_select_order_filter_bottom_sheet_item1_item_0:
+  android:
+    - type: accessibilityId
+      value: orders_select_order_filter_bottom_sheet_item1_item_0
+orders_select_order_filter_bottom_sheet_item1_item_1:
+  android:
+    - type: accessibilityId
+      value: orders_select_order_filter_bottom_sheet_item1_item_1
+pause_mandate_date_input_section_row:
+  android:
+    - type: accessibilityId
+      value: pause_mandate_date_input_section_row
+pause_mandate_end_date_input:
+  android:
+    - type: accessibilityId
+      value: pause_mandate_end_date_input
+pause_mandate_screen_button:
+  android:
+    - type: accessibilityId
+      value: pause_mandate_screen_button
+pause_mandate_screen_button_1:
+  android:
+    - type: accessibilityId
+      value: pause_mandate_screen_button_1
+pause_mandate_screen_button_2:
+  android:
+    - type: accessibilityId
+      value: pause_mandate_screen_button_2
+pause_mandate_screen_button_3:
+  android:
+    - type: accessibilityId
+      value: pause_mandate_screen_button_3
+pause_mandate_start_date_input:
+  android:
+    - type: accessibilityId
+      value: pause_mandate_start_date_input
+pause_mandate_verify_and_pause_button:
+  android:
+    - type: accessibilityId
+      value: pause_mandate_verify_and_pause_button
+payment_method_add_account_button:
+  android:
+    - type: accessibilityId
+      value: payment_method_add_account_button
+payment_method_bank_item_0:
+  android:
+    - type: accessibilityId
+      value: payment_method_bank_item_0
+payment_method_bank_item_1:
+  android:
+    - type: accessibilityId
+      value: payment_method_bank_item_1
+payment_method_bottom_sheet_account_list_item_button:
+  android:
+    - type: accessibilityId
+      value: payment_method_bottom_sheet_account_list_item_button
+payment_method_bottom_sheet_account_list_item_radio:
+  android:
+    - type: accessibilityId
+      value: payment_method_bottom_sheet_account_list_item_radio
+payment_method_bottom_sheet_section_header_row:
+  android:
+    - type: accessibilityId
+      value: payment_method_bottom_sheet_section_header_row
+payment_method_close_button:
+  android:
+    - type: accessibilityId
+      value: payment_method_close_button
+payment_method_other_options_button:
+  android:
+    - type: accessibilityId
+      value: payment_method_other_options_button
+payment_method_pay_button:
+  android:
+    - type: accessibilityId
+      value: payment_method_pay_button
+payment_method_rupay_card_item_0:
+  android:
+    - type: accessibilityId
+      value: payment_method_rupay_card_item_0
+payment_method_rupay_card_item_1:
+  android:
+    - type: accessibilityId
+      value: payment_method_rupay_card_item_1
+payment_method_title_text:
+  android:
+    - type: accessibilityId
+      value: payment_method_title_text
+pending_request_payment_request_bottom_sheet_row:
+  android:
+    - type: accessibilityId
+      value: pending_request_payment_request_bottom_sheet_row
+pending_request_payment_request_bottom_sheet_row_1:
+  android:
+    - type: accessibilityId
+      value: pending_request_payment_request_bottom_sheet_row_1
+pending_request_pending_requestitem_row:
+  android:
+    - type: accessibilityId
+      value: pending_request_pending_requestitem_row
+pending_request_pending_requestitem_row_1:
+  android:
+    - type: accessibilityId
+      value: pending_request_pending_requestitem_row_1
+pending_request_pending_requestitem_row_2:
+  android:
+    - type: accessibilityId
+      value: pending_request_pending_requestitem_row_2
+pending_request_pending_requestitem_row_3:
+  android:
+    - type: accessibilityId
+      value: pending_request_pending_requestitem_row_3
+pending_request_pending_requestitem_row_4:
+  android:
+    - type: accessibilityId
+      value: pending_request_pending_requestitem_row_4
+pending_requests_approve_button:
+  android:
+    - type: accessibilityId
+      value: pending_requests_approve_button
+pending_requests_item_0:
+  android:
+    - type: accessibilityId
+      value: pending_requests_item_0
+pending_requests_item_1:
+  android:
+    - type: accessibilityId
+      value: pending_requests_item_1
+pending_requests_reject_button:
+  android:
+    - type: accessibilityId
+      value: pending_requests_reject_button
+personal_details_selection_chip_row:
+  android:
+    - type: accessibilityId
+      value: personal_details_selection_chip_row
+pop_button_button:
+  android:
+    - type: accessibilityId
+      value: pop_button_button
+pop_search_bar_input:
+  android:
+    - type: accessibilityId
+      value: pop_search_bar_input
+popcoins_faq_button:
+  android:
+    - type: accessibilityId
+      value: popcoins_faq_button
+popcoins_filter_chip:
+  android:
+    - type: accessibilityId
+      value: popcoins_filter_chip
+popcoins_history_tab:
+  android:
+    - type: accessibilityId
+      value: popcoins_history_tab
+popcoins_pending_tab:
+  android:
+    - type: accessibilityId
+      value: popcoins_pending_tab
+popcoins_transaction_item_0:
+  android:
+    - type: accessibilityId
+      value: popcoins_transaction_item_0
+popcoins_transaction_item_1:
+  android:
+    - type: accessibilityId
+      value: popcoins_transaction_item_1
+professional_details_search_selection_bottom_sheet_input:
+  android:
+    - type: accessibilityId
+      value: professional_details_search_selection_bottom_sheet_input
+professional_details_search_selection_bottom_sheet_row:
+  android:
+    - type: accessibilityId
+      value: professional_details_search_selection_bottom_sheet_row
+professional_details_selection_block_row:
+  android:
+    - type: accessibilityId
+      value: professional_details_selection_block_row
+qr_scanner_v2_scanner_button_row:
+  android:
+    - type: accessibilityId
+      value: qr_scanner_v2_scanner_button_row
+query_details_card:
+  android:
+    - type: accessibilityId
+      value: query_details_card
+query_details_refresh_button:
+  android:
+    - type: accessibilityId
+      value: query_details_refresh_button
+query_details_status_text:
+  android:
+    - type: accessibilityId
+      value: query_details_status_text
+quick_actions_row_quick_action_card_row:
+  android:
+    - type: accessibilityId
+      value: quick_actions_row_quick_action_card_row
+raise_complaint_amount_text:
+  android:
+    - type: accessibilityId
+      value: raise_complaint_amount_text
+raise_complaint_bottomsheet_issue_item_0:
+  android:
+    - type: accessibilityId
+      value: raise_complaint_bottomsheet_issue_item_0
+raise_complaint_bottomsheet_issue_item_1:
+  android:
+    - type: accessibilityId
+      value: raise_complaint_bottomsheet_issue_item_1
+raise_complaint_bottomsheet_item_item_0:
+  android:
+    - type: accessibilityId
+      value: raise_complaint_bottomsheet_item_item_0
+raise_complaint_bottomsheet_item_item_1:
+  android:
+    - type: accessibilityId
+      value: raise_complaint_bottomsheet_item_item_1
+raise_complaint_icon_button:
+  android:
+    - type: accessibilityId
+      value: raise_complaint_icon_button
+raise_complaint_issue_option_0:
+  android:
+    - type: accessibilityId
+      value: raise_complaint_issue_option_0
+raise_complaint_issue_option_1:
+  android:
+    - type: accessibilityId
+      value: raise_complaint_issue_option_1
+raise_complaint_item_item_0:
+  android:
+    - type: accessibilityId
+      value: raise_complaint_item_item_0
+raise_complaint_item_item_1:
+  android:
+    - type: accessibilityId
+      value: raise_complaint_item_item_1
+raise_complaint_payee_name_text:
+  android:
+    - type: accessibilityId
+      value: raise_complaint_payee_name_text
+raise_complaint_select_issue_text:
+  android:
+    - type: accessibilityId
+      value: raise_complaint_select_issue_text
+raise_complaint_submit_button:
+  android:
+    - type: accessibilityId
+      value: raise_complaint_submit_button
+raise_complaint_title_text:
+  android:
+    - type: accessibilityId
+      value: raise_complaint_title_text
+rcbp_all_bills_adapter_bill_list_item_button:
+  android:
+    - type: accessibilityId
+      value: rcbp_all_bills_adapter_bill_list_item_button
+rcbp_all_bills_adapter_delete_confirmation_dialog_button:
+  android:
+    - type: accessibilityId
+      value: rcbp_all_bills_adapter_delete_confirmation_dialog_button
+rcbp_all_bills_adapter_delete_confirmation_dialog_button_1:
+  android:
+    - type: accessibilityId
+      value: rcbp_all_bills_adapter_delete_confirmation_dialog_button_1
+rcbp_all_bills_adapter_manage_option_item_row:
+  android:
+    - type: accessibilityId
+      value: rcbp_all_bills_adapter_manage_option_item_row
+rcbp_all_bills_adapter_mark_paid_confirmation_dialog_button:
+  android:
+    - type: accessibilityId
+      value: rcbp_all_bills_adapter_mark_paid_confirmation_dialog_button
+rcbp_all_bills_adapter_mark_paid_confirmation_dialog_button_1:
+  android:
+    - type: accessibilityId
+      value: rcbp_all_bills_adapter_mark_paid_confirmation_dialog_button_1
+rcbp_all_bills_adapter_rcbp_all_bills_screen_row:
+  android:
+    - type: accessibilityId
+      value: rcbp_all_bills_adapter_rcbp_all_bills_screen_row
+rcbp_all_bills_adapter_rcbp_all_bills_screen_row_1:
+  android:
+    - type: accessibilityId
+      value: rcbp_all_bills_adapter_rcbp_all_bills_screen_row_1
+rcbp_all_bills_adapter_rcbp_tab_row_with_zero_padding_indicator_item_item_0:
+  android:
+    - type: accessibilityId
+      value: rcbp_all_bills_adapter_rcbp_tab_row_with_zero_padding_indicator_item_item_0
+rcbp_all_bills_adapter_rcbp_tab_row_with_zero_padding_indicator_item_item_1:
+  android:
+    - type: accessibilityId
+      value: rcbp_all_bills_adapter_rcbp_tab_row_with_zero_padding_indicator_item_item_1
+rcbp_all_bills_adapter_remove_confirmation_dialog_button:
+  android:
+    - type: accessibilityId
+      value: rcbp_all_bills_adapter_remove_confirmation_dialog_button
+rcbp_all_bills_adapter_remove_confirmation_dialog_button_1:
+  android:
+    - type: accessibilityId
+      value: rcbp_all_bills_adapter_remove_confirmation_dialog_button_1
+rcbp_all_bills_adapter_swipeable_bill_item_row:
+  android:
+    - type: accessibilityId
+      value: rcbp_all_bills_adapter_swipeable_bill_item_row
+reason_selection_v2_reason_radio_list_v2_item_item_0:
+  android:
+    - type: accessibilityId
+      value: reason_selection_v2_reason_radio_list_v2_item_item_0
+reason_selection_v2_reason_radio_list_v2_item_item_1:
+  android:
+    - type: accessibilityId
+      value: reason_selection_v2_reason_radio_list_v2_item_item_1
+reason_selection_v2_selected_return_reason_card_v2_row:
+  android:
+    - type: accessibilityId
+      value: reason_selection_v2_selected_return_reason_card_v2_row
+referral_cta_button:
+  android:
+    - type: accessibilityId
+      value: referral_cta_button
+referral_skip_button:
+  android:
+    - type: accessibilityId
+      value: referral_skip_button
+referral_subtitle_text:
+  android:
+    - type: accessibilityId
+      value: referral_subtitle_text
+referral_title_text:
+  android:
+    - type: accessibilityId
+      value: referral_title_text
+residential_address_add_new_address_button_row:
+  android:
+    - type: accessibilityId
+      value: residential_address_add_new_address_button_row
+residential_address_address_card_radio:
+  android:
+    - type: accessibilityId
+      value: residential_address_address_card_radio
+residential_address_address_card_row:
+  android:
+    - type: accessibilityId
+      value: residential_address_address_card_row
+residential_address_address_card_row_1:
+  android:
+    - type: accessibilityId
+      value: residential_address_address_card_row_1
+residential_address_address_form_bottom_sheet_button:
+  android:
+    - type: accessibilityId
+      value: residential_address_address_form_bottom_sheet_button
+residential_address_address_form_bottom_sheet_input:
+  android:
+    - type: accessibilityId
+      value: residential_address_address_form_bottom_sheet_input
+residential_address_address_form_bottom_sheet_input_1:
+  android:
+    - type: accessibilityId
+      value: residential_address_address_form_bottom_sheet_input_1
+residential_address_address_form_bottom_sheet_input_2:
+  android:
+    - type: accessibilityId
+      value: residential_address_address_form_bottom_sheet_input_2
+residential_address_address_form_bottom_sheet_input_3:
+  android:
+    - type: accessibilityId
+      value: residential_address_address_form_bottom_sheet_input_3
+residential_address_city_selection_bottom_sheet_button:
+  android:
+    - type: accessibilityId
+      value: residential_address_city_selection_bottom_sheet_button
+residential_address_city_selection_bottom_sheet_item_item_0:
+  android:
+    - type: accessibilityId
+      value: residential_address_city_selection_bottom_sheet_item_item_0
+residential_address_city_selection_bottom_sheet_item_item_1:
+  android:
+    - type: accessibilityId
+      value: residential_address_city_selection_bottom_sheet_item_item_1
+residential_address_city_selection_bottom_sheet_item1_item_0:
+  android:
+    - type: accessibilityId
+      value: residential_address_city_selection_bottom_sheet_item1_item_0
+residential_address_city_selection_bottom_sheet_item1_item_1:
+  android:
+    - type: accessibilityId
+      value: residential_address_city_selection_bottom_sheet_item1_item_1
+residential_address_city_selector_input:
+  android:
+    - type: accessibilityId
+      value: residential_address_city_selector_input
+residential_address_city_selector_row:
+  android:
+    - type: accessibilityId
+      value: residential_address_city_selector_row
+residential_address_city_selector_row_1:
+  android:
+    - type: accessibilityId
+      value: residential_address_city_selector_row_1
+residential_address_inline_address_form_content_input:
+  android:
+    - type: accessibilityId
+      value: residential_address_inline_address_form_content_input
+residential_address_inline_address_form_content_input_1:
+  android:
+    - type: accessibilityId
+      value: residential_address_inline_address_form_content_input_1
+residential_address_inline_address_form_content_input_2:
+  android:
+    - type: accessibilityId
+      value: residential_address_inline_address_form_content_input_2
+residential_address_prefill_address_card_radio:
+  android:
+    - type: accessibilityId
+      value: residential_address_prefill_address_card_radio
+residential_address_prefill_address_card_row:
+  android:
+    - type: accessibilityId
+      value: residential_address_prefill_address_card_row
+residential_address_prefill_address_card_row_1:
+  android:
+    - type: accessibilityId
+      value: residential_address_prefill_address_card_row_1
+reward_detail_close_button:
+  android:
+    - type: accessibilityId
+      value: reward_detail_close_button
+reward_detail_copy_code_button:
+  android:
+    - type: accessibilityId
+      value: reward_detail_copy_code_button
+reward_detail_copy_pin_button:
+  android:
+    - type: accessibilityId
+      value: reward_detail_copy_pin_button
+reward_detail_share_button:
+  android:
+    - type: accessibilityId
+      value: reward_detail_share_button
+reward_detail_title_text:
+  android:
+    - type: accessibilityId
+      value: reward_detail_title_text
+reward_detail_tnc_toggle_button:
+  android:
+    - type: accessibilityId
+      value: reward_detail_tnc_toggle_button
+reward_detail_use_now_button:
+  android:
+    - type: accessibilityId
+      value: reward_detail_use_now_button
+reward_detail_view_details_text:
+  android:
+    - type: accessibilityId
+      value: reward_detail_view_details_text
+saved_addresses_add_button:
+  android:
+    - type: accessibilityId
+      value: saved_addresses_add_button
+saved_addresses_address_item_row:
+  android:
+    - type: accessibilityId
+      value: saved_addresses_address_item_row
+saved_addresses_item_0:
+  android:
+    - type: accessibilityId
+      value: saved_addresses_item_0
+saved_addresses_item_1:
+  android:
+    - type: accessibilityId
+      value: saved_addresses_item_1
+scan_and_pay_screen_row:
+  android:
+    - type: accessibilityId
+      value: scan_and_pay_screen_row
+scan_pay_flash_toggle:
+  android:
+    - type: accessibilityId
+      value: scan_pay_flash_toggle
+scan_pay_scanner_controls:
+  android:
+    - type: accessibilityId
+      value: scan_pay_scanner_controls
+scan_pay_sheet_toggle:
+  android:
+    - type: accessibilityId
+      value: scan_pay_sheet_toggle
+scan_pay_upload_button:
+  android:
+    - type: accessibilityId
+      value: scan_pay_upload_button
+scan_pay_zoom_button:
+  android:
+    - type: accessibilityId
+      value: scan_pay_zoom_button
+selectable_bank_item_row_radio:
+  android:
+    - type: accessibilityId
+      value: selectable_bank_item_row_radio
+selectable_bank_item_row_radio_1:
+  android:
+    - type: accessibilityId
+      value: selectable_bank_item_row_radio_1
+set_reset_pin_aadhaar_input:
+  android:
+    - type: accessibilityId
+      value: set_reset_pin_aadhaar_input
+set_reset_pin_card_expiry_input:
+  android:
+    - type: accessibilityId
+      value: set_reset_pin_card_expiry_input
+set_reset_pin_card_last6_input:
+  android:
+    - type: accessibilityId
+      value: set_reset_pin_card_last6_input
+set_reset_pin_proceed_button:
+  android:
+    - type: accessibilityId
+      value: set_reset_pin_proceed_button
+set_reset_upi_pin_confirm_close_content_v2_button:
+  android:
+    - type: accessibilityId
+      value: set_reset_upi_pin_confirm_close_content_v2_button
+set_reset_upi_pin_confirm_close_content_v2_button_1:
+  android:
+    - type: accessibilityId
+      value: set_reset_upi_pin_confirm_close_content_v2_button_1
+set_reset_upi_pin_row:
+  android:
+    - type: accessibilityId
+      value: set_reset_upi_pin_row
+set_upi_pin_aadhaar_input:
+  android:
+    - type: accessibilityId
+      value: set_upi_pin_aadhaar_input
+set_upi_pin_aadhaar_input_field_input:
+  android:
+    - type: accessibilityId
+      value: set_upi_pin_aadhaar_input_field_input
+set_upi_pin_card_expiry_input:
+  android:
+    - type: accessibilityId
+      value: set_upi_pin_card_expiry_input
+set_upi_pin_card_last6_input:
+  android:
+    - type: accessibilityId
+      value: set_upi_pin_card_last6_input
+set_upi_pin_card_number_input_field_input:
+  android:
+    - type: accessibilityId
+      value: set_upi_pin_card_number_input_field_input
+set_upi_pin_proceed_button:
+  android:
+    - type: accessibilityId
+      value: set_upi_pin_proceed_button
+set_upi_pin_screen_button:
+  android:
+    - type: accessibilityId
+      value: set_upi_pin_screen_button
+set_upi_pin_screen_button_1:
+  android:
+    - type: accessibilityId
+      value: set_upi_pin_screen_button_1
+setup_lite_activate_button:
+  android:
+    - type: accessibilityId
+      value: setup_lite_activate_button
+setup_lite_tnc_text:
+  android:
+    - type: accessibilityId
+      value: setup_lite_tnc_text
+sim_verify_item_0:
+  android:
+    - type: accessibilityId
+      value: sim_verify_item_0
+sim_verify_item_1:
+  android:
+    - type: accessibilityId
+      value: sim_verify_item_1
+sim_verify_screen_item_item_0:
+  android:
+    - type: accessibilityId
+      value: sim_verify_screen_item_item_0
+sim_verify_screen_item_item_1:
+  android:
+    - type: accessibilityId
+      value: sim_verify_screen_item_item_1
+sim_verify_send_sms_button:
+  android:
+    - type: accessibilityId
+      value: sim_verify_send_sms_button
+sim_verify_sim_card_item_radio:
+  android:
+    - type: accessibilityId
+      value: sim_verify_sim_card_item_radio
+sim_verify_sim_card_item_row:
+  android:
+    - type: accessibilityId
+      value: sim_verify_sim_card_item_row
+size_selection_add_to_cart_button:
+  android:
+    - type: accessibilityId
+      value: size_selection_add_to_cart_button
+size_selection_item_0:
+  android:
+    - type: accessibilityId
+      value: size_selection_item_0
+size_selection_item_1:
+  android:
+    - type: accessibilityId
+      value: size_selection_item_1
+tap_to_scan_scan_button:
+  android:
+    - type: accessibilityId
+      value: tap_to_scan_scan_button
+tnc_section_tnc_checkbox_item_v2_checkbox:
+  android:
+    - type: accessibilityId
+      value: tnc_section_tnc_checkbox_item_v2_checkbox
+toolbar_search_button:
+  android:
+    - type: accessibilityId
+      value: search_back_button  # healed from: toolbar_search_button
+transaction_detail_row:
+  android:
+    - type: accessibilityId
+      value: transaction_detail_row
+user_profile_section_row:
+  android:
+    - type: accessibilityId
+      value: user_profile_section_row
+video_verification_permissions_checklist_bottom_sheet_button:
+  android:
+    - type: accessibilityId
+      value: video_verification_permissions_checklist_bottom_sheet_button
+video_verification_vkcy_qna_bottom_sheet_button:
+  android:
+    - type: accessibilityId
+      value: video_verification_vkcy_qna_bottom_sheet_button

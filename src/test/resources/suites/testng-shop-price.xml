@@ -1,0 +1,54 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<!--
+    Shop Price Validation Suite
+    Verifies that prices shown in PLP, PDP, and Cart all match each other
+    and match what the search API returns.
+
+    Run:
+        mvn test -Psuite -DsuiteFile=src/test/resources/suites/testng-shop-price.xml
+-->
+
+<suite name="Shop Price Validation" parallel="false" thread-count="1">
+
+    <listeners>
+        <listener class-name="com.popclub.listener.TestListener"/>
+    </listeners>
+
+    <parameter name="deviceSerial"  value="10BDCM0YJZ00043"/>
+    <parameter name="projectId"     value="d8f4a221-bc6d-47d8-9448-0834f5d012ec"/>
+    <parameter name="runTitle"      value="Shop Price Validation"/>
+
+    <!-- PLP UI prices match API selling price / MRP -->
+    <test name="PLP vs API">
+        <parameter name="testFile" value="ts_shop_plp_api_price_match.yaml"/>
+        <classes>
+            <class name="com.popclub.runner.TestRunnerTest"/>
+        </classes>
+    </test>
+
+    <!-- PDP prices match what was shown on PLP -->
+    <test name="PLP vs PDP">
+        <parameter name="testFile" value="ts_shop_plp_pdp_price_match.yaml"/>
+        <classes>
+            <class name="com.popclub.runner.TestRunnerTest"/>
+        </classes>
+    </test>
+
+    <!-- Popcoin tag visible/hidden per special_pricing and coin_burn_limit rules -->
+    <test name="PDP Popcoin Tag">
+        <parameter name="testFile" value="ts_shop_pdp_popcoin.yaml"/>
+        <classes>
+            <class name="com.popclub.runner.TestRunnerTest"/>
+        </classes>
+    </test>
+
+    <!-- Cart item price matches PLP, stepper +/- works -->
+    <test name="Cart Price and Stepper">
+        <parameter name="testFile" value="ts_shop_cart_price_verify.yaml"/>
+        <classes>
+            <class name="com.popclub.runner.TestRunnerTest"/>
+        </classes>
+    </test>
+
+</suite>

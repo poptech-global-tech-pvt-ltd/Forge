@@ -1,0 +1,84 @@
+testName: Login via SMV with WhatsApp fallback - cx Approval (auto request_id)
+platform: android
+noReset: false
+loginRequired: true
+testCaseIds:
+  - PO-15527
+
+features:
+  - login
+
+tags:
+  - smoke
+  - regression
+  - sanity
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: waitFor
+    element: login_input_phone
+
+  - action: enterText
+    element: login_input_phone
+    value: "1234567740"
+
+  - action: tap
+    element: login_continue_button
+
+  - action: captureNetworkValue
+    value: "user-login/initiate"
+    extract:
+      smv_request_id: "data.request_id"
+    timeout: 120
+
+  - action: waitFor
+    element: login_merged_login_and_otp_screen_button
+    timeout: 30
+
+  - action: tap
+    element: login_merged_login_and_otp_screen_button
+
+  - action: fetchApi
+    url: "https://keycloak.pop-club-internal.co/realms/Popclub/protocol/openid-connect/token"
+    method: POST
+    headers:
+      Content-Type: "application/x-www-form-urlencoded"
+    body: "username=deepa-test&password=deepa-test&client_id=realm-admin-be&client_secret=uB2oCfIGjQozEJNGKOCo8G5EepOysAJ3&grant_type=password"
+    extract:
+      smv_admin_token: "access_token"
+
+  - action: fetchApi
+    url: "https://popcxgo.popclub.co.in/api/v1/pop/smv/user/update-status"
+    method: POST
+    headers:
+      Authorization: "Bearer ${smv_admin_token}"
+      Content-Type: "application/json"
+    body: '{"request_id": "${smv_request_id}", "comments": "+911234567740", "status": "PASSED"}'
+
+  - action: launchApp
+
+  - action: waitFor
+    element: login_input_phone
+
+  - action: enterText
+    element: login_input_phone
+    value: "1234567740"
+
+  - action: tap
+    element: login_continue_button
+
+  - action: tapByText
+    value: "Explore POP"
+
+  - action: waitFor
+    element: skip_tour
+    timeout: 30
+
+  - action: tap
+    element: skip_tour
+
+  - action: verifyElement
+    element: home_tab

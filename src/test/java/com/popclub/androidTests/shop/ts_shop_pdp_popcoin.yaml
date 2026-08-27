@@ -1,0 +1,111 @@
+testName: Shop — PDP popcoin tag visibility
+platform: android
+noReset: true
+loginRequired: true
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - shop
+  - pdp
+  - popcoin
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  # Navigate to PLP and capture API data
+  - action: call
+    flow: plp_search_and_capture
+    params:
+      search_query:   "the souled store"
+      search_pincode: "560102"
+
+  # ── Tap product → PDP ─────────────────────────────────────────────────────
+  - action: tap
+    element: product_list_item_${product_index}
+
+  - action: waitFor
+    element: product_details_title
+
+  # ── Assert: PDP title matches API ─────────────────────────────────────────
+  - action: assertText
+    element: product_details_title
+    value: "${product_title}"
+
+  # ── Log coin state from API ───────────────────────────────────────────────
+  - action: logVar
+    variable: api_product_list_item_special_pricing
+    value: |
+      ── Popcoin state (from API) ──
+      special_pricing         - ${api_product_list_item_special_pricing}
+      coin_burn_limit_default - ${api_product_list_item_coin_burn_limit_default}
+      price_with_popcoin      - ${api_product_list_item_price_with_popcoin}
+      popcoin                 - ${api_product_list_item_popcoin}
+      coin_redemption_pct     - ${api_product_list_item_coin_redemption_pct}
+
+  # ── Popcoin tag: visible only when special_pricing = true ─────────────────
+  - action: ifVarEquals
+    variable: api_product_list_item_special_pricing
+    value: "true"
+    steps:
+      - action: verifyElement
+        element: product_details_popcoin
+        shouldExist: true
+
+  # ── Popcoin tag: hidden when coin_burn_limit_default = 0 ──────────────────
+  - action: ifVarEquals
+    variable: api_product_list_item_coin_burn_limit_default
+    value: "0"
+    steps:
+      - action: verifyElement
+        element: product_details_popcoin
+        shouldExist: false
+
+  # ── PLP coin tag: visible only when special_pricing = true ────────────────
+  # (Navigate back to PLP to verify the PLP coin tag as well)
+  - action: ifVarEquals
+    variable: api_product_list_item_special_pricing
+    value: "true"
+    steps:
+      - action: logVar
+        variable: product_list_item_price_with_popcoin
+        value: |
+          PLP UI price_with_popcoin - ${product_list_item_price_with_popcoin}
+          PLP UI popcoin            - ${product_list_item_popcoin}
+          API price_with_popcoin    - ₹${api_product_list_item_price_with_popcoin}
+          API popcoin               - ${api_product_list_item_popcoin}
+      - action: ifVarNotEmpty
+        variable: api_product_list_item_price_with_popcoin
+        steps:
+          - action: ifVarNotEquals
+            variable: product_list_item_price_with_popcoin
+            value: "₹${api_product_list_item_price_with_popcoin}"
+            steps:
+              - action: logVar
+                variable: product_list_item_price_with_popcoin
+                value: "MISMATCH price_with_popcoin — PLP UI: ${product_list_item_price_with_popcoin} | API: ₹${api_product_list_item_price_with_popcoin}"
+      - action: ifVarNotEmpty
+        variable: api_product_list_item_popcoin
+        steps:
+          - action: ifVarNotEquals
+            variable: product_list_item_popcoin
+            value: "${api_product_list_item_popcoin}"
+            steps:
+              - action: logVar
+                variable: product_list_item_popcoin
+                value: "MISMATCH popcoin — PLP UI: ${product_list_item_popcoin} | API: ${api_product_list_item_popcoin}"

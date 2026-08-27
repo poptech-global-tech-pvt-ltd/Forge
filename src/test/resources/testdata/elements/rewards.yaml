@@ -1,0 +1,294 @@
+
+# ─── Cashback Claim ────────────────────────────────────────────────────────────
+cashback_claim_details_accordion:
+  android:
+    - type: accessibilityId
+      value: cashback_claim_details_accordion
+cashback_claim_done_button:
+  android:
+    - type: accessibilityId
+      value: cashback_claim_done_button
+cashback_claim_share_button:
+  android:
+    - type: accessibilityId
+      value: cashback_claim_share_button
+cashback_claim_txn_id_copy_button:
+  android:
+    - type: accessibilityId
+      value: cashback_claim_txn_id_copy_button
+
+# ─── Cashback Ledger ───────────────────────────────────────────────────────────
+cashback_ledger_almost_claimable_bottom_sheet_v2_button:
+  android:
+    - type: accessibilityId
+      value: cashback_ledger_almost_claimable_bottom_sheet_v2_button
+cashback_ledger_almost_there_bottom_sheet_v2_button:
+  android:
+    - type: accessibilityId
+      value: cashback_ledger_almost_there_bottom_sheet_v2_button
+cashback_ledger_almost_there_bottom_sheet_v2_button_1:
+  android:
+    - type: accessibilityId
+      value: cashback_ledger_almost_there_bottom_sheet_v2_button_1
+cashback_ledger_cashback_header_row:
+  android:
+    - type: accessibilityId
+      value: cashback_ledger_cashback_header_row
+cashback_ledger_cashback_header_row_1:
+  android:
+    - type: accessibilityId
+      value: cashback_ledger_cashback_header_row_1
+cashback_ledger_cashback_header_row_2:
+  android:
+    - type: accessibilityId
+      value: cashback_ledger_cashback_header_row_2
+cashback_ledger_cashback_zone_image_v2_row:
+  android:
+    - type: accessibilityId
+      value: cashback_ledger_cashback_zone_image_v2_row
+cashback_ledger_claim_button:
+  android:
+    - type: accessibilityId
+      value: cashback_ledger_claim_button
+cashback_ledger_claim_cancel_button:
+  android:
+    - type: accessibilityId
+      value: cashback_ledger_claim_cancel_button
+cashback_ledger_claim_confirm_button:
+  android:
+    - type: accessibilityId
+      value: cashback_ledger_claim_confirm_button
+cashback_ledger_claimable_balance_text:
+  android:
+    - type: accessibilityId
+      value: cashback_ledger_claimable_balance_text
+cashback_ledger_close_button:
+  android:
+    - type: accessibilityId
+      value: cashback_ledger_close_button
+cashback_ledger_earn_button:
+  android:
+    - type: accessibilityId
+      value: cashback_ledger_earn_button
+cashback_ledger_faq_button:
+  android:
+    - type: accessibilityId
+      value: cashback_ledger_faq_button
+cashback_ledger_filter_apply_button:
+  android:
+    - type: accessibilityId
+      value: cashback_ledger_filter_apply_button
+cashback_ledger_filter_button:
+  android:
+    - type: accessibilityId
+      value: cashback_ledger_filter_button
+cashback_ledger_filter_clear_button:
+  android:
+    - type: accessibilityId
+      value: cashback_ledger_filter_clear_button
+cashback_ledger_help_support_button:
+  android:
+    - type: accessibilityId
+      value: cashback_ledger_help_support_button
+cashback_ledger_lifetime_earning_text:
+  android:
+    - type: accessibilityId
+      value: cashback_ledger_lifetime_earning_text
+cashback_ledger_screen_row:
+  android:
+    - type: accessibilityId
+      value: cashback_ledger_screen_row
+cashback_ledger_screen_row_1:
+  android:
+    - type: accessibilityId
+      value: cashback_ledger_screen_row_1
+cashback_ledger_screen_row_2:
+  android:
+    - type: accessibilityId
+      value: cashback_ledger_screen_row_2
+cashback_ledger_screen_row_3:
+  android:
+    - type: accessibilityId
+      value: cashback_ledger_screen_row_3
+cashback_ledger_screen_row_4:
+  android:
+    - type: accessibilityId
+      value: cashback_ledger_screen_row_4
+cashback_ledger_screen_row_5:
+  android:
+    - type: accessibilityId
+      value: cashback_ledger_screen_row_5
+cashback_ledger_screen_row_6:
+  android:
+    - type: accessibilityId
+      value: cashback_ledger_screen_row_6
+cashback_ledger_select_cashback_filter_bottom_sheet_checkbox:
+  android:
+    - type: accessibilityId
+      value: cashback_ledger_select_cashback_filter_bottom_sheet_checkbox
+cashback_ledger_select_cashback_filter_bottom_sheet_row:
+  android:
+    - type: accessibilityId
+      value: cashback_ledger_select_cashback_filter_bottom_sheet_row
+cashback_ledger_select_cashback_filter_bottom_sheet_v2_button:
+  android:
+    - type: accessibilityId
+      value: cashback_ledger_select_cashback_filter_bottom_sheet_v2_button
+cashback_ledger_select_cashback_filter_bottom_sheet_v2_button_1:
+  android:
+    - type: accessibilityId
+      value: cashback_ledger_select_cashback_filter_bottom_sheet_v2_button_1
+cashback_ledger_select_cashback_filter_bottom_sheet_v2_item_item_0:
+  android:
+    - type: accessibilityId
+      value: cashback_ledger_select_cashback_filter_bottom_sheet_v2_item_item_0
+cashback_ledger_select_cashback_filter_bottom_sheet_v2_item_item_1:
+  android:
+    - type: accessibilityId
+      value: cashback_ledger_select_cashback_filter_bottom_sheet_v2_item_item_1
+cashback_ledger_share_button:
+  android:
+    - type: accessibilityId
+      value: cashback_ledger_share_button
+cashback_ledger_txn_item_0:
+  android:
+    - type: accessibilityId
+      value: cashback_ledger_txn_item_0
+cashback_ledger_txn_item_1:
+  android:
+    - type: accessibilityId
+      value: cashback_ledger_txn_item_1
+
+# ─── Cashback Transaction ──────────────────────────────────────────────────────
+cashback_transaction_detail_row:
+  android:
+    - type: accessibilityId
+      value: cashback_transaction_detail_row
+
+# ─── Cashback Txn ──────────────────────────────────────────────────────────────
+cashback_txn_detail_copy_button:
+  android:
+    - type: accessibilityId
+      value: cashback_txn_detail_copy_button
+cashback_txn_detail_copy_txn_id_button:
+  android:
+    - type: accessibilityId
+      value: cashback_txn_detail_copy_txn_id_button
+cashback_txn_detail_got_it_button:
+  android:
+    - type: accessibilityId
+      value: cashback_txn_detail_got_it_button
+cashback_txn_detail_share_button:
+  android:
+    - type: accessibilityId
+      value: cashback_txn_detail_share_button
+cashback_txn_detail_share_screenshot_button:
+  android:
+    - type: accessibilityId
+      value: cashback_txn_detail_share_screenshot_button
+
+# ─── Pop Coins ─────────────────────────────────────────────────────────────────
+pop_coins_pop_coin_transaction_detail_bottom_sheet_button:
+  android:
+    - type: accessibilityId
+      value: pop_coins_pop_coin_transaction_detail_bottom_sheet_button
+pop_coins_pop_coin_transaction_detail_bottom_sheet_icon_button:
+  android:
+    - type: accessibilityId
+      value: pop_coins_pop_coin_transaction_detail_bottom_sheet_icon_button
+pop_coins_select_pop_coin_filter_bottom_sheet_v2_item1_item_0:
+  android:
+    - type: accessibilityId
+      value: pop_coins_select_pop_coin_filter_bottom_sheet_v2_item1_item_0
+pop_coins_select_pop_coin_filter_bottom_sheet_v2_item1_item_1:
+  android:
+    - type: accessibilityId
+      value: pop_coins_select_pop_coin_filter_bottom_sheet_v2_item1_item_1
+pop_coins_select_pop_coin_filter_bottom_sheet_v2_item_item_0:
+  android:
+    - type: accessibilityId
+      value: pop_coins_select_pop_coin_filter_bottom_sheet_v2_item_item_0
+pop_coins_select_pop_coin_filter_bottom_sheet_v2_item_item_1:
+  android:
+    - type: accessibilityId
+      value: pop_coins_select_pop_coin_filter_bottom_sheet_v2_item_item_1
+pop_coins_select_pop_coin_filter_button:
+  android:
+    - type: accessibilityId
+      value: pop_coins_select_pop_coin_filter_button
+
+# ─── Rewards Apply ─────────────────────────────────────────────────────────────
+rewards_apply_now_button:
+  android:
+    - type: accessibilityId
+      value: rewards_apply_now_button
+
+# ─── Rewards Composable ────────────────────────────────────────────────────────
+rewards_composable_footer_section_button:
+  android:
+    - type: accessibilityId
+      value: rewards_composable_footer_section_button
+rewards_composable_rounded_circle_button_row:
+  android:
+    - type: accessibilityId
+      value: rewards_composable_rounded_circle_button_row
+
+# ─── Rewards Earn ──────────────────────────────────────────────────────────────
+rewards_earn_coins_button:
+  android:
+    - type: accessibilityId
+      value: rewards_earn_coins_button
+
+# ─── Rewards List ──────────────────────────────────────────────────────────────
+rewards_list_card_exclusive_filter_button:
+  android:
+    - type: accessibilityId
+      value: rewards_list_card_exclusive_filter_button
+rewards_list_item_0:
+  android:
+    - type: accessibilityId
+      value: rewards_list_item_0
+rewards_list_item_1:
+  android:
+    - type: accessibilityId
+      value: rewards_list_item_1
+rewards_list_reward_type_filter_button:
+  android:
+    - type: accessibilityId
+      value: rewards_list_reward_type_filter_button
+rewards_list_reward_type_selection_bottom_sheet_icon_button:
+  android:
+    - type: accessibilityId
+      value: rewards_list_reward_type_selection_bottom_sheet_icon_button
+rewards_list_reward_type_selection_bottom_sheet_radio:
+  android:
+    - type: accessibilityId
+      value: rewards_list_reward_type_selection_bottom_sheet_radio
+
+# ─── Rewards Retry ─────────────────────────────────────────────────────────────
+rewards_retry_button:
+  android:
+    - type: accessibilityId
+      value: rewards_retry_button
+
+# ─── Rewards Share ─────────────────────────────────────────────────────────────
+rewards_share_button:
+  android:
+    - type: accessibilityId
+      value: rewards_share_button
+
+# ─── Rewards Title ─────────────────────────────────────────────────────────────
+rewards_title_text:
+  android:
+    - type: accessibilityId
+      value: rewards_title_text
+
+# ─── Rewards View ──────────────────────────────────────────────────────────────
+rewards_view_details_button:
+  android:
+    - type: accessibilityId
+      value: rewards_view_details_button
+rewards_view_reward_button:
+  android:
+    - type: accessibilityId
+      value: rewards_view_reward_button

@@ -1,0 +1,102 @@
+home_profile_icon:
+  android:
+    - type: accessibilityId
+      value: Profile
+
+shop_tab:
+  android:
+    - type: accessibilityId
+      value: common_shop_tab
+
+card_tab:
+  android:
+    - type: accessibilityId
+      value: common_card_tab
+
+scan_qr_code:
+  android:
+    - type: accessibilityId
+      value: Scan QR Code
+
+home_tab:
+  android:
+    - type: accessibilityId
+      value: common_home_tab
+
+skip_tour:
+  android:
+    - type: accessibilityId
+      value: Close
+
+
+# ─── Home Brand ────────────────────────────────────────────────────────────────
+home_brand_item_0:
+  android:
+    - type: accessibilityId
+      value: home_brand_item_0
+home_brand_item_1:
+  android:
+    - type: accessibilityId
+      value: home_brand_item_1
+
+# ─── Home Editor ───────────────────────────────────────────────────────────────
+home_editor_pick_item_0:
+  android:
+    - type: accessibilityId
+      value: home_editor_pick_item_0
+home_editor_pick_item_1:
+  android:
+    - type: accessibilityId
+      value: home_editor_pick_item_1
+
+# ─── Home Grid ─────────────────────────────────────────────────────────────────
+home_grid_item_0:
+  android:
+    - type: accessibilityId
+      value: home_grid_item_0
+home_grid_item_1:
+  android:
+    - type: accessibilityId
+      value: home_grid_item_1
+
+# ─── Home Hero ─────────────────────────────────────────────────────────────────
+home_hero_banner_item_0:
+  android:
+    - type: accessibilityId
+      value: home_hero_banner_item_0
+home_hero_banner_item_1:
+  android:
+    - type: accessibilityId
+      value: home_hero_banner_item_1
+
+# ─── Home Product ──────────────────────────────────────────────────────────────
+home_product_item_0:
+  android:
+    - type: accessibilityId
+      value: home_product_item_0
+home_product_item_1:
+  android:
+    - type: accessibilityId
+      value: home_product_item_1
+
+# ─── Home Search ───────────────────────────────────────────────────────────────
+home_search_bar:
+  android:
+    - type: accessibilityId
+      value: home_search_bar
+
+# ─── Home Spotlight ────────────────────────────────────────────────────────────
+home_spotlight_item_0:
+  android:
+    - type: accessibilityId
+      value: home_spotlight_item_0
+home_spotlight_item_1:
+  android:
+    - type: accessibilityId
+      value: home_spotlight_item_1
+
+# ─── Home View ─────────────────────────────────────────────────────────────────
+home_view_all_button:
+  android:
+    - type: accessibilityId
+      value: home_view_all_button

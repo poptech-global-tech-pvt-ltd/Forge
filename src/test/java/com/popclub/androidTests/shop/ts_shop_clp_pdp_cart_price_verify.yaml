@@ -1,0 +1,157 @@
+testName: Shop — CLP item tap → PDP → Add to cart with price verification
+platform: android
+noReset: true
+loginRequired: true
+
+features:
+  - common
+  - shop
+
+tags:
+  - smoke
+  - shop
+  - clp
+  - pdp
+  - cart
+  - price
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  - action: waitFor
+    element: shop_search_icon
+
+  - action: scanTags
+
+  # ── Capture CLP product card prices (first item visible in CLP) ───────────
+  - action: captureText
+    element: product_list_item_price_0
+    variable: clp_item_price
+
+  - action: captureText
+    element: product_list_item_strikethrough_price_0
+    variable: clp_item_strikethrough
+
+  - action: logVar
+    variable: clp_item_price
+    value: |
+      ── CLP card prices ──
+      clp_item_price         - ${clp_item_price}
+      clp_item_strikethrough - ${clp_item_strikethrough}
+
+  # ── Tap first CLP item → PDP ──────────────────────────────────────────────
+  - action: tap
+    element: product_list_item_0
+
+  - action: waitFor
+    element: product_details_title
+
+  - action: scanTags
+
+  # ── Capture PDP prices ────────────────────────────────────────────────────
+  - action: captureText
+    element: product_details_price
+    variable: pdp_price
+
+  - action: captureText
+    element: product_details_strikethrough_price
+    variable: pdp_strikethrough
+
+  - action: logVar
+    variable: pdp_price
+    value: |
+      ── PDP prices ──
+      pdp_price         - ${pdp_price}
+      pdp_strikethrough - ${pdp_strikethrough}
+
+  # ── Assert: PDP price matches CLP card price ──────────────────────────────
+  - action: assertText
+    element: product_details_price
+    value: "${clp_item_price}"
+
+  - action: assertText
+    element: product_details_strikethrough_price
+    value: "${clp_item_strikethrough}"
+
+  # ── Add to cart ───────────────────────────────────────────────────────────
+  - action: tap
+    element: product_details_bottom_sticky_bar_button
+
+  - action: waitFor
+    element: size_selection_item_0
+
+  - action: tap
+    element: size_selection_item_0
+
+  - action: tap
+    element: size_selection_add_to_cart_button
+
+  - action: waitFor
+    element: product_details_go_to_cart_button
+
+  - action: tap
+    element: product_details_go_to_cart_button
+
+  # ── Cart screen: verify structure ─────────────────────────────────────────
+  - action: waitFor
+    element: cart_item_row_0
+
+  - action: verifyElement
+    element: cart_delivery_address_card
+
+  - action: verifyElement
+    element: cart_to_pay_row
+
+  - action: verifyElement
+    element: cart_link_and_pay_button
+
+  - action: scanTags
+
+  # ── Capture cart item prices ──────────────────────────────────────────────
+  - action: captureText
+    element: cart_item_price_0
+    variable: cart_item_price
+
+  - action: captureText
+    element: cart_item_strikethrough_price_0
+    variable: cart_item_strikethrough
+
+  - action: logVar
+    variable: cart_item_price
+    value: |
+      ── Cart item prices ──
+      cart_item_price         - ${cart_item_price}
+      cart_item_strikethrough - ${cart_item_strikethrough}
+
+  # ── Assert: cart prices match PDP prices ──────────────────────────────────
+  - action: assertText
+    element: cart_item_price_0
+    value: "${pdp_price}"
+
+  - action: assertText
+    element: cart_item_strikethrough_price_0
+    value: "${pdp_strikethrough}"
+
+  # ── Summary log ───────────────────────────────────────────────────────────
+  - action: logVar
+    variable: clp_item_price
+    value: |
+      ── Price consistency summary across screens ──
+      CLP card price        - ${clp_item_price}
+      PDP price             - ${pdp_price}
+      Cart price            - ${cart_item_price}
+      CLP strikethrough     - ${clp_item_strikethrough}
+      PDP strikethrough     - ${pdp_strikethrough}
+      Cart strikethrough    - ${cart_item_strikethrough}

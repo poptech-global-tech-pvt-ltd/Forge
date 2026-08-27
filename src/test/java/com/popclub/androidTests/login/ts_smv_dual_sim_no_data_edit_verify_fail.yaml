@@ -1,0 +1,66 @@
+testName: SMV Dual SIM - No Data on SIM2 - Three Taps Fall Through to WA - Edit - Verify Fail
+platform: android
+noReset: false
+loginRequired: false
+testCaseIds:
+  - PO-15774
+
+features:
+  - login
+
+tags:
+  - login
+  - regression
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: waitFor
+    element: login_input_phone
+
+  - action: enterText
+    element: login_input_phone
+    value: "9538351687"
+
+  - action: tap
+    element: login_continue_button
+
+  - action: pressKey
+    value: BACK
+
+  - action: waitFor
+    element: login_input_phone
+    timeout: 10
+
+  - action: tap
+    element: login_continue_button
+
+  - action: pressKey
+    value: BACK
+
+  - action: waitFor
+    element: login_input_phone
+    timeout: 10
+
+  - action: tap
+    element: login_continue_button
+
+  - action: waitFor
+    element: login_merged_login_and_otp_screen_button
+    timeout: 30
+
+  - action: tapByText
+    value: "Edit"
+    timeout: 30
+
+  - action: waitFor
+    element: login_input_phone
+
+  - action: tap
+    element: login_continue_button
+
+  - action: tapByText
+    value: "Try again"
+    timeout: 15

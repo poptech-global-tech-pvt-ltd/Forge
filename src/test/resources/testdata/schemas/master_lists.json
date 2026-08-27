@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["is_success", "data"],
+  "properties": {
+    "is_success": { "type": "boolean" },
+    "data": {
+      "type": "object",
+      "properties": {
+        "company": { "type": "array" },
+        "industry": { "type": "array" },
+        "profession": { "type": "array" },
+        "designation": { "type": "array" },
+        "companytype": { "type": "array" }
+      }
+    }
+  }
+}

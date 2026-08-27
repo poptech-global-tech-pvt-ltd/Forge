@@ -1,0 +1,89 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<!--
+    Shop E2E Suite
+    Full user journey flows: search → PDP → cart → payment.
+
+    Run:
+        mvn test -Psuite -DsuiteFile=src/test/resources/suites/testng-shop-e2e.xml
+
+    Run single flow:
+        mvn test -Psuite -DsuiteFile=src/test/resources/suites/testng-shop-e2e.xml \
+            -DtestFile=ts_shop_e2e_multi_item_cart.yaml
+-->
+
+<suite name="Shop E2E" parallel="false" thread-count="1">
+
+    <listeners>
+        <listener class-name="com.popclub.listener.TestListener"/>
+    </listeners>
+
+    <parameter name="deviceSerial"  value="10BDCM0YJZ00043"/>
+    <parameter name="projectId"     value="d8f4a221-bc6d-47d8-9448-0834f5d012ec"/>
+    <parameter name="runTitle"      value="Shop E2E"/>
+
+    <!-- Full checkout: PLP → PDP → Cart (price + stepper) → Payment screen -->
+    <test name="Checkout">
+        <parameter name="testFile" value="ts_shop_checkout.yaml"/>
+        <classes>
+            <class name="com.popclub.runner.TestRunnerTest"/>
+        </classes>
+    </test>
+
+    <!-- Wishlist → Cart → Payment -->
+    <test name="Wishlist to Cart">
+        <parameter name="testFile" value="ts_shop_e2e_wishlist_to_cart.yaml"/>
+        <classes>
+            <class name="com.popclub.runner.TestRunnerTest"/>
+        </classes>
+    </test>
+
+    <!-- Add to Cart → Remove → Verify gone -->
+    <test name="Cart Remove">
+        <parameter name="testFile" value="ts_shop_e2e_cart_remove_item.yaml"/>
+        <classes>
+            <class name="com.popclub.runner.TestRunnerTest"/>
+        </classes>
+    </test>
+
+    <!-- Search → Apply category filter → PDP → Cart → Payment -->
+    <test name="Search Filter Buy">
+        <parameter name="testFile" value="ts_shop_e2e_search_filter_buy.yaml"/>
+        <classes>
+            <class name="com.popclub.runner.TestRunnerTest"/>
+        </classes>
+    </test>
+
+    <!-- OOS product: verify OOS state and wishlist CTA -->
+    <test name="Out of Stock">
+        <parameter name="testFile" value="ts_shop_e2e_out_of_stock.yaml"/>
+        <classes>
+            <class name="com.popclub.runner.TestRunnerTest"/>
+        </classes>
+    </test>
+
+    <!-- Full checkout → Verify POP UPI / Link UPI / COD on payment screen -->
+    <test name="Payment Methods">
+        <parameter name="testFile" value="ts_shop_e2e_payment_methods.yaml"/>
+        <classes>
+            <class name="com.popclub.runner.TestRunnerTest"/>
+        </classes>
+    </test>
+
+    <!-- PDP → Similar Products → tap → verify price match → Cart → Payment -->
+    <test name="Similar Products">
+        <parameter name="testFile" value="ts_shop_e2e_similar_products.yaml"/>
+        <classes>
+            <class name="com.popclub.runner.TestRunnerTest"/>
+        </classes>
+    </test>
+
+    <!-- Add 2 different items → verify both in cart at any index → Payment -->
+    <test name="Multi Item Cart">
+        <parameter name="testFile" value="ts_shop_e2e_multi_item_cart.yaml"/>
+        <classes>
+            <class name="com.popclub.runner.TestRunnerTest"/>
+        </classes>
+    </test>
+
+</suite>

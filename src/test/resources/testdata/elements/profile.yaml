@@ -1,0 +1,236 @@
+
+# ─── Profile Account ───────────────────────────────────────────────────────────
+profile_account_management_button:
+  android:
+    - type: accessibilityId
+      value: profile_account_management_button
+
+# ─── Profile Apply ─────────────────────────────────────────────────────────────
+profile_apply_rupay_card_button:
+  android:
+    - type: accessibilityId
+      value: profile_apply_rupay_card_button
+
+# ─── Profile Avatar ────────────────────────────────────────────────────────────
+profile_avatar_button:
+  android:
+    - type: accessibilityId
+      value: profile_avatar_button
+
+# ─── Profile Claimed ───────────────────────────────────────────────────────────
+profile_claimed_rewards_button:
+  android:
+    - type: accessibilityId
+      value: profile_claimed_rewards_button
+
+# ─── Profile Copy ──────────────────────────────────────────────────────────────
+profile_copy_upi_id_button:
+  android:
+    - type: accessibilityId
+      value: profile_copy_upi_id_button
+
+# ─── Profile Everything ────────────────────────────────────────────────────────
+profile_everything_upi_button:
+  android:
+    - type: accessibilityId
+      value: profile_everything_upi_button
+
+# ─── Profile Help ──────────────────────────────────────────────────────────────
+profile_help_support_button:
+  android:
+    - type: accessibilityId
+      value: profile_help_support_button
+
+# ─── Profile Link ──────────────────────────────────────────────────────────────
+profile_link_bank_account_button:
+  android:
+    - type: accessibilityId
+      value: profile_link_bank_account_button
+profile_link_rupay_card_button:
+  android:
+    - type: accessibilityId
+      value: profile_link_rupay_card_button
+profile_link_upi_button:
+  android:
+    - type: accessibilityId
+      value: profile_link_upi_button
+
+# ─── Profile Logout ────────────────────────────────────────────────────────────
+profile_logout_button:
+  android:
+    - type: accessibilityId
+      value: profile_logout_button
+profile_logout_cancel_button:
+  android:
+    - type: accessibilityId
+      value: profile_logout_cancel_button
+profile_logout_confirm_button:
+  android:
+    - type: accessibilityId
+      value: profile_logout_confirm_button
+profile_logout_title_text:
+  android:
+    - type: accessibilityId
+      value: profile_logout_title_text
+
+# ─── Profile Manage ────────────────────────────────────────────────────────────
+profile_manage_card_button:
+  android:
+    - type: accessibilityId
+      value: profile_manage_card_button
+
+# ─── Profile Menu ──────────────────────────────────────────────────────────────
+profile_menu_section_profile_section_header_row:
+  android:
+    - type: accessibilityId
+      value: profile_menu_section_profile_section_header_row
+
+# ─── Profile Mobile ────────────────────────────────────────────────────────────
+profile_mobile_number_text:
+  android:
+    - type: accessibilityId
+      value: profile_mobile_number_text
+
+# ─── Profile My ────────────────────────────────────────────────────────────────
+profile_my_qr_button:
+  android:
+    - type: accessibilityId
+      value: profile_my_qr_button
+
+# ─── Profile Name ──────────────────────────────────────────────────────────────
+profile_name_text:
+  android:
+    - type: accessibilityId
+      value: profile_name_text
+
+# ─── Profile Orders ────────────────────────────────────────────────────────────
+profile_orders_button:
+  android:
+    - type: accessibilityId
+      value: profile_orders_button
+
+# ─── Profile Pay ───────────────────────────────────────────────────────────────
+profile_pay_bills_button:
+  android:
+    - type: accessibilityId
+      value: profile_pay_bills_button
+
+# ─── Profile Popcoins ──────────────────────────────────────────────────────────
+profile_popcoins_card:
+  android:
+    - type: accessibilityId
+      value: profile_popcoins_card
+
+# ─── Profile Privacy ───────────────────────────────────────────────────────────
+profile_privacy_policy_button:
+  android:
+    - type: accessibilityId
+      value: profile_privacy_policy_button
+
+# ─── Profile Quick ─────────────────────────────────────────────────────────────
+profile_quick_action_cashback_button:
+  android:
+    - type: accessibilityId
+      value: profile_quick_action_cashback_button
+profile_quick_action_popcoins_button:
+  android:
+    - type: accessibilityId
+      value: profile_quick_action_popcoins_button
+
+# ─── Profile Rate ──────────────────────────────────────────────────────────────
+profile_rate_us_button:
+  android:
+    - type: accessibilityId
+      value: profile_rate_us_button
+
+# ─── Profile Recharge ──────────────────────────────────────────────────────────
+profile_recharge_bills_card:
+  android:
+    - type: accessibilityId
+      value: profile_recharge_bills_card
+
+# ─── Profile Refer ─────────────────────────────────────────────────────────────
+profile_refer_earn_button:
+  android:
+    - type: accessibilityId
+      value: profile_refer_earn_button
+
+# ─── Profile Rewards ───────────────────────────────────────────────────────────
+profile_rewards_button:
+  android:
+    - type: accessibilityId
+      value: profile_rewards_button
+profile_rewards_card:
+  android:
+    - type: accessibilityId
+      value: profile_rewards_card
+
+# ─── Profile Saved ─────────────────────────────────────────────────────────────
+profile_saved_address_button:
+  android:
+    - type: accessibilityId
+      value: profile_saved_address_button
+
+# ─── Profile Settings ──────────────────────────────────────────────────────────
+profile_settings_help_support_button:
+  android:
+    - type: accessibilityId
+      value: profile_settings_help_support_button
+profile_settings_juspay_upi_button:
+  android:
+    - type: accessibilityId
+      value: profile_settings_juspay_upi_button
+profile_settings_logout_button:
+  android:
+    - type: accessibilityId
+      value: profile_settings_logout_button
+profile_settings_saved_address_button:
+  android:
+    - type: accessibilityId
+      value: profile_settings_saved_address_button
+
+# ─── Profile Shop ──────────────────────────────────────────────────────────────
+profile_shop_action_orders_button:
+  android:
+    - type: accessibilityId
+      value: profile_shop_action_orders_button
+profile_shop_action_wishlist_button:
+  android:
+    - type: accessibilityId
+      value: profile_shop_action_wishlist_button
+
+# ─── Profile Terms ─────────────────────────────────────────────────────────────
+profile_terms_conditions_button:
+  android:
+    - type: accessibilityId
+      value: profile_terms_conditions_button
+
+# ─── Profile Transaction ───────────────────────────────────────────────────────
+profile_transaction_history_button:
+  android:
+    - type: accessibilityId
+      value: profile_transaction_history_button
+
+# ─── Profile Upi ───────────────────────────────────────────────────────────────
+profile_upi_action_everything_upi_button:
+  android:
+    - type: accessibilityId
+      value: profile_upi_action_everything_upi_button
+profile_upi_action_link_upi_button:
+  android:
+    - type: accessibilityId
+      value: profile_upi_action_link_upi_button
+profile_upi_action_txn_history_button:
+  android:
+    - type: accessibilityId
+      value: profile_upi_action_txn_history_button
+profile_upi_id_text:
+  android:
+    - type: accessibilityId
+      value: profile_upi_id_text
+
+# ─── Profile Wishlist ──────────────────────────────────────────────────────────
+profile_wishlist_button:
+  android:
+    - type: accessibilityId
+      value: profile_wishlist_button

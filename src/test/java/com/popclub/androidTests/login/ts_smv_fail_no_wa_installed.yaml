@@ -1,0 +1,37 @@
+testName: SMV Fail - No WhatsApp Installed - WA Not Found Sheet
+platform: android
+noReset: false
+loginRequired: true
+testCaseIds:
+  - PO-15539
+
+features:
+  - login
+
+tags:
+  - login
+  - regression
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+
+  - action: waitFor
+    element: login_input_phone
+
+  - action: enterText
+    element: login_input_phone
+    value: "9000000001"
+
+  - action: tap
+    element: login_continue_button
+
+  - action: tapIfPresent
+    locator: Switch
+    timeout: 10
+
+  - action: tapByText
+    value: "Install WhatsApp"
+    timeout: 30

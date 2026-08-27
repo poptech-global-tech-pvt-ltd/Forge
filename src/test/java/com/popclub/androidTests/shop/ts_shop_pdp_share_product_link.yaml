@@ -1,0 +1,68 @@
+testName: Shop — PDP Share Product Link
+platform: android
+noReset: true
+loginRequired: true
+
+features:
+  - common
+  - shop
+
+tags:
+  - smoke
+  - shop
+  - pdp
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab  # healed locator → common_home_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  - action: waitFor
+    element: shop_search_button
+
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: enterText
+    element: search_products_search_input
+    value: "perfume"
+
+  - action: pressKey
+    value: search
+
+  - action: waitFor
+    element: product_list_item_0
+
+  - action: tap
+    element: product_list_item_0
+
+  - action: waitFor
+    element: product_details_title
+
+  - action: scanTags
+
+  - action: tap
+    element: product_details_share_button
+
+  # Android native share sheet opens — scan to confirm it appeared
+  - action: scanTags
+
+  # Dismiss the share sheet
+  - action: pressKey
+    value: back
+
+  - action: waitFor
+    element: product_details_title
