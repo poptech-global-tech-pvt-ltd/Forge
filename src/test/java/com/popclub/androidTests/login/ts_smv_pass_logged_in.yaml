@@ -20,7 +20,7 @@ steps:
 
   - action: enterText
     element: login_phone_input
-    value: "9538351687"
+    value: "9743990458"
 
   - action: tap
     element: login_button

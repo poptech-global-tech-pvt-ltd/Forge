@@ -6,44 +6,35 @@
         <listener class-name="com.popclub.listener.TestListener"/>
     </listeners>
 
-    <!-- ═══════════════════════════════════════════════════════════════════
-         Device A — Standard, WhatsApp installed, mobile data ON (7 tests)
-         Serial: LVPRFYAEWOYTSWEI
-    ════════════════════════════════════════════════════════════════════ -->
     <test name="Login — Device A">
         <parameter name="deviceSerial" value="LVPRFYAEWOYTSWEI"/>
-        <parameter name="testFile"     value="ts_login_continue_disabled_partial_number.yaml,ts_login_edit_phone_from_otp_screen.yaml,ts_login_phone_rejects_non_numeric.yaml,ts_smv_pass_auto_request_id.yaml,ts_smv_pass_logged_in.yaml"/>
+        <parameter name="testFile"     value="ts_login_continue_disabled_partial_number.yaml,ts_login_phone_rejects_non_numeric.yaml"/>
+        <parameter name="projectId"     value="d8f4a221-bc6d-47d8-9448-0834f5d012ec"/>
+
         <classes><class name="com.popclub.runner.TestRunnerTest"/></classes>
     </test>
 
-    <!-- ═══════════════════════════════════════════════════════════════════
-         Device B — Standard, WhatsApp installed, mobile data ON (7 tests)
-         Serial: LVPRFYAEWOYTSWEI
-    ════════════════════════════════════════════════════════════════════ -->
-<!--    <test name="Login — Device B">-->
-<!--        <parameter name="deviceSerial" value="LVPRFYAEWOYTSWEI"/>-->
+
+    <test name="Login — Device B">
+        <parameter name="deviceSerial" value="RZCW90S939Y"/>
+        <parameter name="projectId" value="d8f4a221-bc6d-47d8-9448-0834f5d012ec"/>
+        <parameter name="testFile"     value="ts_login_edit_phone_from_otp_screen.yaml,ts_smv_pass_logged_in.yaml"/>
+        <classes><class name="com.popclub.runner.TestRunnerTest"/></classes>
+    </test>
+
+</suite>
+
+
+
+<!--    <test name="Login — Device A">-->
+<!--        <parameter name="deviceSerial" value=""/>-->
 <!--        <parameter name="testFile"     value="ts_login_continue_disabled_partial_number.yaml,ts_login_edit_phone_from_otp_screen.yaml,ts_login_phone_rejects_non_numeric.yaml,ts_smv_pass_auto_request_id.yaml,ts_smv_pass_logged_in.yaml"/>-->
 <!--        <classes><class name="com.popclub.runner.TestRunnerTest"/></classes>-->
 <!--    </test>-->
 
-    <!-- ═══════════════════════════════════════════════════════════════════
-         Device C — WhatsApp NOT installed, mobile data ON (2 tests)
-         Serial: RZCT70TGTSZ
-    ════════════════════════════════════════════════════════════════════ -->
-    <test name="Login — Device C">
-        <parameter name="deviceSerial" value="10BDCM0YJZ00043"/>
-        <parameter name="testFile"     value="ts_smv_fail_no_wa_installed.yaml"/>
-        <classes><class name="com.popclub.runner.TestRunnerTest"/></classes>
-    </test>
 
-    <!-- ═══════════════════════════════════════════════════════════════════
-         Device D — Dual SIM, mobile data OFF on both SIMs (4 tests)
-         Serial: 10BDCM0YJZ00043
-    ════════════════════════════════════════════════════════════════════ -->
-<!--    <test name="Login — Device D">-->
-<!--        <parameter name="deviceSerial" value="RZCT70TGTSZ"/>-->
-<!--        <parameter name="testFile"     value="ts_login_no_mobile_data_blocked.yaml,ts_smv_dual_sim_no_data_edit_verify_fail.yaml,ts_smv_dual_sim_switch_data_dismiss_retry_smv_pass.yaml,ts_smv_dual_sim_switch_data_open_settings_wa_fail.yaml"/>-->
+<!--    <test name="Login — Device B">-->
+<!--        <parameter name="deviceSerial" value=""/>-->
+<!--        <parameter name="testFile"     value="ts_smv_fail_no_wa_installed.yaml"/>-->
 <!--        <classes><class name="com.popclub.runner.TestRunnerTest"/></classes>-->
 <!--    </test>-->
-
-</suite>
