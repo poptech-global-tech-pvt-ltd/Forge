@@ -1,0 +1,80 @@
+testName: OLP — Tap order to ODP, rate widget, delivered status
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-11334
+
+features:
+  - common
+  - login
+  - home
+  - shop
+  - profile
+
+tags:
+  - shop
+  - regression
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: call
+    flow: navigate_to_olp
+
+  # PO-11334: Tap order card navigates to ODP
+  - action: tap
+    element: order_list_item_status_0
+
+  - action: waitFor
+    element: order_details_v2_status_text
+    timeout: 5000
+
+  - action: verifyElement
+    element: order_details_v2_status_text
+    testCaseId: PO-11334
+
+  # Go back to OLP
+  - action: pressKey
+    value: BACK
+
+  - action: waitFor
+    element: order_list_item_status_0
+    timeout: 5000
+
+  # PO-11332: Rate your order widget on delivered unrated orders
+  # Need element key: olp_rate_order_widget_0
+  # Scroll to find delivered order
+  # - action: verifyElement
+  #   element: olp_rate_order_widget_0
+  #   testCaseId: PO-11332
+
+  # PO-11333: Previously submitted rating shown
+  # - action: verifyElement
+  #   element: olp_submitted_rating_0
+  #   testCaseId: PO-11333
+
+  # PO-11336: Order confirmed status label
+  # Need order in "confirmed" state
+  # - action: tapByText
+  #   value: "Order confirmed"
+  #   testCaseId: PO-11336
+
+  # PO-11338: Delivered green checkmark
+  # - action: tapByText
+  #   value: "Delivered"
+  #   testCaseId: PO-11338
+
+  - action: logVar
+    variable: placeholder
+    value: "PO-11332/11333/11336/11338 — need rate widget element keys and orders in specific states"

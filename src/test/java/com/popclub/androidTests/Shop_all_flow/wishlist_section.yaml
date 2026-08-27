@@ -1,0 +1,78 @@
+testName: Cart — Add from wishlist section
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-11233
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - shop
+  - cart
+  - regression
+
+retry: 0
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: call
+    flow: navigate_to_cart
+
+  # PO-11233: 'Add from wishlist' button shown
+  - action: scrollUntilVisible
+    element: cart_add_from_wishlist_button
+    maxScrolls: 4
+
+  - action: verifyElement
+    element: cart_add_from_wishlist_button
+
+  # PO-11234: Tap opens wishlist bottom sheet
+  - action: tap
+    element: cart_add_from_wishlist_button
+
+  - action: verifyElement
+    element: cart_wishlist_item_add_to_cart_button
+    testCaseId: PO-11234
+
+  # PO-11235: Tap 'Add to cart' on wishlist item
+  - action: tap
+    element: cart_wishlist_item_add_to_cart_button
+    testCaseId: PO-11235
+
+  - action: tap
+    element: cart_add_from_wishlist_button
+
+  # PO-11237: 'Go to wishlist' button — tap and verify wishlist page
+  - action: scrollUntilVisible
+    element: cart_go_to_wishlist_button
+    maxScrolls: 2
+
+  - action: verifyElement
+    element: cart_go_to_wishlist_button
+    testCaseId: PO-11237
+
+  - action: tap
+    element: cart_go_to_wishlist_button
+
+  # Verify wishlist page loaded
+  - action: waitFor
+    element: wishlist_title
+    timeout: 3000
+
+  - action: verifyElement
+    element: wishlist_title
+    testCaseId: PO-11237

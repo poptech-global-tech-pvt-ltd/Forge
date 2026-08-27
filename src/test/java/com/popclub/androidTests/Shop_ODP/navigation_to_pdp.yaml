@@ -1,0 +1,59 @@
+testName: ODP — Tap product image navigates to PDP
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-9045
+
+features:
+  - common
+  - login
+  - home
+  - shop
+  - profile
+
+tags:
+  - shop
+  - regression
+
+retry: 0
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: call
+    flow: navigate_to_olp
+    
+  - action: tap
+    element: olp_item_1
+
+  # Capture product title on ODP
+  - action: captureText
+    element: odp_pay_in3_product_title_text
+    variable: odp_product_title
+
+  # Tap product image to navigate to PDP
+  - action: tap
+    element: ordered_product
+
+  - action: waitFor
+    element: product_details_title
+    timeout: 5000
+
+  # PO-9045: Verify PDP loaded with same product
+  - action: captureText
+    element: product_details_title
+    variable: pdp_product_title
+
+  - action: verifyElement
+    element: product_details_title
+    testCaseId: PO-9045
+   

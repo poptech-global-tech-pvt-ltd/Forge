@@ -1,0 +1,69 @@
+testName: shop sort flow High to Low
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-11011
+ 
+features:
+  - common
+  - login
+  - home
+  - shop
+  
+retry: 0
+
+tags:
+  - smoke
+  - shop
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+   
+  - action: tap
+    element: common_shop_tab
+    
+   # ── PLP: navigate, capture API + UI prices ────────────────────────────────
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: enterText
+    element: search_products_search_input
+    value: "the souled store"
+    
+  - action: pressKey
+    value: search
+  # Capture 1st product price before sort 
+  - action: captureText
+    element:  product_list_item_0
+    value: "product_list_item_price_0"
+    
+  # Verify Sort and Filters are present  
+  - action: verifyElement
+    element: product_list_sort_button
+    
+  - action: tap
+    element: product_list_sort_button
+    
+  # Verify Sort options are visible
+  - action: tapByText
+    value: "Price High → Low"
+    testCaseId: PO-11011
+    
+  # Wait for PLP to reload
+  - action: waitFor
+    element: product_list_item_0
+    
+  # Capture first product's price after sort
+  - action: captureText
+    element:  product_list_item_0
+    value: "product_list_item_price_0"

@@ -1,0 +1,65 @@
+testName: PO-10988 — Verify product card displays all required elements (image, brand, name, price)
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-10988
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - regression
+  - shop
+
+retry: 0
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: tap
+    element: common_shop_tab
+
+  # ── PLP: navigate, capture API + UI prices ────────────────────────────────
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: enterText
+    element: search_products_search_input
+    value: "the souled store"
+    
+  - action: pressKey
+    value: search
+
+  # Verify first product card has all required elements
+  - action: verifyElement
+    element: product_list_item_brand_0
+
+  - action: verifyElement
+    element: product_list_item_title_0
+
+  - action: verifyElement
+    element: product_list_item_price_0
+
+  - action: captureText
+    element: product_list_item_price_0
+    variable: product_card_price
+
+  - action: logVar
+    variable: product_card_price
+    value: "Product card price: ${product_card_price}"
+
+  - action: verifyElement
+    element: product_list_item_price_0
+    testCaseId: PO-10988

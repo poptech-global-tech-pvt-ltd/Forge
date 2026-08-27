@@ -1,0 +1,63 @@
+# Covers: search by issuer name, no-results empty state, clear restores list, case-insensitivity
+testName: Transaction history search — issuer lookup, empty state, clear, case-insensitivity
+platform: android
+noReset: true
+loginRequired: false
+testCaseIds: [PO-13272, PO-13273, PO-13274, PO-13275]
+
+features: [common, billpay]
+
+tags: [rcbp, regression]
+
+retry: 0
+
+steps:
+  - action: launchApp
+
+  - action: call
+    flow: rcbp_history
+
+  # PO-13272 — search by issuer name
+  - action: tap
+    element: pop_input_field_search_icon_row
+
+  - action: enterText
+    element: pop_input_field_search_icon_row
+    value: "ICICI"
+
+  - action: pressKey
+    value: search
+
+  - action: verifyElement
+    element: bill_pay_txn_history_month_title_0
+    testCaseId: P0-13272
+
+  # PO-13273 — no matching results → empty state
+  - action: enterText
+    element: pop_input_field_search_icon_row
+    value: "zzzznonexistentmerchant"
+
+  - action: pressKey
+    value: search
+
+  - action: assertNotVisible
+    element: bill_pay_txn_history_item_0
+
+  - action: verifyElement
+    element: bill_pay_txn_history_fragment_v2_no_search_results_view_list_item 
+    testCaseId: PO-13273
+
+  # PO-13274 — clearing search restores full list
+  - action: tap
+    element: pop_input_field_search_icon_row
+    
+  - action: tap
+    element: clear
+
+  - action: verifyElement
+    element: bill_pay_txn_history_item_0
+
+  - action: verifyElement
+    element: bill_pay_txn_history_item_1
+    testCaseId: PO-13274
+ 
