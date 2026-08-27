@@ -1,0 +1,98 @@
+testName: Cart — POPCoins toggle discount
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-11218
+  - PO-11219
+  - PO-11220
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - shop
+  - regression
+
+retry: 0
+
+steps:
+  - action: launchApp
+
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+
+  - action: waitFor
+    element: home_tab
+
+
+  - action: call
+    flow: add_and_navigate_to_cart
+
+  # Scroll to price summary
+
+  - action: scrollUntilVisible
+    element: cart_to_pay_row
+    maxScrolls: 3
+
+  # Capture total before POPCoins
+
+  - action: captureText
+    element: cart_to_pay_row
+    variable: total_before
+
+  # PO-11218: POPCoins toggle card shown
+
+  - action: scrollUntilVisible
+    element: pop_toggle_row
+    maxScrolls: 2
+
+
+  - action: verifyElement
+    element: pop_toggle_row
+    testCaseId: PO-11218
+
+  # PO-11219: Enable toggle — discount applied
+  # NOTE: Need popcoin toggle element key — if not available, use tapByText
+
+  - action: tap
+    element: pop_toggle_row
+
+
+  - action: scrollUntilVisible
+    element: cart_to_pay_row
+
+
+
+  - action: captureText
+    element: cart_to_pay_row
+    variable: cart_to_pay_price_text
+
+
+  - action: logVar
+    variable: total_after_toggle
+    value: "Total after POPCoins: ${total_after_toggle}"
+    testCaseId: PO-11219
+
+  # PO-11220: Disable toggle — discount removed
+
+  - action: tap
+    element: pop_toggle_row
+
+
+  - action: captureText
+    element: cart_to_pay_row
+    variable: total_after_disable
+
+
+  - action: logVar
+    variable: total_after_disable
+    value: "Total after disable: ${total_after_disable}"
+    testCaseId: PO-11220

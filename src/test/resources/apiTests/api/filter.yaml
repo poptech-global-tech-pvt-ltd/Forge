@@ -1,0 +1,47 @@
+# Filters-list API — sneakers, accessories category
+testName: Filters-list API — sneakers accessories
+platform: android
+noReset: true
+loginRequired: true
+
+testCaseIds:
+  - PO-API-FILTERS-LIST-001
+
+features:
+  - common
+  - login
+
+tags:
+  - api
+  - smoke
+  - search
+
+retry: 1
+
+steps:
+
+  # ── 1. Login & capture JWT ────────────────────────────────────────────────────
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  # loginIfNeeded auto-captures the JWT into ${auth_token} and userId into ${user_id}
+
+  # ── 2. Filters-list — POST https://sherlock.popclub.co.in/api/v4/filters-list ─
+  - action: fetchApi
+    url: "https://sherlock.popclub.co.in/api/v4/filters-list"
+    method: POST
+    body: '{"filters":{"category_name":["accessories"]},"options":"facets=ideal_for,brand_name","query":"sneakers"}'
+    headers:
+      Content-Type: "application/json"
+      Authorization: "Token ${auth_token}"
+      X-Userid: "${user_id}"
+    variable: filters_list_response
+    extract:
+      is_success:        "is_success"
+      nb_pages:           "data[0].nbPages"
+      brand_facet_count:   "data[0].facets.brand_name.length()"
+      ideal_for_facet_count: "data[0].facets.ideal_for.length()"
+      response_time_ms:   "data[0].response_time_ms"

@@ -1,0 +1,42 @@
+# PDP API — unserviceable pincode
+testName: PDP API — unserviceable pincode no delivery
+platform: android
+noReset: true
+loginRequired: true
+
+testCaseIds:
+  - PO-API-PDP-NEG-005
+
+features:
+  - common
+  - login
+
+tags:
+  - api
+  - negative
+  - shop
+
+retry: 1
+
+steps:
+
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: fetchApi
+    url: "https://app.popclub.co.in/api/v3/products/1995895/?pincode=999999"   # TODO: confirm real unserviceable pincode
+    method: GET
+    headers:
+      Content-Type: "application/json"
+      X-Platform: "ios"
+      Authorization: "Token ${auth_token}"
+      pincode: "999999"
+      platform: "ios"
+    variable: pdp_unserviceable_response
+    extract:
+      is_success:            "is_success"
+      is_delivery_available: "data.serviceability.is_delivery_available"
+      estimation_delivery:   "data.serviceability.estimation_delivery_date"

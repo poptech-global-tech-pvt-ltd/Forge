@@ -1,0 +1,60 @@
+testName: ODP — Food item no size field and no return option
+platform: android
+noReset: true
+loginRequired: true
+
+testCaseIds:
+  - PO-9050
+
+features:
+  - common
+  - login
+  - home
+  - shop
+  - profile
+
+tags:
+  - shop
+  - regression
+
+retry: 0
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234563737"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  # Navigate to OLP
+  - action: call
+    flow: navigate_to_olp
+
+  # Search for food item in OLP
+  - action: tap
+    element: olp_search_field_input
+
+  - action: enterText
+    element: olp_search_field_input
+    value: "kitoko"
+
+  - action: pressKey
+    value: search
+
+  # Verify ODP loaded
+  - action: verifyElement
+    element: odp_pay_in3_brand_text
+
+  # PO-9050: Food item — Size field should NOT exist
+  - action: verifyElement
+    element: odp_pay_in3_size_text
+    shouldExist: false
+
+  # PO-9060: Food item — Return button should NOT exist
+  - action: verifyElement
+    element: order_details_v2_return_button
+    shouldExist: false
+    testCaseId: PO-9060

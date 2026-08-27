@@ -1,0 +1,55 @@
+# PDP API — product details
+testName: PDP API — product details
+platform: android
+noReset: true
+loginRequired: true
+
+testCaseIds:
+  - PO-API-PDP-001
+
+features:
+  - common
+  - login
+
+tags:
+  - api
+  - smoke
+  - shop
+
+retry: 1
+
+steps:
+
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: fetchApi
+    url: "https://app.popclub.co.in/api/v3/products/1995895/?pincode=560046"
+    method: GET
+    headers:
+      Content-Type: "application/json"
+      X-Platform: "ios"
+      x-app-version: "3.0.19"
+      app_version: "3.0.19"
+      X-Device-ID: "5AE401EA-A8D7-47F8-B05E-49B2D90C281C"
+      Authorization: "Token ${auth_token}"
+      os_type: "ios"
+      pincode: "560046"
+      X-ClientIP: "192.168.1.9"
+      platform: "ios"
+    variable: pdp_response
+    extract:
+      is_success:          "is_success"
+      product_id:          "data.id"
+      product_title:       "data.title"
+      is_available_to_buy: "data.availability.is_available_to_buy"
+      num_available:       "data.availability.num_available"
+      child_count:          "data.children.length()"
+      child_0_size:         "data.children[0].size"
+      child_0_price:        "data.children[0].price.selling_price"
+      offer_payable_amount: "data.offer_price_detail.product_offer.payable_amount"
+      estimation_delivery:  "data.serviceability.estimation_delivery_date"
+      is_in_wishlist:       "data.is_in_wishlist"

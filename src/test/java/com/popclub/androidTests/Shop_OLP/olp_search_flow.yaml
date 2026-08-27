@@ -1,0 +1,101 @@
+testName: OLP — Search orders, no match, clear search
+platform: android
+noReset: true
+loginRequired: true
+
+testCaseIds:
+  - PO-11344
+  - PO-11345
+  - PO-11346
+  - PO-11347
+  - PO-11348
+
+features:
+  - common
+  - login
+  - home
+  - shop
+  - profile
+
+tags:
+  - olp
+  - shop
+  - regression
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: call
+    flow: navigate_to_olp
+
+  # PO-11344: Tap search bar — focuses input, shows keyboard
+  - action: tap
+    element: orders_order_items_container_input
+
+  - action: verifyElement
+    element: orders_order_items_container_input
+    testCaseId: PO-11344
+
+  # PO-11345: Search "Snackible" — returns matching orders
+  - action: enterText
+    element: orders_order_items_container_input
+    value: "HKV"
+
+  - action: pressKey
+    value: search
+
+  - action: waitFor
+    element: order_list_item_status_0
+    timeout: 5000
+
+  - action: verifyElement
+    element: order_list_item_status_0
+    testCaseId: PO-11345
+
+  # PO-11347: Tap X — clears input, shows all orders
+  - action: tap
+    element: olp_search_clear_button
+
+  - action: waitFor
+    element: order_list_item_status_0
+    timeout: 5000
+
+  - action: verifyElement
+    element: order_list_item_status_0
+    testCaseId: PO-11347
+
+  # PO-11346: Search nonsense — no match found
+  - action: enterText
+    element: orders_order_items_container_input
+    value: "zzzxxyy99887766"
+
+  - action: pressKey
+    value: search
+
+  - action: verifyElement
+    element: olp_empty_state
+    testCaseId: PO-11346
+
+  # Clear for next test
+  - action: tap
+    element: olp_search_clear_button
+
+  - action: waitFor
+    element: order_list_item_status_0
+    timeout: 5000
+
+  # PO-11348: Search with active filter
+  # Apply filter first, then search
+  # Need filter applied state — combine with File 4
+  - action: logVar
+    variable: placeholder
+    value: "PO-11348 — depends on filter being active, see filter test file"

@@ -1,0 +1,42 @@
+# PDP API — invalid pincode format
+testName: PDP API — invalid pincode format
+platform: android
+noReset: true
+loginRequired: true
+
+testCaseIds:
+  - PO-API-PDP-NEG-002
+
+features:
+  - common
+  - login
+
+tags:
+  - api
+  - negative
+  - shop
+
+retry: 1
+
+steps:
+
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: fetchApi
+    url: "https://app.popclub.co.in/api/v3/products/1995895/?pincode=abc"
+    method: GET
+    headers:
+      Content-Type: "application/json"
+      X-Platform: "ios"
+      Authorization: "Token ${auth_token}"
+      pincode: "abc"
+      platform: "ios"
+    variable: pdp_bad_pincode_response
+    extract:
+      is_success:              "is_success"
+      message:                 "message"
+      serviceability_present:  "data.serviceability"   # expect null/absent
