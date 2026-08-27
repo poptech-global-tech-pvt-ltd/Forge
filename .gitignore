@@ -48,6 +48,8 @@ src/test/resources/qa.properties
 ### Local overrides (machine-specific, never commit) ###
 src/main/resources/config/local.cloud.properties
 src/test/resources/config/testsigma-local.properties
+src/test/resources/config/local.cloud.properties
+
 
 ### Forge ###
 *.apk

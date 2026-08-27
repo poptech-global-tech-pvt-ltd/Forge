@@ -18,18 +18,18 @@ steps:
   - action: launchApp
 
   - action: waitFor
-    element: login_input_phone
+    element: login_phone_input
 
   - action: enterText
-    element: login_input_phone
+    element: login_phone_input
     value: "abc!@#"
 
   - action: captureText
-    element: login_input_phone
+    element: login_phone_input
     variable: phoneAfterInvalid
 
   - action: enterText
-    element: login_input_phone
+    element: login_phone_input
     value: "9000000001"
 
   - action: tapByText

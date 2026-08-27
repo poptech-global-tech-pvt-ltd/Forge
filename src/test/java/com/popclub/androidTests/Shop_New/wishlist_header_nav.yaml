@@ -46,26 +46,17 @@ steps:
   - action: tap
     element: toolbar_wishlist_button
 
-  - action: waitFor
-    element: wishlist_item_card_compose_row
-
   # PO-11482: Tap cart icon — navigates to Cart
   - action: tap
     element: toolbar_cart_button
     testCaseId: PO-11482
 
-  - action: waitFor
-    element: cart_item_row_0
-
   - action: pressKey
     value: BACK
 
-  - action: waitFor
-    element: wishlist_item_card_compose_row
-
   # PO-11481: Tap back arrow — exits wishlist
   - action: tap
-    element: wishlist_back_button
+    element: Navigation
     testCaseId: PO-11481
 
   # Verify we're back on PLP

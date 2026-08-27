@@ -48,6 +48,9 @@ public class LaunchAppAction implements Action {
         // 4. Wait until *something* is visible (app loaded past splash screen)
         waitForAppReady(driver);
 
+        // Re-unlock in case the screen locked again during app restart
+        wakeDevice((AndroidDriver) driver);
+
         if (TestContext.isLoginRequired()) {
             // 5a. Login flow — dismiss Google/GMS overlays that can block the login screen
             dismissSystemDialogs(driver);
@@ -62,15 +65,6 @@ public class LaunchAppAction implements Action {
     }
 
     private void wakeDevice(AndroidDriver driver) {
-        try {
-            if (driver.isDeviceLocked()) {
-                driver.unlockDevice();
-                System.out.println("[LaunchApp] Device was locked — unlocked.");
-            }
-        } catch (Exception e) {
-            System.out.println("[LaunchApp] Wake/unlock skipped: " + e.getMessage());
-        }
-
         try {
             driver.executeScript("mobile: shell", java.util.Map.of(
                     "command", "settings",
@@ -101,10 +95,30 @@ public class LaunchAppAction implements Action {
         try {
             io.appium.java_client.appmanagement.ApplicationState state = driver.queryAppState(APP_PACKAGE);
             System.out.println("[LaunchApp] noReset=true — app state: " + state);
-            driver.activateApp(APP_PACKAGE);
+            activateAppExplicit(driver);
             System.out.println("[LaunchApp] App activated.");
         } catch (Exception e) {
             System.out.println("[LaunchApp] queryAppState/activateApp failed: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Activates the app via an explicit `am start -n package/.LauncherFresh` shell command.
+     * driver.activateApp(APP_PACKAGE) resolves the launcher activity itself, which fails here —
+     * the manifest also lists a LauncherClassic entry, but that activity class no longer exists
+     * in this build (`am start` on it fails with "Activity class does not exist"), so
+     * package-only resolution is ambiguous ("Unable to resolve the launchable activity").
+     * LauncherFresh is the one that actually works.
+     */
+    private void activateAppExplicit(AndroidDriver driver) {
+        try {
+            driver.executeScript("mobile: shell", java.util.Map.of(
+                    "command", "am",
+                    "args",    java.util.List.of("start", "-n", APP_PACKAGE + "/.LauncherFresh")
+            ));
+            System.out.println("[LaunchApp] Launched via am start -n " + APP_PACKAGE + "/.LauncherFresh");
+        } catch (Exception e) {
+            System.out.println("[LaunchApp] am start failed: " + e.getMessage());
         }
     }
 
@@ -119,12 +133,7 @@ public class LaunchAppAction implements Action {
         } catch (Exception e) {
             System.out.println("[LaunchApp] terminateApp failed: " + e.getMessage());
         }
-        try {
-            driver.activateApp(APP_PACKAGE);
-            System.out.println("[LaunchApp] activateApp succeeded — app launched");
-        } catch (Exception e) {
-            System.out.println("[LaunchApp] ⚠️  activateApp failed: " + e.getMessage());
-        }
+        activateAppExplicit(driver);
     }
 
     private void waitForHomeTab(AppiumDriver driver) {
@@ -142,9 +151,31 @@ public class LaunchAppAction implements Action {
     private void waitForAppReady(AppiumDriver driver) {
         try {
             new WebDriverWait(driver, Duration.ofSeconds(APP_READY_TIMEOUT_SEC))
-                    .until(d -> !d.findElements(By.xpath("//*[@displayed='true']")).isEmpty());
+                    .until(d -> {
+                        try {
+                            AppiumDriver ad = (AppiumDriver) d;
+                            // Dismiss GMS/system overlays that block the app from reaching foreground
+                            tapIfPresent(ad, By.id("com.google.android.gms:id/cancel"),
+                                    "Google account chooser — Cancel");
+                            tapIfPresent(ad, By.id("com.google.android.gms:id/decline_button"),
+                                    "Google sign-in — Decline");
+                            tapIfPresent(ad, By.id("android:id/button2"),
+                                    "System dialog — Cancel/Deny");
+
+                            String pkg = ((AndroidDriver) ad).getCurrentPackage();
+                            if (APP_PACKAGE.equals(pkg)) return true;
+
+                            // If we dismissed a dialog but the app isn't foreground yet, re-activate
+                            ((AndroidDriver) ad).activateApp(APP_PACKAGE);
+                            return false;
+                        } catch (Exception e) {
+                            return false;
+                        }
+                    });
+            System.out.println("[LaunchApp] POP app is in foreground — proceeding.");
         } catch (Exception e) {
-            System.out.println("[LaunchApp] ⚠️  App-ready wait timed out: " + e.getMessage());
+            System.out.println("[LaunchApp] ⚠️  POP app did not come to foreground after "
+                    + APP_READY_TIMEOUT_SEC + "s: " + e.getMessage());
         }
     }
 
@@ -159,8 +190,20 @@ public class LaunchAppAction implements Action {
             dismissed |= tapIfPresent(driver, By.id("com.google.android.gms:id/decline_button"),
                     "Google sign-in — Decline");
 
-            // Permission dialogs are handled automatically by Appium's autoGrantPermissions capability
-            // (install-time) and PermissionWatcher (runtime mid-test). No need to deny them here.
+            // autoGrantPermissions/PermissionWatcher only cover a fresh install — with
+            // noReset:true the app is reused, so runtime prompts (e.g. notifications) can
+            // still appear. Package name varies by device: AOSP uses
+            // com.android.permissioncontroller, GMS (e.g. this realme unit) uses
+            // com.google.android.permissioncontroller — try both.
+            dismissed |= tapIfPresent(driver,
+                    AppiumBy.androidUIAutomator("new UiSelector().resourceId("
+                            + "\"com.android.permissioncontroller:id/permission_deny_button\")"),
+                    "Runtime permission dialog — Don't allow (AOSP)");
+
+            dismissed |= tapIfPresent(driver,
+                    AppiumBy.androidUIAutomator("new UiSelector().resourceId("
+                            + "\"com.google.android.permissioncontroller:id/permission_deny_button\")"),
+                    "Runtime permission dialog — Don't allow (GMS)");
 
             dismissed |= tapIfPresent(driver, By.id("android:id/button2"),
                     "System dialog — Cancel/Deny (button2)");
@@ -169,6 +212,11 @@ public class LaunchAppAction implements Action {
             dismissed |= tapIfPresent(driver,
                     AppiumBy.accessibilityId("app_update_later_button"),
                     "App update — Later");
+
+            // App onboarding / tour screen — "Close" button
+            dismissed |= tapIfPresent(driver,
+                    AppiumBy.accessibilityId("Close"),
+                    "App tour — Close/Skip");
 
             if (!dismissed) {
                 // No dialogs this round — we're clear

@@ -58,7 +58,7 @@ steps:
 
   # ── Handle address bottomsheet if needed ──
   - action: captureText
-    element: cart_s2_s_payment_button_button
+    element: cart_pay_button
     variable: cart_bottomsheet_cta
 
   - action: ifVarEquals
@@ -66,7 +66,7 @@ steps:
     value: "Add address"
     steps:
       - action: tap
-        element: cart_s2_s_payment_button_button_2
+        element: cart_s2_s_payment_button_2
       - action: call
         flow: add_address
         params:
@@ -81,16 +81,13 @@ steps:
   # ── PO-15722: COD option shows descriptive text ──
 
   - action: verifyElement
-    element: cod_payment_expand
+    element: shop_payment_shop_cod_section_radio
     shouldExist: true
     testCaseId: PO-15722
 
   # ── PO-15723: Select COD updates footer, closes sheet ──
   - action: tap
-    element: cod_payment_expand
-    
-  - action: tap
-    element: shop_payment_shop_cod_section_button
+    element: shop_payment_shop_cod_section_radio
 
   - action: verifyElement
     element: payment_method_title_text

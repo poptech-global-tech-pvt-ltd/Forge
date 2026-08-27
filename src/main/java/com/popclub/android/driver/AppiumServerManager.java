@@ -50,22 +50,27 @@ public class AppiumServerManager {
         String nodePath   = CloudConfig.getNodePath();
         String appiumPath = CloudConfig.getAppiumJsPath();
 
+        String androidHome = CloudConfig.getAndroidHome();
+
         AppiumServiceBuilder builder =
                 new AppiumServiceBuilder()
                         .usingDriverExecutable(new File(nodePath))
                         .withAppiumJS(new File(appiumPath))
                         .usingPort(port)
-                        .withIPAddress("127.0.0.1");
+                        .withIPAddress("127.0.0.1")
+                        .withArgument(() -> "--relaxed-security");
 
-        // Pass ANDROID_HOME / ANDROID_SDK_ROOT so Appium can locate aapt2
-        String androidHome = CloudConfig.getAndroidHome();
+        // Pass ANDROID_HOME / ANDROID_SDK_ROOT so Appium/UiAutomator2 can locate the SDK.
+        // withEnvironment replaces the whole env, so start from the current process env.
+        Map<String, String> env = new HashMap<>();
+        try { env.putAll(System.getenv()); } catch (Exception ignored) {}
         if (androidHome != null) {
-            Map<String, String> env = new HashMap<>();
             env.put("ANDROID_HOME", androidHome);
             env.put("ANDROID_SDK_ROOT", androidHome);
-            builder.withEnvironment(env);
+            env.put("PATH", androidHome + "/platform-tools:" + androidHome + "/tools:" + env.getOrDefault("PATH", ""));
             System.out.println("[Appium] ANDROID_HOME → " + androidHome);
         }
+        builder.withEnvironment(env);
 
         AppiumDriverLocalService service = builder.build();
 

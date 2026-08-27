@@ -1,0 +1,42 @@
+# PDP API — out of stock product
+testName: PDP API — out of stock product
+platform: android
+noReset: true
+loginRequired: true
+
+testCaseIds:
+  - PO-API-PDP-NEG-007
+
+features:
+  - common
+  - login
+
+tags:
+  - api
+  - negative
+  - shop
+
+retry: 1
+
+steps:
+
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: fetchApi
+    url: "https://app.popclub.co.in/api/v3/products/0000001/?pincode=560046"   # TODO: real out-of-stock product id
+    method: GET
+    headers:
+      Content-Type: "application/json"
+      X-Platform: "ios"
+      Authorization: "Token ${auth_token}"
+      pincode: "560046"
+      platform: "ios"
+    variable: pdp_oos_response
+    extract:
+      num_available:       "data.availability.num_available"
+      is_available_to_buy: "data.availability.is_available_to_buy"
+      child_0_available:   "data.children[0].is_available"

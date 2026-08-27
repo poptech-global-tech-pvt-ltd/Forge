@@ -70,6 +70,10 @@ cart_delivery_fee_info_button:
   android:
     - type: accessibilityId
       value: Info
+cart_empty_title:
+  android:
+    - type: accessibilityId
+      value: cart_empty_title
 cart_empty_wishlist_title:
   android:
     - type: accessibilityId
@@ -826,6 +830,10 @@ ordered_product:
   android:
     - type: accessibilityId
       value: Ordered Product
+oss_done_cta:
+  android:
+    - type: accessibilityId
+      value: oss_primary_button
 Out_for_Delivery:
   android:
     - type: accessibilityId
@@ -846,6 +854,10 @@ payment_processing_status_text:
   android:
     - type: accessibilityId
       value: payment_processing_status_text
+plp_sort_text:
+  android:
+    - type: accessibilityId
+      value: plp_sort_text
 pop_chip_row:
   android:
     - type: accessibilityId
@@ -1170,6 +1182,14 @@ scroll_to_top:
   android:
     - type: accessibilityId
       value: Scroll to top
+search_back_button:
+  android:
+    - type: accessibilityId
+      value: search_back_button
+search_category_suggestion_item_0:
+  android:
+    - type: accessibilityId
+      value: search_category_suggestion_item_0
 search_input:
   android:
     - type: accessibilityId
@@ -1286,6 +1306,10 @@ shop_payment_shop_cod_section_button:
   android:
     - type: accessibilityId
       value: shop_payment_shop_cod_section_button
+shop_payment_shop_cod_section_radio:
+  android:
+    - type: accessibilityId
+      value: shop_payment_shop_cod_section_radio
 shop_payment_shop_pop_upi_section_button:
   android:
     - type: accessibilityId
@@ -1355,6 +1379,14 @@ toolbar_popcoin_button:
   android:
     - type: accessibilityId
       value: toolbar_popcoin_button
+toolbar_wishlist_button:
+  android:
+    - type: accessibilityId
+      value: toolbar_wishlist_button
+wishlist_add_to_cart:
+  android:
+    - type: accessibilityId
+      value: Add to cart
 wishlist_add_to_cart_button:
   android:
     - type: accessibilityId
@@ -1375,6 +1407,30 @@ wishlist_item_card_compose_row:
   android:
     - type: accessibilityId
       value: wishlist_item_card_compose_row
+wishlist_item_title_0:
+  android:
+    - type: accessibilityId
+      value: Assorted Protein Wafer Bars (pack Of 10x40gm)
+wishlist_item_title_1:
+  android:
+    - type: accessibilityId
+      value: wishlist_item_title_1
+wishlist_item_title_2:
+  android:
+    - type: accessibilityId
+      value: wishlist_item_title_2
+wishlist_item_title_3:
+  android:
+    - type: accessibilityId
+      value: wishlist_item_title_3
+wishlist_item_title_4:
+  android:
+    - type: accessibilityId
+      value: wishlist_item_title_4
+wishlist_item_title_5:
+  android:
+    - type: accessibilityId
+      value: wishlist_item_title_5
 wishlist_remove_button:
   android:
     - type: accessibilityId

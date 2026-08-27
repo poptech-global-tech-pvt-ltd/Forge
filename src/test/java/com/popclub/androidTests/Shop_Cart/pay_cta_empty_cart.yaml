@@ -31,9 +31,33 @@ steps:
 
   - action: waitFor
     element: home_tab
-
+    
+  - action: tap
+    element: common_shop_tab
+    
   - action: call
-    flow: navigate_to_cart
+    flow: search_product
+    params:
+      search_query: "souled store"
+
+  # ── Select first product ──
+  - action: tap
+    element: product_list_item_0
+
+  # ── Add to cart ──
+  - action: tap
+    element: product_details_bottom_sticky_bar_button
+
+  - action: tap
+    element: size_selection_item_0
+
+  - action: tap
+    element: size_selection_add_to_cart_button
+
+  # ── Go to cart ──
+  - action: tap
+    element: product_details_go_to_cart_button
+
 
   # PO-11238: Pay CTA shows correct amount
   - action: verifyElement
@@ -71,6 +95,7 @@ steps:
     element: cart_remove_product_button
 
   # PO-11241: Empty cart illustration and 'Explore more'
-  - action: verifyElement
-    element: cart_shop_more_button
+  - action: assertText
+    element: cart_empty_title
+    value: "Your cart is empty"
     testCaseId: PO-11241

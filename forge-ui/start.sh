@@ -3,6 +3,10 @@
 set -e
 cd "$(dirname "$0")"
 
+# Ensure ANDROID_HOME is available for Appium/UiAutomator2
+export ANDROID_HOME="${ANDROID_HOME:-$HOME/Library/Android/sdk}"
+export ANDROID_SDK_ROOT="$ANDROID_HOME"
+
 # Auto-install dependencies on first run (or after a fresh clone)
 if [ ! -d "node_modules" ]; then
   echo "📦 Installing dependencies..."

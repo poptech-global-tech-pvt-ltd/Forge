@@ -58,6 +58,12 @@ public class AppiumDriverManager {
             // No remoteAdbHost — for cloud the Appium server runs on the STF host and has
             // direct local ADB access to the device (serial is known to that ADB daemon).
             options.setAutomationName("UiAutomator2");
+
+            String androidHome = CloudConfig.getAndroidHome();
+            if (androidHome != null) {
+                options.setCapability("appium:androidSdkRoot", androidHome);
+            }
+
             if (device.platformVersion != null && !device.platformVersion.isEmpty()) {
                 options.setPlatformVersion(device.platformVersion);
             }

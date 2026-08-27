@@ -262,6 +262,26 @@ bill_pay_payment_review_page_postpaid_payment_option_row_radio:
   android:
     - type: accessibilityId
       value: bill_pay_payment_review_page_postpaid_payment_option_row_radio
+bill_pay_recent_plan_date_0:
+  android:
+    - type: accessibilityId
+      value: bill_pay_recent_plan_date_0
+bill_pay_recent_plan_description_0:
+  android:
+    - type: accessibilityId
+      value: bill_pay_recent_plan_description_0
+bill_pay_recent_plan_item_0:
+  android:
+    - type: accessibilityId
+      value: bill_pay_recent_plan_item_0
+bill_pay_recent_plan_item_1:
+  android:
+    - type: accessibilityId
+      value: bill_pay_recent_plan_item_1
+bill_pay_recent_plan_price_0:
+  android:
+    - type: accessibilityId
+      value: bill_pay_recent_plan_price_0
 bill_pay_recharge_contact_item_0:
   android:
     - type: accessibilityId
@@ -378,6 +398,10 @@ bill_pay_recharge_recent_item_1:
   android:
     - type: accessibilityId
       value: bill_pay_recharge_recent_item_1
+bill_pay_recharge_recents_header:
+  android:
+    - type: accessibilityId
+      value: bill_pay_recharge_recents_header
 bill_pay_recharge_search_input:
   android:
     - type: accessibilityId
@@ -450,6 +474,10 @@ bill_pay_review_proceed_button:
   android:
     - type: accessibilityId
       value: bill_pay_review_proceed_button
+bill_pay_review_summary_item_0:
+  android:
+    - type: accessibilityId
+      value: bill_pay_review_summary_item_0
 bill_pay_state_item_0:
   android:
     - type: accessibilityId
@@ -494,6 +522,10 @@ bill_pay_txn_detail_status_accordion:
   android:
     - type: accessibilityId
       value: bill_pay_txn_detail_status_accordion
+bill_pay_txn_details_screen:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_details_screen
 bill_pay_txn_history_category_filter_chip_with_close_row:
   android:
     - type: accessibilityId
@@ -570,14 +602,58 @@ bill_pay_txn_history_filter_bottom_sheet_content_row_1:
   android:
     - type: accessibilityId
       value: bill_pay_txn_history_filter_bottom_sheet_content_row_1
+bill_pay_txn_history_filter_bottom_sheet_title:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_filter_bottom_sheet_title
 bill_pay_txn_history_filter_chip:
   android:
     - type: accessibilityId
       value: bill_pay_txn_history_filter_chip
+bill_pay_txn_history_filter_chip_item_1:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_filter_chip_item_1
 bill_pay_txn_history_filter_clear_button:
   android:
     - type: accessibilityId
       value: bill_pay_txn_history_filter_clear_button
+bill_pay_txn_history_filter_option_0:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_filter_option_0
+bill_pay_txn_history_filter_option_1:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_filter_option_1
+bill_pay_txn_history_filter_option_2:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_filter_option_2
+bill_pay_txn_history_filter_option_3:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_filter_option_3
+bill_pay_txn_history_filter_option_4:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_filter_option_4
+bill_pay_txn_history_filter_option_5:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_filter_option_5
+bill_pay_txn_history_filter_option_6:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_filter_option_6
+bill_pay_txn_history_filter_option_7:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_filter_option_7
+bill_pay_txn_history_fragment_v2_no_search_results_view_list_item:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_fragment_v2_no_search_results_view_list_item
 bill_pay_txn_history_item_0:
   android:
     - type: accessibilityId
@@ -594,6 +670,14 @@ bill_pay_txn_history_month_item_1:
   android:
     - type: accessibilityId
       value: bill_pay_txn_history_month_item_1
+bill_pay_txn_history_month_title_0:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_month_title_0
+bill_pay_txn_history_month_title_1:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_month_title_1
 bill_pay_txn_history_monthly_transaction_card_row:
   android:
     - type: accessibilityId
@@ -606,7 +690,59 @@ bill_pay_txn_history_search_input:
   android:
     - type: accessibilityId
       value: bill_pay_txn_history_search_input
+clear:
+  android:
+    - type: accessibilityId
+      value: pop_input_field_search_clear_row
+contact_permission_empty_state_button:
+  android:
+    - type: accessibilityId
+      value: contact_permission_empty_state_button
+Contacts_permission_denied:
+  android:
+    - type: accessibilityId
+      value: contact_permission_empty_state_heading
+convenience_fee:
+  android:
+    - type: accessibilityId
+      value: bill_pay_review_summary_value_1
 Delivered:
   android:
     - type: accessibilityId
       value: orders_select_order_filter_bottom_sheet_item1_item_8
+edge_image_banner_container_8:
+  android:
+    - type: accessibilityId
+      value: edge_image_banner_image_1
+edge_image_banner_image_8:
+  android:
+    - type: accessibilityId
+      value: edge_image_banner_image_8
+no_contact_found:
+  android:
+    - type: accessibilityId
+      value: bill_pay_recharge_page_fragmentv2_no_contact_found_message_list_item
+no_plan_result:
+  android:
+    - type: accessibilityId
+      value: bill_pay_recharge_plan_page_fragment_v2_no_results_view_list_item
+payment_history:
+  android:
+    - type: accessibilityId
+      value: edge_image_banner_image_1
+plan_price:
+  android:
+    - type: accessibilityId
+      value: bill_pay_review_summary_value_0
+pop_input_field_search_icon_row:
+  android:
+    - type: accessibilityId
+      value: pop_input_field_search_icon_row
+skip_tour:
+  android:
+    - type: accessibilityId
+      value: Close
+total_price:
+  android:
+    - type: accessibilityId
+      value: bill_pay_review_summary_total_value

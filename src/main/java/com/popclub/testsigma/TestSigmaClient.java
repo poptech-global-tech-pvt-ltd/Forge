@@ -48,8 +48,10 @@ public class TestSigmaClient {
                 .body(body)
                 .post("/projects/" + projectId + "/test_runs");
 
-        if (response.getStatusCode() >= 400) {
-            System.out.println("[TestSigma] Create run failed: " + response.jsonPath().getString("message"));
+        String rawBody = response.getBody().asString();
+        if (response.getStatusCode() >= 400 || rawBody.trim().startsWith("<")) {
+            System.out.println("[TestSigma] Create run failed (HTTP " + response.getStatusCode() + "): "
+                    + rawBody.substring(0, Math.min(rawBody.length(), 200)));
             return null;
         }
 

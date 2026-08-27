@@ -31,13 +31,30 @@ steps:
 
   - action: tap
     element: common_shop_tab
+    
+  - action: call
+    flow: search_product
+    params:
+      search_query: "souled store"
+
+  # ── Select first product ──
+  - action: tap
+    element: product_list_item_0
+
+  # ── Add to cart ──
+  - action: tap
+    element: product_details_bottom_sticky_bar_button
 
   - action: tap
-    element: toolbar_cart_button
+    element: size_selection_item_0
 
-  - action: waitFor
-    element: cart_move_from_cart_button
-    timeout: 5000
+  - action: tap
+    element: size_selection_add_to_cart_button
+
+  # ── Go to cart ──
+  - action: tap
+    element: product_details_go_to_cart_button
+
 
   # PO-11239: FTUE cart shows 'Add address' instead of 'Pay'
   - action: verifyElement

@@ -168,7 +168,7 @@ public class DeviceManager {
                 }
             }
 
-            System.out.println("📱 Detected local devices: " + localDevices);
+            System.out.println("[Device] Local devices: " + localDevices);
 
         } catch (Exception e) {
             throw new RuntimeException("Failed to load devices from ADB", e);
@@ -180,11 +180,24 @@ public class DeviceManager {
     }
 
     private static DeviceInfo getLocalDevice() {
+        String preferredSerial = CloudConfig.getDeviceSerial();
+        if (preferredSerial != null && !preferredSerial.isBlank()) {
+            if (busyDevices.contains(preferredSerial)) {
+                throw new RuntimeException("Requested device is already in use: " + preferredSerial);
+            }
+            if (!localDevices.contains(preferredSerial)) {
+                throw new RuntimeException("Requested device not found in ADB: " + preferredSerial);
+            }
+            busyDevices.add(preferredSerial);
+            int port = devicePortMap.get(preferredSerial);
+            System.out.println("[Device] Allocated (pinned) → " + preferredSerial);
+            return new DeviceInfo(preferredSerial, port);
+        }
         for (String udid : localDevices) {
             if (!busyDevices.contains(udid)) {
                 busyDevices.add(udid);
                 int port = devicePortMap.get(udid);
-                System.out.println("Allocated device → " + udid + " | port: " + port);
+                System.out.println("[Device] Allocated → " + udid);
                 return new DeviceInfo(udid, port);
             }
         }

@@ -32,7 +32,7 @@ steps:
     element: shop_search_button
 
   - action: tap
-    element: search_trending_item_0
+    element: search_recent_item_0
 
   # PO-10999: Tap search icon on PLP — opens Search screen
   - action: tap
@@ -47,12 +47,12 @@ steps:
     value: "shi"
 
   - action: waitFor
-    element: search_suggestion_item_0
+    element: search_category_suggestion_item_0
     testCaseId: PO-11003
 
   # PO-11004: Tap first suggestion — navigates to search results
   - action: tap
-    element: search_suggestion_item_0
+    element: search_category_suggestion_item_0
     testCaseId: PO-11004
 
   - action: waitFor

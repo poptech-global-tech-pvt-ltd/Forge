@@ -65,7 +65,6 @@ public class ActionFactory {
             // ── API calls ─────────────────────────────────────────────────────
             case "fetchApi":                 return new FetchApiAction();
             case "callService":              return new CallServiceAction();
-            case "captureNetworkValue":      return new CaptureNetworkValueAction();
 
             // ── Conditional flow / reusable call ─────────────────────────────
             // These are intercepted by TestExecutor before ActionFactory is reached.

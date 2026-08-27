@@ -258,6 +258,10 @@ banks_list_upi_error_view_button_1:
   android:
     - type: accessibilityId
       value: banks_list_upi_error_view_button_1
+bills_tab:
+  android:
+    - type: accessibilityId
+      value: Bills
 blocked_vpa_empty_state:
   android:
     - type: accessibilityId
@@ -310,6 +314,14 @@ card_delivery_address_invalid_email_bottom_sheet_input:
   android:
     - type: accessibilityId
       value: card_delivery_address_invalid_email_bottom_sheet_input
+clp_section_row_11:
+  android:
+    - type: accessibilityId
+      value: clp_section_row_1  # healed from: clp_section_row_11
+Collapse:
+  android:
+    - type: accessibilityId
+      value: Collapse
 common_back_button:
   android:
     - type: accessibilityId
@@ -382,6 +394,10 @@ create_upi_number_upi_id_selector:
   android:
     - type: accessibilityId
       value: create_upi_number_upi_id_selector
+Credit_card:
+  android:
+    - type: accessibilityId
+      value: Credit card bills
 delete_lite_cancel_button:
   android:
     - type: accessibilityId
@@ -818,6 +834,10 @@ manage_autopay_resume_button:
   android:
     - type: accessibilityId
       value: manage_autopay_resume_button
+manage_bill_coach_mark:
+  android:
+    - type: accessibilityId
+      value: coach_mark_dialog_next_button
 media_upload_v2_upload_media_card_v2_row:
   android:
     - type: accessibilityId
@@ -834,6 +854,18 @@ media_upload_v2_uploaded_media_display_v2_row:
   android:
     - type: accessibilityId
       value: media_upload_v2_uploaded_media_display_v2_row
+Mobile_postpaid:
+  android:
+    - type: accessibilityId
+      value: Mobile postpaid
+Mobile_prepaid:
+  android:
+    - type: accessibilityId
+      value: Mobile prepaid
+month:
+  android:
+    - type: accessibilityId
+      value: bill_pay_txn_history_filter_chip_item_0
 my_qr_account_selection_bottom_sheet_content_button:
   android:
     - type: accessibilityId

@@ -1,0 +1,41 @@
+# PDP API — invalid product id
+testName: PDP API — invalid product id returns error
+platform: android
+noReset: true
+loginRequired: true
+
+testCaseIds:
+  - PO-API-PDP-NEG-001
+
+features:
+  - common
+  - login
+
+tags:
+  - api
+  - negative
+  - shop
+
+retry: 1
+
+steps:
+
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: fetchApi
+    url: "https://app.popclub.co.in/api/v3/products/999999999/?pincode=560046"
+    method: GET
+    headers:
+      Content-Type: "application/json"
+      X-Platform: "ios"
+      Authorization: "Token ${auth_token}"
+      pincode: "560046"
+      platform: "ios"
+    variable: pdp_invalid_response
+    extract:
+      is_success: "is_success"
+      message:    "message"

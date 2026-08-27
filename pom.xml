@@ -125,6 +125,10 @@
                     <suiteXmlFiles>
                         <suiteXmlFile>src/test/resources/suites/testng.xml</suiteXmlFile>
                     </suiteXmlFiles>
+                    <environmentVariables>
+                        <ANDROID_HOME>${env.ANDROID_HOME}</ANDROID_HOME>
+                        <ANDROID_SDK_ROOT>${env.ANDROID_HOME}</ANDROID_SDK_ROOT>
+                    </environmentVariables>
                 </configuration>
             </plugin>
             <!-- Add src/test/resources as an additional test source root

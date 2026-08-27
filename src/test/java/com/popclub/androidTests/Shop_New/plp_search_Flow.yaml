@@ -38,13 +38,10 @@ steps:
   - action: enterText
     element: search_products_search_input
     value: "the souled store"
-    
-  - action: pressKey
-    value: search
       
   # Tap the X (clear) button
   - action: tap
-    element: Clear
+    element: clear
     testCaseId: PO-11005
 
   # Navigate to 1st Trending item

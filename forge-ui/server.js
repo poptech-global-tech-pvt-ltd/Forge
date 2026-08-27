@@ -960,7 +960,7 @@ function startTest(file, deviceOverride, ws, fromStep, batchRun) {
     cwd     : FORGE_ROOT,
     shell   : true,
     detached: true,          // creates a new process group so kill(-pid) kills mvn + forked JVM
-    env     : { ...process.env }
+    env     : { ...process.env, ANDROID_HOME: process.env.ANDROID_HOME || '/Users/vinayakumar/Library/Android/sdk', ANDROID_SDK_ROOT: process.env.ANDROID_SDK_ROOT || '/Users/vinayakumar/Library/Android/sdk' }
   });
   mvn.unref();               // don't keep the Node event loop alive for this child
 

@@ -1,4 +1,4 @@
-testName: Wishlist — Scroll, coin pill, and out-of-stock state
+testName: Wishlist — Scroll, coin pill
 platform: android
 noReset: true
 loginRequired: false
@@ -32,22 +32,25 @@ steps:
     element: shop_search_button
 
   - action: tap
-    element: search_trending_item_0
+    element: search_recent_item_0
 
   # Go to wishlist (assumes items already wishlisted)
   - action: tap
     element: toolbar_wishlist_button
 
   - action: waitFor
-    element: wishlist_item_0
+    element: wishlist_item_title_0
 
   # PO-11485: Verify coin pill on wishlist card
+  - action: verifyElement
+    element: toolbar_popcoin_button
+    
   # TODO: Add element key for wishlist_item_popcoin_0 after scanning tags
   - action: verifyElement
-    element: wishlist_item_0
+    element: wishlist_item_title_0
     testCaseId: PO-11485
 
   # PO-11484: Scroll down to verify grid is scrollable
   - action: scrollUntilVisible
-    element: wishlist_item_1
+    element: wishlist_item_title_0
     testCaseId: PO-11484

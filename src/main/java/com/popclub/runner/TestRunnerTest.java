@@ -57,10 +57,13 @@ public class TestRunnerTest {
             }
         }
 
-        // Index files by lowercase filename (basename only) for -DtestFile= lookup
+        // Index files by lowercase filename (basename) AND by relative path from root
+        // so both "shop_plp.yaml" and "Shop_New/shop_plp.yaml" work with -DtestFile=
         Map<String, File> fileIndex = new java.util.HashMap<>();
         for (File file : allFiles) {
             fileIndex.put(file.getName().toLowerCase(), file);
+            String rel = root.toPath().relativize(file.toPath()).toString().toLowerCase();
+            fileIndex.put(rel, file);
         }
 
         // Collect in declared order (or natural discovery order if no filter)
@@ -70,6 +73,20 @@ public class TestRunnerTest {
                 File f = fileIndex.get(name);
                 if (f != null) {
                     orderedFiles.add(f);
+                } else if (!name.endsWith(".yaml")) {
+                    // Treat as folder prefix — include all files whose relative path starts with it
+                    String prefix = name.endsWith("/") ? name : name + "/";
+                    boolean found = false;
+                    for (File candidate : allFiles) {
+                        String rel = root.toPath().relativize(candidate.toPath()).toString().toLowerCase();
+                        if (rel.startsWith(prefix)) {
+                            orderedFiles.add(candidate);
+                            found = true;
+                        }
+                    }
+                    if (!found) {
+                        System.out.println("Warning: testFile '" + name + "' not found in androidTests folder");
+                    }
                 } else {
                     System.out.println("Warning: testFile '" + name + "' not found in androidTests folder");
                 }
@@ -83,9 +100,22 @@ public class TestRunnerTest {
         for (File file : orderedFiles) {
 
             // Skip files not in the filter (already handled by orderedFiles, but kept for tag-only runs)
-            if (!orderedNames.isEmpty() && !orderedNames.contains(file.getName().toLowerCase())) {
-                System.out.println("Skipping: " + file.getName() + " (not in testFile filter)");
-                continue;
+            String baseName = file.getName().toLowerCase();
+            String relName = root.toPath().relativize(file.toPath()).toString().toLowerCase();
+            if (!orderedNames.isEmpty()) {
+                boolean matched = orderedNames.contains(baseName) || orderedNames.contains(relName);
+                if (!matched) {
+                    for (String n : orderedNames) {
+                        if (!n.endsWith(".yaml") && relName.startsWith(n.endsWith("/") ? n : n + "/")) {
+                            matched = true;
+                            break;
+                        }
+                    }
+                }
+                if (!matched) {
+                    System.out.println("Skipping: " + file.getName() + " (not in testFile filter)");
+                    continue;
+                }
             }
 
             TestCase testCase = YamlParser.parse(file.getPath());

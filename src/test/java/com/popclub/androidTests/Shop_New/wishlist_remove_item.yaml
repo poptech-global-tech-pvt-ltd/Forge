@@ -94,11 +94,8 @@ steps:
   - action: pressKey
     value: BACK
 
-  - action: waitFor
-    element: product_list_item_0
-
   - action: tap
-    element: product_list_item_0
+    element: product_list_item_1
 
   - action: waitFor
     element: product_details_title

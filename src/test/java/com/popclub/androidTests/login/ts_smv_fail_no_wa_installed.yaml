@@ -19,11 +19,11 @@ steps:
 
 
   - action: waitFor
-    element: login_input_phone
+    element: login_phone_input
 
   - action: enterText
-    element: login_input_phone
-    value: "9000000001"
+    element: login_phone_input
+    value: "9000000002"
 
   - action: tap
     element: login_continue_button

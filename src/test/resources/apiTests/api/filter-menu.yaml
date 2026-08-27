@@ -1,0 +1,45 @@
+# Filters-menu-list API — sneakers
+testName: Filters-menu-list API — sneakers
+platform: android
+noReset: true
+loginRequired: true
+
+testCaseIds:
+  - PO-API-FILTERS-MENU-LIST-001
+
+features:
+  - common
+  - login
+
+tags:
+  - api
+  - smoke
+  - search
+
+retry: 1
+
+steps:
+
+  # ── 1. Login & capture JWT ────────────────────────────────────────────────────
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  # loginIfNeeded auto-captures the JWT into ${auth_token}
+
+  # ── 2. Filters-menu-list — POST https://sherlock.popclub.co.in/api/v4/filters-menu-list ─
+  - action: fetchApi
+    url: "https://sherlock.popclub.co.in/api/v4/filters-menu-list"
+    method: POST
+    body: '{"filters":{},"query":"sneakers"}'
+    headers:
+      Content-Type: "application/json"
+      Authorization: "Token ${auth_token}"
+      X-Userid: "${user_id}"  # same open item as the other 2 API tests
+    variable: filters_menu_list_response
+
+  # ── 3. Extract fields — schema unconfirmed, no sample response seen yet ───────
+  # TODO: run step 2 once, inspect filters_menu_list_response in logs, then fill in
+  # real JsonPath keys here instead of guessing.

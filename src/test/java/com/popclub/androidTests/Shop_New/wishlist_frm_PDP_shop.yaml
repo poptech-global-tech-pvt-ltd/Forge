@@ -24,9 +24,9 @@ steps:
   - action: loginIfNeeded
     value: "1234561122"
     text: "560102"
-
-  - action: waitFor
-    element: home_tab
+    
+  - action: tap
+    element: shop_tab
     
  # ── PLP: navigate, capture API + UI prices ────────────────────────────────
   - action: tap
@@ -37,14 +37,14 @@ steps:
 
   - action: enterText
     element: search_products_search_input
-    value: "yogabar"
+    value: "superyou"
     
   - action: pressKey
     value: search
 
-  - action: waitFor
-    element: product_details_title
-
+  - action: tap
+    element: product_list_item_0
+    
   # Capture the title so we can verify it appears in the wishlist later
   - action: captureText
     element: product_details_title
@@ -61,14 +61,14 @@ steps:
     element: toolbar_wishlist_button
 
   - action: waitFor
-    element: wishlist_item_card_compose_row
+    element: wishlist_item_title_0
 
   - action: assertStoredText
     value: wishlisted_title
     
   # Verify wishlist header elements
   - action: verifyElement
-    element: wishlist_back_button
+    element: Navigation
 
   - action: verifyElement
     element: toolbar_cart_button

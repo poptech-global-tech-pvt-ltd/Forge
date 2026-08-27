@@ -766,6 +766,11 @@
     border-radius: 4px;
   }
   .log-clear:hover { color: var(--text); background: var(--surface2); }
+  .log-copy-all { background: none; border: 1px solid var(--border); color: var(--muted); font-size: 11px; cursor: pointer; padding: 2px 8px; border-radius: 4px; }
+  .log-copy-all:hover { color: var(--text); background: var(--surface2); }
+  .step-copy-log { background: none; border: 1px solid transparent; color: var(--muted); font-size: 10px; padding: 2px 6px; border-radius: 4px; cursor: pointer; opacity: 0; transition: all .15s; flex-shrink: 0; white-space: nowrap; }
+  .step-item:hover .step-copy-log { opacity: 1; border-color: var(--border); }
+  .step-copy-log:hover { background: var(--surface2); color: var(--text); opacity: 1; }
 
   /* Inspector toggle */
   .btn-inspect {
@@ -2117,6 +2122,7 @@
       <div class="log-panel" id="log-panel">
         <div class="panel-title">
           <span>Log</span>
+          <button class="log-copy-all" onclick="copyAllLogs(this)" title="Copy all logs">Copy</button>
           <button class="log-clear" onclick="clearLog()">Clear</button>
         </div>
         <div style="padding:6px 10px;border-bottom:1px solid var(--border);flex-shrink:0">
@@ -2159,6 +2165,10 @@ function connectWS() {
 
 function handleMessage(msg) {
   switch (msg.type) {
+
+    case 'batch_run_created':
+      if (_batchRunIdResolver) { _batchRunIdResolver(msg.runId); _batchRunIdResolver = null; }
+      break;
 
     case 'network_call':
       addNetworkCall(msg);
@@ -2642,6 +2652,7 @@ function stepHTML(s) {
         ${shotHTML}
       </div>
       <button class="step-dup-btn" onclick="event.stopPropagation();duplicateStep(${s.index})" title="Duplicate step">⎘ dup</button>
+      <button class="step-copy-log" onclick="event.stopPropagation();copyStepLogs(${s.index}, this)" title="Copy logs for this step">⎘ logs</button>
       ${status !== 'skipped' ? `<button class="step-run-from" onclick="event.stopPropagation();runFromStep(${s.index})" title="Run from step ${s.index + 1}">▶ from here</button>` : ''}
     </div>`;
 }
@@ -2799,41 +2810,7 @@ function showResult(success) {
   badge.textContent = success ? '✓ Passed' : '✗ Failed';
   document.getElementById('btn-fix-claude').style.display = success ? 'none' : 'inline-block';
 
-  const card = document.getElementById('failure-card');
-  if (!steps.length) { card.style.display = 'none'; return; }
-
-  document.querySelector('#failure-card .fc-header').textContent = success ? '✓ Test Summary' : '✗ Test Summary';
-  card.style.background    = success ? 'rgba(34,197,94,.06)'  : 'rgba(239,68,68,.06)';
-  card.style.borderColor   = success ? 'rgba(34,197,94,.25)'  : 'rgba(239,68,68,.25)';
-  document.querySelector('#failure-card .fc-header').style.background = success ? 'rgba(34,197,94,.12)' : 'rgba(239,68,68,.12)';
-  document.querySelector('#failure-card .fc-header').style.color      = success ? 'var(--green)'        : 'var(--red)';
-
-  const rows = steps.map((step, i) => {
-    const s      = stepStates[i] || {};
-    const status = s.status || 'pending';
-    const act    = step.action || '—';
-    const el     = step.element || step.locator || step.value || '';
-    const err    = (s.error || '').replace(/\n[\s\S]*/m, '').trim();
-    const isFail = status === 'failed';
-    const statusIcon  = status === 'passed' ? '<span class="fc-status-pass">✓</span>'
-                      : status === 'failed' ? '<span class="fc-status-fail">✗</span>'
-                      : status === 'skipped' ? '<span class="fc-status-skip">⤷</span>'
-                      : '<span class="fc-status-skip">—</span>';
-    const detail = isFail && err
-      ? `<span class="fc-detail fc-err" title="${err}">${err}</span>`
-      : el ? `<span class="fc-detail fc-el" title="${el}">${el}</span>`
-           : `<span class="fc-detail">—</span>`;
-    return `<div class="fc-row${isFail ? ' fc-failed' : ''}" onclick="jumpToStepLog(${i})">
-      <span class="fc-step">Step ${i + 1}</span>
-      ${statusIcon}
-      <span class="fc-action">${act}</span>
-      ${detail}
-      <span class="fc-jump">↗</span>
-    </div>`;
-  }).join('');
-
-  document.getElementById('failure-card-rows').innerHTML = rows;
-  card.style.display = 'block';
+  document.getElementById('failure-card').style.display = 'none';
 }
 
 function showTestSigmaLink(msg) {
@@ -2995,6 +2972,31 @@ function filterLog(query) {
 function clearLog() {
   document.getElementById('log-body').innerHTML = '';
   document.getElementById('log-search').value = '';
+}
+
+function copyAllLogs(btn) {
+  const lines = document.getElementById('log-body').querySelectorAll('.log-line');
+  const text = Array.from(lines).map(l => l.textContent).join('\n');
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = orig; }, 1500);
+  });
+}
+
+function copyStepLogs(stepIndex, btn) {
+  const lines = document.getElementById('log-body').querySelectorAll(`.log-line[data-step-index="${stepIndex}"]`);
+  const text = Array.from(lines).map(l => l.textContent).join('\n');
+  if (!text) {
+    btn.textContent = 'No logs';
+    setTimeout(() => { btn.textContent = '⎘ logs'; }, 1500);
+    return;
+  }
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = orig; }, 1500);
+  });
 }
 
 // ── Timer ─────────────────────────────────────────────────────────────────
@@ -5804,19 +5806,39 @@ let _batchQueue   = [];
 let _batchIdx     = 0;
 let _batchResults = [];
 
-function runFolder() {
+let _batchRunId = null;
+let _batchRunIdResolver = null;
+
+function requestBatchRunId(folder, files) {
+  return new Promise((resolve) => {
+    _batchRunIdResolver = resolve;
+    ws.send(JSON.stringify({ type: 'create_batch_run', folder, files }));
+  });
+}
+
+async function runFolder() {
   const folder = document.getElementById('folder-select').value;
   if (!folder) return;
   const files = (_testTree[folder] || []).map(t => t.value);
   if (!files.length) { appendLog('No tests in this folder', 'warn'); return; }
   if (!confirm(`Run all ${files.length} test(s) in "${folder}"?`)) return;
-  startBatch(files, `folder: ${folder}`);
+
+  appendLog(`Creating one TestSigma run for folder "${folder}"…`, 'step');
+  const runId = await requestBatchRunId(folder, files);
+  if (runId) {
+    appendLog(`✅ TestSigma run ready — all ${files.length} test(s) will report into it`, 'pass');
+  } else {
+    appendLog('⚠️ Could not create a TestSigma run for this folder — continuing without reporting', 'warn');
+  }
+
+  startBatch(files, `folder: ${folder}`, runId);
 }
 
-function startBatch(files, label) {
+function startBatch(files, label, runId) {
   _batchQueue   = [...files];
   _batchIdx     = 0;
   _batchResults = [];
+  _batchRunId   = runId || null;
   appendLog(`▶ Batch (${label}): ${files.length} test(s) queued`, 'step');
   updateBatchBadge();
   runNextInBatch();
@@ -5832,9 +5854,14 @@ function runNextInBatch() {
     renderSteps();
     updateStats();
     document.getElementById('result-badge').className = 'result-badge';
-  document.getElementById('failure-card').style.display = 'none';
-    // Marks this as a "Run Folder" batch so the Java side creates a TestSigma run.
-    ws.send(JSON.stringify({ type: 'run', file, batchRun: true }));
+    document.getElementById('failure-card').style.display = 'none';
+    ws.send(JSON.stringify({
+      type: 'run',
+      file,
+      batchRun: true,
+      existingRunId: _batchRunId,
+      finalizeRun: _batchIdx === _batchQueue.length - 1,
+    }));
     startScreenPoll();
     updateBatchBadge();
   }, 600);

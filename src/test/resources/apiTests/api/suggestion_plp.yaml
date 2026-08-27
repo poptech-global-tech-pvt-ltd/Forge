@@ -1,0 +1,50 @@
+# Suggestion API — sneakers
+testName: Suggestion API — sneakers
+platform: android
+noReset: true
+loginRequired: true
+
+testCaseIds:
+  - PO-API-SUGGESTION-001
+
+features:
+  - common
+  - login
+
+tags:
+  - api
+  - smoke
+  - search
+
+retry: 1
+
+steps:
+
+  # ── 1. Login & capture JWT ────────────────────────────────────────────────────
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  # loginIfNeeded auto-captures the JWT into ${auth_token} and userId into ${user_id}
+
+  # ── 2. Suggestion — POST https://sherlock.popclub.co.in/api/v4/suggestion ─────
+  - action: fetchApi
+    url: "https://sherlock.popclub.co.in/api/v4/suggestion"
+    method: POST
+    body: '{"query":"sneakers"}'
+    headers:
+      Content-Type: "application/json"
+      Authorization: "Token ${auth_token}"
+      X-Userid: "${user_id}"
+    variable: suggestion_response
+    extract:
+      is_success:              "is_success"
+      brand_hit_count:         "data[0].hits.Brand.length()"
+      brand_hit_0_name:        "data[0].hits.Brand[0].name"
+      brand_hit_0_count:       "data[0].hits.Brand[0].count"
+      category_hit_count:      "data[0].hits.Category.length()"
+      category_hit_0_name:     "data[0].hits.Category[0].name"
+      category_hit_0_count:    "data[0].hits.Category[0].count"
+      response_time_ms:        "data[0].response_time_ms"
