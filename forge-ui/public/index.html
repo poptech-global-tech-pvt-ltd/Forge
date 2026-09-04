@@ -1630,8 +1630,8 @@
       <span id="device-label">Checking device…</span>
     </div>
 
-    <!-- App install status -->
-    <div id="apk-bar" style="display:none;width:100%;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:8px 10px;font-size:11px">
+    <!-- App install status (Android) -->
+    <div id="apk-bar" class="android-only" style="display:none;width:100%;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:8px 10px;font-size:11px">
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
         <span style="color:var(--yellow)">⚠ App not installed</span>
         <div style="flex:1"></div>
@@ -1640,11 +1640,27 @@
       </div>
     </div>
 
-    <!-- APK upload -->
-    <div style="display:flex;align-items:center;gap:6px;width:100%">
+    <!-- IPA install status (iOS) -->
+    <div id="ipa-bar" class="ios-only" style="display:none;width:100%;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:8px 10px;font-size:11px">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span style="color:var(--yellow)" id="ipa-status-text">⚠ App not installed</span>
+        <div style="flex:1"></div>
+        <button class="ibar-btn" id="btn-install-ipa" onclick="installIpa()" style="padding:4px 10px;font-size:11px;color:var(--yellow);border-color:rgba(245,158,11,.4)">⬇ Install</button>
+      </div>
+    </div>
+
+    <!-- APK upload (Android only) -->
+    <div class="android-only" style="display:flex;align-items:center;gap:6px;width:100%">
       <input type="file" id="apk-file-input" accept=".apk" style="display:none" onchange="uploadApk(this)">
       <button class="ibar-btn" onclick="document.getElementById('apk-file-input').click()" style="padding:6px 10px;font-size:11px">⬆ Upload APK</button>
       <span id="apk-upload-status" style="font-size:11px;flex:1;text-align:right"></span>
+    </div>
+
+    <!-- IPA upload (iOS only) -->
+    <div class="ios-only" style="display:flex;align-items:center;gap:6px;width:100%">
+      <input type="file" id="ipa-file-input" accept=".ipa" style="display:none" onchange="uploadIpa(this)">
+      <button class="ibar-btn" onclick="document.getElementById('ipa-file-input').click()" style="padding:6px 10px;font-size:11px">⬆ Upload IPA</button>
+      <span id="ipa-upload-status" style="font-size:11px;flex:1;text-align:right"></span>
     </div>
 
     <!-- Interaction toolbar — mode buttons (4-col grid) -->
@@ -1654,11 +1670,14 @@
       <button class="ibar-btn"        id="ibar-longpress" onclick="setMode('longpress')" title="Long Press">✋ Hold</button>
       <button class="ibar-btn"        id="ibar-inspect"   onclick="setMode('inspect')"   title="Inspect element">🔍 Inspect</button>
     </div>
-    <!-- Nav buttons (3-col grid) -->
-    <div class="interaction-bar-nav">
+    <!-- Nav buttons — Android has Back+Home+Apps, iOS has Home only -->
+    <div class="interaction-bar-nav android-only">
       <button class="ibar-btn" onclick="deviceKey(4)"   title="Back">◀ Back</button>
       <button class="ibar-btn" onclick="deviceKey(3)"   title="Home">⬤ Home</button>
       <button class="ibar-btn" onclick="deviceKey(187)" title="Recents">▣ Apps</button>
+    </div>
+    <div class="interaction-bar-nav ios-only" style="display:none">
+      <button class="ibar-btn" onclick="iosKey('home')" title="Home">⬤ Home</button>
     </div>
 
     <!-- Text input row -->
@@ -3036,8 +3055,33 @@ function doRefresh() {
   screenshotAbort = ctrl;
 
   fetch(`/api/screenshot?t=${Date.now()}`, { signal: ctrl.signal })
-    .then(r => r.blob())
+    .then(r => {
+      if (!r.ok) {
+        // iOS: WDA not running — show placeholder text instead of broken image
+        if (currentPlatform === 'ios') {
+          const img = document.getElementById('screen-img');
+          img.style.display = 'none';
+          let ph = document.getElementById('screen-placeholder');
+          if (!ph) {
+            ph = document.createElement('div');
+            ph.id = 'screen-placeholder';
+            ph.style.cssText = 'color:var(--text2);font-size:11px;text-align:center;padding:20px 10px;line-height:1.6';
+            img.parentNode.insertBefore(ph, img);
+          }
+          ph.textContent = '📱 Run a test to see live screen';
+        }
+        screenshotBusy = false;
+        return null;
+      }
+      // Hide placeholder, show image
+      const img = document.getElementById('screen-img');
+      img.style.display = '';
+      const ph = document.getElementById('screen-placeholder');
+      if (ph) ph.remove();
+      return r.blob();
+    })
     .then(blob => {
+      if (!blob) return;
       if (ctrl !== screenshotAbort) return; // superseded by forceRefresh
       const url = URL.createObjectURL(blob);
       const img = document.getElementById('screen-img');
@@ -3060,6 +3104,19 @@ function forceRefresh() {
 function refreshScreen() { doRefresh(); }
 
 // ── Device check ──────────────────────────────────────────────────────────
+let currentPlatform = 'android';
+
+function applyPlatformUI(platform) {
+  currentPlatform = platform || 'android';
+  const isIos = currentPlatform === 'ios';
+  document.querySelectorAll('.android-only').forEach(el => {
+    el.style.display = isIos ? 'none' : '';
+  });
+  document.querySelectorAll('.ios-only').forEach(el => {
+    el.style.display = isIos ? '' : 'none';
+  });
+}
+
 async function checkDevice() {
   try {
     const res  = await fetch('/api/device');
@@ -3069,15 +3126,81 @@ async function checkDevice() {
     if (data.device) {
       dot.className = 'dot online';
       lbl.textContent = data.device;
+      applyPlatformUI(data.platform);
     } else {
       dot.className = 'dot offline';
       lbl.textContent = 'No device connected';
+      applyPlatformUI('android');
     }
   } catch (_) {
     document.getElementById('device-dot').className = 'dot offline';
     document.getElementById('device-label').textContent = 'Server unreachable';
   }
-  checkApkStatus();
+  if (currentPlatform === 'ios') {
+    checkIpaStatus();
+  } else {
+    checkApkStatus();
+  }
+}
+
+async function checkIpaStatus() {
+  try {
+    const res = await fetch('/api/ipa/status');
+    const data = await res.json();
+    const bar = document.getElementById('ipa-bar');
+    if (!data.installed) {
+      bar.style.display = '';
+      document.getElementById('ipa-status-text').textContent = data.ipaFile
+        ? `⚠ App not installed — ${data.ipaFile} ready`
+        : '⚠ No IPA uploaded';
+      document.getElementById('btn-install-ipa').style.display = data.ipaFile ? '' : 'none';
+    } else {
+      bar.style.display = 'none';
+    }
+  } catch (_) {}
+}
+
+async function installIpa() {
+  document.getElementById('btn-install-ipa').disabled = true;
+  document.getElementById('ipa-status-text').textContent = '⏳ Installing…';
+  try {
+    const res = await fetch('/api/ipa/install', { method: 'POST' });
+    const data = await res.json();
+    if (data.ok) {
+      document.getElementById('ipa-bar').style.display = 'none';
+    } else {
+      document.getElementById('ipa-status-text').textContent = '❌ ' + (data.error || 'Install failed');
+    }
+  } catch (e) {
+    document.getElementById('ipa-status-text').textContent = '❌ ' + e.message;
+  }
+  document.getElementById('btn-install-ipa').disabled = false;
+}
+
+async function uploadIpa(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const statusEl = document.getElementById('ipa-upload-status');
+  statusEl.textContent = '⏳ Uploading…';
+  const form = new FormData();
+  form.append('ipa', file);
+  try {
+    const res = await fetch('/api/upload-ipa', { method: 'POST', body: form });
+    const data = await res.json();
+    if (data.ok) {
+      statusEl.textContent = '✅ Uploaded';
+      checkIpaStatus();
+    } else {
+      statusEl.textContent = '❌ ' + (data.error || 'Upload failed');
+    }
+  } catch (e) {
+    statusEl.textContent = '❌ ' + e.message;
+  }
+  input.value = '';
+}
+
+async function iosKey(key) {
+  await fetch('/api/key', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ key, platform: 'ios' }) });
 }
 
 // ── APK install ────────────────────────────────────────────────────────────
@@ -4427,21 +4550,30 @@ function renderTagSyncRows(elems) {
   if (elems.length === 0) {
     countEl.textContent = '0 untagged';
     document.getElementById('tagsync-rows').innerHTML =
-      `<div class="inspect-loading" style="padding:24px;color:var(--green)">✅ All visible elements already have qaTestTag!</div>`;
+      `<div class="inspect-loading" style="padding:24px;color:var(--green)">✅ All visible elements have accessibility ids and YAML locators!</div>`;
     document.getElementById('tagsync-footer').style.display = 'none';
     return;
   }
 
-  countEl.textContent = `${elems.length} untagged`;
+  const noIdCount   = elems.filter(e => e.issue === 'no_accessibility_id').length;
+  const notYaml     = elems.filter(e => e.issue === 'not_in_yaml').length;
+  countEl.textContent = `${elems.length} missing` +
+    (noIdCount ? ` · ${noIdCount} no accessibility id` : '') +
+    (notYaml   ? ` · ${notYaml} not in YAML` : '');
 
   document.getElementById('tagsync-rows').innerHTML = elems.map((el, i) => {
-    const cls      = (el.className || '').replace('View','');
+    const cls      = (el.className || '').replace('View','').replace('XCUIElementType','');
     const ridShort = el.resourceId ? el.resourceId.split('/').pop() : '';
     const textDisp = el.text
       ? `<div class="tagsync-text">${escHtml(el.text)}</div>`
       : `<div class="tagsync-text" style="color:var(--muted);font-style:italic">${escHtml(ridShort || cls)}</div>`;
     const ridDisp  = (ridShort && el.text)
       ? `<div class="tagsync-rid">${escHtml(ridShort)}</div>` : '';
+    const issueBadge = el.issue === 'no_accessibility_id'
+      ? `<span style="font-size:9px;padding:1px 5px;border-radius:4px;background:rgba(239,68,68,.15);color:#ef4444;margin-left:4px">no id</span>`
+      : el.issue === 'not_in_yaml'
+      ? `<span style="font-size:9px;padding:1px 5px;border-radius:4px;background:rgba(245,158,11,.15);color:var(--yellow);margin-left:4px">not in YAML</span>`
+      : '';
 
     return `<div class="tagsync-row" id="tsrow-${i}"
           data-x1="${el.x1}" data-y1="${el.y1}" data-x2="${el.x2}" data-y2="${el.y2}"
@@ -4450,7 +4582,7 @@ function renderTagSyncRows(elems) {
       <input type="checkbox" class="tagsync-check" id="ts-chk-${i}" checked
              onchange="updateTagSyncCount()" onclick="event.stopPropagation()"/>
       <div class="tagsync-info">
-        ${textDisp}
+        <div style="display:flex;align-items:center;gap:2px">${textDisp}${issueBadge}</div>
         ${ridDisp}
       </div>
       <input class="tagsync-tag-input" id="ts-tag-${i}"

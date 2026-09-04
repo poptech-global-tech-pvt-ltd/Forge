@@ -33,6 +33,7 @@ public class ActionFactory {
             case "assertVisible":     return step -> { step.shouldExist = true;  new VerifyElementAction().perform(step); };
             case "assertNotVisible":  return step -> { step.shouldExist = false; new VerifyElementAction().perform(step); };
             case "scanTags":          return new ScanTagsAction();
+            case "getSource":         return new GetSourceAction();
 
             // ── Auth ──────────────────────────────────────────────────────────
             case "captureToken":      return new CaptureTokenAction();

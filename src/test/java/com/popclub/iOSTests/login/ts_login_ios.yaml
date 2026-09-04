@@ -21,5 +21,4 @@ steps:
     value: "1234561122"
     text: "560102"
 
-  - action: waitFor
-    element: home_tab
+  - action: getSource

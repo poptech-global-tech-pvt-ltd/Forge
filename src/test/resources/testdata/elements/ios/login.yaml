@@ -17,3 +17,19 @@ ios_alert_ok_button:
   ios:
     - type: accessibilityId
       value: OK
+
+# Login screen elements (found via iOS Scan Tags)
+login_signup_devider:
+  ios:
+    - type: accessibilityId
+      value: login_signup_devider
+
+mobile_right_icon:
+  ios:
+    - type: accessibilityId
+      value: mobile_right_icon
+
+login_bottom_npci_icon:
+  ios:
+    - type: accessibilityId
+      value: login_bottom_npci_icon

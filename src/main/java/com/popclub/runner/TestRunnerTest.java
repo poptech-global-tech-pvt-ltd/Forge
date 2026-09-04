@@ -6,6 +6,7 @@ import com.popclub.android.driver.AppiumDriverManager;
 import com.popclub.android.cloud.CloudConfig;
 import com.popclub.android.driver.AppiumServerManager;
 import com.popclub.ios.driver.IOSDriverManager;
+import com.popclub.ios.driver.IOSDeviceManager;
 import com.popclub.ios.driver.IOSAppiumServerManager;
 import com.popclub.model.TestCase;
 import com.popclub.parser.YamlParser;

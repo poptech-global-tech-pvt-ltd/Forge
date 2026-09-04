@@ -2,6 +2,10 @@
 
 <suite name="iOS Tests" parallel="false" thread-count="1">
 
+    <!-- Suite-level params needed by @BeforeSuite (cannot read test-level params) -->
+    <parameter name="platform"   value="ios"/>
+    <parameter name="deviceUdid" value="00008110-000469E636E8401E"/>
+
     <listeners>
         <listener class-name="com.popclub.listener.TestListener"/>
     </listeners>

@@ -24,7 +24,7 @@ public class IOSDriverManager {
     private static final int APPIUM_PORT = 4850;
 
     /** iOS bundle ID of the POP app. */
-    private static final String BUNDLE_ID = "co.popclub.pop";
+    private static final String BUNDLE_ID = "com.popclub.popclubapp";
 
     /** IPA filename under src/main/resources/. */
     private static final String IPA_FILENAME = "pop-qaDebug.ipa";
@@ -55,13 +55,11 @@ public class IOSDriverManager {
             options.setBundleId(BUNDLE_ID);
 
             boolean resumeMode = TestContext.isNoReset();
-            boolean appInstalled = resumeMode && isAppInstalled(device.udid, BUNDLE_ID);
 
-            if (resumeMode && appInstalled) {
-                // Attach to running app — no reinstall, no relaunch
+            if (resumeMode) {
+                // noReset=true: attach to already-installed app, skip reinstall
                 options.setNoReset(true);
-                options.setCapability("appium:autoLaunch", false);
-                System.out.println("[IOSDriver] Resume mode — attaching to running app");
+                System.out.println("[IOSDriver] Resume mode — noReset=true, skipping reinstall");
             } else {
                 String ipaPath = System.getProperty("user.dir") + "/src/main/resources/" + IPA_FILENAME;
                 options.setApp(ipaPath);

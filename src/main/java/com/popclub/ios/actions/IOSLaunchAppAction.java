@@ -19,7 +19,7 @@ public class IOSLaunchAppAction implements Action {
 
     private static final int APP_READY_TIMEOUT_SEC = 45;
     private static final int ALERT_DISMISS_ROUNDS  = 5;
-    private static final String BUNDLE_ID = "co.popclub.pop";
+    private static final String BUNDLE_ID = "com.popclub.popclubapp";
 
     @Override
     public void perform(Step step) {
@@ -47,7 +47,7 @@ public class IOSLaunchAppAction implements Action {
 
     private void ensureAppRunning(AppiumDriver driver) {
         try {
-            driver.activateApp(BUNDLE_ID);
+            driver.executeScript("mobile: activateApp", java.util.Map.of("bundleId", BUNDLE_ID));
             System.out.println("[IOSLaunch] App activated (resume mode).");
         } catch (Exception e) {
             System.out.println("[IOSLaunch] activateApp failed: " + e.getMessage());
@@ -62,7 +62,7 @@ public class IOSLaunchAppAction implements Action {
             System.out.println("[IOSLaunch] terminateApp failed: " + e.getMessage());
         }
         try {
-            driver.activateApp(BUNDLE_ID);
+            driver.executeScript("mobile: activateApp", java.util.Map.of("bundleId", BUNDLE_ID));
             System.out.println("[IOSLaunch] activateApp succeeded");
         } catch (Exception e) {
             System.out.println("[IOSLaunch] activateApp failed: " + e.getMessage());

@@ -13,6 +13,7 @@ function run(cmd, timeout = 5000) {
   });
 }
 const path = require('path');
+const os   = require('os');
 const fs   = require('fs');
 const yaml = require('js-yaml');
 
@@ -23,11 +24,67 @@ const wss    = new WebSocket.Server({ server });
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-const FORGE_ROOT     = path.join(__dirname, '..');
-const TESTDATA_ROOT  = path.join(FORGE_ROOT, 'src/test/java/com/popclub/androidTests');
-const FLOWS_ROOT     = path.join(FORGE_ROOT, 'src/test/java/com/popclub/androidFlows');
+const FORGE_ROOT        = path.join(__dirname, '..');
+const TESTDATA_ROOT     = path.join(FORGE_ROOT, 'src/test/java/com/popclub/androidTests');
+const IOS_TESTDATA_ROOT = path.join(FORGE_ROOT, 'src/test/java/com/popclub/iOSTests');
+const FLOWS_ROOT        = path.join(FORGE_ROOT, 'src/test/java/com/popclub/androidFlows');
+
+// Resolve which test root a relative path belongs to
+function resolveTestRoot(file) {
+  if (file && (file.startsWith('ios/') || file.startsWith('iOSTests/'))) return IOS_TESTDATA_ROOT;
+  const iosPath = path.join(IOS_TESTDATA_ROOT, file || '');
+  if (file && fs.existsSync(iosPath)) return IOS_TESTDATA_ROOT;
+  return TESTDATA_ROOT;
+}
 const APK_DIR        = path.join(FORGE_ROOT, 'src/main/resources');
 const APP_PACKAGE    = 'com.popclub.android';
+const IOS_UDID       = '00008110-000469E636E8401E';
+const WDA_LOCAL_PORT = 8100;
+
+let wdaProc   = null;
+let iproxyProc = null;
+
+function startWdaMirror() {
+  // Find the latest xctestrun for the connected device
+  const derivedData = path.join(os.homedir(), 'Library/Developer/Xcode/DerivedData');
+  let xctestrun = null;
+  try {
+    const { execSync: es } = require('child_process');
+    const found = es(`find "${derivedData}" -name "WebDriverAgentRunner_iphoneos*.xctestrun" 2>/dev/null`, { timeout: 5000 }).toString().trim().split('\n').filter(Boolean);
+    if (found.length) xctestrun = found[0];
+  } catch (_) {}
+  if (!xctestrun) { console.log('[WDA] No xctestrun found — skipping auto-start'); return; }
+
+  console.log('[WDA] Starting persistent WDA server:', xctestrun);
+  wdaProc = spawn('xcodebuild', [
+    'test-without-building',
+    '-xctestrun', xctestrun,
+    '-destination', `id=${IOS_UDID}`
+  ], { stdio: ['ignore', 'pipe', 'pipe'] });
+
+  let started = false;
+  const onData = (chunk) => {
+    const line = chunk.toString();
+    const m = line.match(/ServerURLHere->http:\/\/[^:]+:(\d+)<-ServerURLHere/);
+    if (m && !started) {
+      started = true;
+      const devicePort = parseInt(m[1], 10);
+      console.log(`[WDA] Running on device port ${devicePort} — forwarding to ${WDA_LOCAL_PORT}`);
+      iproxyProc = spawn('iproxy', [String(WDA_LOCAL_PORT), String(devicePort), '-u', IOS_UDID], { stdio: 'ignore' });
+      iproxyProc.on('exit', () => { iproxyProc = null; });
+    }
+  };
+  wdaProc.stdout.on('data', onData);
+  wdaProc.stderr.on('data', onData);
+  wdaProc.on('exit', (code) => {
+    wdaProc = null;
+    if (iproxyProc) { try { iproxyProc.kill(); } catch (_) {} iproxyProc = null; }
+    console.log(`[WDA] exited (${code}) — restarting in 5s`);
+    setTimeout(startWdaMirror, 5000);
+  });
+}
+
+// startWdaMirror() is called after server starts (see bottom of file)
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -46,7 +103,9 @@ function walkYaml(dir, base = '') {
 }
 
 function suiteFor(testFile) {
-  // Pick the most appropriate testng suite based on file path
+  // iOS tests (prefixed with ios/) always use the iOS suite
+  if (testFile.startsWith('ios/')) return 'testng-ios.xml';
+  // Android: pick suite based on feature area
   if (testFile.includes('shop') || testFile.includes('home') ||
       testFile.includes('login') || testFile.includes('profile') ||
       testFile.includes('card')) return 'testng-shop.xml';
@@ -58,6 +117,34 @@ function getConnectedDevice() {
     const out = execSync('adb devices', { timeout: 3000 }).toString();
     const lines = out.split('\n').slice(1).filter(l => l.includes('\tdevice'));
     if (lines.length > 0) return lines[0].split('\t')[0].trim();
+  } catch (_) {}
+  return null;
+}
+
+function getConnectedIosDevice() {
+  // Physical devices first (prefer real device over any booted simulator)
+  try {
+    const out = execSync('xcrun xctrace list devices', { timeout: 5000 }).toString();
+    let inDevices = false;
+    for (const line of out.split('\n')) {
+      if (line.startsWith('== Devices =='))      { inDevices = true;  continue; }
+      if (line.startsWith('== '))                { inDevices = false; continue; }
+      if (!inDevices) continue;
+      const m = line.match(/^(.+?)\s+\([0-9]+\.[0-9][^)]*\)\s+\(([0-9A-Fa-f-]{8,36})\)/);
+      if (m) return { udid: m[2], name: m[1].trim(), iosType: 'device' };
+    }
+  } catch (_) {}
+  // Fall back to booted simulators
+  try {
+    const out = execSync('xcrun simctl list devices booted --json', { timeout: 5000 }).toString();
+    const data = JSON.parse(out);
+    for (const runtime of Object.keys(data.devices)) {
+      for (const sim of data.devices[runtime]) {
+        if (sim.state === 'Booted') {
+          return { udid: sim.udid, name: sim.name, iosType: 'simulator' };
+        }
+      }
+    }
   } catch (_) {}
   return null;
 }
@@ -144,7 +231,10 @@ app.delete('/api/flow', (req, res) => {
 // List all YAML test files
 app.get('/api/tests', (req, res) => {
   try {
-    res.json(walkYaml(TESTDATA_ROOT));
+    const android = walkYaml(TESTDATA_ROOT);
+    const ios     = fs.existsSync(IOS_TESTDATA_ROOT)
+      ? walkYaml(IOS_TESTDATA_ROOT).map(f => 'ios/' + f) : [];
+    res.json([...android, ...ios]);
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
@@ -153,10 +243,15 @@ app.get('/api/tests', (req, res) => {
 // GET /api/tests-meta — file list with testName + tags extracted from each YAML
 app.get('/api/tests-meta', (req, res) => {
   try {
-    const files = walkYaml(TESTDATA_ROOT);
-    const meta  = files.map(file => {
+    const android = walkYaml(TESTDATA_ROOT);
+    const ios     = fs.existsSync(IOS_TESTDATA_ROOT)
+      ? walkYaml(IOS_TESTDATA_ROOT).map(f => 'ios/' + f) : [];
+    const allFiles = [...android, ...ios];
+    const meta = allFiles.map(file => {
+      const root = file.startsWith('ios/') ? IOS_TESTDATA_ROOT : TESTDATA_ROOT;
+      const rel  = file.startsWith('ios/') ? file.slice(4) : file;
       try {
-        const parsed = yaml.load(fs.readFileSync(path.join(TESTDATA_ROOT, file), 'utf8'));
+        const parsed = yaml.load(fs.readFileSync(path.join(root, rel), 'utf8'));
         return { file, testName: parsed.testName || file, tags: Array.isArray(parsed.tags) ? parsed.tags : [] };
       } catch (_) {
         return { file, testName: file, tags: [] };
@@ -172,9 +267,12 @@ app.get('/api/tests-meta', (req, res) => {
 app.post('/api/rename-test', (req, res) => {
   const { file, newFile } = req.body;
   if (!file || !newFile) return res.status(400).json({ error: 'file and newFile required' });
-  const from = path.join(TESTDATA_ROOT, file);
-  const to   = path.join(TESTDATA_ROOT, newFile);
-  if (!from.startsWith(TESTDATA_ROOT) || !to.startsWith(TESTDATA_ROOT))
+  const root = resolveTestRoot(file);
+  const rel  = file.startsWith('ios/') ? file.slice(4) : file;
+  const newRel = newFile.startsWith('ios/') ? newFile.slice(4) : newFile;
+  const from = path.join(root, rel);
+  const to   = path.join(root, newRel);
+  if (!from.startsWith(root) || !to.startsWith(root))
     return res.status(403).json({ error: 'Forbidden' });
   if (!fs.existsSync(from)) return res.status(404).json({ error: 'Source not found' });
   if (fs.existsSync(to))    return res.status(409).json({ error: 'Target already exists' });
@@ -189,9 +287,12 @@ app.post('/api/rename-test', (req, res) => {
 app.post('/api/duplicate-test', (req, res) => {
   const { file, newFile } = req.body;
   if (!file || !newFile) return res.status(400).json({ error: 'file and newFile required' });
-  const from = path.join(TESTDATA_ROOT, file);
-  const to   = path.join(TESTDATA_ROOT, newFile);
-  if (!from.startsWith(TESTDATA_ROOT) || !to.startsWith(TESTDATA_ROOT))
+  const root = resolveTestRoot(file);
+  const rel  = file.startsWith('ios/') ? file.slice(4) : file;
+  const newRel = newFile.startsWith('ios/') ? newFile.slice(4) : newFile;
+  const from = path.join(root, rel);
+  const to   = path.join(root, newRel);
+  if (!from.startsWith(root) || !to.startsWith(root))
     return res.status(403).json({ error: 'Forbidden' });
   if (!fs.existsSync(from)) return res.status(404).json({ error: 'Source not found' });
   if (fs.existsSync(to))    return res.status(409).json({ error: 'Target already exists' });
@@ -267,8 +368,43 @@ function sendPng(res, buf) {
   }
 }
 
-// Live device screenshot — spawn (non-blocking) + JPEG via sips (~5x smaller payload)
+// Live device screenshot — Android via adb, iOS via xcrun devicectl
 app.get('/api/screenshot', (req, res) => {
+  const iosDevice = getConnectedIosDevice();
+  if (iosDevice && iosDevice.iosType === 'device') {
+    // iOS physical device screenshot via xcrun devicectl
+    // iOS physical device: use WDA HTTP API (available when Appium/test is running)
+    const http = require('http');
+    const wdaReq = http.get('http://127.0.0.1:8100/screenshot', { timeout: 3000 }, (wdaRes) => {
+      let body = '';
+      wdaRes.on('data', c => body += c);
+      wdaRes.on('end', () => {
+        try {
+          const parsed = JSON.parse(body);
+          const b64 = parsed.value;
+          if (!b64) return res.status(503).json({ error: 'WDA returned empty screenshot' });
+          const buf = Buffer.from(b64, 'base64');
+          const outFile = path.join(os.tmpdir(), 'forge_ios_screen.png');
+          fs.writeFile(outFile, buf, (writeErr) => {
+            if (writeErr) {
+              if (!res.headersSent) { res.setHeader('Content-Type', 'image/png'); res.send(buf); }
+              return;
+            }
+            sendFileAsJpeg(res, outFile);
+          });
+        } catch (e) {
+          if (!res.headersSent) res.status(503).json({ error: 'WDA parse error: ' + e.message });
+        }
+      });
+    });
+    wdaReq.on('error', () => {
+      if (!res.headersSent) res.status(503).json({ error: 'WDA not running — start a test to enable live screenshots' });
+    });
+    wdaReq.on('timeout', () => { wdaReq.destroy(); if (!res.headersSent) res.status(503).json({ error: 'WDA timeout' }); });
+    return;
+    return;
+  }
+
   const serial = getConnectedDevice();
   const adbArgs = serial
     ? ['-s', serial, 'exec-out', 'screencap', '-p']
@@ -314,6 +450,21 @@ app.get('/api/screenshot', (req, res) => {
   req.on('close', () => adb.kill()); // client aborted → kill screencap immediately
 });
 
+function sendFileAsJpeg(res, filePath) {
+  exec(`sips -s format jpeg -s formatOptions 60 "${filePath}" --out "${SCREEN_JPG}" 2>/dev/null`,
+    { timeout: 3000 }, (sipsErr) => {
+      const src = sipsErr ? filePath : SCREEN_JPG;
+      fs.readFile(src, (readErr, data) => {
+        if (readErr || !data) return res.status(503).json({ error: 'Screenshot unavailable' });
+        if (!res.headersSent) {
+          res.setHeader('Content-Type', sipsErr ? 'image/png' : 'image/jpeg');
+          res.setHeader('Cache-Control', 'no-store');
+          res.send(data);
+        }
+      });
+    });
+}
+
 // Device screen size
 app.get('/api/screen-size', async (req, res) => {
   try {
@@ -328,6 +479,10 @@ app.get('/api/screen-size', async (req, res) => {
 
 // Parse all nodes from uiautomator XML
 function parseNodes(xml) {
+  // iOS WDA returns XCUIElementType* elements; Android returns <node> elements
+  const isIos = xml.includes('XCUIElementType');
+  if (isIos) return parseNodesIos(xml);
+
   const nodeRegex = /<node([^>]+?)(?:\/>|>)/g;
   const attrRegex = /(\w[\w-]*)="([^"]*)"/g;
   const nodes = [];
@@ -360,7 +515,65 @@ function parseNodes(xml) {
   return nodes;
 }
 
+function parseNodesIos(xml) {
+  // WDA source: <XCUIElementTypeXxx type="..." name="..." label="..." value="..."
+  //              x="N" y="N" width="N" height="N" enabled="true" visible="true" ...>
+  const elemRegex = /<(XCUIElementType\w+)([^>]*?)(?:\/>|>)/g;
+  const attrRegex = /(\w[\w-]*)="([^"]*)"/g;
+  const nodes = [];
+
+  let m;
+  while ((m = elemRegex.exec(xml)) !== null) {
+    const type  = m[1];
+    const attrs = {};
+    let a;
+    attrRegex.lastIndex = 0;
+    while ((a = attrRegex.exec(m[2])) !== null) attrs[a[1]] = a[2];
+
+    const x = parseInt(attrs.x || '0');
+    const y = parseInt(attrs.y || '0');
+    const w = parseInt(attrs.width || '0');
+    const h = parseInt(attrs.height || '0');
+    if (w === 0 && h === 0) continue;
+
+    const name  = attrs.name  || attrs.label || '';
+    const label = attrs.label || attrs.value || '';
+    nodes.push({
+      contentDesc : name,
+      resourceId  : name,
+      text        : label,
+      className   : type,
+      bounds      : `[${x},${y}][${x+w},${y+h}]`,
+      x1: x, y1: y, x2: x + w, y2: y + h,
+      clickable   : type.includes('Button') || type.includes('Cell') || type.includes('TextField') || type.includes('Switch') || attrs.type === 'XCUIElementTypeButton',
+      scrollable  : type.includes('ScrollView') || type.includes('Table') || type.includes('CollectionView'),
+      enabled     : attrs.enabled !== 'false',
+      accessible  : attrs.accessible === 'true',
+    });
+  }
+  return nodes;
+}
+
 async function dumpXml() {
+  const ios = getConnectedIosDevice();
+  if (ios && ios.iosType === 'device') {
+    // iOS: use WDA page source endpoint
+    return new Promise((resolve, reject) => {
+      const http = require('http');
+      const req = http.get(`http://127.0.0.1:${WDA_LOCAL_PORT}/source`, { timeout: 8000 }, (res) => {
+        let body = '';
+        res.on('data', c => body += c);
+        res.on('end', () => {
+          try {
+            const d = JSON.parse(body);
+            resolve(d.value || body);
+          } catch (_) { resolve(body); }
+        });
+      });
+      req.on('error', reject);
+      req.on('timeout', () => { req.destroy(); reject(new Error('WDA source timeout')); });
+    });
+  }
   await run(adbShell('uiautomator dump --compressed /sdcard/ui_dump.xml'), 8000);
   return run(adbShell('cat /sdcard/ui_dump.xml'), 5000);
 }
@@ -582,8 +795,10 @@ app.post('/api/run-step', async (req, res) => {
 app.post('/api/step-op', (req, res) => {
   const { op, file, index, from, to } = req.body;
   if (!file) return res.status(400).json({ error: 'file required' });
-  const fullPath = path.join(TESTDATA_ROOT, file);
-  if (!fullPath.startsWith(TESTDATA_ROOT)) return res.status(403).json({ error: 'Forbidden' });
+  const _stepRoot = resolveTestRoot(file);
+  const _stepRel  = file.startsWith('ios/') ? file.slice(4) : file;
+  const fullPath = path.join(_stepRoot, _stepRel);
+  if (!fullPath.startsWith(_stepRoot)) return res.status(403).json({ error: 'Forbidden' });
 
   try {
     const content = fs.readFileSync(fullPath, 'utf8');
@@ -668,8 +883,10 @@ app.get('/api/tagged-elements', async (req, res) => {
 app.get('/api/test-yaml', (req, res) => {
   const file = req.query.file;
   if (!file) return res.status(400).json({ error: 'file param required' });
-  const fullPath = path.join(TESTDATA_ROOT, file);
-  if (!fullPath.startsWith(TESTDATA_ROOT)) return res.status(403).send('Forbidden');
+  const root = resolveTestRoot(file);
+  const rel  = file.startsWith('ios/') ? file.slice(4) : file;
+  const fullPath = path.join(root, rel);
+  if (!fullPath.startsWith(root)) return res.status(403).send('Forbidden');
   try {
     res.setHeader('Content-Type', 'text/plain');
     res.send(fs.readFileSync(fullPath, 'utf8'));
@@ -682,8 +899,10 @@ app.get('/api/test-yaml', (req, res) => {
 app.post('/api/save-test', (req, res) => {
   const { file, content } = req.body;
   if (!file || content === undefined) return res.status(400).json({ error: 'file and content required' });
-  const fullPath = path.join(TESTDATA_ROOT, file);
-  if (!fullPath.startsWith(TESTDATA_ROOT)) return res.status(403).json({ error: 'Forbidden' });
+  const root = resolveTestRoot(file);
+  const rel  = file.startsWith('ios/') ? file.slice(4) : file;
+  const fullPath = path.join(root, rel);
+  if (!fullPath.startsWith(root)) return res.status(403).json({ error: 'Forbidden' });
 
   // Validate YAML before writing — return a friendly error if it won't parse
   try {
@@ -708,13 +927,17 @@ app.post('/api/save-test', (req, res) => {
 app.post('/api/new-test', (req, res) => {
   const { file } = req.body;
   if (!file) return res.status(400).json({ error: 'file required' });
-  const fullPath = path.join(TESTDATA_ROOT, file);
-  if (!fullPath.startsWith(TESTDATA_ROOT)) return res.status(403).json({ error: 'Forbidden' });
+  const isIos   = file.startsWith('ios/');
+  const root    = isIos ? IOS_TESTDATA_ROOT : TESTDATA_ROOT;
+  const rel     = isIos ? file.slice(4) : file;
+  const fullPath = path.join(root, rel);
+  if (!fullPath.startsWith(root)) return res.status(403).json({ error: 'Forbidden' });
 
   const name     = path.basename(file, '.yaml').replace(/_/g, ' ');
+  const platform = isIos ? 'ios' : 'android';
   const template =
 `testName: ${name}
-platform: android
+platform: ${platform}
 noReset: true
 loginRequired: true
 retry: 1
@@ -727,6 +950,7 @@ features:
 
 tags:
   - smoke
+  - ${platform}
 
 steps:
   - action: launchApp
@@ -753,9 +977,10 @@ app.post('/api/delete-test', (req, res) => {
   const { file } = req.body;
   if (!file) return res.status(400).json({ error: 'file required' });
 
-  // Resolve to absolute path and ensure it's inside TESTDATA_ROOT (no path traversal)
-  const fullPath = path.resolve(TESTDATA_ROOT, file);
-  if (!fullPath.startsWith(TESTDATA_ROOT + path.sep) && fullPath !== TESTDATA_ROOT) {
+  const root    = resolveTestRoot(file);
+  const rel     = file.startsWith('ios/') ? file.slice(4) : file;
+  const fullPath = path.resolve(root, rel);
+  if (!fullPath.startsWith(root + path.sep) && fullPath !== root) {
     return res.status(403).json({ error: 'Forbidden: path outside test data root' });
   }
   if (!fs.existsSync(fullPath)) return res.status(404).json({ error: 'File not found' });
@@ -771,8 +996,11 @@ app.post('/api/delete-test', (req, res) => {
 
 // Connected device info
 app.get('/api/device', (req, res) => {
-  const device = getConnectedDevice();
-  res.json({ device });
+  const android = getConnectedDevice();
+  if (android) return res.json({ device: android, platform: 'android' });
+  const ios = getConnectedIosDevice();
+  if (ios) return res.json({ device: ios.name, platform: 'ios', udid: ios.udid, iosType: ios.iosType });
+  res.json({ device: null, platform: null });
 });
 
 // POST /api/stop — HTTP fallback for stopping a test run when WS is unavailable
@@ -917,15 +1145,22 @@ function startTest(file, deviceOverride, ws, fromStep, batchRun) {
   }
   runWasStopped = false;
 
-  // Clean up any stale device state from a previous stopped run
-  const prevDevice = deviceOverride || getConnectedDevice();
-  if (prevDevice) {
-    exec(`adb -s ${prevDevice} shell am force-stop com.popclub.forgedriver.test`, () => {});
-    exec(`adb -s ${prevDevice} forward --remove tcp:7790`, () => {});
+  const suite = suiteFor(file);
+  const isIosTest = suite === 'testng-ios.xml';
+
+  // Clean up any stale device state from a previous stopped run (Android only)
+  if (!isIosTest) {
+    const prevDevice = deviceOverride || getConnectedDevice();
+    if (prevDevice) {
+      exec(`adb -s ${prevDevice} shell am force-stop com.popclub.forgedriver.test`, () => {});
+      exec(`adb -s ${prevDevice} forward --remove tcp:7790`, () => {});
+    }
   }
 
-  const suite  = suiteFor(file);
-  const device = deviceOverride || getConnectedDevice() || '10BDCM0YJZ00043';
+  // For iOS, UDID is baked into testng-ios.xml; for Android use adb serial
+  const device = isIosTest
+    ? (getConnectedIosDevice() || {}).udid || 'ios'
+    : (deviceOverride || getConnectedDevice() || '10BDCM0YJZ00043');
 
   // Derive filename only (TestRunnerTest looks up by basename)
   const fileName = path.basename(file);
@@ -1316,20 +1551,31 @@ function loadAllElementKeys() {
 function loadElementLocatorMap() {
   const map = {};
   if (!fs.existsSync(ELEMENTS_ROOT)) return map;
-  for (const f of fs.readdirSync(ELEMENTS_ROOT)) {
-    if (!f.endsWith('.yaml') && !f.endsWith('.yml')) continue;
-    try {
-      const parsed = yaml.load(fs.readFileSync(path.join(ELEMENTS_ROOT, f), 'utf8'));
-      if (!parsed || typeof parsed !== 'object') continue;
-      for (const [key, def] of Object.entries(parsed)) {
-        if (!def) continue;
-        const locators = def.android || def.ios || [];
-        if (Array.isArray(locators) && locators.length > 0 && locators[0].value) {
-          map[key] = locators[0].value;
+
+  function loadDir(dir) {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) { loadDir(full); continue; }
+      if (!entry.name.endsWith('.yaml') && !entry.name.endsWith('.yml')) continue;
+      try {
+        const parsed = yaml.load(fs.readFileSync(full, 'utf8'));
+        if (!parsed || typeof parsed !== 'object') continue;
+        for (const [key, def] of Object.entries(parsed)) {
+          if (!def) continue;
+          // iOS entries take priority for reverse-map when on iOS
+          const iosLocators = def.ios || [];
+          const andLocators = def.android || [];
+          const iosVal = Array.isArray(iosLocators) && iosLocators[0]?.value;
+          const andVal = Array.isArray(andLocators) && andLocators[0]?.value;
+          if (iosVal) map[iosVal.toLowerCase()] = key;
+          if (andVal) map[andVal.toLowerCase()] = key;
+          if (iosVal || andVal) map[key.toLowerCase()] = key; // key → itself for direct lookup
         }
-      }
-    } catch (_) {}
+      } catch (_) {}
+    }
   }
+
+  loadDir(ELEMENTS_ROOT);
   return map;
 }
 
@@ -1578,23 +1824,20 @@ function overlapFraction(n, t) {
   return nodeArea > 0 ? (ox * oy) / nodeArea : 0;
 }
 
-// GET /api/untagged-elements — interactive elements on screen that have NO qaTestTag
+// GET /api/untagged-elements — elements on screen that:
+//   (a) have NO accessibility id / qaTestTag  — need one added in code
+//   (b) have an accessibility id but it's NOT in the elements YAML — need a locator entry added
 app.get('/api/untagged-elements', async (req, res) => {
   try {
-    const xml   = await dumpXml();
-    const nodes = parseNodes(xml);
-
-    // Collect all nodes that already have a real qaTestTag (non-empty contentDesc)
-    const tagged = nodes.filter(n => n.contentDesc);
+    const xml       = await dumpXml();
+    const isIos     = xml.includes('XCUIElementType');
+    const nodes     = parseNodes(xml);
+    const reverseMap = getReverseElementMap(); // accessibilityId → YAML key
 
     const seen = new Set();
     const candidates = [];
 
     for (const n of nodes) {
-      // Skip elements that already have a qaTestTag
-      if (n.contentDesc) continue;
-      // Skip empty elements with no useful identifier
-      if (!n.text && !n.resourceId) continue;
       // Skip very large containers (full-screen wrappers etc)
       const area = (n.x2 - n.x1) * (n.y2 - n.y1);
       if (area > 600000) continue;
@@ -1603,37 +1846,39 @@ app.get('/api/untagged-elements', async (req, res) => {
       const isInteractive = n.clickable || n.scrollable;
       const isTextOrInput = cls.includes('text') || cls.includes('edit') ||
                             cls.includes('button') || cls.includes('image') ||
-                            cls.includes('recycler');
+                            cls.includes('recycler') || cls.includes('cell') ||
+                            cls.includes('switch') || cls.includes('textfield') ||
+                            cls.includes('statictext') || cls.includes('link');
       if (!isInteractive && !isTextOrInput) continue;
 
-      // Skip child text nodes that sit inside an already-tagged sibling/parent of
-      // comparable size (e.g. the "Shop" TextView inside common_shop_tab).
-      // BUT do NOT filter if the tagged element is a large container (e.g. a full-screen
-      // root like search_products_screen_root) — those are ancestors, not the same widget.
-      const nArea = (n.x2 - n.x1) * (n.y2 - n.y1);
-      const coveredByTag = tagged.some(t => {
-        const tArea = (t.x2 - t.x1) * (t.y2 - t.y1);
-        // Only suppress if the tagged element is at most 5× larger than this node
-        if (tArea > nArea * 5) return false;
-        return overlapFraction(n, t) >= 0.70;
-      });
-      if (coveredByTag) continue;
+      const hasAccessibilityId = !!n.contentDesc;
+      const inYaml = hasAccessibilityId && !!reverseMap[n.contentDesc.toLowerCase()];
 
-      const key = (n.text + '|' + n.resourceId).trim();
-      if (!key || key === '|') continue;
-      if (seen.has(key)) continue;
-      seen.add(key);
+      // Skip elements that are fully mapped (have accessibility id AND in YAML)
+      if (inYaml) continue;
 
-      const suggested = suggestTagName(n);
-      if (!suggested) continue;
+      // Android: skip if truly empty — no text, no accessibility id, no resourceId
+      if (!isIos && !hasAccessibilityId && !n.text && !n.resourceId) continue;
+      // iOS: skip if no text and no name and no label (nothing visible to describe it)
+      if (isIos && !hasAccessibilityId && !n.text) continue;
+
+      const dedupeKey = (n.contentDesc || n.text || n.resourceId || n.bounds).trim();
+      if (!dedupeKey || seen.has(dedupeKey)) continue;
+      seen.add(dedupeKey);
+
+      const suggested = suggestTagName(n) ||
+                        (n.contentDesc ? n.contentDesc.toLowerCase().replace(/\s+/g, '_').slice(0, 32) : null) ||
+                        n.className.replace('XCUIElementType', '').toLowerCase() + '_' + candidates.length;
 
       candidates.push({
-        text       : n.text,
-        resourceId : n.resourceId,
-        className  : n.className.split('.').pop(),
-        bounds     : n.bounds,
+        text          : n.text,
+        resourceId    : n.resourceId || n.contentDesc,
+        className     : n.className.split('.').pop(),
+        bounds        : n.bounds,
         x1: n.x1, y1: n.y1, x2: n.x2, y2: n.y2,
         suggested,
+        // issue type so UI can show different labels
+        issue: !hasAccessibilityId ? 'no_accessibility_id' : 'not_in_yaml',
       });
     }
 
@@ -2141,4 +2386,7 @@ app.post('/api/upload-apk', apkUpload.single('apk'), (req, res) => {
 const PORT = process.env.PORT || 3847;
 server.listen(PORT, () => {
   console.log(`\n  ⚡ Forge UI  →  http://localhost:${PORT}\n`);
+  // Auto-start WDA mirror for iOS physical device
+  const iosDevice = getConnectedIosDevice();
+  if (iosDevice && iosDevice.iosType === 'device') startWdaMirror();
 });
