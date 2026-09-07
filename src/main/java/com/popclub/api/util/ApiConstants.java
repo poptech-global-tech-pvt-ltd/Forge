@@ -24,6 +24,7 @@ public class ApiConstants {
     public static final String PRESENTATION_BASE_URL  = ApiConfig.get("PRESENTATION_BASE_URL",  "https://presentation.popclub.co.in/api/");
 
     public static final String CARDSTACK_BASE_URL = ApiConfig.get("CARDSTACK_BASE_URL", "https://cardstack.getpopcard.co/api/v1");
+    public static final String KONG_BASE_URL      = ApiConfig.get("KONG_BASE_URL",      "https://kong-stage.pop-club-internal.co");
 
     public static final String TESTSIGMA_LOGIN_BASE_URL = ApiConfig.get("TESTSIGMA_LOGIN_BASE_URL", "https://id.testsigma.com");
     public static final String TESTSIGMA_APP_BASE_URL   = ApiConfig.get("TESTSIGMA_APP_BASE_URL",   "https://arcus.testsigma.com");
