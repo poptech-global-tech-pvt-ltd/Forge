@@ -1,5 +1,11 @@
-
-# ─── Cc Aadhaar ────────────────────────────────────────────────────────────────
+card_delivery_address_name_suggestion_bottom_sheet_button:
+  android:
+    - type: accessibilityId
+      value: card_delivery_address_name_suggestion_bottom_sheet_button
+card_delivery_address_name_suggestion_bottom_sheet_radio_0:
+  android:
+    - type: accessibilityId
+      value: card_delivery_address_name_suggestion_bottom_sheet_radio_0
 cc_aadhaar_submit_button:
   android:
     - type: accessibilityId
@@ -8,8 +14,6 @@ cc_aadhaar_title_text:
   android:
     - type: accessibilityId
       value: cc_aadhaar_title_text
-
-# ─── Cc Additional ─────────────────────────────────────────────────────────────
 cc_additional_officer_name_input:
   android:
     - type: accessibilityId
@@ -42,20 +46,14 @@ cc_additional_title_text:
   android:
     - type: accessibilityId
       value: cc_additional_title_text
-
-# ─── Cc Application ────────────────────────────────────────────────────────────
 cc_application_status_footer_section_button:
   android:
     - type: accessibilityId
       value: cc_application_status_footer_section_button
-
-# ─── Cc Delivery ───────────────────────────────────────────────────────────────
 cc_delivery_submit_button:
   android:
     - type: accessibilityId
       value: cc_delivery_submit_button
-
-# ─── Cc Eligibility ────────────────────────────────────────────────────────────
 cc_eligibility_cancel_exit_button:
   android:
     - type: accessibilityId
@@ -68,8 +66,6 @@ cc_eligibility_save_exit_button:
   android:
     - type: accessibilityId
       value: cc_eligibility_save_exit_button
-
-# ─── Cc Name ───────────────────────────────────────────────────────────────────
 cc_name_father_name_input:
   android:
     - type: accessibilityId
@@ -94,8 +90,6 @@ cc_name_suggestion_item_1:
   android:
     - type: accessibilityId
       value: cc_name_suggestion_item_1
-
-# ─── Cc Office ─────────────────────────────────────────────────────────────────
 cc_office_add_new_address_button:
   android:
     - type: accessibilityId
@@ -132,8 +126,6 @@ cc_office_title_text:
   android:
     - type: accessibilityId
       value: cc_office_title_text
-
-# ─── Cc Pan ────────────────────────────────────────────────────────────────────
 cc_pan_number_input:
   android:
     - type: accessibilityId
@@ -158,8 +150,6 @@ cc_pan_tnc_link:
   android:
     - type: accessibilityId
       value: cc_pan_tnc_link
-
-# ─── Cc Personal ───────────────────────────────────────────────────────────────
 cc_personal_dob_input:
   android:
     - type: accessibilityId
@@ -184,8 +174,6 @@ cc_personal_submit_button:
   android:
     - type: accessibilityId
       value: cc_personal_submit_button
-
-# ─── Cc Professional ───────────────────────────────────────────────────────────
 cc_professional_company_name_input:
   android:
     - type: accessibilityId
@@ -218,8 +206,6 @@ cc_professional_submit_button:
   android:
     - type: accessibilityId
       value: cc_professional_submit_button
-
-# ─── Cc Rejection ──────────────────────────────────────────────────────────────
 cc_rejection_dismiss_button:
   android:
     - type: accessibilityId
@@ -236,8 +222,6 @@ cc_rejection_title_text:
   android:
     - type: accessibilityId
       value: cc_rejection_title_text
-
-# ─── Cc Residential ────────────────────────────────────────────────────────────
 cc_residential_pincode_input:
   android:
     - type: accessibilityId
@@ -246,8 +230,6 @@ cc_residential_submit_button:
   android:
     - type: accessibilityId
       value: cc_residential_submit_button
-
-# ─── Cc Status ─────────────────────────────────────────────────────────────────
 cc_status_copy_arn_button:
   android:
     - type: accessibilityId
@@ -264,8 +246,6 @@ cc_status_view_reasons_button:
   android:
     - type: accessibilityId
       value: cc_status_view_reasons_button
-
-# ─── Cc Video ──────────────────────────────────────────────────────────────────
 cc_video_start_button:
   android:
     - type: accessibilityId
@@ -274,13 +254,31 @@ cc_video_title_text:
   android:
     - type: accessibilityId
       value: cc_video_title_text
-
-# ─── Pan Details ───────────────────────────────────────────────────────────────
 pan_details_tnc_checkbox_row_with_bottom_sheet_checkbox:
   android:
     - type: accessibilityId
-      value: pan_details_tnc_checkbox_row_with_bottom_sheet_checkbox
+      value: additional_details_tnc_checkbox_row_with_bottom_sheet_checkbox  # healed from: pan_details_tnc_checkbox_row_with_bottom_sheet_checkbox  # healed from: additional_details_tnc_checkbox_row_with_bottom_sheet_checkbox
 pan_details_tnc_checkbox_row_with_bottom_sheet_row:
   android:
     - type: accessibilityId
       value: pan_details_tnc_checkbox_row_with_bottom_sheet_row
+professional_details_01:
+  android:
+    - type: accessibilityId
+      value: professional_details_selection_bottom_sheet_item_Partnership Firm
+professional_details_search_selection_bottom_sheet_list_item_0:
+  android:
+    - type: accessibilityId
+      value: professional_details_search_selection_bottom_sheet_list_item_0
+professional_details_search_selection_bottom_sheet_list_item_1:
+  android:
+    - type: accessibilityId
+      value: professional_details_search_selection_bottom_sheet_list_item_1
+professional_details_selection_bottom_sheet_item_ACCOUNTANT:
+  android:
+    - type: accessibilityId
+      value: professional_details_selection_bottom_sheet_item_ACCOUNTANT
+professional_details_selection_bottom_sheet_item_Partnership_Firm:
+  android:
+    - type: accessibilityId
+      value: professional_details_selection_bottom_sheet_item_Partnership_Firm

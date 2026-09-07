@@ -1,0 +1,216 @@
+testName: Card Onboarding Level 1 - T&C Consent and PAN Pincode
+platform: android
+noReset: true
+loginRequired: true
+
+testCaseIds:
+  - PO-7597
+
+features:
+  - common
+  - credit_card
+
+tags:
+  - smoke
+  - card
+  - onboarding
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  # ════════════════════════════════════════════════════════════════
+  #  NEGATIVE TEST CASES
+  # ════════════════════════════════════════════════════════════════
+
+  - action: tap
+    element: common_card_tab
+
+  - action: verifyElement
+    element: edge_image_banner_widget_row
+    testCaseId: PO-7597
+
+  - action: tap
+    element: edge_image_banner_widget_row
+
+  - action: verifyElement
+    element: pan_details_tnc_checkbox_row_with_bottom_sheet_checkbox  # healed locator → pan_details_tnc_checkbox_row_with_bottom_sheet_checkbox
+    testCaseId: PO-7598
+
+  - action: verifyElement
+    element: pan_details_tnc_checkbox_row_with_bottom_sheet_checkbox
+    testCaseId: PO-7573
+
+  - action: verifyElement
+    element: cc_pan_submit_button
+    testCaseId: PO-7543
+
+  - action: tap
+    element: pan_details_tnc_checkbox_row_with_bottom_sheet_checkbox
+
+  - action: verifyElement
+    element: pan_details_tnc_checkbox_row_with_bottom_sheet_checkbox
+    testCaseId: PO-7575
+
+  - action: tap
+    element: pan_details_tnc_checkbox_row_with_bottom_sheet_checkbox
+
+  - action: verifyElement
+    element: pan_details_tnc_checkbox_row_with_bottom_sheet_checkbox
+    testCaseId: PO-7576
+
+  # Re-check T&C to proceed
+  - action: tap
+    element: pan_details_tnc_checkbox_row_with_bottom_sheet_checkbox
+
+  - action: tap
+    element: cc_pan_submit_button
+
+  - action: verifyElement
+    element: cc_eligibility_save_exit_button
+    testCaseId: PO-7582
+
+  - action: tap
+    element: cc_eligibility_save_exit_button
+
+  - action: verifyElement
+    element: cc_eligibility_confirm_exit_button
+
+  - action: verifyElement
+    element: cc_eligibility_cancel_exit_button
+    testCaseId: PO-7583
+
+  - action: tap
+    element: cc_eligibility_cancel_exit_button
+
+  - action: verifyElement
+    element: cc_pan_number_input
+    testCaseId: PO-7587
+
+  - action: enterText
+    element: cc_pan_pincode_input
+    value: "400028"
+
+  - action: verifyElement
+    element: cc_pan_submit_button
+    testCaseId: PO-7539
+
+  - action: enterText
+    element: cc_pan_pincode_input
+    value: ""
+
+  - action: enterText
+    element: cc_pan_number_input
+    value: "BVXPN1005K"
+
+  - action: verifyElement
+    element: cc_pan_submit_button
+    testCaseId: PO-7540
+
+  - action: verifyElement
+    element: cc_pan_number_input
+    testCaseId: PO-7555
+
+  - action: enterText
+    element: cc_pan_number_input
+    value: ""
+
+  - action: enterText
+    element: cc_pan_number_input
+    value: "BVXPN1005K"
+
+  - action: enterText
+    element: cc_pan_pincode_input
+    value: "000000"
+
+  - action: tap
+    element: cc_pan_submit_button
+    testCaseId: PO-7565
+
+  - action: enterText
+    element: cc_pan_number_input
+    value: ""
+
+  - action: enterText
+    element: cc_pan_pincode_input
+    value: ""
+
+  - action: tap
+    element: cc_eligibility_save_exit_button
+
+  - action: tap
+    element: cc_eligibility_confirm_exit_button
+    testCaseId: PO-7586
+
+  - action: tap
+    element: common_card_tab
+
+  - action: tap
+    element: edge_image_banner_widget_row
+
+  - action: verifyElement
+    element: pan_details_tnc_checkbox_row_with_bottom_sheet_checkbox
+    testCaseId: PO-7600
+
+  - action: tap
+    element: pan_details_tnc_checkbox_row_with_bottom_sheet_checkbox
+
+  - action: tap
+    element: cc_pan_submit_button
+
+  - action: enterText
+    element: cc_pan_number_input
+    value: "BVXPN1005K"
+
+  - action: enterText
+    element: cc_pan_pincode_input
+    value: "400028"
+
+  - action: tap
+    element: cc_eligibility_save_exit_button
+
+  - action: tap
+    element: cc_eligibility_confirm_exit_button
+
+  - action: tap
+    element: common_card_tab
+
+  - action: tap
+    element: edge_image_banner_widget_row
+
+  - action: verifyElement
+    element: cc_pan_number_input
+    testCaseId: PO-7585
+
+  # ════════════════════════════════════════════════════════════════
+  #  POSITIVE TEST CASES (submits Level 1 → moves to Level 2)
+  #  ⚠ No going back after this — Level 1 is locked once submitted
+  # ════════════════════════════════════════════════════════════════
+
+  - action: enterText
+    element: cc_pan_number_input
+    value: "BVXPN1005K"
+    testCaseId: PO-7549
+
+  - action: enterText
+    element: cc_pan_pincode_input
+    value: "400028"
+    testCaseId: PO-7562
+
+  - action: verifyElement
+    element: cc_pan_submit_button
+
+  - action: tap
+    element: pan_details_tnc_checkbox_row_with_bottom_sheet_checkbox
+
+  - action: tap
+    element: cc_pan_submit_button
+
+  - action: verifyElement
+    element: cc_personal_first_name_input
+    testCaseId: PO-7536

@@ -1,0 +1,180 @@
+testName: Card Onboarding Level 3 - Additional Details (PEP Check)
+platform: android
+noReset: true
+loginRequired: true
+
+testCaseIds:
+  - PO-7707
+
+features:
+  - common
+  - credit_card
+
+tags:
+  - smoke
+  - card
+  - onboarding
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: tap
+    element: common_card_tab
+
+  - action: tap
+    element: edge_image_banner_widget_row
+
+  - action: verifyElement
+    element: cc_additional_title_text
+
+  # ════════════════════════════════════════════════════════════════
+  #  NEGATIVE TEST CASES
+  # ════════════════════════════════════════════════════════════════
+
+  - action: verifyElement
+    element: cc_additional_politically_exposed_yes_chip
+
+  - action: verifyElement
+    element: cc_additional_politically_exposed_no_chip
+
+  - action: verifyElement
+    element: cc_additional_relation_with_officer_yes_chip
+
+  - action: verifyElement
+    element: cc_additional_relation_with_officer_no_chip
+    testCaseId: PO-7707
+
+  - action: verifyElement
+    element: cc_additional_submit_button
+    testCaseId: PO-7723
+
+  - action: tap
+    element: cc_additional_politically_exposed_yes_chip
+
+  - action: verifyElement
+    element: cc_additional_politically_exposed_yes_chip
+    testCaseId: PO-7708
+
+  - action: tap
+    element: cc_additional_politically_exposed_no_chip
+
+  - action: tap
+    element: cc_additional_relation_with_officer_yes_chip
+
+  - action: verifyElement
+    element: cc_additional_relation_selector
+
+  - action: verifyElement
+    element: cc_additional_officer_name_input
+    testCaseId: PO-7711
+
+  - action: verifyElement
+    element: cc_additional_submit_button
+    testCaseId: PO-7712
+
+  - action: tap
+    element: cc_additional_relation_with_officer_no_chip
+
+  - action: verifyElement
+    element: cc_additional_relation_with_officer_no_chip
+    testCaseId: PO-7710
+
+  - action: tap
+    element: additional_details_tnc_checkbox_row_with_bottom_sheet_checkbox  # healed from: pan_details_tnc_checkbox_row_with_bottom_sheet_row
+
+  - action: verifyElement
+    element: additional_details_tnc_checkbox_row_with_bottom_sheet_checkbox  # healed from: pan_details_tnc_checkbox_row_with_bottom_sheet_checkbox
+    testCaseId: PO-7714
+
+  - action: tap
+    element: additional_details_tnc_checkbox_row_with_bottom_sheet_checkbox  # healed from: pan_details_tnc_checkbox_row_with_bottom_sheet_checkbox
+
+  - action: verifyElement
+    element: pan_details_tnc_checkbox_row_with_bottom_sheet_checkbox
+    testCaseId: PO-7716
+
+  - action: tap
+    element: pan_details_tnc_checkbox_row_with_bottom_sheet_checkbox
+
+  - action: verifyElement
+    element: pan_details_tnc_checkbox_row_with_bottom_sheet_checkbox
+    testCaseId: PO-7717
+
+  - action: verifyElement
+    element: cc_additional_submit_button
+    testCaseId: PO-7713
+
+  # ════════════════════════════════════════════════════════════════
+  #  SAVE & EXIT TESTS
+  # ════════════════════════════════════════════════════════════════
+
+  - action: verifyElement
+    element: cc_eligibility_save_exit_button
+
+  - action: tap
+    element: cc_eligibility_save_exit_button
+
+  - action: verifyElement
+    element: cc_eligibility_confirm_exit_button
+
+  - action: verifyElement
+    element: cc_eligibility_cancel_exit_button
+    testCaseId: PO-7729
+
+  - action: tap
+    element: cc_eligibility_cancel_exit_button
+
+  - action: verifyElement
+    element: cc_additional_title_text
+    testCaseId: PO-7726
+
+  - action: tap
+    element: cc_eligibility_save_exit_button
+
+  - action: tap
+    element: cc_eligibility_confirm_exit_button
+    testCaseId: PO-7727
+
+  - action: tap
+    element: common_card_tab
+
+  - action: tap
+    element: edge_image_banner_widget_row
+
+  - action: verifyElement
+    element: cc_additional_title_text
+    testCaseId: PO-7732
+
+  # ════════════════════════════════════════════════════════════════
+  #  POSITIVE TEST CASES (submits Level 3 → moves to Level 4)
+  #  ⚠ No going back after this — Level 3 is locked once submitted
+  # ════════════════════════════════════════════════════════════════
+
+  - action: tap
+    element: cc_additional_politically_exposed_no_chip
+
+  - action: tap
+    element: cc_additional_relation_with_officer_no_chip
+
+  - action: tap
+    element: pan_details_tnc_checkbox_row_with_bottom_sheet_checkbox
+    testCaseId: PO-7721
+
+  - action: tap
+    element: additional_details_tnc_checkbox_row_with_bottom_sheet_row
+
+  - action: tap
+    element: cc_pan_tnc_parent_checkbox_0
+
+  - action: tap
+    element: cc_pan_tnc_continue_button
+
+  - action: tap
+    element: cc_additional_submit_button
+    testCaseId: PO-7722
