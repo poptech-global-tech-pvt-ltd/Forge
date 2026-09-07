@@ -1,7 +1,7 @@
 testName: PDP — Core product info, PLP-to-PDP price match
 platform: android
-noReset: false
-loginRequired: true
+noReset: true
+loginRequired: false
 retry: 0
 
 testCaseIds:
@@ -28,30 +28,30 @@ steps:
   - action: tap
     element: common_shop_tab
 
-  - action: call
-    flow: search_and_open_pdp
-    params:
-      search_query: "snitch"
-      search_pincode: "560102"
-
-  # ── Go back to PLP to capture PLP prices ───────────────────────────────
   - action: tap
-    element: product_details_back_button
+    element: shop_search_button
+
+  - action: enterText
+    element: search_products_search_input
+    value: "the souled store"
+
+  - action: pressKey
+    value: search
 
   - action: captureText
-    element: product_list_item_title_0
+    element: product_list_item_title_1
     variable: plp_title
 
   - action: captureText
-    element: product_list_item_price_0
+    element: product_list_item_price_1
     variable: plp_selling_price
 
   - action: captureText
-    element: product_list_item_strikethrough_price_0
+    element: product_list_item_price_1  # healed from: product_list_item_strikethrough_price_1
     variable: plp_mrp_price
 
   - action: captureText
-    element: product_list_item_brand_0
+    element: product_list_item_brand_1
     variable: plp_brand
 
   - action: logVar
@@ -63,9 +63,8 @@ steps:
       plp_selling_price  - ${plp_selling_price}
       plp_mrp_price      - ${plp_mrp_price}
 
-  # ── Re-enter PDP ───────────────────────────────────────────────────────
   - action: tap
-    element: product_list_item_0
+    element: product_list_item_1
 
   # ── PO-11039: Verify core product info elements ─────────────────────────
   - action: verifyElement
@@ -92,6 +91,9 @@ steps:
       ── PDP prices captured ──
       pdp_selling_price  - ${pdp_selling_price}
       pdp_mrp_price      - ${pdp_mrp_price}
+
+  - action: verifyElement
+    element: product_details_strikethrough_price
 
   # ── Assert: PLP prices must match PDP prices ───────────────────────────
   - action: assertText

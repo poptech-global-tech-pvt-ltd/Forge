@@ -1,6 +1,6 @@
 testName: PDP — Header icons (Back, Search, Cart, POPCoins)
 platform: android
-noReset: false
+noReset: true
 loginRequired: true
 retry: 0
 
@@ -28,11 +28,18 @@ steps:
   - action: tap
     element: common_shop_tab
 
-  - action: call
-    flow: search_and_open_pdp
-    params:
-      search_query: "snitch"
-      search_pincode: "560102"
+  - action: tap
+    element: shop_search_button
+
+  - action: enterText
+    element: search_products_search_input
+    value: "the souled store"
+
+  - action: pressKey
+    value: search
+
+  - action: tap
+    element: product_list_item_0
 
   # ── PO-11032: Verify all header icons exist ───────────────────────────
   - action: tap
