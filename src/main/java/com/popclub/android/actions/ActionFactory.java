@@ -5,6 +5,7 @@ import com.popclub.api.actions.CaptureTokenAction;
 import com.popclub.api.actions.FetchApiAction;
 import com.popclub.core.TestContext;
 import com.popclub.ios.actions.IOSLaunchAppAction;
+import com.popclub.ios.actions.IOSLoginIfNeededAction;
 
 public class ActionFactory {
 
@@ -38,7 +39,7 @@ public class ActionFactory {
 
             // ── Auth ──────────────────────────────────────────────────────────
             case "captureToken":      return new CaptureTokenAction();
-            case "loginIfNeeded":     return new LoginIfNeededAction();
+            case "loginIfNeeded":     return isIOS() ? new IOSLoginIfNeededAction() : new LoginIfNeededAction();
 
             // ── CLP — setup (must run first) ──────────────────────────────────
             case "verifyCLP":         return new VerifyClpAction();
