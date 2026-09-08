@@ -1,0 +1,13 @@
+# Copy this file to testsigma-local.properties and fill in your credentials.
+# testsigma-local.properties is gitignored — never commit real credentials.
+#
+# Setup:
+#   cp src/test/resources/config/testsigma-local.properties.template \
+#      src/test/resources/config/testsigma-local.properties
+
+# Your TestSigma login (used to auto-refresh the session cookie before each run)
+testsigma.login.email=your.name@popclub.co
+testsigma.login.password=
+
+# Leave blank — auto-populated by the framework on first run
+testsigma.session.cookie=

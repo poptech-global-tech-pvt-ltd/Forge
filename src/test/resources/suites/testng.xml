@@ -2,17 +2,18 @@
 
 <suite name="PopClub Suite" parallel="tests" thread-count="2">
 
-<!--    <listeners>-->
-<!--        <listener class-name="com.popclub.listener.TestListener"/>-->
-<!--    </listeners>-->
-<!--    <parameter name="testFile" value=""/>-->
-<!--    <parameter name="deviceSerial" value=""/>-->
-<!--    <parameter name="projectId" value="d8f4a221-bc6d-47d8-9448-0834f5d012ec"/>-->
+    <listeners>
+        <listener class-name="com.popclub.listener.TestListener"/>
+    </listeners>
+
+    <parameter name="projectId" value="d8f4a221-bc6d-47d8-9448-0834f5d012ec"/>
+    <parameter name="testFile" value=""/>
+    <parameter name="deviceSerial" value=""/>
 
     <test name="Mobile Tests">
         <classes>
             <class name="com.popclub.runner.TestRunnerTest"/>
         </classes>
     </test>
-</suite>
 
+</suite>
