@@ -50,7 +50,6 @@ src/main/resources/config/local.cloud.properties
 src/test/resources/config/testsigma-local.properties
 src/test/resources/config/local.cloud.properties
 
-
 ### Forge ###
 *.apk
 *.ipa
