@@ -45,10 +45,12 @@ public class TestListener implements ITestListener, ISuiteListener {
 
         String tagParam = System.getProperty("tag", suite.getParameter("tag"));
         boolean tagRun = tagParam != null && !tagParam.isEmpty();
-        boolean batchRun = Boolean.parseBoolean(System.getProperty("batchRun", "false")) || tagRun;
+        boolean batchRun = Boolean.parseBoolean(System.getProperty("batchRun", "false"))
+                || Boolean.parseBoolean(System.getProperty("batch", "false"))
+                || tagRun;
         if (!batchRun) {
             System.out.println("[TestSigma] Single-file run — skipping TestSigma run creation "
-                    + "(pass -DbatchRun=true, use -Dtag=..., or use Forge UI's \"Run Folder\", to report to TestSigma).");
+                    + "(pass -DbatchRun=true or -Dbatch=true, use -Dtag=..., or use Forge UI's \"Run Folder\", to report to TestSigma).");
             TestContext.setRunId(null);
             return;
         }
@@ -167,6 +169,14 @@ public class TestListener implements ITestListener, ISuiteListener {
     @Override
     public void onTestStart(ITestResult result) {
         TestLogCapture.start(resolveTestName(result));
+        // Populate per-test case IDs so uploadAttachments / updateStatus can report them
+        Object[] params = result.getParameters();
+        if (params != null && params.length > 0 && params[0] instanceof com.popclub.model.TestCase) {
+            com.popclub.model.TestCase tc = (com.popclub.model.TestCase) params[0];
+            if (tc.testCaseIds != null && !tc.testCaseIds.isEmpty()) {
+                TestContext.setTestCaseIds(new java.util.ArrayList<>(tc.testCaseIds));
+            }
+        }
     }
 
     @Override
