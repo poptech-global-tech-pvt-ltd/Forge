@@ -16,18 +16,18 @@ steps:
   - action: launchApp
 
   - action: waitFor
-    element: login_input_phone
+    element: login_phone_input
 
   - action: enterText
-    element: login_input_phone
+    element: login_phone_input
     value: "1234567743"
 
   - action: tap
     element: login_continue_button
 
-  # App calls user-login/initiate on continue tap — capture request_id from fresh response
+  # App calls /api/v3/login/ on continue tap — capture request_id from fresh response
   - action: captureNetworkValue
-    value: "user-login/initiate"
+    value: "api/v3/login"
     extract:
       smv_request_id: "data.request_id"
     timeout: 15

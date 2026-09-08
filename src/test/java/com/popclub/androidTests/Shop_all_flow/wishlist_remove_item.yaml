@@ -1,0 +1,106 @@
+testName: Wishlist — Remove item, verify toast, remaining items, PDP heart state
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-11061
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - shop
+  - regression
+
+retry: 0
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: tap
+    element: common_shop_tab
+
+  # ── PLP: navigate, capture API + UI prices ────────────────────────────────
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: enterText
+    element: search_products_search_input
+    value: "superyou"
+    
+  - action: pressKey
+    value: search
+
+  # Add first product
+  - action: tap
+    element: product_list_item_0
+
+  - action: waitFor
+    element: product_details_title
+
+  - action: captureText
+    element: product_details_title
+    value: "first_product"
+
+  - action: tap
+    element: product_details_wishlist_button
+
+  - action: pressKey
+    value: BACK
+
+  # Add second product
+  - action: tap
+    element: product_list_item_1
+
+  - action: waitFor
+    element: product_details_title
+
+  - action: captureText
+    element: product_details_title
+    value: "second_product"
+
+  - action: tap
+    element: product_details_wishlist_button
+
+  - action: pressKey
+    value: BACK
+
+  # Go to wishlist
+  - action: tap
+    element: toolbar_wishlist_button
+
+  # PO-11061 + PO-11473: Remove first item by tapping filled heart
+  - action: tap
+    element: wishlist_remove_button
+    testCaseId: PO-11061
+
+  # PO-11475: Verify second item is still there
+  - action: waitFor
+    element: wishlist_item_card_compose_row
+    testCaseId: PO-11475
+
+  # PO-11476: Go to PDP of removed product, verify heart is unfilled
+  - action: pressKey
+    value: BACK
+
+  - action: tap
+    element: product_list_item_1
+
+  - action: waitFor
+    element: product_details_title
+
+  # Heart icon should be unfilled (not wishlisted)
+  - action: verifyElement
+    element: product_details_wishlist_button
+    testCaseId: PO-11476

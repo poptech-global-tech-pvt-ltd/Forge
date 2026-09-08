@@ -11,6 +11,7 @@ public class ActionFactory {
     public static Action get(String action) {
         switch (action) {
             // ── Core gestures ──────────────────────────────────────────────────
+            case "toggleMobileData":  return new ToggleMobileDataAction();
             case "tap":               return new TapAction();
             case "enterText":         return new EnterTextAction();
             case "launchApp":         return isIOS() ? new IOSLaunchAppAction() : new LaunchAppAction();
@@ -55,7 +56,7 @@ public class ActionFactory {
             case "clpScrollAndCheck":       return new ClpScrollAndCheckAction();
 
             // ── CLP — interaction helpers ─────────────────────────────────────
-            case "tapByText":         return new TapByTextAction();
+            case "tapByText":              return new TapByTextAction();
             case "tapClpItem":        return new TapClpItemAction();
 
             // ── Text capture / assertion primitives ───────────────────────────

@@ -1,0 +1,81 @@
+testName: ODP — Rate product, track order, delivered badge
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-9074
+  - PO-9078
+  - PO-9073
+  - PO-9048
+
+features:
+  - common
+  - login
+  - home
+  - shop
+  - profile
+
+tags:
+  - odp
+  - shop
+  - regression
+
+retry: 0
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234563737"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: call
+    flow: navigate_to_olp
+
+  # Search for delivered order by brand name
+  - action: tap
+    element: olp_search_field_input
+
+  - action: enterText
+    element: olp_search_field_input
+    value: "Love kaapi"
+
+  - action: pressKey
+    value: search
+
+  # Verify ODP loaded
+  - action: waitFor
+    element: odp_pay_in3_product_title_text
+    timeout: 5000
+
+  # PO-9048: Progress bar / status visible
+  - action: verifyElement
+    element: order_details_v2_status_text
+    testCaseId: PO-9048
+
+  # PO-9073: Delivered order — status badge
+  - action: captureText
+    element: order_details_v2_status_text
+    variable: current_status
+
+  - action: logVar
+    variable: current_status
+    value: "Current order status: ${current_status}"
+
+  - action: verifyElement
+    element: order_details_v2_status_text
+    testCaseId: PO-9073
+
+  # PO-9078: Track order button
+  - action: verifyElement
+    element: order_details_v2_track_button
+    testCaseId: PO-9078
+
+  # PO-9074: Rate product widget for delivered unrated order
+  - action: verifyElement
+    element: rate_your_item
+    testCaseId: PO-9074

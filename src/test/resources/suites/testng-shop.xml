@@ -21,7 +21,6 @@
 
     <parameter name="deviceSerial"  value="10BDCM0YJZ00043"/>
     <parameter name="projectId"     value="d8f4a221-bc6d-47d8-9448-0834f5d012ec"/>
-    <parameter name="runTitle"      value="Shop Regression"/>
 
     <!-- ── Smoke: CLP + search + wishlist + cart remove ────────────────── -->
     <test name="Smoke">

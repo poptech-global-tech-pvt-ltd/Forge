@@ -1,0 +1,34 @@
+testName: No pending dues bottom sheet when bill already paid
+platform: android
+noReset: true
+loginRequired: true
+
+testCaseIds:
+  - PO-13212
+
+features:
+  - common
+  - billpay
+
+tags:
+  - rcbp
+  - regression
+
+retry: 1
+
+steps:
+
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: tap
+    element: bill_pay_all_bills_bills_tab
+
+  - action: tap
+    element: bill_pay_all_bills_item_0   # TODO: confirm this item is an already-paid bill
+
+  - action: verifyElement
+    locator: bill_pay_no_pending_dues_bottom_sheet   # TODO: add to elements/billpay.yaml

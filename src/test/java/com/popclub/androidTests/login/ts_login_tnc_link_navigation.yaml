@@ -1,0 +1,58 @@
+testName: Login - T&C Link Opens Page and Back Preserves Phone Number
+platform: android
+noReset: true
+loginRequired: false
+
+features:
+  - login
+
+tags:
+  - smoke
+  - login
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: waitFor
+    element: login_phone_input
+
+  - action: tap
+    element: login_phone_input
+
+  - action: tap
+    element: login_tnc_text
+
+  - action: waitFor
+    element: login_screen_title_text
+    timeout: 10
+
+  - action: pressKey
+    value: BACK
+
+  - action: waitFor
+    element: login_phone_input
+
+  - action: enterText
+    element: login_phone_input
+    value: "9999999999"
+
+  - action: verifyElement
+    element: login_continue_button
+
+  - action: tap
+    element: login_tnc_text
+
+  - action: waitFor
+    element: login_screen_title_text
+    timeout: 10
+
+  - action: pressKey
+    value: BACK
+
+  - action: waitFor
+    element: login_phone_input
+
+  - action: verifyElement
+    element: login_continue_button

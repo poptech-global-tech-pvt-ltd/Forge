@@ -29,22 +29,36 @@ public class TestListener implements ITestListener, ISuiteListener {
 
         TestSigmaSessionManager.refreshSessionCookie();
 
+        // projectId may be at suite level or test level — collect from all tests as fallback
         projectId = suite.getParameter("projectId");
+        if (projectId == null || projectId.isEmpty()) {
+            for (org.testng.xml.XmlTest xmlTest : suite.getXmlSuite().getTests()) {
+                String val = xmlTest.getParameter("projectId");
+                if (val != null && !val.isEmpty()) { projectId = val; break; }
+            }
+        }
         tags = suite.getParameter("tag");
-        title = suite.getParameter("runTitle");
-
-        CloudConfig.setDeviceSerialFromTestNG(suite.getParameter("deviceSerial"));
+        title = suite.getName();
 
         long start = System.currentTimeMillis() / 1000;
         TestContext.setStartTime(start);
 
         String tagParam = System.getProperty("tag", suite.getParameter("tag"));
         boolean tagRun = tagParam != null && !tagParam.isEmpty();
-        boolean batchRun = Boolean.parseBoolean(System.getProperty("batchRun", "false")) || tagRun;
+        boolean batchRun = Boolean.parseBoolean(System.getProperty("batchRun", "false"))
+                || Boolean.parseBoolean(System.getProperty("batch", "false"))
+                || tagRun;
         if (!batchRun) {
             System.out.println("[TestSigma] Single-file run — skipping TestSigma run creation "
-                    + "(pass -DbatchRun=true, use -Dtag=..., or use Forge UI's \"Run Folder\", to report to TestSigma).");
+                    + "(pass -DbatchRun=true or -Dbatch=true, use -Dtag=..., or use Forge UI's \"Run Folder\", to report to TestSigma).");
             TestContext.setRunId(null);
+            return;
+        }
+
+        String existingRunId = System.getProperty("existingRunId");
+        if (existingRunId != null && !existingRunId.isBlank()) {
+            TestContext.setRunId(existingRunId);
+            System.out.println("[TestSigma] Joining existing run: " + existingRunId);
             return;
         }
 
@@ -55,6 +69,18 @@ public class TestListener implements ITestListener, ISuiteListener {
         if (testFileParam == null || testFileParam.isEmpty()) {
             try { testFileParam = suite.getParameter("testFile"); } catch (Exception ignored) {}
         }
+        // For multi-device suites, collect testFile from each <test> block
+        if (testFileParam == null || testFileParam.isEmpty()) {
+            StringBuilder combined = new StringBuilder();
+            for (org.testng.xml.XmlTest xmlTest : suite.getXmlSuite().getTests()) {
+                String val = xmlTest.getParameter("testFile");
+                if (val != null && !val.isEmpty()) {
+                    if (combined.length() > 0) combined.append(",");
+                    combined.append(val);
+                }
+            }
+            if (combined.length() > 0) testFileParam = combined.toString();
+        }
         if (testFileParam != null && !testFileParam.isEmpty()) {
             for (String name : testFileParam.split(",")) {
                 String n = name.trim().toLowerCase();
@@ -62,10 +88,12 @@ public class TestListener implements ITestListener, ISuiteListener {
             }
         }
 
-        List<String> allTestCaseIds = new ArrayList<>();
+        List<String> allTestCaseIds = new ArrayList<>(new java.util.LinkedHashSet<>());
 
         File root = new File("src/test/java/com/popclub/androidTests");
-        collectTestCaseIds(root, allTestCaseIds, onlyFiles);
+        List<String> rawIds = new ArrayList<>();
+        collectTestCaseIds(root, rawIds, onlyFiles);
+        allTestCaseIds.addAll(new java.util.LinkedHashSet<>(rawIds));
 
         if (allTestCaseIds.isEmpty()) {
             System.out.println("[TestSigma] No testCaseIds found — skipping run creation.");
@@ -100,9 +128,9 @@ public class TestListener implements ITestListener, ISuiteListener {
                 return;
             }
 
-            String baseTitle = (title != null && !title.isBlank()) ? title : "Forge Run";
-            String runTitle = baseTitle + " - "
-                    + new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date());
+            java.text.SimpleDateFormat istFormat = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            istFormat.setTimeZone(java.util.TimeZone.getTimeZone("Asia/Kolkata"));
+            String runTitle = title + " - " + istFormat.format(new java.util.Date());
             String runTags  = (tags  != null && !tags.isBlank())  ? tags  : "Automated";
 
             String runId = TestSigmaClient.createRun(runTitle, projectId, runTags, uuidList);
@@ -122,33 +150,48 @@ public class TestListener implements ITestListener, ISuiteListener {
 
     @Override
     public void onFinish(ISuite suite) {
-        if (TestContext.getRunId() == null) return;
-        try {
-            TestSigmaClient.updateRunStatus(projectId, TestContext.getRunId(), RunStatus.FINISHED);
-            System.out.println("[TestSigma] ✅ Run marked FINISHED: " + TestContext.getRunId());
-        } catch (Exception e) {
-            System.err.println("[TestSigma] ⚠️  Failed to mark run FINISHED: " + e.getMessage());
-        } finally {
-            TestContext.clear();
+        String runId = TestContext.getRunId();
+        if (runId == null) return;
+
+        boolean partOfBatch = System.getProperty("existingRunId") != null;
+        boolean shouldClose = !partOfBatch || Boolean.parseBoolean(System.getProperty("finalizeRun", "false"));
+
+        if (shouldClose) {
+            try {
+                TestSigmaClient.closeRun(projectId, runId);
+                System.out.println("[TestSigma] Run closed: " + runId);
+            } catch (Exception e) {
+                System.err.println("[TestSigma] Failed to close run: " + e.getMessage());
+            }
         }
+
+        TestContext.clear();
     }
 
     @Override
     public void onTestStart(ITestResult result) {
         TestLogCapture.start(resolveTestName(result));
+        // Populate per-test case IDs so uploadAttachments / updateStatus can report them
+        Object[] params = result.getParameters();
+        if (params != null && params.length > 0 && params[0] instanceof com.popclub.model.TestCase) {
+            com.popclub.model.TestCase tc = (com.popclub.model.TestCase) params[0];
+            if (tc.testCaseIds != null && !tc.testCaseIds.isEmpty()) {
+                TestContext.setTestCaseIds(new java.util.ArrayList<>(tc.testCaseIds));
+            }
+        }
     }
 
     @Override
     public void onTestSuccess(ITestResult result) {
+        System.out.println("✅ Test PASSED: " + resolveTestName(result));
         stopVideoQuietly(resolveTestName(result) + "_passed");
         updateStatus(result, TestCaseStatus.PASSED);
-
-        File log = TestLogCapture.stop();
-        uploadAttachments(TestCaseStatus.PASSED, log);
+        TestLogCapture.stop();
     }
 
     @Override
     public void onTestFailure(ITestResult result) {
+        System.out.println("❌ Test FAILED: " + resolveTestName(result));
         DeviceKeepAlive.stop();
 
         String safeName = resolveTestName(result).replaceAll("[^a-zA-Z0-9_-]", "_");
@@ -285,9 +328,22 @@ public class TestListener implements ITestListener, ISuiteListener {
                     if (tc.testCaseIds != null && !tc.testCaseIds.isEmpty()) {
                         result.addAll(tc.testCaseIds);
                     }
+                    // Collect step-level testCaseId fields (used in Shop_PDP and similar tests)
+                    collectStepIds(tc.steps, result);
+                    collectStepIds(tc.onFlowStart, result);
+                    collectStepIds(tc.onFlowComplete, result);
                 } catch (Exception e) {
                     System.out.println("[TestSigma] Skipped unreadable YAML: " + entry.getName());
                 }
+            }
+        }
+    }
+
+    private void collectStepIds(List<com.popclub.model.Step> steps, List<String> result) {
+        if (steps == null) return;
+        for (com.popclub.model.Step step : steps) {
+            if (step.testCaseId != null && !step.testCaseId.isBlank()) {
+                result.add(step.testCaseId);
             }
         }
     }

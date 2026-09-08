@@ -18,28 +18,24 @@ steps:
   - action: launchApp
 
   - action: waitFor
-    element: login_input_phone
+    element: login_phone_input
 
   - action: enterText
-    element: login_input_phone
-    value: "9481781677"
+    element: login_phone_input
+    value: "9481781678"
 
   - action: tap
     element: login_continue_button
 
   - action: pressKey
-    value: BACK
+    value: "BACK"
 
-  - action: waitFor
-    element: login_input_phone
-    timeout: 10
-
-  - action: tap
-    element: login_continue_button
+  - action: pressKey
+    value: "BACK"
 
   - action: tapByText
     value: "Edit"
     timeout: 30
 
   - action: waitFor
-    element: login_input_phone
+    element: login_phone_input

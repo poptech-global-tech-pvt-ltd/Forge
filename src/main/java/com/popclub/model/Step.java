@@ -20,6 +20,8 @@ public class Step {
     public int retry;
     public String testCaseId;
 
+    public String dataRef;
+
     /**
      * Per-step poll timeout in seconds.
      * -1 = inherit the test's {@code defaultTimeout} (set in TestCase YAML).

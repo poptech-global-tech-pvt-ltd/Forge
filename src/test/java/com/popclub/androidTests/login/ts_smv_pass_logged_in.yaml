@@ -19,8 +19,8 @@ steps:
   - action: launchApp
 
   - action: enterText
-    element: login_input_phone
-    value: "9538351687"
+    element: login_phone_input
+    value: "9743990458"
 
   - action: tap
     element: login_button

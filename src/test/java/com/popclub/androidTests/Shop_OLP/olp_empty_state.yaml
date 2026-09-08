@@ -1,0 +1,66 @@
+testName: OLP — Empty states and Explore more navigation
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-11359
+
+features:
+  - common
+  - login
+  - home
+  - shop
+  - profile
+
+tags:
+  - olp
+  - shop
+  - regression
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: call
+    flow: navigate_to_olp
+
+  # PO-11359: Filter with no matching orders — empty state
+  - action: tap
+    element: olp_filter_order_status_pill
+
+  - action: tapByText
+    value: "Returned"
+
+  - action: tapByText
+    value: "Apply"
+
+  - action: tapByText
+    value: "No orders found"
+    testCaseId: PO-11359
+
+  # PO-11360: Tap Explore more on filter empty state — goes to Shop
+  - action: tapByText
+    value: "Explore more"
+
+  - action: waitFor
+    element: shop_search_button
+    timeout: 5000
+
+  - action: verifyElement
+    element: shop_search_button
+    testCaseId: PO-11360
+
+  # PO-11361 + PO-11362: No orders yet (fresh user)
+  # Needs user with zero orders — cannot test with existing user
+  - action: logVar
+    variable: placeholder
+    value: "PO-11361/11362 — need fresh user with no orders"

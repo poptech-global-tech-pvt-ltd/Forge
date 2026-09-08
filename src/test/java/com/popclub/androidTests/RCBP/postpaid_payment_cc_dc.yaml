@@ -1,0 +1,46 @@
+testName: UPI apps and Debit/Credit card sections expand on tap
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-13219
+
+features:
+  - common
+  - billpay
+
+tags:
+  - rcbp
+  - regression
+
+retry: 0
+
+steps:
+
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: tap
+    element: bill_pay_all_bills_bills_tab
+
+  - action: tap
+    element: bill_pay_all_bills_item_0
+
+  - action: waitFor
+    element: bill_pay_payment_list_payment_list_screen_row
+
+  - action: tap
+    element: bill_pay_payment_list_upi_apps_section_button
+
+  - action: verifyElement
+    element: bill_pay_payment_list_upi_vertical_button_row
+
+  - action: tap
+    locator: bill_pay_payment_list_debit_credit_card_section_button   # TODO: add to elements/billpay.yaml — not present, only card_number_input exists
+
+  - action: verifyElement
+    element: bill_pay_payment_list_card_number_input

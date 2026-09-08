@@ -301,7 +301,11 @@ if ! $START_ONLY && ! $CHECK_ONLY; then
   if [[ "$(uname)" == "Darwin" ]]; then
     MVN_SSL_OPTS="-Djavax.net.ssl.trustStoreType=KeychainStore"
   fi
-  MVN_OUTPUT=$(mvn install -DskipTests --no-transfer-progress -q $MVN_SSL_OPTS 2>&1)
+  set +e
+  RAW_MVN_OUTPUT=$(mvn install -DskipTests --no-transfer-progress -q $MVN_SSL_OPTS 2>&1)
+  MVN_EXIT=$?
+  MVN_OUTPUT=$(echo "$RAW_MVN_OUTPUT" | grep -v "sun.misc.Unsafe\|lombok.permit.Permit\|terminally deprecated" || true)
+  set -e
   if echo "$MVN_OUTPUT" | grep -q "PKIX\|certificate\|SSL\|TLS\|sun.security"; then
     err "Maven SSL error — likely caused by Zscaler certificate interception"
     echo ""
@@ -322,7 +326,7 @@ if ! $START_ONLY && ! $CHECK_ONLY; then
     echo -e "  ${CYAN}  3. Re-run:${RESET}  ./setup.sh"
     echo ""
     flag_error "Maven install (Zscaler SSL)"
-  elif [[ -n "$MVN_OUTPUT" ]]; then
+  elif [[ $MVN_EXIT -ne 0 ]]; then
     err "mvn install failed"
     echo "$MVN_OUTPUT" | tail -10
     flag_error "Maven install"

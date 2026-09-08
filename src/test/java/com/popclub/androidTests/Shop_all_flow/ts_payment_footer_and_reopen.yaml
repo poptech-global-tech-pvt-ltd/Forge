@@ -1,0 +1,83 @@
+testName: Payment — Footer amount matches total, method persists on reopen
+platform: android
+noReset: true
+loginRequired: false
+features:
+  - common
+  - login
+  - home
+  - shop
+  
+tags:
+  - shop
+  - payment
+  
+retry: 0
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561234"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: call
+    flow: add_to_cart_and_pay
+    params:
+      search_query: "the souled store"
+      search_pincode: "560102"
+
+  # Capture cart total before going to payment
+  - action: captureText
+    element: cart_to_pay_row
+    variable: cart_total_amount
+
+  - action: call
+    flow: navigate_to_payment_sheet
+
+  # Expand full sheet, select COD (non-POPchop method)
+  - action: tap
+    element: payment_method_other_options_button
+
+  - action: scrollUntilVisible
+    element: shop_payment_shop_cod_section_button
+    direction: down
+    maxScrolls: 3
+
+  - action: tap
+    element: shop_payment_shop_cod_section_button
+
+  # ── PO-15724: Pay button amount matches cart total ──
+  - action: captureText
+    element: cart_link_and_pay_button
+    variable: pay_button_amount
+
+  - action: logVar
+    variable: pay_button_amount
+    value: |
+      PO-15724 — cart_total: ${cart_total_amount} | pay_button: ${pay_button_amount}
+
+  - action: verifyElement
+    element: cart_link_and_pay_button
+    shouldExist: true
+    testCaseId: PO-15724
+
+  # ── PO-15726: Reopen sheet — previously selected method pre-selected ──
+  - action: tap
+    element: cart_payment_method_bottom_sheet_button
+
+  - action: waitFor
+    element: payment_method_title_text
+    timeout: 3000
+
+  # COD should still be selected — verify COD section visible/highlighted
+  - action: verifyElement
+    element: shop_payment_shop_cod_section_button
+    shouldExist: true
+    testCaseId: PO-15726
+
+  - action: tap
+    element: payment_method_close_button

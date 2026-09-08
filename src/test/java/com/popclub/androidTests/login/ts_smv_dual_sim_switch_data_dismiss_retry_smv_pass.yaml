@@ -18,11 +18,11 @@ steps:
   - action: launchApp
 
   - action: waitFor
-    element: login_input_phone
+    element: login_phone_input
 
   - action: enterText
-    element: login_input_phone
-    value: "9481781677"
+    element: login_phone_input
+    value: "9019384462"
 
   - action: tap
     element: login_continue_button
@@ -31,20 +31,22 @@ steps:
     value: BACK
 
   - action: waitFor
-    element: login_input_phone
+    element: login_phone_input
     timeout: 10
 
   - action: enterText
-    element: login_input_phone
-    value: "9538351687"
+    element: login_phone_input
+    value: "9481781677"
 
   - action: tap
     element: login_continue_button
 
-  - action: tapIfPresent
-    locator: Skip
-    timeout: 30
+  - action: waitFor
+    element: skip_tour
+    timeout: 60
+
+  - action: tap
+    element: skip_tour
 
   - action: verifyElement
     element: home_tab
-    timeout: 30

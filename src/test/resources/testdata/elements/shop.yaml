@@ -510,6 +510,18 @@ clp_section_view_all_9:
   android:
     - type: accessibilityId
       value: clp_section_view_all_9
+Collapse:
+  android:
+    - type: accessibilityId
+      value: Collapse
+Expand:
+  android:
+    - type: accessibilityId
+      value: Expand
+grey_price:
+  android:
+    - type: accessibilityId
+      value: pdp_product_strikethrough_price
 order_details_bill_items_list_row:
   android:
     - type: accessibilityId
@@ -746,14 +758,6 @@ payment_processing_status_text:
   android:
     - type: accessibilityId
       value: payment_processing_status_text
-pop_chip_row:
-  android:
-    - type: accessibilityId
-      value: pop_chip_row
-pop_top_bar_with_content_row:
-  android:
-    - type: accessibilityId
-      value: pop_top_bar_with_content_row
 product_details_back_button:
   android:
     - type: accessibilityId
@@ -825,7 +829,7 @@ product_details_size_option_1:
 product_details_strikethrough_price:
   android:
     - type: accessibilityId
-      value: pdp_product_strikethrough_price
+      value: pdp_product_price
 product_details_title:
   android:
     - type: accessibilityId
@@ -905,11 +909,11 @@ product_list_item_rating_0:
 product_list_item_strikethrough_price_0:
   android:
     - type: accessibilityId
-      value: product_list_item_strikethrough_price_0
+      value: product_list_item_0
 product_list_item_strikethrough_price_1:
   android:
     - type: accessibilityId
-      value: product_list_item_strikethrough_price_1
+      value: product_list_item_price_1  # healed from: product_list_item_strikethrough_price_1
 product_list_item_title_0:
   android:
     - type: accessibilityId
@@ -934,22 +938,6 @@ product_list_sort_selection_screen_radio:
   android:
     - type: accessibilityId
       value: product_list_sort_selection_screen_radio
-profile_page_title_help_and_support:
-  android:
-    - type: accessibilityId
-      value: profile_page_title_help_and_support
-profile_page_title_saved_address:
-  android:
-    - type: accessibilityId
-      value: profile_page_title_saved_address
-profile_page_title_shop_orders:
-  android:
-    - type: accessibilityId
-      value: profile_page_title_shop_orders
-profile_page_title_wishlist:
-  android:
-    - type: accessibilityId
-      value: profile_page_title_wishlist
 return_details_status_text:
   android:
     - type: accessibilityId

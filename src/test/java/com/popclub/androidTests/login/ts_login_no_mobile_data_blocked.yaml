@@ -17,12 +17,15 @@ retry: 1
 steps:
   - action: launchApp
 
+  - action: toggleMobileData
+    value: off_if_on
+
   - action: waitFor
-    element: login_input_phone
+    element: login_phone_input
 
   - action: enterText
-    element: login_input_phone
-    value: "9538351687"
+    element: login_phone_input
+    value: "8722249459"
 
   - action: tap
     element: login_continue_button
@@ -35,8 +38,11 @@ steps:
     value: BACK
 
   - action: waitFor
-    element: login_input_phone
+    element: login_phone_input
     timeout: 10
 
   - action: verifyElement
     element: login_continue_button
+
+  - action: toggleMobileData
+    value: on

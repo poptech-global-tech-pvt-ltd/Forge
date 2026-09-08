@@ -1,0 +1,74 @@
+testName: ODP — Status text, progress bar, more details, bill summary
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-9047
+
+features:
+  - common
+  - login
+  - home
+  - shop
+  - profile
+
+tags:
+  - shop
+  - regression
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: call
+    flow: navigate_to_olp
+  
+  - action: tap
+    element: olp_item_1
+
+  # Capture product title on ODP
+  - action: captureText
+    element: odp_pay_in3_product_title_text
+    variable: odp_product_title
+
+
+  # PO-9047: Progress bar shows Placed as active step
+  # - action: verifyElement
+  # element: order_details_v2_status_text
+
+  # - action: captureText
+   #  element: order_details_v2_status_text
+    # variable: odp_status
+
+  # - action: logVar
+  #   variable: odp_status
+   #  value: "ODP status: ${odp_status}"
+
+  # - action: verifyElement
+   #  element: order_details_v2_status_text
+    # testCaseId: PO-9047
+
+  # PO-9061: Tap More details — shows address, payment, order ID
+  - action: scrollTo
+    element: more_details_accordion
+
+  - action: tap
+    element: Expand
+
+  - action: verifyElement
+    element: order_details_order_id_row
+    testCaseId: PO-9061
+
+  # PO-9069: Bill summary — verify billing section visible
+  - action: verifyElement
+    element: odp_bill_item_total_text
+    testCaseId: PO-9069

@@ -18,11 +18,11 @@ steps:
   - action: launchApp
 
   - action: waitFor
-    element: login_input_phone
+    element: login_input_phone  # healed from: login_otp_input
 
   - action: enterText
-    element: login_input_phone
-    value: "9538351687"
+    element: login_input_phone  # healed from: login_phone_input
+    value: "9019384462"
 
   - action: tap
     element: login_continue_button
@@ -31,7 +31,7 @@ steps:
     value: BACK
 
   - action: waitFor
-    element: login_input_phone
+    element: login_phone_input
     timeout: 10
 
   - action: tap
@@ -41,7 +41,7 @@ steps:
     value: BACK
 
   - action: waitFor
-    element: login_input_phone
+    element: login_phone_input
     timeout: 10
 
   - action: tap
@@ -56,7 +56,7 @@ steps:
     timeout: 30
 
   - action: waitFor
-    element: login_input_phone
+    element: login_phone_input
 
   - action: tap
     element: login_continue_button
