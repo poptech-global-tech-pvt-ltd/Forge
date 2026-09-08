@@ -35,7 +35,8 @@ public class TestRunnerTest {
     @DataProvider(name = "testData", parallel = false)
     public Object[][] getTestData(ITestContext context) {
 
-        String platformParam = context.getCurrentXmlTest().getParameter("platform");
+        String platformParam = System.getProperty("platform",
+                context.getCurrentXmlTest().getParameter("platform"));
         String testsDir = "ios".equalsIgnoreCase(platformParam)
                 ? "src/test/java/com/popclub/iOSTests"
                 : "src/test/java/com/popclub/androidTests";
