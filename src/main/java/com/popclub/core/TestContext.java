@@ -308,6 +308,7 @@ public class TestContext {
         platform.remove();
         freshLaunch.remove();
         testCaseId.remove();
+        testCaseIds.remove();
         runId = null;
         videoFile.remove();
         clpData.remove();

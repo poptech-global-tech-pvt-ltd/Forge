@@ -138,7 +138,15 @@ public class AppiumDriverManager {
                 // correct entry point when the APK declares multiple launcher activities.
                 options.setAppPackage("com.popclub.android");
                 options.setAppActivity("com.popclub.android.LauncherFresh");
-                options.setNoReset(false);
+                if (!resumeMode) {
+                    // noReset=false (fresh run): use fullReset so Appium uninstalls + reinstalls.
+                    // This clears all app data without calling `pm clear`, which is blocked
+                    // by device security policy (CLEAR_APP_USER_DATA) on Android 16+.
+                    options.setCapability("appium:fullReset", true);
+                } else {
+                    // noReset=true but app not installed: install fresh, keep any existing data.
+                    options.setNoReset(true);
+                }
             }
 
             options.setNewCommandTimeout(Duration.ofSeconds(300));
