@@ -88,10 +88,12 @@ public class TestListener implements ITestListener, ISuiteListener {
             }
         }
 
-        List<String> allTestCaseIds = new ArrayList<>();
+        List<String> allTestCaseIds = new ArrayList<>(new java.util.LinkedHashSet<>());
 
         File root = new File("src/test/java/com/popclub/androidTests");
-        collectTestCaseIds(root, allTestCaseIds, onlyFiles);
+        List<String> rawIds = new ArrayList<>();
+        collectTestCaseIds(root, rawIds, onlyFiles);
+        allTestCaseIds.addAll(new java.util.LinkedHashSet<>(rawIds));
 
         if (allTestCaseIds.isEmpty()) {
             System.out.println("[TestSigma] No testCaseIds found — skipping run creation.");
@@ -326,9 +328,22 @@ public class TestListener implements ITestListener, ISuiteListener {
                     if (tc.testCaseIds != null && !tc.testCaseIds.isEmpty()) {
                         result.addAll(tc.testCaseIds);
                     }
+                    // Collect step-level testCaseId fields (used in Shop_PDP and similar tests)
+                    collectStepIds(tc.steps, result);
+                    collectStepIds(tc.onFlowStart, result);
+                    collectStepIds(tc.onFlowComplete, result);
                 } catch (Exception e) {
                     System.out.println("[TestSigma] Skipped unreadable YAML: " + entry.getName());
                 }
+            }
+        }
+    }
+
+    private void collectStepIds(List<com.popclub.model.Step> steps, List<String> result) {
+        if (steps == null) return;
+        for (com.popclub.model.Step step : steps) {
+            if (step.testCaseId != null && !step.testCaseId.isBlank()) {
+                result.add(step.testCaseId);
             }
         }
     }

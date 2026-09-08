@@ -102,6 +102,30 @@ public class TokenExtractor {
         return null;
     }
 
+    public static String getLegacyToken(String deviceSerial) {
+        String tokenA = grepLogcatLegacy(deviceSerial,
+                "logcat -d okhttp.OkHttpClient:I *:S | grep '\"token\"'");
+        if (tokenA != null) return tokenA;
+        return grepLogcatLegacy(deviceSerial,
+                "logcat -d | grep '\"token\"'");
+    }
+
+    private static String grepLogcatLegacy(String deviceSerial, String shellCmd) {
+        try {
+            String[] cmd = buildAdb(deviceSerial, "shell", shellCmd);
+            String output = run(cmd);
+            if (output == null || output.isBlank()) return null;
+            Pattern p = Pattern.compile("\"token\"\\s*:\\s*\"([a-f0-9]{40,})\"");
+            Matcher m = p.matcher(output);
+            String last = null;
+            while (m.find()) last = m.group(1);
+            if (last != null) System.out.println("[TokenExtractor] ✅ Legacy DRF token found in logcat");
+            return last;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     // ── Local cache (strategy 3) ──────────────────────────────────────────────
     // Persists the JWT to ~/.forge/auth_token after every successful capture.
     // Read back on subsequent runs when login is skipped and device storage is
@@ -111,6 +135,16 @@ public class TokenExtractor {
      * Persists the token to the local cache file so future runs can reuse it.
      * Called automatically whenever any strategy successfully returns a token.
      */
+    public static void clearCache() {
+        try {
+            if (Files.deleteIfExists(TOKEN_CACHE_FILE)) {
+                System.out.println("[TokenExtractor] Cleared cached token: " + TOKEN_CACHE_FILE);
+            }
+        } catch (Exception e) {
+            System.out.println("[TokenExtractor] Cache clear failed: " + e.getMessage());
+        }
+    }
+
     public static void saveToCache(String token) {
         if (token == null || token.isBlank()) return;
         try {
