@@ -37,17 +37,28 @@ public class TestRunnerTest {
 
         String platformParam = System.getProperty("platform",
                 context.getCurrentXmlTest().getParameter("platform"));
-        String testsDir = "ios".equalsIgnoreCase(platformParam)
+        String testFileParam0 = System.getProperty("testFile",
+                context.getCurrentXmlTest().getParameter("testFile"));
+
+        // Auto-detect platform from testFile name if not explicitly set
+        if ((platformParam == null || platformParam.isBlank()) && testFileParam0 != null) {
+            if (testFileParam0.toLowerCase().contains("ios") ||
+                    new File("src/test/java/com/popclub/iOSTests/" + testFileParam0).exists()) {
+                platformParam = "ios";
+            }
+        }
+
+        String primaryDir  = "ios".equalsIgnoreCase(platformParam)
                 ? "src/test/java/com/popclub/iOSTests"
                 : "src/test/java/com/popclub/androidTests";
-        File root = new File(testsDir);
+        String fallbackDir = "ios".equalsIgnoreCase(platformParam)
+                ? "src/test/java/com/popclub/androidTests"
+                : "src/test/java/com/popclub/iOSTests";
 
-        // Collect all .yaml files recursively (root + all subfolders)
         List<File> allFiles = new ArrayList<>();
-        collectYamlFiles(root, allFiles);
-
+        collectYamlFiles(new File(primaryDir), allFiles);
         if (allFiles.isEmpty()) {
-            throw new RuntimeException("No YAML files found in androidTests folder (including subfolders)");
+            throw new RuntimeException("No YAML files found in " + primaryDir);
         }
 
         // Wire per-<test> deviceSerial into the ThreadLocal so DeviceManager picks the right device.
@@ -57,10 +68,7 @@ public class TestRunnerTest {
 
         String tagParam      = System.getProperty("tag",
                                 context.getCurrentXmlTest().getParameter("tag"));
-        // -DtestFile=shop_clp_full.yaml on the mvn command line takes priority
-        // over the <parameter name="testFile"> value in testng.xml
-        String testFileParam = System.getProperty("testFile",
-                                context.getCurrentXmlTest().getParameter("testFile"));
+        String testFileParam = testFileParam0;
 
         // Build an ordered name list from the comma-separated testFile param
         List<String> orderedNames = new ArrayList<>();
@@ -76,15 +84,24 @@ public class TestRunnerTest {
             fileIndex.put(file.getName().toLowerCase(), file);
         }
 
+        // Build fallback index from the other platform's test dir
+        Map<String, File> fallbackIndex = new java.util.HashMap<>();
+        List<File> fallbackFiles = new ArrayList<>();
+        collectYamlFiles(new File(fallbackDir), fallbackFiles);
+        for (File file : fallbackFiles) {
+            fallbackIndex.put(file.getName().toLowerCase(), file);
+        }
+
         // Collect in declared order (or natural discovery order if no filter)
         List<File> orderedFiles = new ArrayList<>();
         if (!orderedNames.isEmpty()) {
             for (String name : orderedNames) {
                 File f = fileIndex.get(name);
+                if (f == null) f = fallbackIndex.get(name);
                 if (f != null) {
                     orderedFiles.add(f);
                 } else {
-                    System.out.println("Warning: testFile '" + name + "' not found in androidTests folder");
+                    System.out.println("Warning: testFile '" + name + "' not found in either test directory");
                 }
             }
         } else {
@@ -122,7 +139,10 @@ public class TestRunnerTest {
         }
 
         if (filtered.isEmpty()) {
-            throw new RuntimeException("No tests matched given tags");
+            if (!orderedNames.isEmpty() && orderedFiles.isEmpty()) {
+                throw new RuntimeException("No test files found matching: " + testFileParam0 + " (searched " + primaryDir + " and " + fallbackDir + ")");
+            }
+            throw new RuntimeException("No tests matched filter — testFile=" + testFileParam0 + " tag=" + tagParam);
         }
 
         // Register the total test count for this device so AppiumDriverManager
