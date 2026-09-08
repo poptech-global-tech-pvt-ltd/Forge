@@ -1,0 +1,17 @@
+testName: iOS Hierarchy Dump
+platform: ios
+noReset: true
+loginRequired: false
+
+features:
+  - common
+
+tags:
+  - ios
+  - debug
+
+retry: 1
+
+steps:
+  - action: launchApp
+  - action: dumpHierarchy
