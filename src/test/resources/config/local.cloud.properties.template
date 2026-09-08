@@ -1,0 +1,22 @@
+# Copy this file to local.cloud.properties and fill in your values.
+# local.cloud.properties is gitignored — never commit real credentials or IPs.
+#
+# Setup:
+#   cp src/test/resources/config/local.cloud.properties.template \
+#      src/test/resources/config/local.cloud.properties
+
+cloud.enabled=false
+
+# STF (OpenSTF) device lab — get the URL from your team's STF instance
+stf.base.url=https://<stf-ip>
+stf.auth.email=testdevices@temp.popclub.co
+stf.auth.name=test
+
+# Comma-separated Appium server ports (one per parallel device)
+appium.remote.ports=4723,4725,4727,4729,4731
+
+# Path to your local Node.js binary (used to launch Appium)
+appium.node.path=~/.nvm/versions/node/v20.20.1/bin/node
+
+# Android SDK root — leave blank to fall back to $ANDROID_HOME env var
+android.home=

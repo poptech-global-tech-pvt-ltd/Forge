@@ -1,0 +1,23 @@
+# Copy this file to prod.properties and fill in prod tokens before running against prod.
+# prod.properties is gitignored — never commit real tokens.
+#
+# Setup:
+#   cp src/test/resources/config/prod.properties.template \
+#      src/test/resources/config/prod.properties
+
+ENV=prod
+
+# Base URLs
+APP_BASE_URL=https://app.popclub.co.in
+HASHIRA_BASE_URL=https://hashira.popclub.co.in
+USER_PROFILE_BASE_URL=https://userprofile.popclub.co.in
+PROD_BASE_URL=https://prod.popclub.co.in
+
+# Auth tokens — get prod tokens from the team's internal secrets store
+APP_TOKEN=
+PROD_TOKEN=
+
+# Phone number series for onboarding
+PHONE_PREFIX=+91
+PHONE_BASE=1234560001
+PHONE_MAX=1234569999
