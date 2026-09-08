@@ -38,7 +38,7 @@ function resolveTestRoot(file) {
 }
 const APK_DIR        = path.join(FORGE_ROOT, 'src/main/resources');
 const APP_PACKAGE    = 'com.popclub.android';
-const IOS_UDID       = '00008110-000469E636E8401E';
+const IOS_UDID       = process.env.IOS_UDID || '00008110-000469E636E8401E';
 const WDA_LOCAL_PORT = 8100;
 
 let wdaProc   = null;
@@ -1421,6 +1421,9 @@ function startTest(file, deviceOverride, ws, fromStep, batchRun, existingRunId, 
     `-DdeviceSerial=${device}`,
     '--no-transfer-progress',
   ];
+  if (isIosTest) {
+    args.push(`-DdeviceUdid=${device}`);
+  }
 
   if (startStep) {
     args.push(`-DfromStep=${startStep}`);

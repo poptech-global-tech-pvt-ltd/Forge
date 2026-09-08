@@ -25,6 +25,11 @@ USER_TOKEN=
 # Device serial for CLP verification (run: adb devices)
 DEVICE_SERIAL=
 
+# iOS — real device UDID (run: xcrun xctrace list devices)
+IOS_UDID=
+# Path to signed IPA for install (e.g. /path/to/Pop.ipa)
+IOS_IPA_PATH=
+
 # TestSigma API token — get from https://arcus.testsigma.com/ui/settings/apikeys
 TESTSIGMA_API_TOKEN=
 
