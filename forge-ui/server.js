@@ -479,7 +479,9 @@ app.get('/api/test-steps', (req, res) => {
   const file = req.query.file;
   if (!file) return res.status(400).json({ error: 'file param required' });
 
-  const fullPath = path.join(TESTDATA_ROOT, file);
+  const testRoot = resolveTestRoot(file);
+  const rel      = file.startsWith('ios/') ? file.slice(4) : file;
+  const fullPath = path.join(testRoot, rel);
   try {
     const parsed   = yaml.load(fs.readFileSync(fullPath, 'utf8'));
     const platform = parsed.platform || 'android';
@@ -787,6 +789,85 @@ app.get('/api/inspect', async (req, res) => {
 // POST /api/device-action — perform ADB input actions on the device (async)
 app.post('/api/device-action', async (req, res) => {
   const { type, x, y, x2, y2, text, key, duration, value } = req.body;
+
+  // iOS branch: use WDA HTTP API instead of ADB
+  const iosDevice = getConnectedIosDevice();
+  if (iosDevice) {
+    const wdaBase = `http://127.0.0.1:${WDA_LOCAL_PORT}`;
+    const wdaPost = (path, body) => new Promise((resolve, reject) => {
+      const payload = JSON.stringify(body);
+      const opts = {
+        hostname: '127.0.0.1',
+        port: WDA_LOCAL_PORT,
+        path,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) },
+      };
+      const req2 = http.request(opts, r => {
+        let body = '';
+        r.on('data', chunk => { body += chunk; });
+        r.on('end', () => {
+          if (r.statusCode >= 400) reject(new Error(`WDA ${r.statusCode}: ${body}`));
+          else resolve(body);
+        });
+      });
+      req2.on('error', reject);
+      req2.write(payload);
+      req2.end();
+    });
+
+    try {
+      switch (type) {
+        case 'tap':
+          await wdaPost(`/wda/tap/0`, { x: Math.round(x), y: Math.round(y) });
+          break;
+        case 'swipe':
+          await wdaPost('/wda/dragfromtoforduration', {
+            fromX: Math.round(x), fromY: Math.round(y),
+            toX: Math.round(x2), toY: Math.round(y2),
+            duration: (duration || 300) / 1000,
+          });
+          break;
+        case 'text':
+          await wdaPost('/wda/keys', { value: (text || '').split('') });
+          break;
+        case 'key':
+          if (key === 'home' || key === 'HOME') {
+            await wdaPost('/wda/homescreen', {});
+          }
+          // iOS has no back key — silently skip other key events
+          break;
+        case 'scroll': {
+          const dist = 400;
+          const dy = (y2 || 0) > 0 ? -dist : dist;
+          await wdaPost('/wda/dragfromtoforduration', {
+            fromX: Math.round(x), fromY: Math.round(y),
+            toX: Math.round(x), toY: Math.round(y + dy),
+            duration: 0.4,
+          });
+          break;
+        }
+        case 'back':
+          // No back button on iOS — silently no-op
+          break;
+        case 'hideKeyboard':
+          await wdaPost('/wda/keyboard/dismiss', {});
+          break;
+        case 'longpress':
+          await wdaPost('/wda/touchAndHold', { x: Math.round(x), y: Math.round(y), duration: 0.8 });
+          break;
+        case 'sleep':
+          await new Promise(r => setTimeout(r, parseInt(value) || 1000));
+          break;
+        default:
+          return res.status(400).json({ error: 'Unknown iOS action: ' + type });
+      }
+      return res.json({ ok: true });
+    } catch (e) {
+      return res.status(500).json({ error: 'WDA error: ' + e.message });
+    }
+  }
+
   try {
     switch (type) {
       case 'tap':
