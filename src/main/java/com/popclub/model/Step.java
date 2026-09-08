@@ -1,5 +1,6 @@
 package com.popclub.model;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.popclub.core.Locator;
 import java.util.List;
@@ -7,6 +8,7 @@ import java.util.Map;
 
 public class Step {
     public String action;
+    @JsonAlias("accessibilityId")
     public String locator;      // accessibilityId (qaTestTag) — first priority
     public String element;      // ElementRepository key
     public String text;         // visible text fallback
@@ -18,6 +20,7 @@ public class Step {
     public String direction;    // for scroll/swipe
     public List<Locator> locators;
     public int retry;
+    @JsonAlias("testCaseID")
     public String testCaseId;
 
     public String dataRef;
