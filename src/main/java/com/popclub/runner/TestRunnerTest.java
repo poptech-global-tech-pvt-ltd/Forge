@@ -207,8 +207,11 @@ public class TestRunnerTest {
     public void setUp(@org.testng.annotations.Optional("") String deviceUdid,
                       @org.testng.annotations.Optional("android") String platform) {
         System.setOut(new DeviceAwarePrintStream(System.out));
-        if ("ios".equalsIgnoreCase(platform) && !deviceUdid.isBlank()) {
-            IOSDeviceManager.setFixedUdid(deviceUdid);
+        // -DdeviceUdid on the CLI takes priority over testng.xml parameter
+        String udid = System.getProperty("deviceUdid", deviceUdid);
+        String plat = System.getProperty("platform", platform);
+        if ("ios".equalsIgnoreCase(plat) && !udid.isBlank()) {
+            IOSDeviceManager.setFixedUdid(udid);
         }
     }
 

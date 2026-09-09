@@ -81,10 +81,13 @@ public class IOSDeviceManager {
                     new InputStreamReader(p.getInputStream()))) {
                 String line;
                 while ((line = br.readLine()) != null) {
-                    // Physical device lines end with a UUID in parentheses, e.g.:
-                    // iPhone 14 Pro (16.4) (00008110-000A5C120E82401E)
-                    if (line.matches(".*\\([0-9A-Fa-f-]{36}\\).*") && !line.contains("Simulator")) {
-                        String udid = line.replaceAll(".*\\(([0-9A-Fa-f-]{36})\\).*", "$1").trim();
+                    // Physical device lines end with a UDID in parentheses, e.g.:
+                    //   iPhone (iOS 18.x) (00008110-000469E636E8401E)   ← real device (25 chars)
+                    //   iPhone 15 (AB72BEBD-105E-5E94-8398-F07C93A7B0CE) ← simulator UUID (36 chars)
+                    // Match both formats; exclude Simulator lines.
+                    if (!line.contains("Simulator") &&
+                            line.matches(".*\\([0-9A-Fa-f]{8}-[0-9A-Fa-f-]{8,}\\).*")) {
+                        String udid = line.replaceAll(".*\\(([0-9A-Fa-f]{8}-[0-9A-Fa-f-]{8,})\\).*", "$1").trim();
                         udids.add(udid);
                     }
                 }
