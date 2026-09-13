@@ -36,7 +36,32 @@ public enum Routes {
 
     TESTSIGMA_LOGIN         ("/login"),
     TESTSIGMA_AUTHORIZE     ("/callbacks/authorize/72987"),
-    TESTSIGMA_TOKEN_EXCHANGE("/identity/authorize_callback");
+    TESTSIGMA_TOKEN_EXCHANGE("/identity/authorize_callback"),
+
+    // ── C2C-Svc routes (via Kong) ─────────────────────────────────────────────
+    CSVC_PAYEE_LIST           ("/c2c/api/v1/payee-list"),
+    CSVC_PAYEE_BASIC_INFO     ("/c2c/api/v1/payee/basic-info"),
+    CSVC_PAYEE_VERIFICATION   ("/c2c/api/v1/payee/verification"),
+    CSVC_PAYMENT_SUMMARY      ("/c2c/api/v1/payment/summary"),
+    CSVC_PAYMENT_INTENT       ("/c2c/api/v1/payee/payment-intent"),
+    CSVC_PAYMENT_INTENT_VERIFY("/c2c/api/v1/payment-intent/%s/verify"),
+    CSVC_PAYMENT_INTENT_STATUS("/c2c/api/v1/payment-intent/%s/status"),
+    CSVC_LIMIT_RESERVE        ("/c2c/api/v1/limit/reserve"),
+    CSVC_LIMITS_RELEASE       ("/c2c/api/v1/limits/release"),
+    CSVC_LIMITS_CONSUME       ("/c2c/api/v1/limits/consume"),
+
+    // ── OMS routes (via Kong) ─────────────────────────────────────────────────
+    OMS_ORDERS                ("/order-management/api/v1/marketplace/orders"),
+    OMS_GET_ORDER             ("/order-management/api/v1/marketplace/order/%s"),
+    OMS_ORDER_STATUS          ("/order-management/api/v1/marketplace/order/%s/status"),
+    OMS_ACCEPTANCE_RESPONSE   ("/order-management/api/v1/internal/marketplace/orders/%s/acceptance-response"),
+    OMS_STREAM                ("/order-management/api/v1/marketplace/orders/%s/stream"),
+
+    // ── Onboarding routes (via Kong) ─────────────────────────────────────────
+    ONBOARDING_SEND_OTP       ("/c2c-onboarding/auth/api/v1/send-otp"),
+    ONBOARDING_VERIFY_OTP     ("/c2c-onboarding/auth/api/v1/verify-otp"),
+    ONBOARDING_PAYEE_DETAILS  ("/c2c-onboarding/api/v1/payee"),
+    ONBOARDING_PAYEE_CONSENT  ("/c2c-onboarding/api/v1/payee/consent");
 
     private final String path;
 
@@ -70,5 +95,9 @@ public enum Routes {
 
     public String testSigmaAppUrl() {
         return ApiConstants.TESTSIGMA_APP_BASE_URL + path;
+    }
+
+    public String kongUrl(String... args) {
+        return ApiConstants.KONG_BASE_URL + String.format(path, (Object[]) args);
     }
 }

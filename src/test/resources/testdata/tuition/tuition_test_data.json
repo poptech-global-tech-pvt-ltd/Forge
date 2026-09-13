@@ -1,0 +1,27 @@
+{
+  "tutor": {
+    "mobile": "8318762027",
+    "pan": "ANNPY9033H",
+    "payee_type": "TUTOR",
+    "vpa": "8318762027@ybl"
+  },
+  "payment": {
+    "amount": "1234",
+    "total_payable": "1236.56",
+    "convenience_fee": "3.00",
+    "gst_convenience_fee": "0.54",
+    "card_number": "4111111111111111",
+    "expiry_month": "12",
+    "expiry_year": "2028",
+    "cvv": "123",
+    "card_holder_name": "Test User",
+    "card_type": "DEBIT"
+  },
+  "consent": {
+    "category": "tuition",
+    "payee_action": "confirm",
+    "consent_type_id": "TUITION_TERMS",
+    "consent_version_id": "v1",
+    "action": "granted"
+  }
+}

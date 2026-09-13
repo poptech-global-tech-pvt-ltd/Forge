@@ -29,4 +29,6 @@ public class ConfigManager {
     public static String getXSourceApiKey() { return PROPS.getProperty("x.source.api.key"); }
     public static String getMobileNumber()  { return PROPS.getProperty("mobile.number"); }
     public static String getFakePanMobile() { return PROPS.getProperty("fake.pan.mobile"); }
+    public static String getKongBaseUrl()       { return PROPS.getProperty("kong.base.url"); }
+    public static String getTutorMobileNumber() { return PROPS.getProperty("tutor.mobile.number"); }
 }
