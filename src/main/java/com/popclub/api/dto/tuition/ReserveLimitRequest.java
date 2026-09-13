@@ -7,5 +7,6 @@ import lombok.Data;
 @Data @Builder
 public class ReserveLimitRequest {
     @JsonProperty("payment_intent_id") private String paymentIntentId;
-    private long                                      amount;
+    private String                                    category;
+    @JsonProperty("order_number")      private String orderNumber;
 }

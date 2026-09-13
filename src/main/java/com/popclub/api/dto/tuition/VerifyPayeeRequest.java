@@ -6,5 +6,8 @@ import lombok.Data;
 
 @Data @Builder
 public class VerifyPayeeRequest {
-    @JsonProperty("payee_id") private String payeeId;
+    private String pan;
+    private String mobile;
+    @JsonProperty("payee_type")          private String payeeType;
+    @JsonProperty("payout_reference_id") private String payoutReferenceId;
 }
