@@ -1,0 +1,76 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Card Full Suite">
+    <listeners>
+        <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
+    </listeners>
+    <test name="Login">
+        <classes>
+            <class name="com.popclub.cardApiTests.Card_Onboarding.LoginTest"/>
+        </classes>
+    </test>
+    <test name="OTP Send Negative">
+        <classes>
+            <class name="com.popclub.cardApiTests.Card_Onboarding.OtpSendNegativeTest"/>
+        </classes>
+    </test>
+    <test name="L1 PopConsents Positive">
+        <classes>
+            <class name="com.popclub.cardApiTests.Card_Onboarding.L1_PopConsents_PositiveTest"/>
+        </classes>
+    </test>
+    <test name="L1 PopConsents Negative">
+        <classes>
+            <class name="com.popclub.cardApiTests.Card_Onboarding.L1_PopConsents_NegativeTest"/>
+        </classes>
+    </test>
+    <test name="L2 BasicDetails Positive">
+        <classes>
+            <class name="com.popclub.cardApiTests.Card_Onboarding.L2_BasicDetails_PositiveTest"/>
+        </classes>
+    </test>
+    <test name="L2 BasicDetails Negative">
+        <classes>
+            <class name="com.popclub.cardApiTests.Card_Onboarding.L2_BasicDetails_NegativeTest"/>
+        </classes>
+    </test>
+    <test name="L3 YblConsents Positive">
+        <classes>
+            <class name="com.popclub.cardApiTests.Card_Onboarding.L3_YblConsents_PositiveTest"/>
+        </classes>
+    </test>
+    <test name="L3 YblConsents Negative">
+        <classes>
+            <class name="com.popclub.cardApiTests.Card_Onboarding.L3_YblConsents_NegativeTest"/>
+        </classes>
+    </test>
+    <test name="L4 ResidentialAddress Positive">
+        <classes>
+            <class name="com.popclub.cardApiTests.Card_Onboarding.L4_ResidentialAddress_PositiveTest"/>
+        </classes>
+    </test>
+    <test name="L4 ResidentialAddress Negative">
+        <classes>
+            <class name="com.popclub.cardApiTests.Card_Onboarding.L4_ResidentialAddress_NegativeTest"/>
+        </classes>
+    </test>
+    <test name="L5 PersonalDetails Positive">
+        <classes>
+            <class name="com.popclub.cardApiTests.Card_Onboarding.L5_PersonalDetails_PositiveTest"/>
+        </classes>
+    </test>
+    <test name="L5 PersonalDetails Negative">
+        <classes>
+            <class name="com.popclub.cardApiTests.Card_Onboarding.L5_PersonalDetails_NegativeTest"/>
+        </classes>
+    </test>
+    <test name="L6 ProfessionalDetails Positive">
+        <classes>
+            <class name="com.popclub.cardApiTests.Card_Onboarding.L6_ProfessionalDetails_PositiveTest"/>
+        </classes>
+    </test>
+    <test name="L6 ProfessionalDetails Negative">
+        <classes>
+            <class name="com.popclub.cardApiTests.Card_Onboarding.L6_ProfessionalDetails_NegativeTest"/>
+        </classes>
+    </test>
+</suite>
