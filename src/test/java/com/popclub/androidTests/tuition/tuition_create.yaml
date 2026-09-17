@@ -9,6 +9,7 @@ features:
   - login
   - home
   - shop
+  - tuition
 
 tags:
   - smoke
@@ -16,24 +17,11 @@ tags:
 steps:
   - action: launchApp
 
-  - action: enterText
-    element: login_phone_input
-    value: "9743990458"
-
-  - action: tap
-    element: login_button
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
 
   - action: waitFor
-    element: skip_tour
-    timeout: 120
-
-  - action: tap
-    element: skip_tour
-
-  - action: verifyElement
     element: home_tab
 
   - action: captureToken
-
-
-

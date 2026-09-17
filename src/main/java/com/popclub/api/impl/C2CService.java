@@ -10,7 +10,9 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
-public class CsvcService {
+import java.util.UUID;
+
+public class C2CService {
 
     private String accessToken;
 
@@ -22,9 +24,13 @@ public class CsvcService {
                 .contentType(ContentType.JSON)
                 .filter(new RequestLoggingFilter())
                 .filter(new ResponseLoggingFilter());
+
         if (accessToken != null) {
             spec.header("Authorization", "Bearer " + accessToken);
         }
+
+        spec.header("X-Userid", "ee17b17a8ba7533a93189013508ac3b6");
+
         return spec;
     }
 
@@ -41,19 +47,24 @@ public class CsvcService {
         return buildSpec().body(req).post(Routes.CSVC_PAYEE_BASIC_INFO.getPath());
     }
 
-    public Response verifyPayeeInfo(VerifyPayeeRequest req) {
+    public Response verifyPayee(VerifyPayeeRequestDto req) {
         return buildSpec().body(req).post(Routes.CSVC_PAYEE_VERIFICATION.getPath());
+
     }
 
-    public Response getPaymentSummary(String payeeId, long amount) {
+    public Response getPaymentSummary(String payeeDisplayId, double amount) {
         return buildSpec()
-                .queryParam("payee_id", payeeId)
+                .queryParam("payee_display_id", payeeDisplayId)
                 .queryParam("amount", amount)
                 .get(Routes.CSVC_PAYMENT_SUMMARY.getPath());
     }
 
     public Response generatePaymentIntent(GeneratePaymentIntentRequest req) {
-        return buildSpec().body(req).post(Routes.CSVC_PAYMENT_INTENT.getPath());
+        return buildSpec()
+                .header("request-id", UUID.randomUUID().toString())
+                .header("X-RequestId", UUID.randomUUID().toString())
+                .body(req)
+                .post(Routes.CSVC_PAYMENT_INTENT.getPath());
     }
 
     public Response verifyPaymentIntent(String paymentIntentId, Object body) {

@@ -1,0 +1,69 @@
+# Tuition Fee element keys.
+# ⚠ STUB — key = accessibilityId assumed by naming convention, NOT yet confirmed
+# against a live device hierarchy. Verify each of these with forge_get_hierarchy
+# (or manual Appium inspector) before trusting this file for a real run.
+
+pop_input_field_search_input:
+  android:
+    - type: accessibilityId
+      value: pop_input_field_search_input
+
+pop_input_field_underline_naked_small_input:
+  android:
+    - type: accessibilityId
+      value: pop_input_field_underline_naked_small_input
+
+pop_input_field_underline_naked_large_keypad_input:
+  android:
+    - type: accessibilityId
+      value: pop_input_field_underline_naked_large_keypad_input
+
+tuition_pan_validation_bottom_action_section_button:
+  android:
+    - type: accessibilityId
+      value: tuition_pan_validation_bottom_action_section_button
+
+tuition_summary_review_pay_button:
+  android:
+    - type: accessibilityId
+      value: tuition_summary_review_pay_button
+
+tuition_payment_list_card_number_input:
+  android:
+    - type: accessibilityId
+      value: tuition_payment_list_card_number_input
+
+tuition_payment_list_expiry_input:
+  android:
+    - type: accessibilityId
+      value: tuition_payment_list_expiry_input
+
+tuition_payment_list_cvv_input:
+  android:
+    - type: accessibilityId
+      value: tuition_payment_list_cvv_input
+
+tuition_payment_list_name_input:
+  android:
+    - type: accessibilityId
+      value: tuition_payment_list_name_input
+
+tuition_payment_list_card_pay_button:
+  android:
+    - type: accessibilityId
+      value: tuition_payment_list_card_pay_button
+
+razorpay_submit:
+  android:
+    - type: accessibilityId
+      value: razorpay_submit
+
+tuition_tss_remind_button:
+  android:
+    - type: accessibilityId
+      value: tuition_tss_remind_button
+
+tuition_tss_copy_link_button:
+  android:
+    - type: accessibilityId
+      value: tuition_tss_copy_link_button

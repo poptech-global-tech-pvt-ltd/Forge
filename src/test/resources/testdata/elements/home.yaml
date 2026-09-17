@@ -57,7 +57,7 @@ home_grid_item_0:
 home_grid_item_1:
   android:
     - type: accessibilityId
-      value: home_grid_item_1
+      value: home_grid_item_1  # healed from: home_portrait_carousel_item_1  # healed from: home_grid_item_1
 
 # ─── Home Hero ─────────────────────────────────────────────────────────────────
 home_hero_banner_item_0:

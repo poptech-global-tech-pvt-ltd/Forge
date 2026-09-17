@@ -29,7 +29,9 @@ public class TestContext {
     private static ThreadLocal<Boolean> resumeMode     = ThreadLocal.withInitial(() -> false);
     private static ThreadLocal<File> videoFile = new ThreadLocal<>();
     private static ThreadLocal<String> currentTestCase = new ThreadLocal<>();
-    private static ThreadLocal<String> userToken = new ThreadLocal<>();
+    // Must be shared across TestNG worker threads — the Android login step
+    // and the API test classes run in separate <test> tags/threads.
+    private static String userToken;
     private static ThreadLocal<String> failingElement = new ThreadLocal<>();
 
     public static void setFailingElement(String element) { failingElement.set(element); }
@@ -193,13 +195,13 @@ public class TestContext {
     // ---------------- USER TOKEN (captured after login) ----------------
 
     public static void setUserToken(String token) {
-        userToken.set(token);
+        userToken = token;
         // Auto-extract userId from JWT payload when token is set
         String id = extractUserIdFromJwt(token);
         if (id != null) userId.set(id);
     }
 
-    public static String getUserToken() { return userToken.get(); }
+    public static String getUserToken() { return userToken; }
 
     // ---------------- USER ID (extracted from JWT payload) ----------------
 

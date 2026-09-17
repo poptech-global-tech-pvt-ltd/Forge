@@ -26,7 +26,7 @@ public class TuitionOnboardingTest {
     private String inviteCode;
     private String orderNumber;
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void setup() {
         onboarding = new OnboardingService();
 

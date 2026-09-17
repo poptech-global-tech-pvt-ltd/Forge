@@ -40,6 +40,13 @@
         </classes>
     </test>
 
+    <!-- ── Tuition fee (C2C) payment acceptance — needs -DtuitionInviteUrl / -DtuitionOtp ── -->
+    <test name="Tuition Fee Payment Acceptance Tests">
+        <classes>
+            <class name="com.popclub.webTests.TuitionFeePaymentAcceptanceTest"/>
+        </classes>
+    </test>
+
 <!--    <test name="Error Page Tests">-->
 <!--        <classes>-->
 <!--            <class name="com.popclub.webTests.ErrorPageTest"/>-->

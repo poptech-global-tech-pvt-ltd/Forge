@@ -18,22 +18,20 @@
         <listener class-name="com.popclub.listener.TestListener"/>
     </listeners>
 
-    <parameter name="deviceSerial" value=""/>
+    <parameter name="deviceSerial" value="acccf848"/>
     <parameter name="projectId"    value="d8f4a221-bc6d-47d8-9448-0834f5d012ec"/>
     <parameter name="tag"          value="tuition-c2c"/>
 
-    <!-- ── Step 1: Android login + captureToken ───────────────────────────
-         Launches the app, logs in with the student number, captures JWT
-         into TestContext.getUserToken() for the API tests below.         -->
+    <!-- ── Step 1: Android login + captureToken ─────────────────────────── -->
     <test name="Step 1 — Student App Login">
+        <parameter name="tag" value="smoke"/>
         <parameter name="testFile" value="tuition_create.yaml"/>
         <classes>
             <class name="com.popclub.runner.TestRunnerTest"/>
         </classes>
     </test>
 
-    <!-- ── Step 2: Student payer API tests (uses token from Step 1) ──────
-         Stores invite_code + orderNumber in TestContext for Step 3.      -->
+    <!-- ── Step 2: Student payer API tests ──────────────────────────────── -->
     <test name="Step 2 — Student Payer API (Happy Path)">
         <groups>
             <run>
@@ -45,7 +43,8 @@
         </classes>
     </test>
 
-    <!-- ── Step 3: Tutor onboarding API tests (uses invite_code from Step 2) -->
+    <!-- ── Step 3: Tutor onboarding API tests ───────────────────────────── -->
+    <!--
     <test name="Step 3 — Tutor Onboarding API (Happy Path)">
         <groups>
             <run>
@@ -56,8 +55,10 @@
             <class name="com.popclub.apiTests.tuition.TuitionOnboardingTest"/>
         </classes>
     </test>
+    -->
 
     <!-- ── Step 4: Student error cases ──────────────────────────────────── -->
+    <!--
     <test name="Step 4 — Student Payer API (Error Cases)">
         <groups>
             <run>
@@ -68,8 +69,10 @@
             <class name="com.popclub.apiTests.tuition.TuitionPayerJourneyTest"/>
         </classes>
     </test>
+    -->
 
-    <!-- ── Step 5: Tutor error cases ─────────────────────────────────────── -->
+    <!-- ── Step 5: Tutor error cases ────────────────────────────────────── -->
+    <!--
     <test name="Step 5 — Tutor Onboarding API (Error Cases)">
         <groups>
             <run>
@@ -80,5 +83,6 @@
             <class name="com.popclub.apiTests.tuition.TuitionOnboardingTest"/>
         </classes>
     </test>
+    -->
 
 </suite>

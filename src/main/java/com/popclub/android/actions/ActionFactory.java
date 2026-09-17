@@ -13,6 +13,7 @@ public class ActionFactory {
             case "tap":               return new TapAction();
             case "enterText":         return new EnterTextAction();
             case "launchApp":         return new LaunchAppAction();
+            case "deeplink":          return new DeeplinkAction();
             case "tapIfPresent":      return new TapIfPresentAction();
             case "waitFor":           return new WaitForAction();
             case "waitForGone":       return new WaitForGoneAction();
