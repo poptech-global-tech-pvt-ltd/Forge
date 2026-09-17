@@ -1,0 +1,40 @@
+testName: Shop CLP — Grid Section Items Verification
+platform: android
+noReset: true
+loginRequired: true
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - smoke
+  - clp
+  - shop
+  - grid
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  - action: waitFor
+    element: shop_search_icon
+
+  - action: verifyCLP
+    value: SHOP
+
+  - action: verifyClpSectionItems
+    value: SHOP

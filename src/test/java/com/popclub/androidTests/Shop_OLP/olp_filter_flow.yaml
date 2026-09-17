@@ -1,0 +1,89 @@
+testName: OLP — Order status filter, apply, chip, remove
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-11349
+
+features:
+  - common
+  - login
+  - home
+  - shop
+  - profile
+
+tags:
+  - shop
+  - regression
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: call
+    flow: navigate_to_olp
+
+  # PO-11349: Tap Order status filter pill — opens bottom sheet
+  - action: tap
+    element: olp_filter_dropdown
+    
+  - action: waitFor
+    element: order_list_item_status_0
+    timeout: 5000
+
+  - action: verifyElement
+    element: orders_select_order_filter_bottom_sheet_item1_item_0
+    testCaseId: PO-11349
+
+  # PO-11365: Tap X on filter sheet — closes without applying
+  - action: tap
+    element: skip_tour
+
+  - action: verifyElement
+    element: order_list_item_status_0
+    testCaseId: PO-11365
+
+  # PO-11350: Select Delivered, tap Apply
+  - action: tap
+    element: olp_filter_dropdown
+
+  - action: tap
+    value: orders_select_order_filter_bottom_sheet_item_item_8
+
+  - action: tap
+    value: orders_select_order_filter_bottom_sheet_button
+
+  - action: waitFor
+    element: order_list_item_status_0
+    timeout: 5000
+
+  - action: verifyElement
+    element: order_list_item_status_0
+    testCaseId: PO-11350
+
+  # PO-11351: Active filter chip appears
+  # Need element key: olp_active_filter_chip
+  - action: verifyElement
+    element: skip_tour
+    testCaseId: PO-11351
+
+  # PO-11352: Tap X on chip — removes filter, shows all orders
+  - action: tap
+    element: skip_tour
+
+  - action: waitFor
+    element: order_list_item_status_0
+    timeout: 5000
+
+  - action: verifyElement
+    element: order_list_item_status_0
+    testCaseId: PO-11352

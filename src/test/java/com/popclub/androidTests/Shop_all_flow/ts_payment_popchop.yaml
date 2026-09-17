@@ -1,0 +1,70 @@
+testName: Payment — POPchop selection, check limit, coins combo
+platform: android
+noReset: true
+loginRequired: false
+features:
+  - common
+  - login
+  - home
+  - shop
+  
+tags:
+  - shop
+  - payment
+  
+retry: 0
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: call
+    flow: add_to_cart_and_pay
+    params:
+      search_query: "the souled store"
+      search_pincode: "560102"
+
+  - action: call
+    flow: navigate_to_payment_sheet
+
+  # ── PO-15708: Select POPchop updates cart footer, closes sheet ──
+  # NOTE: Missing element key — need: popchop_payment_option_button
+  # Placeholder — use tapByText if visible text known
+  - action: tapByText
+    value: "POPchop"
+
+  - action: verifyElement
+    element: payment_method_title_text
+    shouldExist: false
+    testCaseId: PO-15708
+
+  # ── PO-15709: POPchop 'Check limit' opens limit details ──
+  # Reopen sheet
+  - action: tap
+    element: cart_payment_method_bottom_sheet_button
+
+  - action: waitFor
+    element: payment_method_title_text
+    timeout: 3000
+
+  # NOTE: Missing element key — need: popchop_check_limit_button
+  # Placeholder — use tapByText
+  - action: tapByText
+    value: "Check limit"
+    testCaseId: PO-15709
+
+  - action: pressKey
+    value: BACK
+
+  # ── PO-15727: POPcoins toggle ON + POPchop = Pay 0 when fully covered ──
+  # NOTE: Missing element keys — need: popcoin_toggle_button, cart_pay_amount_text
+  # Cannot fully automate until element keys added
+  - action: logVar
+    variable: product_title
+    value: "PO-15727 SKIPPED — popcoin_toggle element key not available yet"

@@ -1,0 +1,224 @@
+testName: Shop E2E — Multi-item Cart
+platform: android
+noReset: true
+loginRequired: true
+
+# Flow: Add item A (Souled Store) → Add item B (Yogabar, different search)
+#        → Go to cart → Verify both items present at correct prices
+#        → Verify stepper on each → Proceed to payment
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - shop
+  - cart
+  - e2e
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  # ── Item A: Search → PLP → PDP → Add to Cart ─────────────────────────────
+  - action: call
+    flow: plp_search_and_capture
+    params:
+      search_query:   "the souled store"
+      search_pincode: "560102"
+
+  - action: tap
+    element: product_list_item_${product_index}
+
+  - action: waitFor
+    element: product_details_title
+
+  # Store item A details
+  - action: captureText
+    element: product_details_title
+    variable: item_a_title
+
+  - action: captureText
+    element: product_details_price
+    variable: item_a_price
+
+  - action: logVar
+    variable: item_a_title
+    value: "Item A: ${item_a_title} — ${item_a_price}"
+
+  - action: tap
+    element: product_details_bottom_sticky_bar_button
+
+  - action: waitFor
+    element: size_selection_item_0
+
+  - action: tap
+    element: size_selection_item_0
+
+  - action: tap
+    element: size_selection_add_to_cart_button
+
+  - action: waitFor
+    element: product_details_go_to_cart_button
+
+  # Go back to shop CLP to search for item B
+  - action: pressKey
+    value: BACK
+
+  - action: pressKey
+    value: BACK
+
+  - action: waitFor
+    element: shop_search_button
+
+  # ── Item B: Second search → PDP → Add to Cart ─────────────────────────────
+  - action: call
+    flow: plp_search_and_capture
+    params:
+      search_query:   "yogabar"
+      search_pincode: "560102"
+
+  - action: tap
+    element: product_list_item_${product_index}
+
+  - action: waitFor
+    element: product_details_title
+
+  # Store item B details (overwrite flow vars, save to item_b_*)
+  - action: captureText
+    element: product_details_title
+    variable: item_b_title
+
+  - action: captureText
+    element: product_details_price
+    variable: item_b_price
+
+  - action: logVar
+    variable: item_b_title
+    value: "Item B: ${item_b_title} — ${item_b_price}"
+
+  - action: tap
+    element: product_details_bottom_sticky_bar_button
+
+  - action: waitFor
+    element: size_selection_item_0
+
+  - action: tap
+    element: size_selection_item_0
+
+  - action: tap
+    element: size_selection_add_to_cart_button
+
+  - action: waitFor
+    element: product_details_go_to_cart_button
+
+  - action: tap
+    element: product_details_go_to_cart_button
+
+  # ── Mini-cart bottomsheet ─────────────────────────────────────────────────
+  - action: captureText
+    element: cart_s2_s_payment_button_button
+    variable: cart_bottomsheet_cta
+
+  - action: ifVarEquals
+    variable: cart_bottomsheet_cta
+    value: "Add address"
+    steps:
+      - action: tap
+        element: cart_s2_s_payment_button_button_2
+      - action: call
+        flow: add_address
+        params:
+          addressLine1: "123 MG Road"
+          first_name: "Deepa"
+          last_name: "Hegde"
+          address_mobile_number: "6361463451"
+
+  - action: tap
+    element: cart_s2_s_payment_button_button_2
+
+  - action: waitFor
+    element: cart_item_row_0
+
+  # ── Verify Item A in cart ─────────────────────────────────────────────────
+  - action: findCartItemIndex
+    value: "${item_a_title}"
+    variable: cart_index_a
+
+  - action: scrollTo
+    element: cart_item_row_${cart_index_a}
+
+  - action: assertText
+    element: cart_item_title_${cart_index_a}
+    value: "${item_a_title}"
+
+  - action: assertText
+    element: cart_item_price_${cart_index_a}
+    value: "${item_a_price}"
+
+  - action: verifyElement
+    element: cart_item_increase_button_${cart_index_a}
+    shouldExist: true
+
+  - action: verifyElement
+    element: cart_item_decrease_button_${cart_index_a}
+    shouldExist: true
+
+  - action: logVar
+    variable: item_a_title
+    value: "Item A verified in cart at index ${cart_index_a}: ${item_a_title}"
+
+  # ── Verify Item B in cart ─────────────────────────────────────────────────
+  - action: findCartItemIndex
+    value: "${item_b_title}"
+    variable: cart_index_b
+
+  - action: scrollTo
+    element: cart_item_row_${cart_index_b}
+
+  - action: assertText
+    element: cart_item_title_${cart_index_b}
+    value: "${item_b_title}"
+
+  - action: assertText
+    element: cart_item_price_${cart_index_b}
+    value: "${item_b_price}"
+
+  - action: verifyElement
+    element: cart_item_increase_button_${cart_index_b}
+    shouldExist: true
+
+  - action: verifyElement
+    element: cart_item_decrease_button_${cart_index_b}
+    shouldExist: true
+
+  - action: logVar
+    variable: item_b_title
+    value: "Item B verified in cart at index ${cart_index_b}: ${item_b_title}"
+
+  # ── Summary log ───────────────────────────────────────────────────────────
+  - action: logVar
+    variable: item_a_title
+    value: |
+      ── Multi-item cart summary ──
+      Item A (index ${cart_index_a}) - ${item_a_title} — ${item_a_price}
+      Item B (index ${cart_index_b}) - ${item_b_title} — ${item_b_price}
+
+  # ── Proceed to payment ────────────────────────────────────────────────────
+  - action: tap
+    element: cart_link_and_pay_button
+
+  - action: waitFor
+    element: shop_payment_screen_row

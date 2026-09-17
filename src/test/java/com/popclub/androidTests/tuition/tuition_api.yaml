@@ -1,0 +1,93 @@
+testName: tuition create
+platform: android
+noReset: true
+loginRequired: true
+retry: 1
+
+features:
+  - common
+  - login
+  - home
+  - shop
+  - tuition
+
+tags:
+  - smoke
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: captureToken
+
+  - action: scrollUntilVisible
+    element: clp_section_row_5
+    direction: down
+
+  - action: tap
+    element: home_landscape_slider_item_0
+
+  - action: tap
+    element: home_grid_item_1  # healed locator → home_grid_item_1
+
+  - action: enterText
+    element: pop_input_field_search_input
+    value: "swetaranjan92578@okicici"
+
+  - action: tap
+    element: tuition_search_contact_item
+
+  - action: enterText
+    element: tuition_pan_validation_mobile_input
+    value: "9423148694"
+
+  - action: enterText
+    element: pop_input_field_underline_naked_small_input
+    value: "BABPR2601G"
+
+  - action: tap
+    element: tuition_pan_validation_bottom_action_section_button
+
+  - action: enterText
+    element: tuition_summary_amount_input
+    value: "100"
+
+  - action: tap
+    element: tuition_summary_review_pay_button
+
+  - action: tap
+    element: tuition_summary_review_pay_button
+
+  - action: enterText
+    element: tuition_payment_list_card_number_input
+    value: "4854981703916023"
+
+  - action: enterText
+    element: tuition_payment_list_expiry_input
+    value: "0332"
+
+  - action: enterText
+    element: tuition_payment_list_cvv_input
+    value: "900"
+
+  - action: enterText
+    element: tuition_payment_list_name_input
+    value: "Deepa"
+
+  - action: tap
+    element: tuition_payment_list_card_pay_button
+
+
+
+
+
+
+
+
+

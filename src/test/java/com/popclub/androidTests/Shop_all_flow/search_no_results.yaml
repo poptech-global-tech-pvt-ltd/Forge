@@ -1,0 +1,56 @@
+testName: Search — No products found and No match found states
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-10997
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - regression
+  - shop
+
+retry: 0
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: tap
+    element: common_shop_tab
+
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  # PO-11006: Type nonsense — verify no match in suggestions
+  - action: enterText
+    element: search_products_search_input
+    value: "zzzxxyy99887766"
+
+  - action: tapByText
+    value: "No match found"
+    testCaseId: PO-11006
+
+  # PO-10997: Submit search — verify no products found on PLP
+  - action: pressKey
+    value: search
+
+  - action: waitFor
+    accessibilityId: Empty state
+
+  - action: assertText
+    element: search_no_products_found
+    value: "No products found"
+    testCaseId: PO-10997

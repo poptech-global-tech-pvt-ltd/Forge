@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "forge": {
+      "command": "node",
+      "args": ["/Users/deepa/repos/Forge/forge-mcp/index.js"],
+      "env": {},
+      "cwd": "/Users/deepa/repos/Forge/forge-mcp"
+    }
+  }
+}

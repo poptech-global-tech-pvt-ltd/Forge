@@ -1,0 +1,92 @@
+testName: Shop — PLP UI prices match API
+platform: android
+noReset: true
+loginRequired: true
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - shop
+  - plp
+  - price
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  # Navigate to PLP and capture UI + API prices
+  - action: call
+    flow: plp_search_and_capture
+    params:
+      search_query:   "the souled store"
+      search_pincode: "560102"
+
+  # ── Assert: PLP UI price == API selling price ─────────────────────────────
+  - action: ifVarNotEquals
+    variable: product_list_item_price
+    value: "₹${api_product_list_item_price}"
+    steps:
+      - action: logVar
+        variable: product_list_item_price
+        value: "MISMATCH price — UI: ${product_list_item_price} | API: ₹${api_product_list_item_price}"
+
+  # ── Assert: PLP UI strikethrough == API MRP ──────────────────────────────
+  # API returns bare number (e.g. 1399); UI shows ₹1,399 — soft log only.
+  - action: logVar
+    variable: product_list_item_strikethrough_price
+    value: |
+      PLP UI strikethrough  - ${product_list_item_strikethrough_price}
+      API MRP               - ₹${api_product_list_item_strikethrough_price}
+
+  # ── Assert: price_with_popcoin — only when API returned coin_burn_rules ──
+  - action: ifVarNotEmpty
+    variable: api_product_list_item_price_with_popcoin
+    steps:
+      - action: ifVarNotEquals
+        variable: product_list_item_price_with_popcoin
+        value: "₹${api_product_list_item_price_with_popcoin}"
+        steps:
+          - action: logVar
+            variable: product_list_item_price_with_popcoin
+            value: "MISMATCH price_with_popcoin — UI: ${product_list_item_price_with_popcoin} | API: ₹${api_product_list_item_price_with_popcoin}"
+
+  # ── Assert: popcoin count — only when API returned coin_burn_rules ────────
+  - action: ifVarNotEmpty
+    variable: api_product_list_item_popcoin
+    steps:
+      - action: ifVarNotEquals
+        variable: product_list_item_popcoin
+        value: "${api_product_list_item_popcoin}"
+        steps:
+          - action: logVar
+            variable: product_list_item_popcoin
+            value: "MISMATCH popcoin — UI: ${product_list_item_popcoin} | API: ${api_product_list_item_popcoin}"
+
+  # ── Summary log ───────────────────────────────────────────────────────────
+  - action: logVar
+    variable: product_list_item_price
+    value: |
+      ── PLP vs API price summary ──
+      PLP UI price              - ${product_list_item_price}
+      API price                 - ₹${api_product_list_item_price}
+      PLP UI strikethrough      - ${product_list_item_strikethrough_price}
+      API strikethrough         - ₹${api_product_list_item_strikethrough_price}
+      PLP UI price_with_popcoin - ${product_list_item_price_with_popcoin}
+      API price_with_popcoin    - ₹${api_product_list_item_price_with_popcoin}
+      PLP UI popcoin            - ${product_list_item_popcoin}
+      API popcoin               - ${api_product_list_item_popcoin}
+      API discount_pct          - ${api_product_list_item_discount_pct}

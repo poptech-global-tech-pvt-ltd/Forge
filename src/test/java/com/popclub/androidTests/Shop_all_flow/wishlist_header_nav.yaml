@@ -1,0 +1,64 @@
+testName: Wishlist — Back arrow and Cart icon navigation
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-11481
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - shop
+  - regression
+
+retry: 0
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: tap
+    element: common_shop_tab
+    
+ # ── PLP: navigate, capture API + UI prices ────────────────────────────────
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: enterText
+    element: search_products_search_input
+    value: "the souled store"
+    
+  - action: pressKey
+    value: search
+
+  # Go to wishlist
+  - action: tap
+    element: toolbar_wishlist_button
+
+  # PO-11482: Tap cart icon — navigates to Cart
+  - action: tap
+    element: toolbar_cart_button
+    testCaseId: PO-11482
+
+  - action: pressKey
+    value: BACK
+
+  # PO-11481: Tap back arrow — exits wishlist
+  - action: tap
+    element: Navigation
+    testCaseId: PO-11481
+
+  # Verify we're back on PLP
+  - action: waitFor
+    element: product_list_item_0

@@ -1,0 +1,72 @@
+testName: Shop — API-driven product search (deliverable to 560102)
+platform: android
+noReset: true
+loginRequired: true
+
+testCaseIds:
+  - PO-SHOP-API-SEARCH-001
+
+features:
+  - common
+  - login
+  - shop
+
+tags:
+  - smoke
+  - shop
+  - api_driven
+
+retry: 1
+
+steps:
+  # ── 1. Launch & login ─────────────────────────────────────────────────────────
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  # ── 2. Search API — find first product deliverable to 560102 ──────────────────
+  - action: call
+    flow: search_get_product
+    params:
+      search_query:   "shirt"
+      search_pincode: "560102"
+
+  # ── 3. Navigate to Shop ───────────────────────────────────────────────────────
+  - action: waitFor
+    element: home_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  - action: waitFor
+    element: shop_search_button
+
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  # ── 4. Search using the API-resolved product name ─────────────────────────────
+  - action: enterText
+    element: search_products_search_input
+    value: "${product_title}"
+
+  - action: pressKey
+    value: search
+
+  - action: waitFor
+    element: product_list_item_0
+
+  - action: scanTags
+
+  # ── 5. Open first result ──────────────────────────────────────────────────────
+  - action: tap
+    element: product_list_item_0
+
+  - action: waitFor
+    element: product_details_title
+
+  - action: scanTags

@@ -1,0 +1,132 @@
+testName: Payment — Debit/Credit card entry, validation errors
+platform: android
+noReset: true
+loginRequired: false
+features:
+  - common
+  - login
+  - home
+  - shop
+tags:
+  - shop
+  - payment
+retry: 0
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: call
+    flow: search_product
+    params:
+      search_query: "souled store"
+
+  - action: call
+    flow: navigate_to_payment_sheet
+
+  # Expand full sheet
+  - action: tap
+    element: payment_method_other_options_button
+
+  # ── PO-15717: Cards section expands to show card entry form ──
+  - action: scrollUntilVisible
+    element: shop_payment_shop_cards_section_button
+    direction: down
+    maxScrolls: 3
+
+  - action: tap
+    element: shop_payment_shop_cards_section_button
+
+  - action: verifyElement
+    element: shop_payment_shop_cards_section_input
+    shouldExist: true
+    testCaseId: PO-15717
+
+  # ── PO-15719: Tap Proceed with empty card number shows error ──
+  # shop_payment_shop_cards_section_input   = card number
+  # shop_payment_shop_cards_section_input_1 = expiry
+  # shop_payment_shop_cards_section_input_2 = CVV
+  # shop_payment_shop_cards_section_input_3 = name (if present)
+  - action: tap
+    element: payment_method_pay_button
+
+  # NOTE: Missing element key — need: card_error_text or card_validation_error
+  # Use tapByText as assertion for error message
+  - action: tapByText
+    value: "Enter card number"
+    testCaseId: PO-15719
+
+  # ── PO-15721: Invalid 15-digit card number shows error ──
+  - action: tap
+    element: shop_payment_shop_cards_section_input
+
+  - action: enterText
+    element: shop_payment_shop_cards_section_input
+    value: "411111111111111"
+
+  - action: tap
+    element: shop_payment_shop_cards_section_input_1
+
+  - action: enterText
+    element: shop_payment_shop_cards_section_input_1
+    value: "12/30"
+
+  - action: tap
+    element: shop_payment_shop_cards_section_input_2
+
+  - action: enterText
+    element: shop_payment_shop_cards_section_input_2
+    value: "123"
+
+  - action: tap
+    element: payment_method_pay_button
+
+  # NOTE: Error text element key needed — using tapByText
+  - action: tapByText
+    value: "Invalid card number"
+    testCaseId: PO-15721
+
+  # ── PO-15720: Expired card date shows error ──
+  # Clear previous input
+  - action: tap
+    element: shop_payment_shop_cards_section_input
+
+  - action: enterText
+    element: shop_payment_shop_cards_section_input
+    value: "4111111111111111"
+
+  - action: tap
+    element: shop_payment_shop_cards_section_input_1
+
+  - action: enterText
+    element: shop_payment_shop_cards_section_input_1
+    value: "01/23"
+
+  - action: tap
+    element: payment_method_pay_button
+
+  - action: tapByText
+    value: "Invalid expiry"
+    testCaseId: PO-15720
+
+  # ── PO-15718: Valid card details + Proceed updates footer ──
+  - action: tap
+    element: shop_payment_shop_cards_section_input_1
+
+  - action: enterText
+    element: shop_payment_shop_cards_section_input_1
+    value: "12/30"
+
+  - action: tap
+    element: payment_method_pay_button
+
+  - action: verifyElement
+    element: payment_method_title_text
+    shouldExist: false
+    testCaseId: PO-15718

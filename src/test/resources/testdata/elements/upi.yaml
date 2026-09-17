@@ -1,0 +1,924 @@
+
+# ─── Bank Transfer ─────────────────────────────────────────────────────────────
+bank_transfer_account_number_input:
+  android:
+    - type: accessibilityId
+      value: bank_transfer_account_number_input
+bank_transfer_bank_account_not_found_button:
+  android:
+    - type: accessibilityId
+      value: bank_transfer_bank_account_not_found_button
+bank_transfer_ifsc_input:
+  android:
+    - type: accessibilityId
+      value: bank_transfer_ifsc_input
+bank_transfer_leaving_from_add_payee_button:
+  android:
+    - type: accessibilityId
+      value: bank_transfer_leaving_from_add_payee_button
+bank_transfer_leaving_from_add_payee_button_1:
+  android:
+    - type: accessibilityId
+      value: bank_transfer_leaving_from_add_payee_button_1
+bank_transfer_recents_delete_payee_button:
+  android:
+    - type: accessibilityId
+      value: bank_transfer_recents_delete_payee_button
+bank_transfer_recents_delete_payee_button_1:
+  android:
+    - type: accessibilityId
+      value: bank_transfer_recents_delete_payee_button_1
+bank_transfer_recents_item_0:
+  android:
+    - type: accessibilityId
+      value: bank_transfer_recents_item_0
+bank_transfer_recents_item_1:
+  android:
+    - type: accessibilityId
+      value: bank_transfer_recents_item_1
+bank_transfer_recents_payee_account_unavailable_button:
+  android:
+    - type: accessibilityId
+      value: bank_transfer_recents_payee_account_unavailable_button
+bank_transfer_recents_payee_account_unavailable_button_1:
+  android:
+    - type: accessibilityId
+      value: bank_transfer_recents_payee_account_unavailable_button_1
+bank_transfer_recents_payee_details_bottom_sheet_button:
+  android:
+    - type: accessibilityId
+      value: bank_transfer_recents_payee_details_bottom_sheet_button
+bank_transfer_recents_screen_button:
+  android:
+    - type: accessibilityId
+      value: bank_transfer_recents_screen_button
+bank_transfer_recents_screen_button_1:
+  android:
+    - type: accessibilityId
+      value: bank_transfer_recents_screen_button_1
+bank_transfer_recents_screen_button_2:
+  android:
+    - type: accessibilityId
+      value: bank_transfer_recents_screen_button_2
+bank_transfer_recents_screen_input:
+  android:
+    - type: accessibilityId
+      value: bank_transfer_recents_screen_input
+bank_transfer_recents_screen_row:
+  android:
+    - type: accessibilityId
+      value: bank_transfer_recents_screen_row
+bank_transfer_recents_to_bank_transfer_content_view_button:
+  android:
+    - type: accessibilityId
+      value: bank_transfer_recents_to_bank_transfer_content_view_button
+bank_transfer_save_and_exit_button:
+  android:
+    - type: accessibilityId
+      value: bank_transfer_save_and_exit_button
+bank_transfer_save_and_pay_button:
+  android:
+    - type: accessibilityId
+      value: bank_transfer_save_and_pay_button
+bank_transfer_screen_v2_button:
+  android:
+    - type: accessibilityId
+      value: bank_transfer_screen_v2_button
+bank_transfer_screen_v2_input:
+  android:
+    - type: accessibilityId
+      value: bank_transfer_screen_v2_input
+bank_transfer_screen_v2_input_1:
+  android:
+    - type: accessibilityId
+      value: bank_transfer_screen_v2_input_1
+bank_transfer_verify_button:
+  android:
+    - type: accessibilityId
+      value: bank_transfer_verify_button
+
+# ─── Check Balance ─────────────────────────────────────────────────────────────
+check_balance_account_item_0:
+  android:
+    - type: accessibilityId
+      value: check_balance_account_item_0
+check_balance_account_item_1:
+  android:
+    - type: accessibilityId
+      value: check_balance_account_item_1
+check_balance_add_button:
+  android:
+    - type: accessibilityId
+      value: check_balance_add_button
+check_balance_screen_button:
+  android:
+    - type: accessibilityId
+      value: check_balance_screen_button
+check_balance_screen_row:
+  android:
+    - type: accessibilityId
+      value: check_balance_screen_row
+check_balance_screen_row_1:
+  android:
+    - type: accessibilityId
+      value: check_balance_screen_row_1
+
+# ─── Enter Amount ──────────────────────────────────────────────────────────────
+enter_amount_add_bank_button:
+  android:
+    - type: accessibilityId
+      value: enter_amount_add_bank_button
+enter_amount_back_button:
+  android:
+    - type: accessibilityId
+      value: enter_amount_back_button
+enter_amount_banks_view_row:
+  android:
+    - type: accessibilityId
+      value: enter_amount_banks_view_row
+enter_amount_bottom_section_button:
+  android:
+    - type: accessibilityId
+      value: enter_amount_bottom_section_button
+enter_amount_bottom_section_button_1:
+  android:
+    - type: accessibilityId
+      value: enter_amount_bottom_section_button_1
+enter_amount_cancel_confirm_button:
+  android:
+    - type: accessibilityId
+      value: enter_amount_cancel_confirm_button
+enter_amount_cancel_no_button:
+  android:
+    - type: accessibilityId
+      value: enter_amount_cancel_no_button
+enter_amount_error_message:
+  android:
+    - type: accessibilityId
+      value: enter_amount_error_message
+enter_amount_input:
+  android:
+    - type: accessibilityId
+      value: enter_amount_input
+enter_amount_link_bank_button:
+  android:
+    - type: accessibilityId
+      value: enter_amount_link_bank_button
+enter_amount_notes_input:
+  android:
+    - type: accessibilityId
+      value: enter_amount_notes_input
+enter_amount_pay_button:
+  android:
+    - type: accessibilityId
+      value: enter_amount_pay_button
+enter_amount_payment_method_row_row:
+  android:
+    - type: accessibilityId
+      value: enter_amount_payment_method_row_row
+enter_amount_payment_method_row_row_1:
+  android:
+    - type: accessibilityId
+      value: enter_amount_payment_method_row_row_1
+enter_amount_payment_method_row_row_2:
+  android:
+    - type: accessibilityId
+      value: enter_amount_payment_method_row_row_2
+enter_amount_payment_method_row_row_3:
+  android:
+    - type: accessibilityId
+      value: enter_amount_payment_method_row_row_3
+enter_amount_proceed_button:
+  android:
+    - type: accessibilityId
+      value: enter_amount_proceed_button
+enter_amount_screen_input:
+  android:
+    - type: accessibilityId
+      value: enter_amount_screen_input
+enter_amount_screen_row:
+  android:
+    - type: accessibilityId
+      value: enter_amount_screen_row
+enter_amount_screen_row_1:
+  android:
+    - type: accessibilityId
+      value: enter_amount_screen_row_1
+enter_amount_screen_row_2:
+  android:
+    - type: accessibilityId
+      value: enter_amount_screen_row_2
+enter_amount_screen_row_3:
+  android:
+    - type: accessibilityId
+      value: enter_amount_screen_row_3
+
+# ─── Everything Upi ────────────────────────────────────────────────────────────
+everything_upi_blocked_vpas_button:
+  android:
+    - type: accessibilityId
+      value: everything_upi_blocked_vpas_button
+everything_upi_check_balance_button:
+  android:
+    - type: accessibilityId
+      value: everything_upi_check_balance_button
+everything_upi_check_balance_section_row:
+  android:
+    - type: accessibilityId
+      value: everything_upi_check_balance_section_row
+everything_upi_every_thing_upi_reskin_component_button:
+  android:
+    - type: accessibilityId
+      value: everything_upi_every_thing_upi_reskin_component_button
+everything_upi_every_thing_upi_reskin_component_button_1:
+  android:
+    - type: accessibilityId
+      value: everything_upi_every_thing_upi_reskin_component_button_1
+everything_upi_every_thing_upi_reskin_component_button_2:
+  android:
+    - type: accessibilityId
+      value: everything_upi_every_thing_upi_reskin_component_button_2
+everything_upi_every_thing_upi_reskin_component_row:
+  android:
+    - type: accessibilityId
+      value: everything_upi_every_thing_upi_reskin_component_row
+everything_upi_faqs_button:
+  android:
+    - type: accessibilityId
+      value: everything_upi_faqs_button
+everything_upi_feature_button_row:
+  android:
+    - type: accessibilityId
+      value: everything_upi_feature_button_row
+everything_upi_help_support_button:
+  android:
+    - type: accessibilityId
+      value: everything_upi_help_support_button
+everything_upi_history_button:
+  android:
+    - type: accessibilityId
+      value: everything_upi_history_button
+everything_upi_manage_accounts_button:
+  android:
+    - type: accessibilityId
+      value: everything_upi_manage_accounts_button
+everything_upi_manage_autopay_button:
+  android:
+    - type: accessibilityId
+      value: everything_upi_manage_autopay_button
+everything_upi_my_queries_button:
+  android:
+    - type: accessibilityId
+      value: everything_upi_my_queries_button
+everything_upi_my_upi_id_button:
+  android:
+    - type: accessibilityId
+      value: everything_upi_my_upi_id_button
+everything_upi_pay_friends_button:
+  android:
+    - type: accessibilityId
+      value: everything_upi_pay_friends_button
+everything_upi_pending_requests_button:
+  android:
+    - type: accessibilityId
+      value: everything_upi_pending_requests_button
+everything_upi_rupay_cards_button:
+  android:
+    - type: accessibilityId
+      value: everything_upi_rupay_cards_button
+everything_upi_scan_and_pay_button:
+  android:
+    - type: accessibilityId
+      value: everything_upi_scan_and_pay_button
+everything_upi_to_bank_button:
+  android:
+    - type: accessibilityId
+      value: everything_upi_to_bank_button
+everything_upi_upi_id_text:
+  android:
+    - type: accessibilityId
+      value: everything_upi_upi_id_text
+everything_upi_upi_lite_button:
+  android:
+    - type: accessibilityId
+      value: everything_upi_upi_lite_button
+everything_upi_upi_number_button:
+  android:
+    - type: accessibilityId
+      value: everything_upi_upi_number_button
+
+# ─── Link Bank ─────────────────────────────────────────────────────────────────
+link_bank_proceed_button:
+  android:
+    - type: accessibilityId
+      value: link_bank_proceed_button
+link_bank_title_text:
+  android:
+    - type: accessibilityId
+      value: link_bank_title_text
+
+# ─── Mandate Details ───────────────────────────────────────────────────────────
+mandate_details_action_card_row:
+  android:
+    - type: accessibilityId
+      value: mandate_details_action_card_row
+mandate_details_cancel_button:
+  android:
+    - type: accessibilityId
+      value: mandate_details_cancel_button
+mandate_details_payment_history_button:
+  android:
+    - type: accessibilityId
+      value: mandate_details_payment_history_button
+mandate_details_resume_button:
+  android:
+    - type: accessibilityId
+      value: mandate_details_resume_button
+mandate_details_screen_button:
+  android:
+    - type: accessibilityId
+      value: mandate_details_screen_button
+mandate_details_screen_button_1:
+  android:
+    - type: accessibilityId
+      value: mandate_details_screen_button_1
+mandate_details_screen_button_2:
+  android:
+    - type: accessibilityId
+      value: mandate_details_screen_button_2
+mandate_details_screen_button_3:
+  android:
+    - type: accessibilityId
+      value: mandate_details_screen_button_3
+mandate_details_screen_button_4:
+  android:
+    - type: accessibilityId
+      value: mandate_details_screen_button_4
+mandate_details_screen_button_5:
+  android:
+    - type: accessibilityId
+      value: mandate_details_screen_button_5
+mandate_details_screen_button_6:
+  android:
+    - type: accessibilityId
+      value: mandate_details_screen_button_6
+mandate_details_screen_row:
+  android:
+    - type: accessibilityId
+      value: mandate_details_screen_row
+mandate_details_status_text:
+  android:
+    - type: accessibilityId
+      value: mandate_details_status_text
+
+# ─── Mandate Failure ───────────────────────────────────────────────────────────
+mandate_failure_payee_amount_text:
+  android:
+    - type: accessibilityId
+      value: mandate_failure_payee_amount_text
+mandate_failure_status_text:
+  android:
+    - type: accessibilityId
+      value: mandate_failure_status_text
+
+# ─── Mandate Payments ──────────────────────────────────────────────────────────
+mandate_payments_item_0:
+  android:
+    - type: accessibilityId
+      value: mandate_payments_item_0
+mandate_payments_item_1:
+  android:
+    - type: accessibilityId
+      value: mandate_payments_item_1
+
+# ─── Mandate Success ───────────────────────────────────────────────────────────
+mandate_success_payee_amount_text:
+  android:
+    - type: accessibilityId
+      value: mandate_success_payee_amount_text
+mandate_success_status_text:
+  android:
+    - type: accessibilityId
+      value: mandate_success_status_text
+
+# ─── Payment Success ───────────────────────────────────────────────────────────
+payment_success_amount_text:
+  android:
+    - type: accessibilityId
+      value: payment_success_amount_text
+payment_success_payee_name_text:
+  android:
+    - type: accessibilityId
+      value: payment_success_payee_name_text
+payment_success_status_text:
+  android:
+    - type: accessibilityId
+      value: payment_success_status_text
+
+# ─── Self Transfer ─────────────────────────────────────────────────────────────
+self_transfer_account_item_0:
+  android:
+    - type: accessibilityId
+      value: self_transfer_account_item_0
+self_transfer_account_item_1:
+  android:
+    - type: accessibilityId
+      value: self_transfer_account_item_1
+self_transfer_add_account_button:
+  android:
+    - type: accessibilityId
+      value: self_transfer_add_account_button
+self_transfer_screen_button:
+  android:
+    - type: accessibilityId
+      value: self_transfer_screen_button
+self_transfer_screen_item_item_0:
+  android:
+    - type: accessibilityId
+      value: self_transfer_screen_item_item_0
+self_transfer_screen_item_item_1:
+  android:
+    - type: accessibilityId
+      value: self_transfer_screen_item_item_1
+self_transfer_screen_v2_button:
+  android:
+    - type: accessibilityId
+      value: self_transfer_screen_v2_button
+self_transfer_screen_v2_button_1:
+  android:
+    - type: accessibilityId
+      value: self_transfer_screen_v2_button_1
+self_transfer_screen_v2_radio:
+  android:
+    - type: accessibilityId
+      value: self_transfer_screen_v2_radio
+self_transfer_screen_v2_radio_1:
+  android:
+    - type: accessibilityId
+      value: self_transfer_screen_v2_radio_1
+self_transfer_v2_add_account_button:
+  android:
+    - type: accessibilityId
+      value: self_transfer_v2_add_account_button
+self_transfer_v2_from_account_item_0:
+  android:
+    - type: accessibilityId
+      value: self_transfer_v2_from_account_item_0
+self_transfer_v2_from_account_item_1:
+  android:
+    - type: accessibilityId
+      value: self_transfer_v2_from_account_item_1
+self_transfer_v2_to_account_item_0:
+  android:
+    - type: accessibilityId
+      value: self_transfer_v2_to_account_item_0
+self_transfer_v2_to_account_item_1:
+  android:
+    - type: accessibilityId
+      value: self_transfer_v2_to_account_item_1
+
+# ─── Send Money ────────────────────────────────────────────────────────────────
+send_money_add_fave_button:
+  android:
+    - type: accessibilityId
+      value: send_money_add_fave_button
+send_money_contact_item_0:
+  android:
+    - type: accessibilityId
+      value: send_money_contact_item_0
+send_money_contact_item_1:
+  android:
+    - type: accessibilityId
+      value: send_money_contact_item_1
+send_money_contact_item_row:
+  android:
+    - type: accessibilityId
+      value: send_money_contact_item_row
+send_money_contacts_header:
+  android:
+    - type: accessibilityId
+      value: send_money_contacts_header
+send_money_content_row:
+  android:
+    - type: accessibilityId
+      value: send_money_content_row
+send_money_edit_fave_button:
+  android:
+    - type: accessibilityId
+      value: send_money_edit_fave_button
+send_money_error_primary_button:
+  android:
+    - type: accessibilityId
+      value: send_money_error_primary_button
+send_money_error_secondary_button:
+  android:
+    - type: accessibilityId
+      value: send_money_error_secondary_button
+send_money_filtered_contact_item_0:
+  android:
+    - type: accessibilityId
+      value: send_money_filtered_contact_item_0
+send_money_filtered_contact_item_1:
+  android:
+    - type: accessibilityId
+      value: send_money_filtered_contact_item_1
+send_money_filtered_contact_pay_button_0:
+  android:
+    - type: accessibilityId
+      value: send_money_filtered_contact_pay_button_0
+send_money_filtered_contact_pay_button_1:
+  android:
+    - type: accessibilityId
+      value: send_money_filtered_contact_pay_button_1
+send_money_search_input:
+  android:
+    - type: accessibilityId
+      value: send_money_search_input
+send_money_search_result_header:
+  android:
+    - type: accessibilityId
+      value: send_money_search_result_header
+send_money_vpa_verified_pay_button:
+  android:
+    - type: accessibilityId
+      value: send_money_vpa_verified_pay_button
+
+# ─── Tss Amount ────────────────────────────────────────────────────────────────
+tss_amount_text:
+  android:
+    - type: accessibilityId
+      value: tss_amount_text
+
+# ─── Tss Close ─────────────────────────────────────────────────────────────────
+tss_close_button:
+  android:
+    - type: accessibilityId
+      value: tss_close_button
+
+# ─── Tss Coins ─────────────────────────────────────────────────────────────────
+tss_coins_earned_text:
+  android:
+    - type: accessibilityId
+      value: tss_coins_earned_text
+
+# ─── Tss Copy ──────────────────────────────────────────────────────────────────
+tss_copy_pop_txn_id_button:
+  android:
+    - type: accessibilityId
+      value: tss_copy_pop_txn_id_button
+tss_copy_upi_txn_id_button:
+  android:
+    - type: accessibilityId
+      value: tss_copy_upi_txn_id_button
+
+# ─── Tss Done ──────────────────────────────────────────────────────────────────
+tss_done_btn:
+  android:
+    - type: accessibilityId
+      value: tss_done_btn
+
+# ─── Tss Faq ───────────────────────────────────────────────────────────────────
+tss_faq_btn:
+  android:
+    - type: accessibilityId
+      value: tss_faq_btn
+
+# ─── Tss Go ────────────────────────────────────────────────────────────────────
+tss_go_back_btn:
+  android:
+    - type: accessibilityId
+      value: tss_go_back_btn
+
+# ─── Tss Pay ───────────────────────────────────────────────────────────────────
+tss_pay_other_bills_btn:
+  android:
+    - type: accessibilityId
+      value: tss_pay_other_bills_btn
+
+# ─── Tss Payee ─────────────────────────────────────────────────────────────────
+tss_payee_name_text:
+  android:
+    - type: accessibilityId
+      value: tss_payee_name_text
+
+# ─── Tss Raise ─────────────────────────────────────────────────────────────────
+tss_raise_complaint_btn:
+  android:
+    - type: accessibilityId
+      value: tss_raise_complaint_btn
+
+# ─── Tss Retry ─────────────────────────────────────────────────────────────────
+tss_retry_btn:
+  android:
+    - type: accessibilityId
+      value: tss_retry_btn
+
+# ─── Tss Share ─────────────────────────────────────────────────────────────────
+tss_share_btn:
+  android:
+    - type: accessibilityId
+      value: tss_share_btn
+
+# ─── Tss Status ────────────────────────────────────────────────────────────────
+tss_status_text:
+  android:
+    - type: accessibilityId
+      value: tss_status_text
+
+# ─── Tss Support ───────────────────────────────────────────────────────────────
+tss_support_btn:
+  android:
+    - type: accessibilityId
+      value: tss_support_btn
+
+# ─── Tss Timestamp ─────────────────────────────────────────────────────────────
+tss_timestamp_text:
+  android:
+    - type: accessibilityId
+      value: tss_timestamp_text
+
+# ─── Tss Transaction ───────────────────────────────────────────────────────────
+tss_transaction_table_toggle:
+  android:
+    - type: accessibilityId
+      value: tss_transaction_table_toggle
+
+# ─── Txn Detail ────────────────────────────────────────────────────────────────
+txn_detail_amount_text:
+  android:
+    - type: accessibilityId
+      value: txn_detail_amount_text
+txn_detail_copy_pop_txn_id_btn:
+  android:
+    - type: accessibilityId
+      value: txn_detail_copy_pop_txn_id_btn
+txn_detail_copy_upi_id_btn:
+  android:
+    - type: accessibilityId
+      value: txn_detail_copy_upi_id_btn
+txn_detail_copy_upi_txn_id_btn:
+  android:
+    - type: accessibilityId
+      value: txn_detail_copy_upi_txn_id_btn
+txn_detail_pay_again_btn:
+  android:
+    - type: accessibilityId
+      value: txn_detail_pay_again_btn
+txn_detail_share_screenshot_btn:
+  android:
+    - type: accessibilityId
+      value: txn_detail_share_screenshot_btn
+txn_detail_status_text:
+  android:
+    - type: accessibilityId
+      value: txn_detail_status_text
+
+# ─── Txn History ───────────────────────────────────────────────────────────────
+txn_history_amount_text_0:
+  android:
+    - type: accessibilityId
+      value: txn_history_amount_text_0
+txn_history_amount_text_1:
+  android:
+    - type: accessibilityId
+      value: txn_history_amount_text_1
+txn_history_empty_title_text:
+  android:
+    - type: accessibilityId
+      value: txn_history_empty_title_text
+txn_history_item_0:
+  android:
+    - type: accessibilityId
+      value: txn_history_item_0
+txn_history_item_1:
+  android:
+    - type: accessibilityId
+      value: txn_history_item_1
+txn_history_status_text_0:
+  android:
+    - type: accessibilityId
+      value: txn_history_status_text_0
+txn_history_status_text_1:
+  android:
+    - type: accessibilityId
+      value: txn_history_status_text_1
+
+# ─── Txn Success ───────────────────────────────────────────────────────────────
+txn_success_amount_text:
+  android:
+    - type: accessibilityId
+      value: txn_success_amount_text
+txn_success_copy_pop_txn_id_button:
+  android:
+    - type: accessibilityId
+      value: txn_success_copy_pop_txn_id_button
+txn_success_copy_upi_txn_id_button:
+  android:
+    - type: accessibilityId
+      value: txn_success_copy_upi_txn_id_button
+txn_success_status_text:
+  android:
+    - type: accessibilityId
+      value: txn_success_status_text
+
+# ─── Upi Actions ───────────────────────────────────────────────────────────────
+upi_actions_card_upi_action_item_row:
+  android:
+    - type: accessibilityId
+      value: upi_actions_card_upi_action_item_row
+
+# ─── Upi Error ─────────────────────────────────────────────────────────────────
+upi_error_primary_button:
+  android:
+    - type: accessibilityId
+      value: upi_error_primary_button
+upi_error_secondary_button:
+  android:
+    - type: accessibilityId
+      value: upi_error_secondary_button
+upi_error_title_text:
+  android:
+    - type: accessibilityId
+      value: upi_error_title_text
+
+# ─── Upi Lite ──────────────────────────────────────────────────────────────────
+upi_lite_add_money_button:
+  android:
+    - type: accessibilityId
+      value: upi_lite_add_money_button
+upi_lite_balance_text:
+  android:
+    - type: accessibilityId
+      value: upi_lite_balance_text
+upi_lite_bank_selection_item_0:
+  android:
+    - type: accessibilityId
+      value: upi_lite_bank_selection_item_0
+upi_lite_bank_selection_item_1:
+  android:
+    - type: accessibilityId
+      value: upi_lite_bank_selection_item_1
+upi_lite_bank_selection_radio_0:
+  android:
+    - type: accessibilityId
+      value: upi_lite_bank_selection_radio_0
+upi_lite_bank_selection_radio_1:
+  android:
+    - type: accessibilityId
+      value: upi_lite_bank_selection_radio_1
+upi_lite_bank_selector_row:
+  android:
+    - type: accessibilityId
+      value: upi_lite_bank_selector_row
+upi_lite_check_balance_row:
+  android:
+    - type: accessibilityId
+      value: upi_lite_check_balance_row
+upi_lite_delete_menu_item:
+  android:
+    - type: accessibilityId
+      value: upi_lite_delete_menu_item
+upi_lite_faq_menu_item:
+  android:
+    - type: accessibilityId
+      value: upi_lite_faq_menu_item
+upi_lite_help_menu_item:
+  android:
+    - type: accessibilityId
+      value: upi_lite_help_menu_item
+upi_lite_okay_button:
+  android:
+    - type: accessibilityId
+      value: upi_lite_okay_button
+upi_lite_screen_radio:
+  android:
+    - type: accessibilityId
+      value: upi_lite_screen_radio
+upi_lite_screen_row:
+  android:
+    - type: accessibilityId
+      value: upi_lite_screen_row
+upi_lite_topup_button:
+  android:
+    - type: accessibilityId
+      value: upi_lite_topup_button
+upi_lite_withdraw_amount_button:
+  android:
+    - type: accessibilityId
+      value: upi_lite_withdraw_amount_button
+upi_lite_withdraw_amount_input:
+  android:
+    - type: accessibilityId
+      value: upi_lite_withdraw_amount_input
+upi_lite_withdraw_button:
+  android:
+    - type: accessibilityId
+      value: upi_lite_withdraw_button
+upi_lite_withdraw_cancel_button:
+  android:
+    - type: accessibilityId
+      value: upi_lite_withdraw_cancel_button
+upi_lite_withdraw_confirm_button:
+  android:
+    - type: accessibilityId
+      value: upi_lite_withdraw_confirm_button
+upi_lite_withdraw_failure_cancel_button:
+  android:
+    - type: accessibilityId
+      value: upi_lite_withdraw_failure_cancel_button
+upi_lite_withdraw_failure_try_again_button:
+  android:
+    - type: accessibilityId
+      value: upi_lite_withdraw_failure_try_again_button
+upi_lite_withdraw_success_got_it_button:
+  android:
+    - type: accessibilityId
+      value: upi_lite_withdraw_success_got_it_button
+
+# ─── Upi Number ────────────────────────────────────────────────────────────────
+upi_number_create_button:
+  android:
+    - type: accessibilityId
+      value: upi_number_create_button
+upi_number_create_custom_button:
+  android:
+    - type: accessibilityId
+      value: upi_number_create_custom_button
+upi_number_delete_upi_number_content_v2_button:
+  android:
+    - type: accessibilityId
+      value: upi_number_delete_upi_number_content_v2_button
+upi_number_delete_upi_number_content_v2_button_1:
+  android:
+    - type: accessibilityId
+      value: upi_number_delete_upi_number_content_v2_button_1
+upi_number_disable_upi_number_content_v2_button:
+  android:
+    - type: accessibilityId
+      value: upi_number_disable_upi_number_content_v2_button
+upi_number_disable_upi_number_content_v2_button_1:
+  android:
+    - type: accessibilityId
+      value: upi_number_disable_upi_number_content_v2_button_1
+upi_number_item_0:
+  android:
+    - type: accessibilityId
+      value: upi_number_item_0
+upi_number_item_1:
+  android:
+    - type: accessibilityId
+      value: upi_number_item_1
+upi_number_list_item_button:
+  android:
+    - type: accessibilityId
+      value: upi_number_list_item_button
+upi_number_list_item_row:
+  android:
+    - type: accessibilityId
+      value: upi_number_list_item_row
+upi_number_list_item_row_1:
+  android:
+    - type: accessibilityId
+      value: upi_number_list_item_row_1
+upi_number_proceed_button:
+  android:
+    - type: accessibilityId
+      value: upi_number_proceed_button
+upi_number_row_copy_button:
+  android:
+    - type: accessibilityId
+      value: upi_number_row_copy_button
+upi_number_row_create_upi_number_button:
+  android:
+    - type: accessibilityId
+      value: upi_number_row_create_upi_number_button
+upi_number_row_create_upi_number_input:
+  android:
+    - type: accessibilityId
+      value: upi_number_row_create_upi_number_input
+upi_number_row_enable_button:
+  android:
+    - type: accessibilityId
+      value: upi_number_row_enable_button
+upi_number_row_item:
+  android:
+    - type: accessibilityId
+      value: upi_number_row_item
+upi_number_row_options_button:
+  android:
+    - type: accessibilityId
+      value: upi_number_row_options_button
+upi_number_row_upi_action_row_row:
+  android:
+    - type: accessibilityId
+      value: upi_number_row_upi_action_row_row
+upi_number_set_now_button:
+  android:
+    - type: accessibilityId
+      value: upi_number_set_now_button
+
+# ─── Upi Welcome ───────────────────────────────────────────────────────────────
+upi_welcome_tap_to_scan_button:
+  android:
+    - type: accessibilityId
+      value: upi_welcome_tap_to_scan_button

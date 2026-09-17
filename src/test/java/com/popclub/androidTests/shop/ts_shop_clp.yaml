@@ -1,0 +1,80 @@
+testName: Shop — CLP Sections, Prices & Navigation (E2E)
+platform: android
+noReset: true
+loginRequired: true
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - smoke
+  - clp
+  - shop
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  - action: waitFor
+    element: shop_search_icon
+
+  # Fetch CLP API, assert every section title is rendered on screen
+  - action: verifyCLP
+    value: SHOP
+
+  # Assert page is fully loaded — no shimmer/spinner, no empty sections
+  - action: verifyCLPFullyLoaded
+    value: SHOP
+
+  # Assert section order on screen matches API order
+  - action: verifyCLPOrder
+    value: SHOP
+
+  # Assert prices, discounts and POPcoin badges match API data
+  - action: verifyCLPPrices
+    value: SHOP
+
+  # Tap first item in the first section → verify PDP opens → back
+  - action: tapClpItem
+    value: SHOP
+    text: "0"
+
+  - action: waitFor
+    element: product_details_title
+
+  - action: pressKey
+    value: back
+
+  - action: waitFor
+    element: shop_search_icon
+
+  # Tap "See All" / "View All" → verify listing page opens → back
+  - action: verifyCLPSeeAll
+    value: SHOP
+
+  # Tap each banner CTA → verify destination page opens → back
+  - action: verifyCLPBanners
+    value: SHOP
+
+  # Swipe carousels to reveal more items
+  - action: verifyCLPCarouselSwipe
+    value: SHOP
+    text: "2"
+
+  # Verify in-page filters (Men/Women) and deep-link filter chips
+  - action: verifyCLPFilters
+    value: SHOP

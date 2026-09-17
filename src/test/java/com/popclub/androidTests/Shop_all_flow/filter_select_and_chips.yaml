@@ -1,0 +1,96 @@
+testName: Filters — Select filter, select all, verify chips, remove chip
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-11017
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - shop
+  - regression
+
+retry: 0
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: tap
+    element: common_shop_tab
+
+  # ── PLP: navigate, capture API + UI prices ────────────────────────────────
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: enterText
+    element: search_products_search_input
+    value: "the souled store"
+    
+  - action: pressKey
+    value: search
+
+  # Capture PLP price before filter
+  - action: captureText
+    element: product_list_item_price_0
+    variable: plp_price_before_filter
+
+  # Open filter sheet
+  - action: tap
+    element: product_list_filter_button
+
+  # PO-11017: Select a filter option (first sub-item)
+  - action: tap
+    element: product_filter_category_item_0
+
+  - action: tap
+    element: product_filter_sub_item_0
+
+  - action: verifyElement
+    element: product_filter_sub_item_0
+
+  # PO-11018: Tap select all
+  - action: tap
+    element: product_filter_select_all_checkbox
+
+  - action: verifyElement
+    element: product_filter_select_all_checkbox
+    testCaseId: PO-11018
+
+  # PO-11019: Apply filters and verify products loaded
+  - action: tap
+    element: product_filter_apply_button
+
+  - action: waitFor
+    element: product_list_item_0
+
+  - action: verifyElement
+    element: product_list_item_0
+    testCaseId: PO-11019
+
+  # PO-11020: Reopen filter and reset to remove filters
+  - action: tap
+    element: product_list_filter_button
+
+  - action: tap
+    element: product_filter_reset_button
+
+  - action: waitFor
+    element: product_list_item_0
+
+  - action: assertText
+    element: product_list_item_price_0
+    value: "${plp_price_before_filter}"
+    testCaseId: PO-11020

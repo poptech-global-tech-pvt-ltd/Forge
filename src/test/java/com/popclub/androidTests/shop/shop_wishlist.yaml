@@ -1,0 +1,82 @@
+testName: Shop — Add Item to Wishlist and Verify in Wishlist
+platform: android
+noReset: true
+loginRequired: true
+
+testCaseIds:
+  - PO-SHOP-WISHLIST
+
+features:
+  - home
+  - login
+  - shop
+
+tags:
+  - smoke
+  - shop
+  - search
+  - wishlist
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: tapIfPresent
+    element: skip_tour
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: tap
+    element: shop_tab
+
+  - action: waitFor
+    element: shop_search_icon
+
+  - action: tap
+    element: shop_search_icon
+
+  - action: enterText
+    element: search_input
+    value: yogabar
+
+  - action: pressKey
+    value: ENTER
+
+  - action: waitFor
+    element: product_list_filter_button
+
+  - action: tap
+    element: product_list_item_0
+
+  - action: waitFor
+    element: product_details_title
+
+  # Capture the title so we can verify it appears in the wishlist later
+  - action: captureText
+    element: product_details_title
+    value: wishlisted_title
+
+  - action: tap
+    element: product_details_wishlist_button
+
+  - action: pressKey
+    value: BACK
+
+  - action: waitFor
+    element: product_list_filter_button
+
+  # qaTestTag in popdroid: "wishlsit" (typo is intentional — matches app code)
+  - action: tap
+    element: wishlist_icon
+
+  - action: waitFor
+    element: wishlist_item_card_compose_row
+
+  - action: assertStoredText
+    value: wishlisted_title

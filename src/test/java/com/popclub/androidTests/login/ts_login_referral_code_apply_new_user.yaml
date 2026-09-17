@@ -1,0 +1,46 @@
+testName: Login - Referral Code Apply (New User)
+platform: android
+noReset: false
+loginRequired: false
+
+features:
+  - login
+
+tags:
+  - smoke
+  - regression
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: waitFor
+    element: login_phone_input
+
+  - action: enterText
+    element: login_phone_input
+    value: "9538351687"
+
+  - action: tap
+    element: login_referral_code_row
+
+  - action: waitFor
+    element: login_referral_input
+
+  - action: enterText
+    element: login_referral_input
+    value: "CC94LOA95I"
+
+  - action: tap
+    element: login_referral_apply_button
+
+  - action: tap
+    element: login_continue_button
+
+  - action: waitFor
+    element: referral_cta_button
+    timeout: 120
+
+  - action: verifyElement
+    element: referral_cta_button

@@ -1,0 +1,192 @@
+testName: Shop E2E — Similar Products navigation and buy
+platform: android
+noReset: true
+loginRequired: true
+
+# Flow: Search → PDP → Scroll to Similar Products section
+#        → Tap first similar product → Verify new PDP loaded
+#        → Add similar product to Cart → Proceed to payment
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - shop
+  - pdp
+  - similar_products
+  - e2e
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  # ── Navigate to PLP and pick product ──────────────────────────────────────
+  - action: call
+    flow: plp_search_and_capture
+    params:
+      search_query:   "the souled store"
+      search_pincode: "560102"
+
+  - action: tap
+    element: product_list_item_${product_index}
+
+  - action: waitFor
+    element: product_details_title
+
+  - action: captureText
+    element: product_details_title
+    variable: original_product_title
+
+  - action: logVar
+    variable: original_product_title
+    value: "Original product: ${original_product_title}"
+
+  # ── Scroll to Similar Products section ────────────────────────────────────
+  - action: scrollTo
+    element: product_details_similar_products_section_row
+
+  - action: verifyElement
+    element: product_details_similar_products_section_row
+    shouldExist: true
+
+  - action: verifyElement
+    element: similar_product_item_0
+    shouldExist: true
+
+  # ── Capture first similar product details ─────────────────────────────────
+  - action: captureText
+    element: similar_product_item_title_0
+    variable: similar_product_title
+
+  - action: captureText
+    element: similar_product_item_price_0
+    variable: similar_product_price
+
+  - action: logVar
+    variable: similar_product_title
+    value: |
+      ── Similar product ──
+      title - ${similar_product_title}
+      price - ${similar_product_price}
+
+  # ── Tap first similar product ─────────────────────────────────────────────
+  - action: tap
+    element: similar_product_item_0
+
+  - action: waitFor
+    element: product_details_title
+
+  # ── Verify new PDP loaded (different from original) ───────────────────────
+  - action: captureText
+    element: product_details_title
+    variable: similar_pdp_title
+
+  - action: captureText
+    element: product_details_price
+    variable: similar_pdp_price
+
+  - action: captureText
+    element: product_details_strikethrough_price
+    variable: similar_pdp_strikethrough
+
+  - action: logVar
+    variable: similar_pdp_title
+    value: |
+      ── Similar PDP loaded ──
+      title        - ${similar_pdp_title}
+      price        - ${similar_pdp_price}
+      strikethrough- ${similar_pdp_strikethrough}
+      original     - ${original_product_title}
+
+  # Price on similar PDP should match what was shown in the similar card
+  - action: ifVarNotEquals
+    variable: similar_pdp_price
+    value: "${similar_product_price}"
+    steps:
+      - action: logVar
+        variable: similar_product_price
+        value: "MISMATCH similar card vs PDP price — card: ${similar_product_price} | PDP: ${similar_pdp_price}"
+
+  - action: verifyElement
+    element: product_details_bottom_sticky_bar_button
+    shouldExist: true
+
+  # ── Add similar product to Cart ───────────────────────────────────────────
+  - action: tap
+    element: product_details_bottom_sticky_bar_button
+
+  - action: waitFor
+    element: size_selection_item_0
+
+  - action: tap
+    element: size_selection_item_0
+
+  - action: tap
+    element: size_selection_add_to_cart_button
+
+  - action: waitFor
+    element: product_details_go_to_cart_button
+
+  - action: tap
+    element: product_details_go_to_cart_button
+
+  # ── Mini-cart bottomsheet ─────────────────────────────────────────────────
+  - action: captureText
+    element: cart_s2_s_payment_button_button
+    variable: cart_bottomsheet_cta
+
+  - action: ifVarEquals
+    variable: cart_bottomsheet_cta
+    value: "Add address"
+    steps:
+      - action: tap
+        element: cart_s2_s_payment_button_button_2
+      - action: call
+        flow: add_address
+        params:
+          addressLine1: "123 MG Road"
+          first_name: "Deepa"
+          last_name: "Hegde"
+          address_mobile_number: "6361463451"
+
+  - action: tap
+    element: cart_s2_s_payment_button_button_2
+
+  - action: waitFor
+    element: cart_item_row_0
+
+  # ── Verify similar product in cart ───────────────────────────────────────
+  - action: findCartItemIndex
+    value: "${similar_pdp_title}"
+    variable: cart_item_index
+
+  - action: scrollTo
+    element: cart_item_row_${cart_item_index}
+
+  - action: assertText
+    element: cart_item_title_${cart_item_index}
+    value: "${similar_pdp_title}"
+
+  - action: assertText
+    element: cart_item_price_${cart_item_index}
+    value: "${similar_pdp_price}"
+
+  # ── Proceed to payment ────────────────────────────────────────────────────
+  - action: tap
+    element: cart_link_and_pay_button
+
+  - action: waitFor
+    element: shop_payment_screen_row

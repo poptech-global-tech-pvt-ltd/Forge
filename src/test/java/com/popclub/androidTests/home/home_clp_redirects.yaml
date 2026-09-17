@@ -1,0 +1,48 @@
+testName: Home CLP Redirects All Items
+platform: android
+noReset: true
+
+testCaseIds:
+  - PO-HOME-CLP-REDIRECTS
+
+features:
+  - home
+  - login
+
+tags:
+  - clp
+  - home
+  - redirects
+
+retry: 0
+
+steps:
+  - action: launchApp
+
+  - action: tapIfPresent
+    element: skip_tour
+
+  - action: enterText
+    element: login_input_phone
+    value: 1234561122
+
+  - action: tap
+    element: login_button
+
+  - action: enterText
+    element: otp_input
+    value: 560102
+
+  - action: captureToken
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: verifyCLP
+    value: HOME
+
+  - action: verifyCLPRedirects
+    value: HOME
+    text: "all"

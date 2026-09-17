@@ -1,0 +1,86 @@
+testName: Shop CLP Full Verification
+platform: android
+noReset: true
+loginRequired: true
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - smoke
+  - clp
+  - shop
+  - regression
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  # Capture JWT via API — sets userId in TestContext for personalised CLP API calls
+  - action: captureToken
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  - action: waitFor
+    element: shop_search_icon
+
+  # Fetch shopmerch-30 API (real userId + pagination) — assert every section title on screen
+  - action: verifyCLP
+    value: SHOP
+
+  # Cross-check live API response vs screen — no spinners, no empty sections, all sections visible
+  - action: verifyCLPFullyLoaded
+    value: SHOP
+
+  # Assert section order on screen matches API order
+  - action: verifyCLPOrder
+    value: SHOP
+
+  # Assert prices, discounts and POPcoin badges match API data
+  - action: verifyCLPPrices
+    value: SHOP
+
+  # Verify banner CTAs render correctly
+  - action: verifyCLPBanners
+    value: SHOP
+
+  # Verify in-page filters (Men/Women) and deep-link filter chips
+  - action: verifyCLPFilters
+    value: SHOP
+
+  # Swipe carousels to reveal more items
+  - action: verifyCLPCarouselSwipe
+    value: SHOP
+    text: "3"
+
+  # Tap "See All" / "View All" → verify listing page opens → back
+  - action: verifyCLPSeeAll
+    value: SHOP
+
+  # Tap first banner/redirect → verify destination → back
+  - action: verifyCLPRedirects
+    value: SHOP
+    text: "1"
+
+  # Pull to refresh and re-verify fresh API data matches screen
+  - action: pullToRefresh
+
+  - action: verifyCLP
+    value: SHOP
+
+  - action: verifyCLPFullyLoaded
+    value: SHOP

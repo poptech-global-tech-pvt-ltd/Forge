@@ -1,0 +1,62 @@
+testName: SMV Dual SIM - Switch Data Sheet - Open Settings - WA Fail
+platform: android
+noReset: false
+loginRequired: false
+testCaseIds:
+  - PO-15774
+  - PO-15536
+
+features:
+  - login
+
+tags:
+  - login
+  - smv
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: waitFor
+    element: login_phone_input  # healed from: login_input_phone
+
+  - action: enterText
+    element: login_phone_input
+    value: "8722249451"
+
+  - action: tap
+    element: login_continue_button
+
+  - action: waitFor
+    element: login_merged_login_and_otp_screen_button  # healed locator → login_merged_login_and_otp_screen_button
+    timeout: 20
+
+  - action: tap
+    element: login_merged_login_and_otp_screen_button
+
+  - action: pressKey
+    value: BACK
+
+  - action: tap
+    element: login_continue_button
+
+  - action: waitFor
+    element: login_merged_login_and_otp_screen_button  # healed locator → login_merged_login_and_otp_screen_button
+    timeout: 20
+
+  - action: tap
+    element: login_merged_login_and_otp_screen_button
+
+  - action: pressKey
+    value: BACK
+
+  - action: tap
+    element: login_continue_button
+
+  - action: waitFor
+    element: login_merged_login_and_otp_screen_button
+    timeout: 60
+
+  - action: tap
+    element: login_merged_login_and_otp_screen_button

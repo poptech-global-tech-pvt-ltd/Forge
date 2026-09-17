@@ -1,0 +1,52 @@
+testName: SMV Dual SIM - Switch Data Sheet - Dismiss - Correct SIM - SMV Pass
+platform: android
+noReset: false
+loginRequired: true
+testCaseIds:
+  - PO-15771
+
+features:
+  - login
+
+tags:
+  - login
+  - regression
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: waitFor
+    element: login_phone_input
+
+  - action: enterText
+    element: login_phone_input
+    value: "9019384462"
+
+  - action: tap
+    element: login_continue_button
+
+  - action: pressKey
+    value: BACK
+
+  - action: waitFor
+    element: login_phone_input
+    timeout: 10
+
+  - action: enterText
+    element: login_phone_input
+    value: "9481781677"
+
+  - action: tap
+    element: login_continue_button
+
+  - action: waitFor
+    element: skip_tour
+    timeout: 60
+
+  - action: tap
+    element: skip_tour
+
+  - action: verifyElement
+    element: home_tab

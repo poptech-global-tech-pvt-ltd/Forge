@@ -1,0 +1,40 @@
+testName: Shop CLP Redirects All Items
+platform: android
+noReset: true
+loginRequired: true
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - clp
+  - shop
+  - redirects
+
+retry: 0
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  - action: waitFor
+    element: shop_search_icon
+
+  - action: verifyCLP
+    value: SHOP
+
+  - action: verifyCLPRedirects
+    value: SHOP
+    text: "all"

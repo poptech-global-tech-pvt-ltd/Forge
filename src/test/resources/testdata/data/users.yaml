@@ -1,0 +1,7 @@
+test_user_default:
+  login: "1234561122"   # phone / login number
+  otp:   "560102"       # OTP for this user
+
+test_user_2:
+  login: "9876543210"
+  otp:   "654321"

@@ -1,0 +1,87 @@
+testName: Filters — Filter persists after navigating to PDP and back
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-15807
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - shop
+  - regression
+
+retry: 0
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: tap
+    element: common_shop_tab
+
+  # ── PLP: navigate, capture API + UI prices ────────────────────────────────
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: enterText
+    element: search_products_search_input
+    value: "the souled store"
+    
+  - action: pressKey
+    value: search
+
+  # Apply a filter
+  - action: tap
+    element: product_list_filter_button
+
+  - action: tap
+    element: product_filter_category_item_0
+
+  - action: tap
+    element: product_filter_sub_item_0
+
+  - action: tap
+    element: product_filter_apply_button
+
+  - action: waitFor
+    element: product_list_item_0
+
+  # Capture first product title after filter
+  - action: captureText
+    element: product_list_item_title_0
+    value: "filtered_title"
+
+  # Navigate to PDP
+  - action: tap
+    element: product_list_item_0
+
+  - action: waitFor
+    element: product_details_title
+
+  # Come back to PLP
+  - action: pressKey
+    value: BACK
+
+  - action: waitFor
+    element: product_list_item_0
+
+  # Verify filter is still applied — same product should be first
+  - action: captureText
+    element: product_list_item_title_0
+    value: "title_after_return"
+
+  - action: assertStoredText
+    value: "filtered_title"
+    testCaseId: PO-15807

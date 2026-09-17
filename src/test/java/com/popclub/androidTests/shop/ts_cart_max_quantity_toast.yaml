@@ -1,0 +1,126 @@
+testName: Cart — Verify max quantity toast when adding 6th unit
+platform: android
+noReset: true
+loginRequired: true
+
+testCaseIds:
+  - "PO-11217"
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - smoke
+  - shop
+  - cart
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  - action: waitFor
+    element: shop_search_icon
+
+  # ── Search for product ────────────────────────────────────────────────────
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: enterText
+    element: search_products_search_input
+    value: "vitamin c face wash"
+
+  - action: pressKey
+    value: search
+
+  - action: waitFor
+    element: product_list_item_0
+
+  # ── Add product to cart ───────────────────────────────────────────────────
+  - action: tap
+    element: product_list_item_0
+
+  - action: waitFor
+    element: product_details_title
+
+  - action: tap
+    element: product_details_bottom_sticky_bar_button
+
+  - action: waitFor
+    element: size_selection_item_0
+
+  - action: tap
+    element: size_selection_item_0
+
+  - action: tap
+    element: size_selection_add_to_cart_button
+
+  - action: waitFor
+    element: product_details_go_to_cart_button
+
+  - action: tap
+    element: product_details_go_to_cart_button
+
+  # ── Navigate to full cart screen ──────────────────────────────────────────
+  - action: tap
+    element: cart_s2_s_payment_button_button_2
+
+  - action: waitFor
+    element: cart_item_row_0
+
+  # ── Increase quantity to 5 (tap + 4 times from initial qty 1) ────────────
+  - action: tap
+    element: cart_item_increase_button_0
+
+  - action: assertText
+    element: cart_item_quantity_0
+    value: "2"
+
+  - action: tap
+    element: cart_item_increase_button_0
+
+  - action: assertText
+    element: cart_item_quantity_0
+    value: "3"
+
+  - action: tap
+    element: cart_item_increase_button_0
+
+  - action: assertText
+    element: cart_item_quantity_0
+    value: "4"
+
+  - action: tap
+    element: cart_item_increase_button_0
+
+  - action: assertText
+    element: cart_item_quantity_0
+    value: "5"
+
+  # ── Attempt to add 6th unit — should show max quantity toast ──────────────
+  - action: tap
+    element: cart_item_increase_button_0
+
+  - action: waitFor
+    locator: cart_max_quantity_toast  # TODO: verify actual accessibilityId after first run
+
+  # ── Verify quantity remains at 5 (did not increment to 6) ────────────────
+  - action: assertText
+    element: cart_item_quantity_0
+    value: "5"

@@ -1,0 +1,54 @@
+testName: Search PLP API — t-shirt
+platform: android
+noReset: true
+loginRequired: true
+
+testCaseIds:
+  - PO-API-SEARCH-PLP-001
+
+features:
+  - common
+  - login
+
+tags:
+  - api
+  - smoke
+  - search
+
+retry: 1
+
+steps:
+
+  # ── 1. Login & capture JWT ────────────────────────────────────────────────────
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  # loginIfNeeded auto-captures the JWT from OkHttp logcat into ${auth_token}
+
+  # ── 2. Search PLP — POST /api/search/v2/plp/ ──────────────────────────────────
+  - action: fetchApi
+    url: "${APP_API_URL}search/v2/plp/?page=1"
+    method: POST
+    body: '{"query":"t-shirt"}'
+    headers:
+      X-Access-Token: "Token ${auth_token}"
+      x-app-version: "237"
+      platform: "android"
+    variable: search_response
+
+  # ── 3. Extract key fields ──────────────────────────────────────────────────────
+  - action: fetchApi
+    url: "${APP_API_URL}search/v2/plp/?page=1"
+    method: POST
+    body: '{"query":"t-shirt"}'
+    headers:
+      X-Access-Token: "Token ${auth_token}"
+      x-app-version: "237"
+      platform: "android"
+    extract:
+      search_total_count: "data.total_count"
+      search_first_title: "data.results[0].name"
+      search_first_price: "data.results[0].price"

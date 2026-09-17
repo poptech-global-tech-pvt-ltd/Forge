@@ -1,0 +1,140 @@
+testName: Shop E2E — Payment screen methods verify
+platform: android
+noReset: true
+loginRequired: true
+
+# Flow: Search → PDP → Add to Cart → Payment screen
+#        → Verify POP UPI section, Link UPI button, COD section visible
+#        → Verify cart summary on payment screen
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - shop
+  - payment
+  - e2e
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  # ── Navigate to PLP and pick product ──────────────────────────────────────
+  - action: call
+    flow: plp_search_and_capture
+    params:
+      search_query:   "the souled store"
+      search_pincode: "560102"
+
+  - action: tap
+    element: product_list_item_${product_index}
+
+  - action: waitFor
+    element: product_details_title
+
+  - action: assertText
+    element: product_details_title
+    value: "${product_title}"
+
+  # ── Add to Cart ───────────────────────────────────────────────────────────
+  - action: tap
+    element: product_details_bottom_sticky_bar_button
+
+  - action: waitFor
+    element: size_selection_item_0
+
+  - action: tap
+    element: size_selection_item_0
+
+  - action: tap
+    element: size_selection_add_to_cart_button
+
+  - action: waitFor
+    element: product_details_go_to_cart_button
+
+  - action: tap
+    element: product_details_go_to_cart_button
+
+  # ── Mini-cart bottomsheet ─────────────────────────────────────────────────
+  - action: captureText
+    element: cart_s2_s_payment_button_button
+    variable: cart_bottomsheet_cta
+
+  - action: ifVarEquals
+    variable: cart_bottomsheet_cta
+    value: "Add address"
+    steps:
+      - action: tap
+        element: cart_s2_s_payment_button_button_2
+      - action: call
+        flow: add_address
+        params:
+          addressLine1: "123 MG Road"
+          first_name: "Deepa"
+          last_name: "Hegde"
+          address_mobile_number: "6361463451"
+
+  - action: tap
+    element: cart_s2_s_payment_button_button_2
+
+  - action: waitFor
+    element: cart_item_row_0
+
+  # ── Proceed to payment screen ─────────────────────────────────────────────
+  - action: tap
+    element: cart_link_and_pay_button
+
+  - action: waitFor
+    element: shop_payment_screen_row
+
+  # ── Verify payment screen structure ──────────────────────────────────────
+  - action: logVar
+    variable: product_title
+    value: "On payment screen — verifying payment options for: ${product_title}"
+
+  # POP UPI section
+  - action: verifyElement
+    element: shop_payment_pop_upi_section
+    shouldExist: true
+
+  # Link UPI button
+  - action: verifyElement
+    element: shop_payment_link_upi_button
+    shouldExist: true
+
+  # COD section
+  - action: verifyElement
+    element: shop_payment_shop_cod_section_button
+    shouldExist: true
+
+  # Cart summary card
+  - action: verifyElement
+    element: shop_payment_cart_summary_card_row
+    shouldExist: true
+
+  # ── Capture cart summary total ────────────────────────────────────────────
+  - action: captureText
+    element: shop_payment_cart_summary_card_row
+    variable: payment_cart_summary
+
+  - action: logVar
+    variable: payment_cart_summary
+    value: |
+      ── Payment screen verified ──
+      payment_cart_summary  - ${payment_cart_summary}
+      product               - ${product_title}
+      price (PLP UI)        - ${product_list_item_price}
+      API price             - ₹${api_product_list_item_price}

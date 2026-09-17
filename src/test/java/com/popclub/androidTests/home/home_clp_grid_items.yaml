@@ -1,0 +1,49 @@
+testName: Home CLP — Grid Section Items Verification
+platform: android
+noReset: false
+
+testCaseIds:
+  - PO-HOME-CLP-GRID
+
+features:
+  - home
+  - login
+
+tags:
+  - smoke
+  - clp
+  - home
+  - grid
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: tapIfPresent
+    element: skip_tour
+
+  - action: enterText
+    element: login_input_phone
+    value: 1234561122
+
+  - action: tap
+    element: login_button
+
+  - action: enterText
+    element: otp_input
+    value: 560102
+
+  - action: captureToken
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: verifyCLP
+    value: HOME
+
+  - action: verifyClpSectionItems
+    value: HOME
+    # element: omitted → automatically checks ALL grid sections on this page

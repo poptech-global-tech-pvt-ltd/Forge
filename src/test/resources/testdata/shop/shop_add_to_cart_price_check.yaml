@@ -1,0 +1,133 @@
+testName: Shop - Add Item to Cart and Verify Price Across Pages
+platform: android
+noReset: true
+loginRequired: true
+
+features:
+  - common
+  - shop
+
+tags:
+  - smoke
+  - shop
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: common_home_tab
+
+  # ── Navigate to Shop ────────────────────────────────────────────────────────
+  - action: tap
+    element: common_shop_tab
+
+  - action: waitFor
+    element: shop_search_button
+
+  # ── Search for a product ────────────────────────────────────────────────────
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: enterText
+    element: search_products_search_input
+    value: "shirt"
+
+  - action: pressKey
+    value: search
+
+  - action: waitFor
+    element: product_list_item_0
+
+  # ── Page 1: Product List Page — verify price is shown ──────────────────────
+  - action: verifyElement
+    element: product_list_item_price_0
+
+  - action: captureText
+    element: product_list_item_price_0
+    variable: plp_price
+
+  - action: verifyElement
+    element: product_list_item_title_0
+
+  # ── Navigate to Product Details Page ───────────────────────────────────────
+  - action: tap
+    element: product_list_item_0
+
+  - action: waitFor
+    element: product_details_title
+
+  - action: scanTags
+
+  # ── Page 2: Product Details Page — verify price matches PLP ────────────────
+  - action: verifyElement
+    element: product_details_price
+
+  - action: captureText
+    element: product_details_price
+    variable: pdp_price
+
+  - action: assertStoredText
+    variable: plp_price
+
+  - action: verifyElement
+    element: product_details_strikethrough_price
+
+  # ── Add to cart ─────────────────────────────────────────────────────────────
+  - action: tap
+    element: product_details_bottom_sticky_bar_button
+
+  - action: waitFor
+    element: size_selection_item_0
+
+  - action: tap
+    element: size_selection_item_0
+
+  - action: tap
+    element: size_selection_add_to_cart_button
+
+  - action: waitFor
+    element: product_details_go_to_cart_button
+
+  - action: tap
+    element: product_details_go_to_cart_button
+
+  # ── Page 3: Cart — verify item price and total ──────────────────────────────
+  - action: waitFor
+    element: cart_item_row_0
+
+  - action: scanTags
+
+  - action: verifyElement
+    element: cart_item_price_0
+
+  - action: assertStoredText
+    variable: pdp_price
+
+  - action: verifyElement
+    element: cart_item_strikethrough_price_0
+
+  - action: verifyElement
+    element: cart_item_final_price_0
+
+  - action: verifyElement
+    element: cart_delivery_address_card
+
+  # ── Expand price summary and verify total to pay ────────────────────────────
+  - action: tap
+    element: cart_price_summary_toggle
+
+  - action: verifyElement
+    element: cart_to_pay_row
+
+  # ── Verify pay CTA is present ───────────────────────────────────────────────
+  - action: verifyElement
+    element: cart_s2_s_payment_button_button

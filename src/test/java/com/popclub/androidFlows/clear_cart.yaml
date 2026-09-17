@@ -1,0 +1,33 @@
+# Reusable flow: navigate to cart and remove all items until empty.
+#
+# Pre-condition: caller can be on any screen — navigates via cart_icon.
+# Post-condition: cart is empty; cart_shop_more_button is visible.
+#
+# No inputs required.
+
+steps:
+  - action: tap
+    element: cart_icon
+
+  - action: waitFor
+    element: cart_delivery_address_card
+
+  # Move out-of-stock items out of cart first (they block normal cartRemoveItem)
+  - action: tapIfPresent
+    element: cart_move_from_cart_button
+
+  # Confirm removal on the "Some items are unavailable" bottom sheet
+  - action: tapIfPresent
+    element: cart_unavailable_remove_button
+
+  # Only clear remaining in-stock items if cart is not empty
+  - action: ifPresent
+    element: cart_item_row_0
+    steps:
+      - action: repeat
+        times: 10
+        steps:
+          - action: ifPresent
+            element: cart_item_row_0
+            steps:
+              - action: cartRemoveItem

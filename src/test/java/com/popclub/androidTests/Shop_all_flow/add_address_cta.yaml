@@ -1,0 +1,65 @@
+testName: Cart — FTUE shows Add address CTA
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-11239
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - shop
+  - cart
+  - regression
+
+retry: 0
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: tap
+    element: common_shop_tab
+    
+  - action: call
+    flow: search_product
+    params:
+      search_query: "souled store"
+
+  # ── Select first product ──
+  - action: tap
+    element: product_list_item_0
+
+  # ── Add to cart ──
+  - action: tap
+    element: product_details_bottom_sticky_bar_button
+
+  - action: tap
+    element: size_selection_item_0
+
+  - action: tap
+    element: size_selection_add_to_cart_button
+
+  # ── Go to cart ──
+  - action: tap
+    element: product_details_go_to_cart_button
+
+
+  # PO-11239: FTUE cart shows 'Add address' instead of 'Pay'
+  - action: verifyElement
+    element: cart_s2_s_payment_button_button_1
+    testCaseId: PO-11239
+
+  - action: verifyElement
+    text: "Add address"

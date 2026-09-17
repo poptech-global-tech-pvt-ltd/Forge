@@ -1,0 +1,70 @@
+testName: Custom amount min/max error validation + advance payment banners
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-13215
+  - PO-13216
+  - PO-13217
+
+features:
+  - common
+  - billpay
+
+tags:
+  - rcbp
+  - regression
+
+retry: 0
+
+steps:
+
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: tap
+    element: bill_pay_all_bills_bills_tab
+
+  - action: tap
+    element: bill_pay_all_bills_item_0
+
+  - action: tap
+    element: bill_pay_review_cc_payment_custom_radio
+
+  # PO-13215 — amount below minimum allowed limit
+  - action: enterText
+    locator: bill_pay_review_custom_amount_input   # TODO: add to elements/billpay.yaml
+    value: "1"
+
+  - action: verifyElement
+    locator: bill_pay_review_amount_error_toast   # TODO: add to elements/billpay.yaml — below-min toast
+
+  # PO-13216 — amount exceeds maximum allowed limit
+  - action: enterText
+    locator: bill_pay_review_custom_amount_input   # TODO: add to elements/billpay.yaml
+    value: "9999999"
+
+  - action: verifyElement
+    locator: bill_pay_review_amount_error_toast   # TODO: add to elements/billpay.yaml — above-max toast
+
+  # PO-13217 — min/max error banners on advance payment flow
+  - action: tap
+    locator: bill_pay_review_advance_payment_toggle   # TODO: add to elements/billpay.yaml
+
+  - action: enterText
+    locator: bill_pay_review_custom_amount_input   # TODO: add to elements/billpay.yaml
+    value: "1"
+
+  - action: verifyElement
+    locator: bill_pay_review_advance_payment_min_error_banner   # TODO: add to elements/billpay.yaml
+
+  - action: enterText
+    locator: bill_pay_review_custom_amount_input   # TODO: add to elements/billpay.yaml
+    value: "9999999"
+
+  - action: verifyElement
+    locator: bill_pay_review_advance_payment_max_error_banner   # TODO: add to elements/billpay.yaml

@@ -1,0 +1,81 @@
+testName: Cart — Header, address, quantity controls
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+    - PO-11213
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - shop
+  - regression
+
+retry: 0
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: call
+    flow: navigate_to_cart
+
+  # PO-11209: Wishlist icon and POPCoins in header
+  - action: verifyElement
+    element: cart_wishlist_button
+    testCaseId: PO-11209
+
+  - action: verifyElement
+    element: cart_toolbar_popcoin_buttom
+
+  # PO-11210: Delivery address with chevron
+  - action: verifyElement
+    element: cart_delivery_address_card
+    testCaseId: PO-11210
+
+  # PO-11247: Delivery date on cart item
+  - action: verifyElement
+    element: cart_item_delivery_date_chip
+    testCaseId: PO-11247
+
+  # Capture initial quantity
+  - action: captureText
+    element: cart_item_price_0  # healed from: cart_item_quantity_0
+    variable: qty_before
+
+  # PO-11212: Tap '+' increments quantity
+  - action: tap
+    element: cart_item_increase
+
+  - action: captureText
+    element: cart_item_quantity_0
+    variable: qty_after_increase
+
+  - action: logVar
+    variable: qty_after_increase
+    value: "Qty after increase: ${qty_after_increase}"
+    testCaseId: PO-11212
+
+  # PO-11213: Tap '−' decrements quantity
+  - action: tap
+    element: cart_iteam_decrease
+
+  - action: captureText
+    element: cart_item_quantity_0
+    variable: qty_after_decrease
+
+  - action: logVar
+    variable: qty_after_decrease
+    value: "Qty after decrease: ${qty_after_decrease}"
+    testCaseId: PO-11213

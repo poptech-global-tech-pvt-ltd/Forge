@@ -1,0 +1,54 @@
+testName: Recharge contact search — permission states
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds: [PO-13178, PO-13179, PO-13180]
+
+features: [common, billpay]
+
+tags: [rcbp, prepaid, regression]
+
+retry: 0
+
+steps:
+  - action: launchApp
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+    
+  - action: tap
+    element: bills_tab  
+  
+  - action: scrollTo
+    element: Mobile_prepaid
+
+  - action: tap
+    element: Mobile_prepaid
+    
+  # PO-13179 — recent contacts still shown when permission denied
+  - action: verifyElement
+    element: bill_pay_recharge_recent_item_0
+    testCaseId: P0-13179
+    
+    
+  # PO-13178 — contacts permission denied screen
+  - action: scrollTo
+    text: "Contacts permission denied"  
+    
+  - action: verifyElement
+    element: contact_permission_empty_state_button
+    testCaseId: P0-13178
+
+  # PO-13180 — no search results when searching without contact permission
+  - action: enterText
+    element: bill_pay_recharge_search_input
+    value: "anything"
+  - action: pressKey
+    value: search
+    
+  - action: verifyElement
+    element: contact_permission_empty_state_button
+    testCaseId: P0-13180
+ 
+

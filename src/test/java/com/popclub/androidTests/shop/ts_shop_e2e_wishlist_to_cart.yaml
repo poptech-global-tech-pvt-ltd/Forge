@@ -1,0 +1,147 @@
+testName: Shop E2E — Wishlist to Cart
+platform: android
+noReset: true
+loginRequired: true
+
+# Flow: Search → PDP → Add to Wishlist → Go to Wishlist → Verify item
+#        → Move to Cart from Wishlist → Proceed to Payment screen
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - shop
+  - wishlist
+  - e2e
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  # ── Navigate to PLP and pick product ──────────────────────────────────────
+  - action: call
+    flow: plp_search_and_capture
+    params:
+      search_query:   "the souled store"
+      search_pincode: "560102"
+
+  - action: tap
+    element: product_list_item_${product_index}
+
+  - action: waitFor
+    element: product_details_title
+
+  - action: assertText
+    element: product_details_title
+    value: "${product_title}"
+
+  # ── Add to Wishlist from PDP ──────────────────────────────────────────────
+  - action: verifyElement
+    element: product_details_wishlist_button
+    shouldExist: true
+
+  - action: tap
+    element: product_details_wishlist_button
+
+  - action: logVar
+    variable: product_title
+    value: "Added to wishlist: ${product_title}"
+
+  # ── Navigate to Wishlist ──────────────────────────────────────────────────
+  - action: pressKey
+    value: BACK
+
+  - action: waitFor
+    element: product_list_item_0
+
+  - action: tap
+    element: wishlist_icon
+
+  - action: waitFor
+    element: wishlist_item_card_compose_row
+
+  # ── Verify wishlisted item is present ────────────────────────────────────
+  - action: verifyElement
+    element: wishlist_item_0
+    shouldExist: true
+
+  - action: captureText
+    element: wishlist_item_0
+    variable: wishlist_item_title
+
+  - action: logVar
+    variable: wishlist_item_title
+    value: |
+      wishlist_item_title - ${wishlist_item_title}
+      expected_title      - ${product_title}
+
+  # ── Move to Cart from Wishlist ────────────────────────────────────────────
+  - action: verifyElement
+    element: wishlist_add_to_cart_button
+    shouldExist: true
+
+  - action: tap
+    element: wishlist_add_to_cart_button
+
+  # Size selection appears when moving from wishlist to cart
+  - action: waitFor
+    element: size_selection_item_0
+
+  - action: tap
+    element: size_selection_item_0
+
+  - action: tap
+    element: size_selection_add_to_cart_button
+
+  # ── Verify item now in cart ───────────────────────────────────────────────
+  - action: waitFor
+    element: cart_item_row_0
+
+  - action: findCartItemIndex
+    value: "${product_title}"
+    variable: cart_item_index
+
+  - action: scrollTo
+    element: cart_item_row_${cart_item_index}
+
+  - action: captureText
+    element: cart_item_title_${cart_item_index}
+    variable: cart_item_title
+
+  - action: logVar
+    variable: cart_item_title
+    value: |
+      cart_item_title - ${cart_item_title}
+      expected_title  - ${product_title}
+
+  - action: assertText
+    element: cart_item_title_${cart_item_index}
+    value: "${product_title}"
+
+  - action: assertText
+    element: cart_item_price_${cart_item_index}
+    value: "${product_list_item_price}"
+
+  # ── Proceed to payment screen ────────────────────────────────────────────
+  - action: verifyElement
+    element: cart_link_and_pay_button
+    shouldExist: true
+
+  - action: tap
+    element: cart_link_and_pay_button
+
+  - action: waitFor
+    element: shop_payment_screen_row
