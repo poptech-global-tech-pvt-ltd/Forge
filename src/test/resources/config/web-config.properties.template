@@ -1,0 +1,17 @@
+# Copy this file to web-config.properties and adjust for your environment.
+#
+# Setup:
+#   cp src/test/resources/config/web-config.properties.template \
+#      src/test/resources/config/web-config.properties
+
+# Target environment URL for Playwright web tests
+base.url=https://popcard-reskin-sit.popclub.co.in
+
+# Browser: chromium | firefox | webkit
+browser=chromium
+
+# Set true for CI (no visible window), false for local debugging
+headless=false
+
+# Default element/navigation timeout in ms
+timeout=30000

@@ -1,0 +1,61 @@
+testName: PDP — Add to Cart without size shows size prompt
+platform: android
+noReset: true
+loginRequired: false
+retry: 0
+
+testCaseIds:
+  - PO-11070
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - regression
+  - shop
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561234"
+    text: "560102"
+
+  - action: tap
+    element: common_shop_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  - action: tap
+    element: shop_search_button
+
+  - action: enterText
+    element: search_products_search_input
+    value: "the souled store"
+
+  - action: pressKey
+    value: search
+
+  - action: tap
+    element: product_list_item_0
+
+  - action: tap
+    element: product_details_bottom_sticky_bar_button
+
+  - action: verifyElement
+    element: size_selection_item_0
+
+  - action: verifyElement
+    element: size_selection_add_to_cart_button
+
+  - action: captureText
+    element: pdp_select_size_text
+    variable: select_size_text
+
+  - action: assertText
+    element: pdp_select_size_text
+    value: "${select_size_text}"
