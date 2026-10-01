@@ -96,14 +96,14 @@ steps:
     element: additional_details_tnc_checkbox_row_with_bottom_sheet_checkbox  # healed from: pan_details_tnc_checkbox_row_with_bottom_sheet_checkbox
 
   - action: verifyElement
-    element: pan_details_tnc_checkbox_row_with_bottom_sheet_checkbox
+    element: additional_details_tnc_checkbox_row_with_bottom_sheet_checkbox  # healed from: pan_details_tnc_checkbox_row_with_bottom_sheet_checkbox
     testCaseId: PO-7716
 
   - action: tap
-    element: pan_details_tnc_checkbox_row_with_bottom_sheet_checkbox
+    element: additional_details_tnc_checkbox_row_with_bottom_sheet_checkbox  # healed from: pan_details_tnc_checkbox_row_with_bottom_sheet_checkbox
 
   - action: verifyElement
-    element: pan_details_tnc_checkbox_row_with_bottom_sheet_checkbox
+    element: additional_details_tnc_checkbox_row_with_bottom_sheet_checkbox  # healed from: pan_details_tnc_checkbox_row_with_bottom_sheet_checkbox
     testCaseId: PO-7717
 
   - action: verifyElement
@@ -163,7 +163,7 @@ steps:
     element: cc_additional_relation_with_officer_no_chip
 
   - action: tap
-    element: pan_details_tnc_checkbox_row_with_bottom_sheet_checkbox
+    element: additional_details_tnc_checkbox_row_with_bottom_sheet_checkbox  # healed from: pan_details_tnc_checkbox_row_with_bottom_sheet_checkbox
     testCaseId: PO-7721
 
   - action: tap

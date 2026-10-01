@@ -79,26 +79,29 @@ public class TestExecutor {
         }
 
         // DECIDE MODE
-        List<String> allTestCaseIds = new ArrayList<>();
+        // File-level ids take the test's overall outcome; step-level ids are
+        // reported individually from their own pass/fail. Both are collected —
+        // a YAML can carry a `testCaseIds:` block AND per-step `testCaseId:`.
+        List<String> fileLevelIds = new ArrayList<>();
+        List<String> stepLevelIds = new ArrayList<>();
 
         if (testCase.testCaseIds != null && !testCase.testCaseIds.isEmpty()) {
-
-            //  YAML MODE
             TestContext.setExecutionMode("YAML");
-            allTestCaseIds.addAll(testCase.testCaseIds);
-
+            fileLevelIds.addAll(testCase.testCaseIds);
         } else {
-
-            //  STEP MODE
             TestContext.setExecutionMode("STEP");
-
-            for (Step step : testCase.steps) {
-                if (step.testCaseId != null) {
-                    allTestCaseIds.add(step.testCaseId);
-                }
-            }
         }
 
+        collectStepTestCaseIds(testCase.onFlowStart, stepLevelIds);
+        collectStepTestCaseIds(testCase.steps, stepLevelIds);
+        collectStepTestCaseIds(testCase.onFlowComplete, stepLevelIds);
+
+        List<String> allTestCaseIds = new ArrayList<>(fileLevelIds);
+        for (String id : stepLevelIds) {
+            if (!allTestCaseIds.contains(id)) allTestCaseIds.add(id);
+        }
+
+        TestContext.setFileLevelTestCaseIds(fileLevelIds);
         TestContext.setTestCaseIds(allTestCaseIds);
 
         System.out.println("Execution Mode: " + TestContext.getExecutionMode());
@@ -456,10 +459,11 @@ public class TestExecutor {
             System.out.println("[TestExecutor] ⚠️  Video save failed (non-fatal): " + e.getMessage());
         }
 
-        // YAML MODE RESULT
+        // YAML MODE RESULT — only the file-level ids inherit the overall outcome.
+        // Step-level ids were already marked individually as each step ran.
         if ("YAML".equals(TestContext.getExecutionMode())) {
 
-            for (String tc : allTestCaseIds) {
+            for (String tc : fileLevelIds) {
                 TestContext.markPassed(tc);
             }
         }
@@ -622,6 +626,20 @@ public class TestExecutor {
      */
     private void resolveAndRunSteps(List<Step> steps, int maxRetry) {
         resolveAndRunSteps(steps, maxRetry, false);
+    }
+
+    /**
+     * Collects per-step `testCaseId:` values so each one can be reported to
+     * TestSigma with its own pass/fail rather than inheriting the whole test's
+     * status. Null-safe so it can be called for optional hook lists.
+     */
+    private void collectStepTestCaseIds(List<Step> steps, List<String> into) {
+        if (steps == null) return;
+        for (Step step : steps) {
+            if (step.testCaseId != null && !step.testCaseId.isBlank()) {
+                into.add(step.testCaseId);
+            }
+        }
     }
 
     private void resolveAndRunSteps(List<Step> steps, int maxRetry, boolean isFlow) {
@@ -801,11 +819,17 @@ public class TestExecutor {
                     } else {
                         LoggerUtil.pass("  branch step " + idx + " passed");
                     }
+                    if (step.testCaseId != null) {
+                        TestContext.markPassed(step.testCaseId);
+                    }
                 } catch (Exception e) {
                     attempt++;
                     if (attempt > maxRetry) {
                         if (isFlow) {
                             LoggerUtil.fail("F:" + idx + " failed: " + e.getMessage());
+                        }
+                        if (step.testCaseId != null) {
+                            TestContext.markFailed(step.testCaseId);
                         }
                         throw new RuntimeException(
                             (isFlow ? "Flow" : "Conditional branch") + " step " + idx

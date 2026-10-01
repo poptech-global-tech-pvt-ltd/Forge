@@ -376,23 +376,29 @@ public class TestListener implements ITestListener, ISuiteListener {
                 runCaseMap = TestSigmaClient.getTestCaseRunMap(projectId, TestContext.getRunId());
             }
 
+            Map<String, String> stepResults = TestContext.getResults();
+            List<String> fileLevelIds = TestContext.getFileLevelTestCaseIds();
+
             for (String id : testCases) {
+
+                TestCaseStatus idStatus =
+                        resolveStatus(id, stepResults, fileLevelIds, status);
 
                 String uuid = id;
                 if (id.startsWith("PO-")) {
                     uuid = TestSigmaClient.getTestCaseIdByHumanId(projectId, id);
                 }
 
-                System.out.println("[TestSigma] Reporting " + id + " (" + uuid + ") → " + status);
+                System.out.println("[TestSigma] Reporting " + id + " (" + uuid + ") → " + idStatus);
 
                 TestSigmaClient.updateTestCaseRun(
                         projectId, TestContext.getRunId(), uuid,
-                        status.id(), TestSigmaConfig.userId(), duration);
+                        idStatus.id(), TestSigmaConfig.userId(), duration);
 
                 String runCaseId = runCaseMap.getOrDefault(id, runCaseMap.get(uuid));
                 if (runCaseId != null) {
-                    TestSigmaClient.updateTestCaseStatus(TestContext.getRunId(), runCaseId, status);
-                    System.out.println("[TestSigma] ✅ " + id + " marked " + status);
+                    TestSigmaClient.updateTestCaseStatus(TestContext.getRunId(), runCaseId, idStatus);
+                    System.out.println("[TestSigma] ✅ " + id + " marked " + idStatus);
                 } else {
                     System.out.println("[TestSigma] ⚠️  No test_case_run id found for: " + id);
                 }
@@ -403,6 +409,37 @@ public class TestListener implements ITestListener, ISuiteListener {
         } catch (Exception e) {
             System.err.println("[TestSigma] ⚠️  Failed to update status for "
                     + result.getName() + ": " + e.getMessage());
+        }
+    }
+
+    /**
+     * Picks the status to report for one test case id.
+     *
+     * File-level ids (the YAML's own `testCaseIds:`) represent the test as a
+     * whole and take the TestNG outcome. Step-level ids take the result their
+     * own step produced. A step-level id with no recorded result never ran —
+     * that's BLOCKED when the test failed, and the test outcome otherwise.
+     */
+    private TestCaseStatus resolveStatus(String id,
+                                         Map<String, String> stepResults,
+                                         List<String> fileLevelIds,
+                                         TestCaseStatus testOutcome) {
+
+        if (fileLevelIds != null && fileLevelIds.contains(id)) return testOutcome;
+
+        String recorded = stepResults == null ? null : stepResults.get(id);
+
+        if (recorded == null) {
+            return testOutcome == TestCaseStatus.PASSED
+                    ? TestCaseStatus.PASSED
+                    : TestCaseStatus.BLOCKED;
+        }
+
+        switch (recorded) {
+            case "PASSED":  return TestCaseStatus.PASSED;
+            case "FAILED":  return TestCaseStatus.FAILED;
+            case "BLOCKED": return TestCaseStatus.BLOCKED;
+            default:        return testOutcome;
         }
     }
 }

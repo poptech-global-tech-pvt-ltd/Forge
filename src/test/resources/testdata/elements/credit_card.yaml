@@ -257,7 +257,7 @@ cc_video_title_text:
 pan_details_tnc_checkbox_row_with_bottom_sheet_checkbox:
   android:
     - type: accessibilityId
-      value: additional_details_tnc_checkbox_row_with_bottom_sheet_checkbox  # healed from: pan_details_tnc_checkbox_row_with_bottom_sheet_checkbox  # healed from: additional_details_tnc_checkbox_row_with_bottom_sheet_checkbox
+      value: additional_details_tnc_checkbox_row_with_bottom_sheet_checkbox  # healed from: pan_details_tnc_checkbox_row_with_bottom_sheet_checkbox  # healed from: additional_details_tnc_checkbox_row_with_bottom_sheet_checkbox  # healed from: pan_details_tnc_checkbox_row_with_bottom_sheet_checkbox  # healed from: additional_details_tnc_checkbox_row_with_bottom_sheet_checkbox  # healed from: pan_details_tnc_checkbox_row_with_bottom_sheet_checkbox  # healed from: additional_details_tnc_checkbox_row_with_bottom_sheet_checkbox  # healed from: pan_details_tnc_checkbox_row_with_bottom_sheet_checkbox  # healed from: additional_details_tnc_checkbox_row_with_bottom_sheet_checkbox  # healed from: pan_details_tnc_checkbox_row_with_bottom_sheet_checkbox  # healed from: additional_details_tnc_checkbox_row_with_bottom_sheet_checkbox
 pan_details_tnc_checkbox_row_with_bottom_sheet_row:
   android:
     - type: accessibilityId
