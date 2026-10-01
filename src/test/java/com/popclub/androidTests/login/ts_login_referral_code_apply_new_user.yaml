@@ -15,12 +15,16 @@ retry: 1
 steps:
   - action: launchApp
 
+  - action: tapByText
+    value: "Skip"
+    optional: true
+
   - action: waitFor
     element: login_phone_input
 
   - action: enterText
     element: login_phone_input
-    value: "9538351687"
+    value: "8618082300"
 
   - action: tap
     element: login_referral_code_row

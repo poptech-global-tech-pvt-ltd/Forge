@@ -43,6 +43,10 @@ public class TapByTextAction implements Action {
 
         WebElement element = findWithScroll(driver, text);
         if (element == null) {
+            if (step.optional) {
+                System.out.println("  ⚠️  tapByText [optional]: \"" + text + "\" not found — skipping");
+                return;
+            }
             throw new RuntimeException(
                     "tapByText FAILED: \"" + text + "\" not found after "
                     + MAX_SCROLLS + " scrolls.");
