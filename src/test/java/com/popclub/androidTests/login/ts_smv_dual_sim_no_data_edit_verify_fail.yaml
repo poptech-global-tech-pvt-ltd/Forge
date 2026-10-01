@@ -17,6 +17,10 @@ retry: 1
 steps:
   - action: launchApp
 
+  - action: tapByText
+    value: "Skip"
+    optional: true
+
   - action: waitFor
     element: login_input_phone  # healed from: login_otp_input
 
