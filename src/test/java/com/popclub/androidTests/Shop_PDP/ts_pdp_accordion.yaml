@@ -1,0 +1,70 @@
+testName: PDP — Product details accordion
+platform: android
+noReset: true
+loginRequired: true
+retry: 0
+
+testCaseIds:
+  - PO-11051
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - sanity
+  - shop
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561234"
+    text: "560102"
+
+  - action: tap
+    element: common_shop_tab
+
+  - action: tap
+    element: shop_search_button
+
+  - action: enterText
+    element: search_products_search_input
+    value: "the souled store"
+
+  - action: pressKey
+    value: search
+
+  - action: tap
+    element: product_list_item_0
+  # ── Scroll to product details section ──────────────────────────────────
+  - action: swipe
+    direction: up
+
+  - action: swipe
+    direction: up
+    
+  - action: swipe
+    direction: up
+
+  # ── PO-11051: Accordion collapsed by default ───────────────────────────
+
+  - action: verifyElement
+    element: Expand
+
+  # ── PO-11052: Tap to expand → shows full product info ──────────────────
+  - action: tap
+    element: Expand
+
+  - action: verifyElement
+    element: Collapse
+    testCaseId: PO-11052
+
+  # ── Tap again to collapse ──────────────────────────────────────────────
+  - action: tap
+    element: Collapse
+
+  - action: verifyElement
+    element: Expand

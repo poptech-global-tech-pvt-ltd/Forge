@@ -55,7 +55,7 @@ steps:
     element: product_details_back_button
 
   - action: verifyElement
-    element: toolbar_search_button
+    element: toolbar_search_button  # healed locator → toolbar_search_button
 
   - action: verifyElement
     element: toolbar_cart_button
