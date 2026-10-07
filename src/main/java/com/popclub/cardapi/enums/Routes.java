@@ -15,4 +15,9 @@ public class Routes {
     public static final String YBL_PERSONAL_DETAILS      = "/api/v1/ybl/personal-details";
     public static final String YBL_PROFESSIONAL_DETAILS  = "/api/v1/ybl/professional-details";
     public static final String YBL_MASTER_LISTS           = "/api/v1/ybl/master-lists";
+
+    // Mock gateway routes (Consent / EKYC / VKYC)
+    public static final String MOCK_CONSENT = "/CCPartnerProgram/v1/enc/Consent";
+    public static final String MOCK_EKYC    = "/CCPartnerProgram/v1/enc/EKYC";
+    public static final String MOCK_VKYC    = "/CCPartnerProgram/v1/enc/VKYC";
 }

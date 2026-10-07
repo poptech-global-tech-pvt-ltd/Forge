@@ -58,4 +58,5 @@ public class ConfigManager {
     public static String getCompanyType()            { return get("card.company.type"); }
     public static String getProfession()             { return get("card.profession"); }
     public static String getProfessionalOccupation() { return get("card.professional.occupation"); }
+    public static String getMockBaseUrl()             { return get("mock.base.url"); }
 }

@@ -1,5 +1,5 @@
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
-<suite name="Card Full Suite">
+<suite name="Card Full Suite [regression]">
     <listeners>
         <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
     </listeners>
@@ -71,6 +71,36 @@
     <test name="L6 ProfessionalDetails Negative">
         <classes>
             <class name="com.popclub.cardApiTests.Card_Onboarding.L6_ProfessionalDetails_NegativeTest"/>
+        </classes>
+    </test>
+    <test name="L7 Consent Positive">
+        <classes>
+            <class name="com.popclub.cardApiTests.Card_Onboarding.L7_Consent_PositiveTest"/>
+        </classes>
+    </test>
+    <test name="L7 Consent Negative">
+        <classes>
+            <class name="com.popclub.cardApiTests.Card_Onboarding.L7_Consent_NegativeTest"/>
+        </classes>
+    </test>
+    <test name="L8 EKYC Positive">
+        <classes>
+            <class name="com.popclub.cardApiTests.Card_Onboarding.L8_EKYC_PositiveTest"/>
+        </classes>
+    </test>
+    <test name="L8 EKYC Negative">
+        <classes>
+            <class name="com.popclub.cardApiTests.Card_Onboarding.L8_EKYC_NegativeTest"/>
+        </classes>
+    </test>
+    <test name="L9 VKYC Positive">
+        <classes>
+            <class name="com.popclub.cardApiTests.Card_Onboarding.L9_VKYC_PositiveTest"/>
+        </classes>
+    </test>
+    <test name="L9 VKYC Negative">
+        <classes>
+            <class name="com.popclub.cardApiTests.Card_Onboarding.L9_VKYC_NegativeTest"/>
         </classes>
     </test>
 </suite>
