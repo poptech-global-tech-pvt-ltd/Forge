@@ -1448,7 +1448,7 @@ function startTest(file, deviceOverride, ws, fromStep, batchRun, existingRunId, 
     cwd     : FORGE_ROOT,
     shell   : true,
     detached: true,          // creates a new process group so kill(-pid) kills mvn + forked JVM
-    env     : { ...process.env }
+    env     : { ...process.env, JAVA_HOME: '/opt/homebrew/Cellar/openjdk@17/17.0.18/libexec/openjdk.jdk/Contents/Home' }
   });
   mvn.unref();               // don't keep the Node event loop alive for this child
 

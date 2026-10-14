@@ -1,0 +1,28 @@
+testName: iOS Hierarchy Dump — Shop Screen
+platform: ios
+noReset: true
+loginRequired: true
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - ios
+  - debug
+
+retry: 1
+
+steps:
+  - action: launchApp
+  - action: loginIfNeeded
+    value: "9743990458"
+    text: "560102"
+  - action: waitFor
+    element: home_tab
+    timeout: 30
+  - action: tap
+    element: shop_tab
+  - action: getSource

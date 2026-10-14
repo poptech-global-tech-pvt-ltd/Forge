@@ -1,0 +1,54 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<suite name="iOS Screen Dumps" parallel="false" thread-count="1">
+
+    <parameter name="platform"   value="ios"/>
+    <parameter name="deviceUdid" value="00008110-000469E636E8401E"/>
+
+    <listeners>
+        <listener class-name="com.popclub.listener.TestListener"/>
+    </listeners>
+
+    <test name="Dump — Launch">
+        <parameter name="platform"   value="ios"/>
+        <parameter name="testFile"   value="ts_ios_dump.yaml"/>
+        <parameter name="deviceUdid" value="00008110-000469E636E8401E"/>
+        <classes><class name="com.popclub.runner.TestRunnerTest"/></classes>
+    </test>
+
+    <test name="Dump — Home">
+        <parameter name="platform"   value="ios"/>
+        <parameter name="testFile"   value="ts_ios_dump_home.yaml"/>
+        <parameter name="deviceUdid" value="00008110-000469E636E8401E"/>
+        <classes><class name="com.popclub.runner.TestRunnerTest"/></classes>
+    </test>
+
+    <test name="Dump — Shop">
+        <parameter name="platform"   value="ios"/>
+        <parameter name="testFile"   value="ts_ios_dump_shop.yaml"/>
+        <parameter name="deviceUdid" value="00008110-000469E636E8401E"/>
+        <classes><class name="com.popclub.runner.TestRunnerTest"/></classes>
+    </test>
+
+    <test name="Dump — Profile">
+        <parameter name="platform"   value="ios"/>
+        <parameter name="testFile"   value="ts_ios_dump_profile.yaml"/>
+        <parameter name="deviceUdid" value="00008110-000469E636E8401E"/>
+        <classes><class name="com.popclub.runner.TestRunnerTest"/></classes>
+    </test>
+
+    <test name="Dump — Rewards">
+        <parameter name="platform"   value="ios"/>
+        <parameter name="testFile"   value="ts_ios_dump_rewards.yaml"/>
+        <parameter name="deviceUdid" value="00008110-000469E636E8401E"/>
+        <classes><class name="com.popclub.runner.TestRunnerTest"/></classes>
+    </test>
+
+    <test name="Dump — Cart">
+        <parameter name="platform"   value="ios"/>
+        <parameter name="testFile"   value="ts_ios_dump_cart.yaml"/>
+        <parameter name="deviceUdid" value="00008110-000469E636E8401E"/>
+        <classes><class name="com.popclub.runner.TestRunnerTest"/></classes>
+    </test>
+
+</suite>

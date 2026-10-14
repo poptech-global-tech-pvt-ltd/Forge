@@ -79,6 +79,9 @@ public class IOSDriverManager {
             options.setCapability("appium:wdaLaunchTimeout", 120000);
             options.setCapability("appium:wdaConnectionTimeout", 120000);
 
+            // Custom WDA bundle ID — must match what was set in Xcode Signing & Capabilities
+            options.setCapability("appium:updatedWDABundleId", "com.popclub.WebDriverAgentRunner");
+
             TestContext.setFreshLaunch(!resumeMode);
 
             AppiumDriver driverInstance = new IOSDriver(

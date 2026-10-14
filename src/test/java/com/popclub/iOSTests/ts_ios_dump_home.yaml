@@ -1,0 +1,24 @@
+testName: iOS Hierarchy Dump — Home Screen
+platform: ios
+noReset: true
+loginRequired: true
+
+features:
+  - common
+  - login
+
+tags:
+  - ios
+  - debug
+
+retry: 1
+
+steps:
+  - action: launchApp
+  - action: loginIfNeeded
+    value: "9743990458"
+    text: "560102"
+  - action: waitFor
+    element: home_tab
+    timeout: 30
+  - action: getSource

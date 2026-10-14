@@ -1,0 +1,4 @@
+# iOS profile screen element overrides.
+# Run ts_ios_dump_profile.yaml to get accessibility IDs, then fill in below.
+
+# TODO: add after running dump

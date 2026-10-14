@@ -2,17 +2,22 @@ package com.popclub.ios.actions;
 
 import com.popclub.android.actions.Action;
 import com.popclub.android.driver.DriverManager;
+import com.popclub.api.util.ConfigManager;
 import com.popclub.core.TestContext;
 import com.popclub.ios.driver.IOSDriverManager;
 import com.popclub.model.Step;
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.ios.IOSDriver;
 import org.openqa.selenium.By;
+import org.openqa.selenium.interactions.PointerInput;
+import org.openqa.selenium.interactions.Sequence;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 
 /** launchApp for iOS — boots XCUITest session, dismisses system alerts, waits for app ready. */
 public class IOSLaunchAppAction implements Action {
@@ -21,10 +26,19 @@ public class IOSLaunchAppAction implements Action {
     private static final int ALERT_DISMISS_ROUNDS  = 5;
     private static final String BUNDLE_ID = "com.popclub.popclubapp";
 
+    // Reads from config/{env}.properties → ios.passcode, with system property override
+    private static String getPasscode() {
+        String sysProp = System.getProperty("ios.passcode");
+        if (sysProp != null && !sysProp.isEmpty()) return sysProp;
+        try { return ConfigManager.getIosPasscode(); } catch (Exception e) { return null; }
+    }
+
     @Override
     public void perform(Step step) {
         AppiumDriver driver = IOSDriverManager.getDriver();
         DriverManager.setDriver(driver);
+
+        unlockDeviceIfLocked(driver);
 
         if (TestContext.isResumeMode()) {
             ensureAppRunning(driver);
@@ -43,6 +57,65 @@ public class IOSLaunchAppAction implements Action {
         }
 
         System.out.println("[IOSLaunch] App launch complete — proceeding with test steps.");
+    }
+
+    /**
+     * Unlocks the device if it is locked.
+     * 1. Checks isDeviceLocked() via Appium.
+     * 2. Presses the home button to wake the screen.
+     * 3. Swipes up from the bottom (Face ID / modern iPhones) to reach lock screen.
+     * 4. If DEVICE_PASSCODE is set, taps each digit on the passcode pad.
+     */
+    private void unlockDeviceIfLocked(AppiumDriver driver) {
+        try {
+            boolean locked = (Boolean) driver.executeScript("mobile: isLocked");
+            if (!locked) {
+                System.out.println("[IOSLaunch] Device already unlocked.");
+                return;
+            }
+            System.out.println("[IOSLaunch] Device is locked — unlocking...");
+        } catch (Exception e) {
+            System.out.println("[IOSLaunch] Could not check lock state: " + e.getMessage());
+            return;
+        }
+
+        // Wake screen — press home / side button
+        try {
+            driver.executeScript("mobile: pressButton", Map.of("name", "home"));
+        } catch (Exception e) {
+            try { driver.executeScript("mobile: pressButton", Map.of("name", "volumeup")); }
+            catch (Exception ignored) {}
+        }
+        sleep(800);
+
+        // Swipe up from bottom to dismiss lock screen (Face ID devices)
+        try {
+            Map<String, Object> args = Map.of(
+                    "direction", "up",
+                    "velocity", 1000
+            );
+            driver.executeScript("mobile: swipe", args);
+            sleep(600);
+        } catch (Exception e) {
+            System.out.println("[IOSLaunch] Swipe-up on lock screen failed: " + e.getMessage());
+        }
+
+        // Enter passcode if provided
+        String passcode = getPasscode();
+        if (passcode != null && !passcode.isEmpty()) {
+            System.out.println("[IOSLaunch] Entering passcode...");
+            for (char digit : passcode.toCharArray()) {
+                try {
+                    driver.findElement(AppiumBy.accessibilityId(String.valueOf(digit))).click();
+                    sleep(150);
+                } catch (Exception e) {
+                    System.out.println("[IOSLaunch] Passcode digit '" + digit + "' not found: " + e.getMessage());
+                }
+            }
+            sleep(1000);
+        }
+
+        System.out.println("[IOSLaunch] Device unlock sequence complete.");
     }
 
     private void ensureAppRunning(AppiumDriver driver) {

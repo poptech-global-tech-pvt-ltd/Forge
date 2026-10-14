@@ -1,4 +1,4 @@
-testName: iOS Hierarchy Dump
+testName: iOS Hierarchy Dump — Launch Screen
 platform: ios
 noReset: true
 loginRequired: false
@@ -14,4 +14,4 @@ retry: 1
 
 steps:
   - action: launchApp
-  - action: dumpHierarchy
+  - action: getSource

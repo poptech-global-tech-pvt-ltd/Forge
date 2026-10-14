@@ -1,0 +1,29 @@
+# iOS home screen element overrides.
+# Run ts_ios_dump_home.yaml to get accessibility IDs, then fill in below.
+# Only add elements that differ from Android. Android fallback applies automatically.
+
+# ── Bottom navigation ──────────────────────────────────────────────────────────
+home_tab:
+  ios:
+    - type: accessibilityId
+      value: Home   # TODO: verify from dump
+
+shop_tab:
+  ios:
+    - type: accessibilityId
+      value: Shop   # TODO: verify from dump
+
+rewards_tab:
+  ios:
+    - type: accessibilityId
+      value: Rewards   # TODO: verify from dump
+
+profile_tab:
+  ios:
+    - type: accessibilityId
+      value: Profile   # TODO: verify from dump
+
+cart_tab:
+  ios:
+    - type: accessibilityId
+      value: Cart   # TODO: verify from dump
