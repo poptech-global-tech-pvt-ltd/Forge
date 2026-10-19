@@ -1,0 +1,65 @@
+name: Forge Tuition Tests
+
+# Correlation tag is embedded in the run name so the caller (pop-c2c-svc)
+# can locate this exact run after a workflow_dispatch.
+run-name: Forge Tuition Tests ${{ inputs.run_tag }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_tag:
+        description: "Correlation tag supplied by the caller to locate this run"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  tuition-tests:
+    runs-on: pop-ubuntu
+    steps:
+      - name: Checkout Forge
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+
+      - name: Load secrets from AWS Secrets Manager
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ap-south-1
+        run: |
+          set -euo pipefail
+          echo "Fetching secret 'qa/prod/forge' from AWS Secrets Manager (ap-south-1)..."
+          SECRET_JSON=$(aws secretsmanager get-secret-value \
+            --secret-id qa/prod/forge \
+            --query SecretString --output text)
+
+          # Expect a flat JSON object of key/value pairs. Export each entry as a
+          # masked environment variable so the Maven/TestNG run can consume them.
+          for key in $(echo "$SECRET_JSON" | jq -r 'keys[]'); do
+            value=$(echo "$SECRET_JSON" | jq -r --arg k "$key" '.[$k]')
+            echo "::add-mask::$value"
+            echo "$key=$value" >> "$GITHUB_ENV"
+          done
+          echo "Loaded $(echo "$SECRET_JSON" | jq -r 'keys | length') secret value(s) into the environment."
+
+      - name: Run tuition full suite
+        run: |
+          mvn test \
+            -Dsurefire.suiteXmlFiles=src/test/resources/suites/testng-tuition-full.xml \
+            -Denv=sit
+
+      - name: Upload Surefire reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: target/surefire-reports/**
+          if-no-files-found: ignore
