@@ -13,6 +13,7 @@ public class ActionFactory {
             case "tap":               return new TapAction();
             case "enterText":         return new EnterTextAction();
             case "launchApp":         return new LaunchAppAction();
+            case "deeplink":          return new DeeplinkAction();
             case "tapIfPresent":      return new TapIfPresentAction();
             case "waitFor":           return new WaitForAction();
             case "waitForGone":       return new WaitForGoneAction();
@@ -82,6 +83,11 @@ public class ActionFactory {
                 throw new RuntimeException(msg);
             };
             case "call":                     return step -> {}; // no-op sentinel
+
+            // ── Webview / context switching (tutor onboarding) ────────────────
+            case "initiate":          return new InitiateAction();
+            case "switchToWebview":   return new SwitchToWebviewAction();
+            case "switchToNative":    return new SwitchToNativeAction();
 
             // ── Search / Cart / Wishlist flows ────────────────────────────────
             case "searchAndVerifyCartPrice": return new SearchCartPriceAction();

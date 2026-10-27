@@ -63,6 +63,7 @@ steps:
 `pressKey` `verifyElement` `scanTags` `captureText` `assertStoredText`
 `scrollDown` `scrollUp` `pullToRefresh` `tapByText` `verifyCLP`
 `verifyCLPRedirects` `verifyCLPFilters`
+`initiate` `switchToWebview` `switchToNative`
 
 ## Element keys
 Element keys live in `src/test/resources/testdata/elements/*.yaml`.
