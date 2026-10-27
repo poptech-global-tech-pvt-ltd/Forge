@@ -17,6 +17,10 @@ retry: 1
 steps:
   - action: launchApp
 
+  - action: tapByText
+    value: "Skip"
+    optional: true
+
   - action: waitFor
     element: login_phone_input
 
@@ -30,10 +34,10 @@ steps:
 
   - action: enterText
     element: login_phone_input
-    value: "9000000001"
+    value: "8618082300"
 
   - action: tapByText
-    value: "9000000001"
+    value: "8618082300"
     timeout: 5
 
   - action: verifyElement

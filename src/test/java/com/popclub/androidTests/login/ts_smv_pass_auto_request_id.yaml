@@ -18,12 +18,16 @@ retry: 1
 steps:
   - action: launchApp
 
+  - action: tapByText
+    value: "Skip"
+    optional: true
+
   - action: waitFor
     element: login_phone_input
 
   - action: enterText
     element: login_phone_input
-    value: "1234567741"
+    value: "1234567747"
 
   - action: tap
     element: login_continue_button
@@ -56,7 +60,7 @@ steps:
     headers:
       Authorization: "Bearer ${smv_admin_token}"
       Content-Type: "application/json"
-    body: '{"request_id": "${smv_request_id}", "comments": "+911234567741", "status": "PASSED"}'
+    body: '{"request_id": "${smv_request_id}", "comments": "+911234567747", "status": "PASSED"}'
 
   - action: launchApp
 
@@ -65,7 +69,7 @@ steps:
 
   - action: enterText
     element: login_phone_input
-    value: "1234567741"
+    value: "1234567747"
 
   - action: tap
     element: login_continue_button
@@ -73,12 +77,12 @@ steps:
   - action: tapByText
     value: "Explore POP"
 
-  - action: waitFor
-    element: skip_tour
-    timeout: 30
-
-  - action: tap
-    element: skip_tour
+#  - action: waitFor
+#    element: skip_tour
+#    timeout: 30
+#
+#  - action: tap
+#    element: skip_tour
 
   - action: verifyElement
     element: home_tab

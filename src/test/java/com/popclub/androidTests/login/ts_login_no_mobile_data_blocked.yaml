@@ -17,6 +17,10 @@ retry: 1
 steps:
   - action: launchApp
 
+  - action: tapByText
+    value: "Skip"
+    optional: true
+
   - action: toggleMobileData
     value: off_if_on
 
@@ -25,7 +29,7 @@ steps:
 
   - action: enterText
     element: login_phone_input
-    value: "8722249459"
+    value: "8618082300"
 
   - action: tap
     element: login_continue_button

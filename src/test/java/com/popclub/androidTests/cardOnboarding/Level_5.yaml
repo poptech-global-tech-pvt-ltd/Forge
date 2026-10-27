@@ -1,0 +1,138 @@
+testName: Card Onboarding Level 5 - Office Details (Professional)
+platform: android
+noReset: true
+loginRequired: true
+
+testCaseIds:
+  - PO-7814
+
+features:
+  - common
+  - credit_card
+
+tags:
+  - smoke
+  - card
+  - onboarding
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: tap
+    element: common_card_tab
+
+  - action: tap
+    element: edge_image_banner_widget_row
+
+  - action: verifyElement
+    element: cc_professional_company_name_input
+
+  # ════════════════════════════════════════════════════════════════
+  #  NEGATIVE TEST CASES
+  # ════════════════════════════════════════════════════════════════
+
+  - action: enterText
+    element: cc_professional_income_input
+    value: "50000"
+
+  - action: verifyElement
+    element: cc_professional_submit_button
+    testCaseId: PO-7814
+
+  - action: enterText
+    element: cc_professional_income_input
+    value: ""
+
+  # ════════════════════════════════════════════════════════════════
+  #  SAVE & EXIT TESTS
+  # ════════════════════════════════════════════════════════════════
+
+  - action: verifyElement
+    element: cc_eligibility_save_exit_button
+    testCaseId: PO-7805
+
+  - action: tap
+    element: cc_eligibility_save_exit_button
+
+  - action: verifyElement
+    element: cc_eligibility_confirm_exit_button
+    testCaseId: PO-7806
+
+  - action: verifyElement
+    element: cc_eligibility_cancel_exit_button
+    testCaseId: PO-7807
+
+  - action: tap
+    element: cc_eligibility_cancel_exit_button
+
+  - action: verifyElement
+    element: cc_professional_company_name_input
+    testCaseId: PO-7810
+
+  - action: tap
+    element: cc_eligibility_save_exit_button
+
+  - action: tap
+    element: cc_eligibility_confirm_exit_button
+    testCaseId: PO-7811
+
+  - action: tap
+    element: common_card_tab
+
+  - action: tap
+    element: edge_image_banner_widget_row
+
+  - action: verifyElement
+    element: cc_professional_company_name_input
+    testCaseId: PO-7813
+
+  # ════════════════════════════════════════════════════════════════
+  #  POSITIVE TEST CASES (submits Level 5 → moves to Level 6)
+  #  ⚠ No going back after this — Level 5 is locked once submitted
+  # ════════════════════════════════════════════════════════════════
+
+  - action: tap
+    element: cc_professional_company_type_input
+
+  - action: verifyElement
+    element: professional_details_01
+    testCaseId: PO-7783
+
+  - action: tap
+    element: professional_details_01
+    testCaseId: PO-7787
+
+  - action: tap
+    element: cc_professional_profession_input
+
+  - action: tap
+    element: professional_details_selection_bottom_sheet_item_ACCOUNTANT
+    testCaseId: PO-7789
+
+  - action: tap
+    element: cc_professional_designation_input
+
+  - action: tap
+    element: professional_details_search_selection_bottom_sheet_list_item_1
+    testCaseId: PO-7790
+
+  - action: enterText
+    element: cc_professional_income_input
+    value: "9887856"
+    testCaseId: PO-7815
+
+  - action: tap
+    element: cc_professional_company_name_input
+    testCaseId: PO-7782
+
+  - action: tap
+    element: professional_details_search_selection_bottom_sheet_list_item_0
+
+  - action: tap
+    element: cc_professional_submit_button

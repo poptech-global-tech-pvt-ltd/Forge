@@ -20,6 +20,11 @@ public class TestContext {
 
     private static final ThreadLocal<List<String>> testCaseIds = new ThreadLocal<>();
 
+    // File-level testCaseIds (the YAML's own `testCaseIds:` block). These represent
+    // the test as a whole, so they take the overall pass/fail outcome. Step-level
+    // ids are reported individually from `results` instead.
+    private static final ThreadLocal<List<String>> fileLevelTestCaseIds = new ThreadLocal<>();
+
     private static ThreadLocal<Set<String>> failedTestCases =
             ThreadLocal.withInitial(HashSet::new);
 
@@ -29,9 +34,11 @@ public class TestContext {
     private static ThreadLocal<Boolean> resumeMode     = ThreadLocal.withInitial(() -> false);
     private static ThreadLocal<File> videoFile = new ThreadLocal<>();
     private static ThreadLocal<String> currentTestCase = new ThreadLocal<>();
+
     // Must be shared across TestNG worker threads — the Android login step
     // and the API test classes run in separate <test> tags/threads.
     private static String userToken;
+    private static ThreadLocal<String> legacyToken = new ThreadLocal<>();
     private static ThreadLocal<String> failingElement = new ThreadLocal<>();
 
     public static void setFailingElement(String element) { failingElement.set(element); }
@@ -108,6 +115,15 @@ public class TestContext {
 
     public static List<String> getTestCaseIds() {
         return testCaseIds.get();
+    }
+
+    public static void setFileLevelTestCaseIds(List<String> ids) {
+        fileLevelTestCaseIds.set(ids);
+    }
+
+    public static List<String> getFileLevelTestCaseIds() {
+        List<String> ids = fileLevelTestCaseIds.get();
+        return ids == null ? List.of() : ids;
     }
 
 
@@ -202,6 +218,20 @@ public class TestContext {
     }
 
     public static String getUserToken() { return userToken; }
+
+    public static void setLegacyToken(String token) { legacyToken.set(token); }
+    public static String getLegacyToken() { return legacyToken.get(); }
+
+    // ---------------- LOGIN CREDENTIALS (for API fallback) ----------------
+
+    private static ThreadLocal<String> loginPhone = new ThreadLocal<>();
+    private static ThreadLocal<String> loginOtp   = new ThreadLocal<>();
+
+    public static void setLoginPhone(String phone) { loginPhone.set(phone); }
+    public static String getLoginPhone() { return loginPhone.get(); }
+
+    public static void setLoginOtp(String otp) { loginOtp.set(otp); }
+    public static String getLoginOtp() { return loginOtp.get(); }
 
     // ---------------- USER ID (extracted from JWT payload) ----------------
 
@@ -310,6 +340,8 @@ public class TestContext {
         platform.remove();
         freshLaunch.remove();
         testCaseId.remove();
+        testCaseIds.remove();
+        fileLevelTestCaseIds.remove();
         runId = null;
         videoFile.remove();
         clpData.remove();

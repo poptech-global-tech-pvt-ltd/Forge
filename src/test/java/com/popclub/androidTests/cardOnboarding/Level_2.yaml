@@ -1,0 +1,237 @@
+testName: Card Onboarding Level 2 - Confirm Your Details (Personal Details)
+platform: android
+noReset: true
+loginRequired: true
+
+testCaseIds:
+  - PO-7604
+
+features:
+  - common
+  - credit_card
+
+tags:
+  - smoke
+  - card
+  - onboarding
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: tap
+    element: common_card_tab
+
+  - action: tap
+    element: edge_image_banner_widget_row
+
+  - action: verifyElement
+    element: cc_personal_first_name_input
+
+  # ════════════════════════════════════════════════════════════════
+  #  PAGE 1 — NEGATIVE TEST CASES (First name, Last name, Father name)
+  # ════════════════════════════════════════════════════════════════
+
+  - action: verifyElement
+    element: personal_details_content_button
+    testCaseId: PO-7604
+
+  # ── First name: numeric ──
+  - action: enterText
+    element: cc_personal_first_name_input
+    value: "12345"
+
+  - action: verifyElement
+    element: personal_details_content_button
+    testCaseId: PO-7629
+
+  - action: enterText
+    element: cc_personal_first_name_input
+    value: ""
+
+  # ── First name: special characters ──
+  - action: enterText
+    element: cc_personal_first_name_input
+    value: "@#$%&"
+
+  - action: verifyElement
+    element: personal_details_content_button
+    testCaseId: PO-7631
+
+  - action: enterText
+    element: cc_personal_first_name_input
+    value: ""
+
+  # ── Last name: numeric ──
+  - action: enterText
+    element: cc_personal_last_name_input
+    value: "12345"
+
+  - action: verifyElement
+    element: personal_details_content_button
+    testCaseId: PO-7642
+
+  - action: enterText
+    element: cc_personal_last_name_input
+    value: ""
+
+  # ── Last name: special characters ──
+  - action: enterText
+    element: cc_personal_last_name_input
+    value: "@#$%&"
+
+  - action: verifyElement
+    element: personal_details_content_button
+    testCaseId: PO-7644
+
+  - action: enterText
+    element: cc_personal_last_name_input
+    value: ""
+
+  # ── Father name: numeric ──
+  - action: enterText
+    element: cc_name_father_name_input
+    value: "12345"
+
+  - action: verifyElement
+    element: personal_details_content_button
+    testCaseId: PO-7636
+
+  - action: enterText
+    element: cc_name_father_name_input
+    value: ""
+
+  # ── Father name: special characters ──
+  - action: enterText
+    element: cc_name_father_name_input
+    value: "@#$%&"
+
+  - action: verifyElement
+    element: personal_details_content_button
+    testCaseId: PO-7635
+
+  - action: enterText
+    element: cc_name_father_name_input
+    value: ""
+
+  # ════════════════════════════════════════════════════════════════
+  #  PAGE 1 — SAVE & EXIT TESTS
+  # ════════════════════════════════════════════════════════════════
+
+  - action: verifyElement
+    element: cc_eligibility_save_exit_button
+    testCaseId: PO-7647
+
+  - action: tap
+    element: cc_eligibility_save_exit_button
+
+  - action: verifyElement
+    element: cc_eligibility_confirm_exit_button
+    testCaseId: PO-7649
+
+  - action: verifyElement
+    element: cc_eligibility_cancel_exit_button
+    testCaseId: PO-7650
+
+  # ── Cancel exit → stays on page ──
+  - action: tap
+    element: cc_eligibility_cancel_exit_button
+    testCaseId: PO-7651
+
+  - action: verifyElement
+    element: cc_personal_first_name_input
+    testCaseId: PO-7654
+
+  # ── Confirm exit → leaves, then re-enter ──
+  - action: tap
+    element: cc_eligibility_save_exit_button
+
+  - action: tap
+    element: cc_eligibility_confirm_exit_button
+    testCaseId: PO-7655
+
+  - action: tap
+    element: common_card_tab
+
+  - action: tap
+    element: edge_image_banner_widget_row
+
+  - action: verifyElement
+    element: cc_personal_first_name_input
+    testCaseId: PO-7658
+
+  # ════════════════════════════════════════════════════════════════
+  #  PAGE 1 — POSITIVE FLOW (fill & go to page 2)
+  # ════════════════════════════════════════════════════════════════
+
+  - action: enterText
+    element: cc_personal_first_name_input
+    value: "Harshala"
+
+  - action: enterText
+    element: cc_personal_last_name_input
+    value: "Sonavane"
+
+  - action: enterText
+    element: personal_details_state_one_fields_input
+    value: "Pop Singh"
+    testCaseId: PO-7603
+
+  - action: tap
+    element: cc_personal_dob_input
+
+  - action: tap
+    element: personal_details_dob_picker_ok_button
+    testCaseId: PO-7605
+
+  - action: tap
+    element: cc_personal_gender_chip_1
+    testCaseId: PO-7615
+
+  - action: tap
+    element: personal_details_content_button
+
+  # ════════════════════════════════════════════════════════════════
+  #  PAGE 2 — NEGATIVE TEST CASES (Email)
+  # ════════════════════════════════════════════════════════════════
+
+  # ── Email: invalid format ──
+  - action: enterText
+    element: cc_personal_email_input
+    value: "invalid-email"
+    testCaseId: PO-7609
+
+  - action: verifyElement
+    element: personal_details_content_button
+    testCaseId: PO-7610
+
+  - action: enterText
+    element: cc_personal_email_input
+    value: ""
+
+  # ════════════════════════════════════════════════════════════════
+  #  PAGE 2 — POSITIVE FLOW (fill & submit Level 2)
+  #  ⚠ No going back after this — Level 2 is locked once submitted
+  # ════════════════════════════════════════════════════════════════
+
+  - action: enterText
+    element: cc_personal_email_input
+    value: "singh.gaurav@popclub.co"
+    testCaseId: PO-7608
+
+  - action: tap
+    element: cc_personal_occupation_chip_0
+    testCaseId: PO-7624
+
+  - action: tap
+    element: cc_personal_marital_status_chip_0
+    testCaseId: PO-7620
+
+  - action: tap
+    element: personal_details_content_button
+    testCaseId: PO-7627

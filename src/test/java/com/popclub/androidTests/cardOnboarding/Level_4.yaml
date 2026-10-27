@@ -1,0 +1,170 @@
+testName: Card Onboarding Level 4 - Current Residential Address
+platform: android
+noReset: true
+loginRequired: true
+
+testCaseIds:
+  - PO-7755
+
+features:
+  - common
+  - credit_card
+
+tags:
+  - smoke
+  - card
+  - onboarding
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: tap
+    element: common_card_tab
+
+  - action: tap
+    element: edge_image_banner_widget_row
+
+  - action: verifyElement
+    element: cc_residential_pincode_input
+
+  # ════════════════════════════════════════════════════════════════
+  #  NEGATIVE TEST CASES
+  # ════════════════════════════════════════════════════════════════
+
+  - action: verifyElement
+    element: cc_residential_submit_button
+    testCaseId: PO-7755
+
+  - action: enterText
+    element: residential_address_inline_address_form_content_input
+    value: "@#$%&"
+
+  - action: verifyElement
+    element: cc_residential_submit_button
+    testCaseId: PO-7753
+
+  - action: enterText
+    element: residential_address_inline_address_form_content_input
+    value: ""
+
+  - action: enterText
+    element: residential_address_inline_address_form_content_input_1
+    value: "@#$%&"
+
+  - action: verifyElement
+    element: cc_residential_submit_button
+    testCaseId: PO-7754
+
+  - action: enterText
+    element: residential_address_inline_address_form_content_input_1
+    value: ""
+
+  - action: enterText
+    element: residential_address_inline_address_form_content_input
+    value: "ABCDEFGHIJKLMNOPQRSTUVWXYZ12345678"
+
+  - action: verifyElement
+    element: cc_residential_submit_button
+    testCaseId: PO-7751
+
+  - action: enterText
+    element: residential_address_inline_address_form_content_input
+    value: ""
+
+  - action: enterText
+    element: residential_address_inline_address_form_content_input_1
+    value: "ABCDEFGHIJKLMNOPQRSTUVWXYZ12345678"
+
+  - action: verifyElement
+    element: cc_residential_submit_button
+    testCaseId: PO-7752
+
+  - action: enterText
+    element: residential_address_inline_address_form_content_input_1
+    value: ""
+
+  - action: verifyElement
+    element: cc_residential_submit_button
+    testCaseId: PO-7760
+
+  # ════════════════════════════════════════════════════════════════
+  #  SAVE & EXIT TESTS
+  # ════════════════════════════════════════════════════════════════
+
+  - action: verifyElement
+    element: cc_eligibility_save_exit_button
+    testCaseId: PO-7761
+
+  - action: tap
+    element: cc_eligibility_save_exit_button
+
+  - action: verifyElement
+    element: cc_eligibility_confirm_exit_button
+
+  - action: verifyElement
+    element: cc_eligibility_cancel_exit_button
+    testCaseId: PO-7762
+
+  - action: tap
+    element: cc_eligibility_cancel_exit_button
+    testCaseId: PO-7763
+
+  - action: verifyElement
+    element: cc_residential_pincode_input
+    testCaseId: PO-7764
+
+  - action: tap
+    element: cc_eligibility_save_exit_button
+
+  - action: tap
+    element: cc_eligibility_confirm_exit_button
+
+  - action: tap
+    element: common_card_tab
+
+  - action: tap
+    element: edge_image_banner_widget_row
+
+  - action: verifyElement
+    element: cc_residential_pincode_input
+
+  # ════════════════════════════════════════════════════════════════
+  #  POSITIVE TEST CASES (submits Level 4 → moves to Level 5)
+  #  ⚠ No going back after this — Level 4 is locked once submitted
+  # ════════════════════════════════════════════════════════════════
+
+  - action: enterText
+    element: residential_address_inline_address_form_content_input
+    value: "12 MG Road"
+    testCaseId: PO-7748
+
+  - action: enterText
+    element: residential_address_inline_address_form_content_input_1
+    value: "Indiranagar"
+    testCaseId: PO-7749
+
+  - action: enterText
+    element: residential_address_inline_address_form_content_input_2
+    value: "Near Metro Station"
+    testCaseId: PO-7750
+
+  - action: enterText
+    element: cc_residential_pincode_input
+    value: "400028"
+    testCaseId: PO-7757
+
+  - action: verifyElement
+    element: cc_residential_submit_button
+    testCaseId: PO-7759
+
+  - action: tap
+    element: cc_residential_submit_button
+
+  - action: verifyElement
+    element: cc_professional_company_name_input

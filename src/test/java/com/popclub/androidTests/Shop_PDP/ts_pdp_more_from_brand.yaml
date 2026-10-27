@@ -1,0 +1,67 @@
+testName: PDP — More from this brand
+platform: android
+noReset: true
+loginRequired: false
+retry: 0
+
+testCaseIds:
+  - PO-11055
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - sanity
+  - shop
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561234"
+    text: "560102"
+
+  - action: tap
+    element: common_shop_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  - action: tap
+    element: shop_search_button
+
+  - action: enterText
+    element: search_products_search_input
+    value: "the souled store"
+
+  - action: pressKey
+    value: search
+
+  - action: tap
+    element: product_list_item_0
+
+  # ── Scroll down to 'More from this brand' section ──────────────────────
+  - action: swipe
+    direction: up
+
+  - action: swipe
+    direction: up
+
+  # ── PO-11054: Verify section exists ────────────────────────────────────
+  - action: verifyElement
+    element: product_details_similar_products_section_row
+
+  - action: verifyElement
+    element: product_details_similar_product_card_row
+    testCaseId: PO-11054
+
+  # ── PO-11055: Tap a product card → opens new PDP ──────────────────────
+  - action: tap
+    element: product_details_similar_product_card_row
+
+  - action: verifyElement
+    element: product_details_title
+    testCaseId: PO-11055
