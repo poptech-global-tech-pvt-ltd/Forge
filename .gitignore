@@ -49,6 +49,7 @@ src/test/resources/qa.properties
 src/main/resources/config/local.cloud.properties
 src/test/resources/config/testsigma-local.properties
 src/test/resources/config/local.cloud.properties
+src/test/resources/config/uat.properties
 
 
 ### Forge ###

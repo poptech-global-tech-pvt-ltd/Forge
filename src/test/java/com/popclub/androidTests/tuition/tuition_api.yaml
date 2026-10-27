@@ -21,21 +21,20 @@ steps:
     value: "1234561122"
     text: "560102"
 
-  - action: waitFor
-    element: home_tab
-
   - action: captureToken
-
-  - action: scrollUntilVisible
-    element: clp_section_row_5
-    direction: down
+  
+  - action: scrollTo
+    element: clp_section_title_4
+    
+  - action: tap
+    element: home_grid_item_merch
 
   - action: tap
-    element: home_landscape_slider_item_0
-
+    element: home_grid_item_tuition_fee
+    
   - action: tap
-    element: home_grid_item_1  # healed locator → home_grid_item_1
-
+    element: pop_input_field_search_input
+    
   - action: enterText
     element: pop_input_field_search_input
     value: "swetaranjan92578@okicici"

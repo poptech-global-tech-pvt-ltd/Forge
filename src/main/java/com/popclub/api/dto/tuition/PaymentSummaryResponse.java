@@ -6,15 +6,33 @@ import lombok.Data;
 
 @Data @JsonIgnoreProperties(ignoreUnknown = true)
 public class PaymentSummaryResponse {
-    private String status;
-    private Data data;
+
+    @JsonProperty("is_success") private boolean success;
+    private String message;
+    private Data   data;
 
     @lombok.Data @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Data {
-        private long amount;
-        @JsonProperty("platform_fee")  private long platformFee;
-        private long gst;
-        @JsonProperty("total_amount")  private long totalAmount;
-        @JsonProperty("fee_percentage") private double feePercentage;
+        private Fee   fee;
+        private Payee payee;
+    }
+
+    @lombok.Data @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class Fee {
+        @JsonProperty("total_cta_amount")     private String totalCtaAmount;
+        @JsonProperty("total_amount")         private double totalAmount;
+        @JsonProperty("convenience_fee")      private double convenienceFee;
+        @JsonProperty("gst_convenience_fee")  private double gstConvenienceFee;
+        @JsonProperty("total_payable")        private double totalPayable;
+    }
+
+    @lombok.Data @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class Payee {
+        private String vpa;
+        private String name;
+        @JsonProperty("payee_id")         private String payeeId;
+        @JsonProperty("payee_display_id") private String payeeDisplayId;
+        @JsonProperty("masked_phone")     private String maskedPhone;
+        @JsonProperty("masked_pan")       private String maskedPan;
     }
 }

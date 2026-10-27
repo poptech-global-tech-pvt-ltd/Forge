@@ -58,7 +58,6 @@
     -->
 
     <!-- ── Step 4: Student error cases ──────────────────────────────────── -->
-    <!--
     <test name="Step 4 — Student Payer API (Error Cases)">
         <groups>
             <run>
@@ -69,7 +68,6 @@
             <class name="com.popclub.apiTests.tuition.TuitionPayerJourneyTest"/>
         </classes>
     </test>
-    -->
 
     <!-- ── Step 5: Tutor error cases ────────────────────────────────────── -->
     <!--

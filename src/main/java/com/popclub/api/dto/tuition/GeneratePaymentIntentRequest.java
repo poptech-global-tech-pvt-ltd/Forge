@@ -6,19 +6,28 @@ import lombok.Data;
 
 @Data @Builder
 public class GeneratePaymentIntentRequest {
-<<<<<<< HEAD
     @JsonProperty("payee_display_id")    private String payeeDisplayId;
     @JsonProperty("total_payable")       private String totalPayable;
     @JsonProperty("gst_convenience_fee") private String gstConvenienceFee;
     @JsonProperty("total_amount")        private String totalAmount;
     @JsonProperty("convenience_fee")     private String convenienceFee;
     @JsonProperty("idempotency_key")     private String idempotencyKey;
-=======
-    @JsonProperty("payee_display_id")     private String payeeDisplayId;
-    @JsonProperty("total_payable")        private String totalPayable;
-    @JsonProperty("gst_convenience_fee")  private String gstConvenienceFee;
-    @JsonProperty("total_amount")         private String totalAmount;
-    @JsonProperty("convenience_fee")      private String convenienceFee;
-    @JsonProperty("idempotency_key")      private String idempotencyKey;
->>>>>>> 7679027 (feat(tuition-c2c):)
+
+    public static GeneratePaymentIntentRequest from(
+            String payeeDisplayId, PaymentSummaryResponse.Fee fee, String idempotencyKey) {
+        return GeneratePaymentIntentRequest.builder()
+                .payeeDisplayId(payeeDisplayId)
+                .totalPayable(String.valueOf(fee.getTotalPayable()))
+                .gstConvenienceFee(String.valueOf(fee.getGstConvenienceFee()))
+                .totalAmount(String.valueOf(fee.getTotalAmount()))
+                .convenienceFee(String.valueOf(fee.getConvenienceFee()))
+                .idempotencyKey(idempotencyKey)
+                .build();
+    }
+
+    public static GeneratePaymentIntentRequest withIdempotencyKeyOnly(String idempotencyKey) {
+        return GeneratePaymentIntentRequest.builder()
+                .idempotencyKey(idempotencyKey)
+                .build();
+    }
 }

@@ -6,13 +6,16 @@ import lombok.Data;
 
 @Data @JsonIgnoreProperties(ignoreUnknown = true)
 public class VerifyOtpResponse {
-    private String status;
-    private Data data;
+
+    @JsonProperty("is_success") private boolean success;
+    private String message;
+    private Data   data;
 
     @lombok.Data @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Data {
-        private String token;
-        @JsonProperty("access_token") private String accessToken;
-        @JsonProperty("mobile_number") private String mobileNumber;
+        private String message;
+        @JsonProperty("access_token")  private String accessToken;
+        @JsonProperty("refresh_token") private String refreshToken;
+        @JsonProperty("expire_at")     private String expireAt;
     }
 }

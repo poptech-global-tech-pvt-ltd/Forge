@@ -1,10 +1,20 @@
 package com.popclub.api.dto.tuition;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 
 @Data @Builder
 public class VerifyOtpRequest {
-    private String code;
-    private String otp;
+    @JsonProperty("mobile_number")  private String mobileNumber;
+    @JsonProperty("country_code")   private String countryCode;
+    private String                                  otp;
+
+    public static VerifyOtpRequest of(String mobileNumber, String otp) {
+        return VerifyOtpRequest.builder()
+                .mobileNumber(mobileNumber)
+                .countryCode("+91")
+                .otp(otp)
+                .build();
+    }
 }

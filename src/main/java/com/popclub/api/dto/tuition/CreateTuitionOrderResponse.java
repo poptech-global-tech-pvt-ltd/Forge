@@ -6,14 +6,23 @@ import lombok.Data;
 
 @Data @JsonIgnoreProperties(ignoreUnknown = true)
 public class CreateTuitionOrderResponse {
-    private String status;
-    private Data data;
+
+    @JsonProperty("is_success") private boolean success;
+    private String message;
+    private Data   data;
+
+    // Error envelope ({"is_success":false,"error_code":...,"error_message":...}) shares this shape.
+    @JsonProperty("error_code")    private String errorCode;
+    @JsonProperty("error_message") private String errorMessage;
 
     @lombok.Data @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Data {
-        @JsonProperty("order_number")  private String orderNumber;
-        @JsonProperty("invite_code")   private String inviteCode;
+        @JsonProperty("order_number") private String orderNumber;
+        @JsonProperty("order_type")   private String orderType;
         private String status;
-        @JsonProperty("payment_intent_id") private String paymentIntentId;
+        @JsonProperty("workflow_id")  private String workflowId;
+        @JsonProperty("payee_id")     private String payeeId;
+        private String amount;
+        @JsonProperty("created_at")   private String createdAt;
     }
 }

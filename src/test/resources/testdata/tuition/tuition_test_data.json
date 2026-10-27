@@ -1,27 +1,50 @@
 {
   "tutor": {
-    "mobile": "8318762027",
-    "pan": "ANNPY9033H",
+    "mobile": "9911934876",
+    "pan": "DQJPK6188P",
     "payee_type": "TUTOR",
-    "vpa": "8318762027@ybl"
+    "vpa": "9911934876@yespop"
   },
   "payment": {
-    "amount": "1234",
-    "total_payable": "1236.56",
-    "convenience_fee": "3.00",
-    "gst_convenience_fee": "0.54",
-    "card_number": "4111111111111111",
-    "expiry_month": "12",
-    "expiry_year": "2028",
-    "cvv": "123",
-    "card_holder_name": "Test User",
-    "card_type": "DEBIT"
+    "amount": "2.00",
+    "card_number": "5241939305776012",
+    "expiry_month": "01",
+    "expiry_year": "32",
+    "cvv": "890",
+    "card_holder_name": "Manoj",
+    "card_type": "CREDIT",
+    "otp": "98765"
   },
   "consent": {
     "category": "tuition",
     "payee_action": "confirm",
-    "consent_type_id": "TUITION_TERMS",
-    "consent_version_id": "v1",
+    "consent_type_id": "0a08e0b9-2c8b-4530-90ed-4cd6dda29167",
+    "consent_version_id": "c2f4da19-6606-4f18-9eca-1f98ac65bfc0",
     "action": "granted"
+  },
+  "invalid_cases": {
+    "invalid_payment_option": "NOT_A_REAL_OPTION",
+    "well_formed_vpa": "9483862699@mapper.npci",
+    "invalid_vpa": "not-a-valid-vpa",
+    "malformed_pan": "INVALIDPAN",
+    "unresolvable_pan": "ZZZZZ0000Z",
+    "rate_limit_sample_pan": "GOGPS2222J",
+    "rate_limit_sample_mobile": "8318762027",
+    "generic_mobile": "+913232342424",
+    "unknown_payment_intent_id": "pi_never_issued_00000000000",
+    "dummy_card": {
+      "card_number": "4111111111111111",
+      "expiry_month": "12",
+      "expiry_year": "2028",
+      "cvv": "123",
+      "card_holder_name": "Test User",
+      "card_type": "DEBIT"
+    },
+    "dummy_amount_breakdown": {
+      "total_amount": "50000",
+      "convenience_fee": "500",
+      "gst_convenience_fee": "90",
+      "total_payable": "50590"
+    }
   }
 }

@@ -6,15 +6,23 @@ import lombok.Data;
 
 @Data @JsonIgnoreProperties(ignoreUnknown = true)
 public class PaymentIntentResponse {
-    private String status;
-    private Data data;
+
+    @JsonProperty("is_success") private boolean success;
+    private String message;
+    private Data   data;
 
     @lombok.Data @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Data {
-        @JsonProperty("payment_intent_id") private String paymentIntentId;
-        @JsonProperty("razorpay_order_id") private String razorpayOrderId;
-        @JsonProperty("razorpay_key_id")   private String razorpayKeyId;
-        private long amount;
-        private String currency;
+        @JsonProperty("is_active")         private boolean active;
+        @JsonProperty("idempotency_key")   private String  idempotencyKey;
+        @JsonProperty("payment_intent_id") private String  paymentIntentId;
+        @JsonProperty("payee_id")          private String  payeeId;
+        @JsonProperty("payee_display_id")  private String  payeeDisplayId;
+        @JsonProperty("payer_id")          private String  payerId;
+        @JsonProperty("payout_type")       private String  payoutType;
+        private String vpa;
+        private String status;
+        @JsonProperty("total_payable")     private String  totalPayable;
+        @JsonProperty("created_at")        private String  createdAt;
     }
 }

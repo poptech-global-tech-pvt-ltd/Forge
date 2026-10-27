@@ -7,9 +7,22 @@ import io.restassured.RestAssured;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.http.ContentType;
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class OmsService {
@@ -65,12 +78,13 @@ public class OmsService {
      * Opens the OMS SSE stream for an order and collects raw event lines until
      * either a line containing expectedStatus is seen, or timeout elapses.
      */
-    public java.util.List<String> listenToOrderStream(String orderNumber, String expectedStatus, java.time.Duration timeout) throws java.io.IOException, InterruptedException {
-        java.net.http.HttpClient client = java.net.http.HttpClient.newBuilder()
-                .connectTimeout(java.time.Duration.ofSeconds(10))
+    public List<String> listenToOrderStream(String orderNumber, String expectedStatus, Duration timeout)
+            throws IOException, InterruptedException {
+        HttpClient client = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(10))
                 .build();
-        java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
-                .uri(java.net.URI.create(Routes.OMS_STREAM.kongUrl(orderNumber)))
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(Routes.OMS_STREAM.kongUrl(orderNumber)))
                 .header("Authorization", "Bearer " + accessToken)
                 .header("X-RequestId", UUID.randomUUID().toString())
                 .header("Accept", "text/event-stream")
@@ -78,13 +92,13 @@ public class OmsService {
                 .GET()
                 .build();
 
-        java.net.http.HttpResponse<java.io.InputStream> response =
-                client.send(request, java.net.http.HttpResponse.BodyHandlers.ofInputStream());
+        HttpResponse<InputStream> response =
+                client.send(request, HttpResponse.BodyHandlers.ofInputStream());
 
-        java.util.List<String> events = new java.util.ArrayList<>();
+        List<String> events = new ArrayList<>();
         long deadline = System.currentTimeMillis() + timeout.toMillis();
-        try (java.io.BufferedReader reader = new java.io.BufferedReader(
-                new java.io.InputStreamReader(response.body(), java.nio.charset.StandardCharsets.UTF_8))) {
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(response.body(), StandardCharsets.UTF_8))) {
             String line;
             while (System.currentTimeMillis() < deadline) {
                 line = reader.readLine();
@@ -94,9 +108,28 @@ public class OmsService {
                 System.out.println("[SSE] " + line);
                 if (expectedStatus != null && (line.contains(expectedStatus) || line.contains("FAILED"))) break;
             }
-        } catch (java.io.IOException e) {
+        } catch (IOException e) {
             System.out.println("[SSE] stream closed/timed out: " + e.getMessage());
         }
         return events;
+    }
+
+    /**
+     * Scans raw SSE event lines (as collected by {@link #listenToOrderStream})
+     * for the first state_change event carrying a payment_link, and returns it.
+     * Returns null if no event in the list has one.
+     */
+    public static String extractPaymentLink(List<String> events) {
+        for (String event : events) {
+            if (!event.startsWith("data:") || !event.contains("\"payment_link\"")) {
+                continue;
+            }
+            String json = event.substring(event.indexOf('{'));
+            String link = JsonPath.from(json).getString("data.payment_details.payment_link");
+            if (link != null) {
+                return link;
+            }
+        }
+        return null;
     }
 }

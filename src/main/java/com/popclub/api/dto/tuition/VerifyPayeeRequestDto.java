@@ -18,4 +18,11 @@ public class VerifyPayeeRequestDto {
     @JsonProperty("payout_reference_id")
     private String payoutReferenceId;
 
+    public static VerifyPayeeRequestDto from(String pan, String mobile, String payoutReferenceId) {
+        return VerifyPayeeRequestDto.builder()
+                .pan(pan)
+                .mobile(mobile)
+                .payoutReferenceId(payoutReferenceId)
+                .build();
+    }
 }

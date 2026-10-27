@@ -10,6 +10,7 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
+import java.util.Map;
 import java.util.UUID;
 
 public class C2CService {
@@ -49,7 +50,6 @@ public class C2CService {
 
     public Response verifyPayee(VerifyPayeeRequestDto req) {
         return buildSpec().body(req).post(Routes.CSVC_PAYEE_VERIFICATION.getPath());
-
     }
 
     public Response getPaymentSummary(String payeeDisplayId, double amount) {
@@ -57,6 +57,15 @@ public class C2CService {
                 .queryParam("payee_display_id", payeeDisplayId)
                 .queryParam("amount", amount)
                 .get(Routes.CSVC_PAYMENT_SUMMARY.getPath());
+    }
+
+    /** For error/edge-case tests that need to omit or corrupt individual query params. */
+    public Response getPaymentSummaryRaw(Map<String, Object> queryParams) {
+        RequestSpecification spec = buildSpec();
+        for (Map.Entry<String, Object> e : queryParams.entrySet()) {
+            spec = spec.queryParam(e.getKey(), e.getValue());
+        }
+        return spec.get(Routes.CSVC_PAYMENT_SUMMARY.getPath());
     }
 
     public Response generatePaymentIntent(GeneratePaymentIntentRequest req) {
@@ -67,8 +76,8 @@ public class C2CService {
                 .post(Routes.CSVC_PAYMENT_INTENT.getPath());
     }
 
-    public Response verifyPaymentIntent(String paymentIntentId, Object body) {
-        return buildSpec().body(body)
+    public Response verifyPaymentIntent(String paymentIntentId, PaymentIntentVerifyRequest req) {
+        return buildSpec().body(req)
                 .post(Routes.CSVC_PAYMENT_INTENT_VERIFY.kongUrl(paymentIntentId));
     }
 

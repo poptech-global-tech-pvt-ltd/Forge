@@ -84,6 +84,11 @@ public class ActionFactory {
             };
             case "call":                     return step -> {}; // no-op sentinel
 
+            // ── Webview / context switching (tutor onboarding) ────────────────
+            case "initiate":          return new InitiateAction();
+            case "switchToWebview":   return new SwitchToWebviewAction();
+            case "switchToNative":    return new SwitchToNativeAction();
+
             // ── Search / Cart / Wishlist flows ────────────────────────────────
             case "searchAndVerifyCartPrice": return new SearchCartPriceAction();
             case "cartRemoveItem":           return new CartRemoveAction();

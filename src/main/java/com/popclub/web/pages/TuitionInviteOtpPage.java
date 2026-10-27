@@ -16,9 +16,9 @@ public class TuitionInviteOtpPage {
     private final Page page;
     private static final Logger log = LoggerFactory.getLogger(TuitionInviteOtpPage.class);
 
-    private static final String OTP_DIGIT_INPUTS = "input[type='tel']";
+    private static final String OTP_DIGIT_INPUTS = "input[type='text']";
     private static final String VERIFY_BUTTON    = "button:has-text('Verify OTP')";
-    private static final String FEE_HEADING      = "text=education fee of";
+    private static final String FEE_HEADING      = "text=education fee";
 
     public TuitionInviteOtpPage(Page page) {
         this.page = page;

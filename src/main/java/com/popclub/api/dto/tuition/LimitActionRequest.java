@@ -9,7 +9,14 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class LimitActionRequest {
     @JsonProperty("payment_intent_id")    private String paymentIntentId;
-    private String                                       category;
+    @JsonProperty("category")             @Builder.Default private String category = "TUITION";
     @JsonProperty("limit_reservation_id") private String limitReservationId;
     @JsonProperty("order_number")         private String orderNumber;
+
+    public static LimitActionRequest from(String paymentIntentId, String limitReservationId) {
+        return LimitActionRequest.builder()
+                .paymentIntentId(paymentIntentId)
+                .limitReservationId(limitReservationId)
+                .build();
+    }
 }
