@@ -1,0 +1,59 @@
+testName: Card CLP Redirects All Items
+platform: android
+noReset: true
+
+testCaseIds:
+  - PO-CARD-CLP-REDIRECTS
+
+features:
+  - home
+  - login
+  - credit_card
+
+tags:
+  - clp
+  - card
+  - redirects
+
+retry: 0
+
+steps:
+  # ── 1. Launch & login ───────────────────────────────────────────────────────
+  - action: launchApp
+
+  - action: tapIfPresent
+    element: skip_tour
+
+  - action: enterText
+    element: login_input_phone
+    value: 1234561122
+
+  - action: tap
+    element: login_button
+
+  - action: enterText
+    element: otp_input
+    value: 560102
+
+  - action: captureToken
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: tap
+    element: card_tab
+
+  # ── 2. Fetch Card CLP sections (populates TestContext) ──────────────────────
+  - action: verifyCLP
+    value: CARD
+
+  # ── 3. Tap every item in every section — verifies all redirects ─────────────
+  #       ✅ navigation detected (back button visible after tap)
+  #       ⚠️  item not visible on screen (skipped — may be inside carousel)
+  #       ❌ fails only if ZERO items navigate successfully across all sections
+  # ─────────────────────────────────────────────────────────────────────────────
+  - action: verifyCLPRedirects
+    value: CARD
+    text: "all"

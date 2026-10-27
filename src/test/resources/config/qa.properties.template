@@ -1,0 +1,23 @@
+# Copy this file to qa.properties and fill in your values.
+# qa.properties is gitignored — never commit real tokens.
+#
+# Setup:
+#   cp src/test/resources/config/qa.properties.template \
+#      src/test/resources/config/qa.properties
+
+ENV=qa
+
+# Base URLs
+APP_BASE_URL=https://app-qa.popclub.co.in
+HASHIRA_BASE_URL=https://hashira-qa.popclub.co.in
+USER_PROFILE_BASE_URL=https://userprofile-qa.popclub.co.in
+PROD_BASE_URL=https://prod-qa.popclub.co.in
+
+# Auth tokens — get from the team's internal secrets store
+APP_TOKEN=
+PROD_TOKEN=
+
+# Phone number series for onboarding
+PHONE_PREFIX=+91
+PHONE_BASE=1234560001
+PHONE_MAX=1234569999

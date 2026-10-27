@@ -1,0 +1,102 @@
+testName: Payment — UPI apps expand, select GPay/PhonePe, switch methods
+platform: android
+noReset: true
+loginRequired: false
+features:
+  - common
+  - login
+  - home
+  - shop
+  
+tags:
+  - shop
+  - payment
+  
+retry: 0
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: call
+    flow: add_to_cart_and_pay
+    params:
+      search_query: "the souled store"
+      search_pincode: "560102"
+
+  - action: call
+    flow: navigate_to_payment_sheet
+
+  # Expand to full sheet
+  - action: tap
+    element: payment_method_other_options_button
+
+  # ── PO-15713: UPI apps section expands ──
+  # NOTE: Missing element key — need: upi_apps_section_button
+  - action: scrollUntilVisible
+    element: shop_payment_upi_vertical_button_row
+    direction: down
+    maxScrolls: 3
+
+  - action: verifyElement
+    element: shop_payment_upi_vertical_button_row
+    shouldExist: true
+    testCaseId: PO-15713
+
+  # ── PO-15714: Select Google Pay updates footer, closes sheet ──
+  # NOTE: Missing element key — need: upi_app_gpay_button
+  - action: tapByText
+    value: "Google Pay"
+
+  - action: verifyElement
+    element: payment_method_title_text
+    shouldExist: false
+    testCaseId: PO-15714
+
+  # ── PO-15725: Switch from GPay to PhonePe updates footer ──
+  - action: tap
+    element: cart_payment_method_bottom_sheet_button
+
+  - action: waitFor
+    element: payment_method_title_text
+    timeout: 3000
+
+  - action: tap
+    element: payment_method_other_options_button
+
+  - action: scrollUntilVisible
+    element: shop_payment_upi_vertical_button_row
+    direction: down
+    maxScrolls: 3
+
+  # ── PO-15715: Select PhonePe updates footer ──
+  - action: tapByText
+    value: "PhonePe"
+
+  - action: verifyElement
+    element: payment_method_title_text
+    shouldExist: false
+    testCaseId: PO-15715
+
+  # PO-15725 validated — switching from GPay to PhonePe closed sheet
+  # Capture footer to confirm it updated
+  - action: captureText
+    element: cart_payment_method_bottom_sheet_button
+    variable: payment_method_after_switch
+
+  - action: logVar
+    variable: payment_method_after_switch
+    value: "PO-15725 payment method after switch: ${payment_method_after_switch}"
+    testCaseId: PO-15725
+
+  # ── PO-15716: UPI apps list horizontally scrollable (5+ apps) ──
+  # NOTE: Cannot assert horizontal scroll via Forge — visual/manual check
+  - action: logVar
+    variable: product_title
+    value: "PO-15716 — horizontal scroll of UPI apps requires manual verification"

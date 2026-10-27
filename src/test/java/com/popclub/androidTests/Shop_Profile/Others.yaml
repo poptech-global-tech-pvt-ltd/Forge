@@ -1,0 +1,70 @@
+testName: Profile — Others section navigation
+platform: android
+noReset: true
+loginRequired: true
+retry: 0
+
+testCaseIds:
+  - PO-11703
+
+features:
+  - common
+  - login
+  - home
+  - profile
+
+tags:
+  - regression
+  
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561234"
+    text: "560102"
+
+  - action: tap
+    element: home_profile_icon
+
+  - action: swipe
+    direction: up
+
+  # ── PO-11703: Help & Support navigation ────────────────────────────────
+  - action: tap
+    element: profile_help_support_button
+
+  - action: verifyElement
+    element: your_cart_merchant_background
+    testCaseId: PO-11703
+
+  - action: pressKey
+    value: back
+
+  # ── PO-11704: Terms & Conditions visible ───────────────────────────────
+  - action: verifyElement
+    element: profile_terms_conditions_button
+    testCaseId: PO-11704
+
+  # ── PO-11705: Privacy Policy visible ───────────────────────────────────
+  - action: verifyElement
+    element: profile_privacy_policy_button
+    testCaseId: PO-11705
+
+  # ── PO-11706: Rate Us visible ──────────────────────────────────────────
+  - action: verifyElement
+    element: profile_rate_us_button
+    testCaseId: PO-11706
+
+  # ── PO-11707: Logout shows confirmation ────────────────────────────────
+  - action: swipe
+    direction: up
+
+  - action: tap
+    element: profile_logout_button
+
+  - action: verifyElement
+    element: profile_logout_title_text
+    testCaseId: PO-11707
+
+  - action: tap
+    element: profile_logout_cancel_button

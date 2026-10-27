@@ -1,0 +1,120 @@
+# Reusable flow: find first product that is available, deliverable, and has at least one size in stock.
+#
+# Inputs (set via `params:` in the calling test):
+#   search_query   — what to search for        (required)
+#   search_pincode — delivery pincode filter   (optional)
+#   search_phone   — phone for API auth        (optional — default: "1234561122")
+#   search_otp     — OTP for API auth          (optional — default: "560102")
+#   search_page    — results page              (optional — default: 1)
+#
+# Outputs stored in TestContext:
+#   product_title                              — title of first qualifying product
+#   product_id                                 — id of first qualifying product
+#   product_brand                              — brand name
+#   product_size                               — first available size for that product
+#   product_index                              — 0-based index in hits[] (for UI scrollTo/tap)
+#
+#   api_product_list_item_price                — selling price (offer_price_detail.price.selling_price)
+#   api_product_list_item_strikethrough_price  — MRP / original price
+#   api_product_list_item_price_with_popcoin   — price after max coin redemption
+#   api_product_list_item_popcoin              — max coins user can burn
+#   api_product_list_item_discount_pct         — discount percentage
+#   api_product_list_item_coins_earned         — popstar coins earned on purchase
+#   api_product_list_item_coin_redemption_pct        — max % of price payable via coins
+#   api_product_list_item_special_pricing            — true if coin offer is active
+#   api_product_list_item_coin_burn_limit_default    — 0 means no coin redemption (coin tag hidden)
+
+steps:
+  - action: callService
+    service: search.plp
+    params:
+      query:   "${search_query}"
+      pincode: "${search_pincode}"
+      phone:   "${search_phone}"
+      otp:     "${search_otp}"
+      page:    "${search_page}"
+    extract:
+      product_title: >
+        data[0].hits.find {
+          it.availability.is_available_to_buy == true &&
+          it.sizes.any { s -> s.availability.is_available_to_buy == true }
+        }.title
+
+      product_id: >
+        data[0].hits.find {
+          it.availability.is_available_to_buy == true &&
+          it.sizes.any { s -> s.availability.is_available_to_buy == true }
+        }.id
+
+      product_brand: >
+        data[0].hits.find {
+          it.availability.is_available_to_buy == true &&
+          it.sizes.any { s -> s.availability.is_available_to_buy == true }
+        }.brand_info.name
+
+      product_size: >
+        data[0].hits.find {
+          it.availability.is_available_to_buy == true &&
+          it.sizes.any { s -> s.availability.is_available_to_buy == true }
+        }.sizes.find { it.availability.is_available_to_buy == true }.size
+
+      product_index: >
+        data[0].hits.findIndexOf {
+          it.availability.is_available_to_buy == true &&
+          it.sizes.any { s -> s.availability.is_available_to_buy == true }
+        }
+
+      # api_ prefix = sourced from API, not UI
+      api_product_list_item_price: >
+        data[0].hits.find {
+          it.availability.is_available_to_buy == true &&
+          it.sizes.any { s -> s.availability.is_available_to_buy == true }
+        }.offer_price_detail.price.selling_price
+
+      api_product_list_item_strikethrough_price: >
+        data[0].hits.find {
+          it.availability.is_available_to_buy == true &&
+          it.sizes.any { s -> s.availability.is_available_to_buy == true }
+        }.offer_price_detail.price.mrp
+
+      api_product_list_item_price_with_popcoin: >
+        data[0].hits.find {
+          it.availability.is_available_to_buy == true &&
+          it.sizes.any { s -> s.availability.is_available_to_buy == true }
+        }.coin_burn_rules.max_cash_price
+
+      api_product_list_item_popcoin: >
+        data[0].hits.find {
+          it.availability.is_available_to_buy == true &&
+          it.sizes.any { s -> s.availability.is_available_to_buy == true }
+        }.coin_burn_rules.max_coins_burn_limit
+
+      api_product_list_item_discount_pct: >
+        data[0].hits.find {
+          it.availability.is_available_to_buy == true &&
+          it.sizes.any { s -> s.availability.is_available_to_buy == true }
+        }.offer_price_detail.price.discount_percent
+
+      api_product_list_item_coins_earned: >
+        data[0].hits.find {
+          it.availability.is_available_to_buy == true &&
+          it.sizes.any { s -> s.availability.is_available_to_buy == true }
+        }.offer_price_detail.price.popstarCoins
+
+      api_product_list_item_coin_redemption_pct: >
+        data[0].hits.find {
+          it.availability.is_available_to_buy == true &&
+          it.sizes.any { s -> s.availability.is_available_to_buy == true }
+        }.coin_burn_rules.max_coins_redemption_percent
+
+      api_product_list_item_special_pricing: >
+        data[0].hits.find {
+          it.availability.is_available_to_buy == true &&
+          it.sizes.any { s -> s.availability.is_available_to_buy == true }
+        }.coin_burn_rules.special_pricing
+
+      api_product_list_item_coin_burn_limit_default: >
+        data[0].hits.find {
+          it.availability.is_available_to_buy == true &&
+          it.sizes.any { s -> s.availability.is_available_to_buy == true }
+        }.coin_burn_rules_default.max_coins_burn_limit

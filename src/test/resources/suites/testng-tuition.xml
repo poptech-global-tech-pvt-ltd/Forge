@@ -1,0 +1,79 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<!--
+  Tuition C2C API suite — student payer flow + tutor onboarding flow.
+
+  Prerequisites:
+    1. Run the Android YAML (ts_tuition_student_login.yaml) to capture the student JWT into TestContext.
+       OR pass a token via -Duser.token=<jwt> if running API tests standalone.
+    2. For standalone tutor tests, pass:
+         -Dc2c.invite.code=<code> -Dc2c.order.number=<number>
+
+  Run full suite (payer → onboarding in order):
+    mvn test -Dsurefire.suiteXmlFiles=src/test/resources/suites/testng-tuition.xml -Denv=sit
+
+  Run only happy path:
+    mvn test -Dsurefire.suiteXmlFiles=src/test/resources/suites/testng-tuition.xml -Denv=sit -Dgroups="tuition-payer,tuition-onboarding"
+
+  Run only error cases:
+    mvn test -Dsurefire.suiteXmlFiles=src/test/resources/suites/testng-tuition.xml -Denv=sit -Dgroups="tuition-payer-error,tuition-onboarding-error"
+-->
+<suite name="Tuition C2C API Suite" parallel="false">
+
+    <listeners>
+        <listener class-name="com.popclub.listener.TestListener"/>
+    </listeners>
+
+    <parameter name="runTitle" value="Tuition C2C API Tests"/>
+    <parameter name="projectId" value="d8f4a221-bc6d-47d8-9448-0834f5d012ec"/>
+    <parameter name="tag"       value="tuition-c2c"/>
+
+    <!-- ── Student (Payer) happy path — runs first, stores invite_code + orderNumber ── -->
+    <test name="Tuition - Student Happy Path">
+        <groups>
+            <run>
+                <include name="tuition-payer"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.popclub.apiTests.tuition.TuitionPayerJourneyTest"/>
+        </classes>
+    </test>
+
+    <!-- ── Tutor (Onboarding) happy path — depends on invite_code from above ── -->
+    <test name="Tuition - Tutor Onboarding Happy Path">
+        <groups>
+            <run>
+                <include name="tuition-onboarding"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.popclub.apiTests.tuition.TuitionOnboardingTest"/>
+        </classes>
+    </test>
+
+    <!-- ── Student error cases ── -->
+    <test name="Tuition - Student Error Cases">
+        <groups>
+            <run>
+                <include name="tuition-payer-error"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.popclub.apiTests.tuition.TuitionPayerJourneyTest"/>
+        </classes>
+    </test>
+
+    <!-- ── Tutor error cases ── -->
+    <test name="Tuition - Tutor Onboarding Error Cases">
+        <groups>
+            <run>
+                <include name="tuition-onboarding-error"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.popclub.apiTests.tuition.TuitionOnboardingTest"/>
+        </classes>
+    </test>
+
+</suite>

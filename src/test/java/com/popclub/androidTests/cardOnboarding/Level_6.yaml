@@ -1,0 +1,130 @@
+testName: Card Onboarding Level 6 - Office Address
+platform: android
+noReset: true
+loginRequired: true
+
+testCaseIds:
+  - PO-16713
+
+features:
+  - common
+  - credit_card
+
+tags:
+  - smoke
+  - card
+  - onboarding
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: tap
+    element: common_card_tab
+
+  - action: tap
+    element: edge_image_banner_widget_row
+
+  - action: verifyElement
+    element: cc_office_title_text
+
+  # ════════════════════════════════════════════════════════════════
+  #  NEGATIVE TEST CASES
+  # ════════════════════════════════════════════════════════════════
+
+  - action: verifyElement
+    element: cc_office_select_on_maps_button
+
+  - action: verifyElement
+    element: cc_office_add_new_address_button
+
+  - action: verifyElement
+    element: cc_office_submit_button
+
+  - action: tap
+    element: cc_office_add_new_address_button
+    testCaseId: PO-16713
+
+  - action: verifyElement
+    element: cc_office_building_name_input
+    testCaseId: PO-16714
+
+  - action: verifyElement
+    element: cc_office_locality_input
+    testCaseId: PO-16715
+
+  - action: verifyElement
+    element: cc_office_landmark_input
+    testCaseId: PO-16716
+
+  - action: verifyElement
+    element: cc_office_pincode_input
+    testCaseId: PO-16718
+
+  - action: verifyElement
+    element: office_address_form_bottom_sheet_button
+    testCaseId: PO-16719
+
+  - action: verifyElement
+    element: office_address_form_bottom_sheet_button
+    testCaseId: PO-16720
+
+  - action: pressKey
+    value: back
+    testCaseId: PO-16724
+
+  - action: verifyElement
+    element: cc_office_title_text
+
+  # ════════════════════════════════════════════════════════════════
+  #  POSITIVE TEST CASES (submits Level 6 → moves to KYC)
+  #  ⚠ No going back after this — Level 6 is locked once submitted
+  # ════════════════════════════════════════════════════════════════
+
+  - action: tap
+    element: cc_office_add_new_address_button
+
+  - action: enterText
+    element: cc_office_building_name_input
+    value: "Tadikondamandal guntur district"
+
+  - action: enterText
+    element: cc_office_locality_input
+    value: "Sultanpur Wadgaon Maharashtra"
+
+  - action: enterText
+    element: cc_office_landmark_input
+    value: "Near Bus Stop"
+    testCaseId: PO-16717
+
+  - action: enterText
+    element: cc_office_pincode_input
+    value: "400028"
+
+  - action: verifyElement
+    element: cc_office_city_selector
+    testCaseId: PO-16723
+
+  - action: tap
+    element: office_address_form_bottom_sheet_button
+    testCaseId: PO-16725
+
+  - action: tap
+    element: cc_office_submit_button
+
+  - action: tap
+    element: card_delivery_address_delivery_address_card_radio
+
+  - action: tap
+    element: cc_delivery_submit_button
+    
+  - action: tap
+    element: card_delivery_address_name_suggestion_bottom_sheet_radio_0
+    
+  - action: tap
+    element: card_delivery_address_name_suggestion_bottom_sheet_button

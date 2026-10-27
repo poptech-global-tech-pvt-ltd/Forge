@@ -1,0 +1,55 @@
+testName: add address
+platform: android
+noReset: false
+
+features:
+  - common
+  - login
+
+tags:
+  - smoke
+retry: 1
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  # Add steps below
+  - action: tap
+    element: cart_s2_s_payment_button_button_2
+
+  - action: verifyElement
+    element: Google Map
+
+  - action: tap
+    element: add_address_screen_row
+
+  - action: tap
+    element: add_address_confirm_location_button
+
+  - action: verifyElement
+    element: Close
+
+  - action: enterText
+    element: add_address_house_no_input
+    value: "234,Test address"
+
+  - action: enterText
+    element: add_address_first_name_input
+    value: "Deepa"
+
+  - action: enterText
+    element: add_address_last_name_input
+    value: "Hegde"
+
+  - action: enterText
+    element: add_address_phone_input
+    value: "6361463451"
+
+  - action: tap
+    element: add_address_make_default_checkbox
+
+  - action: tap
+    element: add_address_save_button

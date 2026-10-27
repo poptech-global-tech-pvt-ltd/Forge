@@ -1,0 +1,11 @@
+{
+  "type": "module",
+  "devDependencies": {
+    "pptxgenjs": "^4.0.1"
+  },
+  "dependencies": {
+    "docx": "^9.7.1",
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "xml2js": "^0.6.2"
+  }
+}

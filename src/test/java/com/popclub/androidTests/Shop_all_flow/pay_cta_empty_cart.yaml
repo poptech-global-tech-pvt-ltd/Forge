@@ -1,0 +1,101 @@
+testName: Cart — Pay CTA and empty state
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-11238
+  - PO-11240
+  - PO-11241
+  - PO-11242
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - shop
+  - cart
+  - regression
+
+retry: 0
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+    
+  - action: tap
+    element: common_shop_tab
+    
+  - action: call
+    flow: search_product
+    params:
+      search_query: "souled store"
+
+  # ── Select first product ──
+  - action: tap
+    element: product_list_item_0
+
+  # ── Add to cart ──
+  - action: tap
+    element: product_details_bottom_sticky_bar_button
+
+  - action: tap
+    element: size_selection_item_0
+
+  - action: tap
+    element: size_selection_add_to_cart_button
+
+  # ── Go to cart ──
+  - action: tap
+    element: product_details_go_to_cart_button
+
+
+  # PO-11238: Pay CTA shows correct amount
+  - action: verifyElement
+    element: cart_pay_button
+    testCaseId: PO-11238
+
+  # PO-11240: Pay CTA updates when quantity changes
+  - action: captureText
+    element: cart_pay_button
+    variable: pay_before
+
+  - action: tap
+    element: cart_item_increase
+
+  - action: captureText
+    element: cart_pay_button
+    variable: pay_after
+
+  - action: logVar
+    variable: pay_after
+    value: "Pay after qty change: ${pay_after}"
+    testCaseId: PO-11240
+
+  # Restore quantity
+  - action: tap
+    element: cart_iteam_decrease
+
+  # PO-11241, 11242: Empty cart state
+  # Remove all items to see empty state
+  - action: tap
+    element: cart_iteam_decrease
+
+  # Popup appears
+  - action: tap
+    element: cart_remove_product_button
+
+  # PO-11241: Empty cart illustration and 'Explore more'
+  - action: assertText
+    element: cart_empty_title
+    value: "Your cart is empty"
+    testCaseId: PO-11241

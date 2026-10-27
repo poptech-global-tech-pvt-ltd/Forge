@@ -1,0 +1,85 @@
+testName: Recharge plan search, caps-lock case-insensitivity, plan rendering
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds: [PO-13183, PO-13185, PO-13187, PO-13188, PO-13189]
+
+features: [common, billpay]
+
+tags: [rcbp, prepaid, regression]
+
+retry: 0
+
+steps:
+  - action: launchApp
+  
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+    
+  - action: tap
+    element: bills_tab  
+  
+  - action: scrollTo
+    element: Mobile_prepaid
+
+  - action: tap
+    element: Mobile_prepaid
+    
+  - action: tap
+    element: bill_pay_recharge_my_number_item
+ 
+  # PO-13183 — no search results for unmatched plan search term
+  - action: tap
+    element: bill_pay_recharge_plan_search_input
+    
+  - action: enterText
+    element: bill_pay_recharge_plan_search_input
+    value: "zzznonexistentplan"
+    
+  - action: pressKey
+    value: search
+    
+  - action: verifyElement
+    element: no_plan_result 
+    testCaseId: P0-13183
+
+  # PO-13185 — caps lock doesn't affect plan search
+  - action: enterText
+    element: bill_pay_recharge_plan_search_input
+    value: "TALKTIME"  
+  
+  - action: pressKey
+    value: search
+    
+  - action: verifyElement
+    element: bill_pay_recharge_plan_item_0
+    
+  - action: tap
+    element: clear
+    
+  - action: enterText
+    element: bill_pay_recharge_plan_search_input
+    value: "data"
+    
+  - action: pressKey
+    value: search
+    
+  - action: verifyElement
+    element: bill_pay_recharge_plan_item_0
+    testCaseId: P0-13185
+    
+  - action: tap
+    element: clear
+
+  # PO-13187 — validite plan shows correctly in Recent Plans
+  - action: verifyElement
+    element: bill_pay_recent_plan_price_0
+    testCaseId: P0-13187
+
+  # PO-13188 — plan without data column renders with only validity info
+  - action: verifyElement
+    element: bill_pay_recharge_plan_page_plan_item_card_row
+    
+ 

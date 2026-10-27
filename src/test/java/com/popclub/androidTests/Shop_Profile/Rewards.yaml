@@ -1,0 +1,49 @@
+testName: Profile — Rewards and Cashback navigation
+platform: android
+noReset: true
+loginRequired: true
+retry: 0
+
+testCaseIds:
+  - PO-11692
+
+features:
+  - common
+  - login
+  - home
+  - profile
+
+tags:
+  - regression
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561234"
+    text: "560102"
+
+  - action: tap
+    element: home_profile_icon
+
+  # ── PO-11692: POPcoin Balance navigation ───────────────────────────────
+  - action: tap
+    element: profile_quick_action_popcoins_button
+
+  - action: verifyElement
+    element: clp_section_row_1
+    testCaseId: PO-11692
+
+  - action: pressKey
+    value: back
+
+  # ── PO-13847: Cashback Widget navigation ───────────────────────────────
+  - action: tap
+    element: profile_quick_action_cashback_button
+
+  - action: verifyElement
+    element: pop_chip_row
+    testCaseId: PO-13847
+
+  - action: pressKey
+    value: back

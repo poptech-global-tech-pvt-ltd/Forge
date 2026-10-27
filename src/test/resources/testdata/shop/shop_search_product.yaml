@@ -1,0 +1,52 @@
+testName: Shop - Search for a Product
+platform: android
+noReset: true
+loginRequired: true
+
+features:
+  - common
+  - shop
+
+tags:
+  - smoke
+  - shop
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: common_home_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  - action: waitFor
+    element: shop_search_button
+
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: enterText
+    element: search_products_search_input
+    value: "shirt"
+
+  - action: pressKey
+    value: search
+
+  - action: waitFor
+    element: product_list_item_0
+
+  - action: verifyElement
+    element: product_list_item_0
+
+  - action: verifyElement
+    element: product_list_item_title_0

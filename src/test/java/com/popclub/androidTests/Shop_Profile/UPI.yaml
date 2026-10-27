@@ -1,0 +1,50 @@
+testName: Profile — UPI Link navigation
+platform: android
+noReset: true
+loginRequired: true
+retry: 0
+
+testCaseIds:
+  - PO-15943
+
+features:
+  - common
+  - login
+  - home
+  - profile
+
+tags:
+  - regression
+  - shop
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561234"
+    text: "560102"
+
+  - action: tap
+    element: home_profile_icon
+
+  # ── PO-15943: Link Bank Account navigation ─────────────────────────────
+  - action: tap
+    element: profile_link_bank_account_button
+
+  - action: verifyElement
+    element: pop_top_bar_with_content_row
+    testCaseId: PO-15943
+
+  - action: pressKey
+    value: back
+
+  # ── PO-15944: Link RuPay Credit Card navigation ───────────────────────
+  - action: tap
+    element: profile_link_rupay_card_button
+
+  - action: verifyElement
+    element: pop_top_bar_with_content_row
+    testCaseId: PO-15944
+
+  - action: pressKey
+    value: back

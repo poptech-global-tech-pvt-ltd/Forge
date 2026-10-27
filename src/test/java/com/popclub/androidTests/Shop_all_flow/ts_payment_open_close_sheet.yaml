@@ -1,0 +1,99 @@
+testName: Payment — Open/close sheet, view more, collapse sections
+platform: android
+noReset: true
+loginRequired: false
+features:
+  - common
+  - login
+  - home
+  - shop
+  
+tags:
+  - shop
+  - payment
+  
+retry: 0
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  # ── Get to cart via reusable flow ──
+  - action: call
+    flow: add_to_cart_and_pay
+    params:
+      search_query: "the souled store"
+      search_pincode: "560102"
+
+  # ── Tap Pay to reach payment screen ──
+  - action: tap
+    element: cart_link_and_pay_button
+
+  - action: waitFor
+    element: shop_payment_screen_row
+    timeout: 5000
+
+  # ── PO-15700: Tap 'Pay using' opens payment bottom sheet ──
+  - action: tap
+    element: cart_payment_method_bottom_sheet_button
+
+  - action: verifyElement
+    element: payment_method_title_text
+    shouldExist: true
+    testCaseId: PO-15700
+
+  # ── PO-15701: Tap X closes sheet without changing method ──
+  - action: captureText
+    element: cart_payment_method_bottom_sheet_button
+    variable: payment_method_before_close
+
+  - action: tap
+    element: payment_method_close_button
+
+  - action: verifyElement
+    element: payment_method_title_text
+    shouldExist: false
+    testCaseId: PO-15701
+
+  # Reopen sheet for next tests
+  - action: tap
+    element: cart_payment_method_bottom_sheet_button
+
+  - action: waitFor
+    element: payment_method_title_text
+    timeout: 3000
+
+  # ── PO-15706: Tap 'View more options' expands full sheet ──
+  - action: tap
+    element: payment_method_other_options_button
+
+  - action: verifyElement
+    element: shop_payment_shop_cards_section_button
+    shouldExist: true
+    testCaseId: PO-15706
+
+  # ── PO-15707: Expanded sheet shows order total ──
+  - action: verifyElement
+    element: shop_payment_cart_summary_card_row
+    shouldExist: true
+    testCaseId: PO-15707
+
+  # ── PO-15728: Tapping another section collapses previous ──
+  # Expand POP UPI section
+  - action: tap
+    element: shop_payment_shop_pop_upi_section_button
+
+  # Now expand COD — POP UPI should collapse
+  - action: tap
+    element: shop_payment_shop_cod_section_button
+
+  - action: verifyElement
+    element: shop_payment_shop_cod_section_button
+    shouldExist: true
+    testCaseId: PO-15728

@@ -1,0 +1,362 @@
+{
+  "step1_1_getPopConsents" : {
+    "humanId" : "PO-12740",
+    "uuid" : "d6c938c5-1d54-4c4c-9e07-6085cf59cf2f"
+  },
+  "step1_2_postPopConsent" : {
+    "humanId" : "PO-12741",
+    "uuid" : "e1b8247e-93dd-475c-8889-8a7b271203ae"
+  },
+  "step2_0_updateUserDetailsPan" : {
+    "humanId" : "PO-12742",
+    "uuid" : "58c1f106-06ff-4c2c-82be-b77b87fa466e"
+  },
+  "step2_1_verifyPincode" : {
+    "humanId" : "PO-12743",
+    "uuid" : "cc25926a-dda5-4768-b17b-394ce59ca0c5"
+  },
+  "step3_1_getUserDetails" : {
+    "humanId" : "PO-12744",
+    "uuid" : "ede5e807-6b64-4310-913f-4f9264de5e10"
+  },
+  "step3_0_updateUserDetailsBasic" : {
+    "humanId" : "PO-12745",
+    "uuid" : "c2b08985-6c04-4baf-be49-26882a6b93f4"
+  },
+  "step4_1_getYblConsents" : {
+    "humanId" : "PO-12746",
+    "uuid" : "b4ed40d0-94c4-4911-b5cc-68bcabc346b5"
+  },
+  "step4_0_saveYblConsents" : {
+    "humanId" : "PO-12747",
+    "uuid" : "f8c1ab96-817b-4591-bf6e-a9ccc36ed65d"
+  },
+  "step5_0_saveAddressCurrent" : {
+    "humanId" : "PO-12748",
+    "uuid" : "c8eaf27e-5d3d-48bb-bf72-205e0112afb4"
+  },
+  "step5_1_getAddresses" : {
+    "humanId" : "PO-12749",
+    "uuid" : "a7d7b124-f91c-4080-b009-117d76e99cf0"
+  },
+  "step6_0_savePersonalDetails" : {
+    "humanId" : "PO-12750",
+    "uuid" : "c8731877-a3bd-4b1e-95ad-1850faddca01"
+  },
+  "step6_1_getPersonalDetails" : {
+    "humanId" : "PO-12751",
+    "uuid" : "55170689-a1e4-4579-9052-e8009069163c"
+  },
+  "step7_0_getProfessionMasters" : {
+    "humanId" : "PO-12752",
+    "uuid" : "eec54909-a713-43ec-90b3-aceef3a4e7a3"
+  },
+  "step7_0_saveProfessionalDetails" : {
+    "humanId" : "PO-12753",
+    "uuid" : "1ffa45a2-eb4f-47e6-b0bb-dc6d7754f9e0"
+  },
+  "step8_0_saveAddressOffice" : {
+    "humanId" : "PO-12754",
+    "uuid" : "de4cec12-b2f4-441c-bb93-663010762517"
+  },
+  "step9_0_saveAddressDelivery" : {
+    "humanId" : "PO-12755",
+    "uuid" : "1e53ef62-8399-45c4-9220-a759af328dcc"
+  },
+  "auth_noToken_updateUserDetailsBasic" : {
+    "humanId" : "PO-12645",
+    "uuid" : "3817020a-983e-44a3-a47c-089f3c77169a"
+  },
+  "auth_noToken_saveProfessionalDetails" : {
+    "humanId" : "PO-12653",
+    "uuid" : "56ee0503-95b3-4d9a-b034-c255dcd254d3"
+  },
+  "personalDetails_specialCharsNameOnCard" : {
+    "humanId" : "PO-12694",
+    "uuid" : "68ef06e1-0784-4c0d-b567-48539690baa9"
+  },
+  "professionalDetails_missingCompanyName" : {
+    "humanId" : "PO-12695",
+    "uuid" : "b46222bb-acb4-457b-a90c-6908903b338f"
+  },
+  "professionalDetails_missingDesignation" : {
+    "humanId" : "PO-12696",
+    "uuid" : "cae85148-44cb-499b-a30f-ece890b511bb"
+  },
+  "server_malformedJsonBody_userDetails" : {
+    "humanId" : "PO-12730",
+    "uuid" : "1e7e4b05-39e3-47c9-8f5e-f96ded9a2189"
+  },
+  "server_malformedJsonBody_yblConsents" : {
+    "humanId" : "PO-12731",
+    "uuid" : "987f6c98-f409-4ae9-9ac8-a8432a5e9556"
+  },
+  "server_invalidContentType_userDetails" : {
+    "humanId" : "PO-12734",
+    "uuid" : "b13e9fdf-349c-48b6-b6b7-e67d21af9ad6"
+  },
+  "server_malformedJsonBody_yblAddress" : {
+    "humanId" : "PO-12735",
+    "uuid" : "e2c4c128-a6ed-4a18-a4e7-56c8c100b67a"
+  },
+  "server_malformedJsonBody_yblPersonalDetails" : {
+    "humanId" : "PO-12736",
+    "uuid" : "0e5e72ba-f08a-49c4-8d50-afa2f67a2695"
+  },
+  "server_malformedJsonBody_yblProfessionalDetails" : {
+    "humanId" : "PO-12737",
+    "uuid" : "72b65bf6-82b9-47c2-8c52-7580c15277e8"
+  },
+  "server_invalidContentType_yblConsents" : {
+    "humanId" : "PO-12739",
+    "uuid" : "f9429147-5137-468e-b5de-0758b68311f6"
+  },
+  "pan_invalidFormat" : {
+    "humanId" : "PO-12665",
+    "uuid" : "c1c1fe01-0e53-42d4-b357-618d1ca5421d"
+  },
+  "pan_emptyPan" : {
+    "humanId" : "PO-12666",
+    "uuid" : "fdf0485d-7e01-47e1-a7e4-5234c059c7d7"
+  },
+  "pan_nullPan" : {
+    "humanId" : "PO-12667",
+    "uuid" : "7bb53047-5418-4cbb-874a-95de676a43d6"
+  },
+  "pan_tooLongPan" : {
+    "humanId" : "PO-12669",
+    "uuid" : "6814713b-2f17-4154-98bf-844d972aed8b"
+  },
+  "pan_nullPincode" : {
+    "humanId" : "PO-12670",
+    "uuid" : "3f209b2f-4a21-4974-ae16-405778217eb9"
+  },
+  "pan_emptyPincode" : {
+    "humanId" : "PO-12671",
+    "uuid" : "87c4120a-f46a-40bf-84ff-c082c91a7bfc"
+  },
+  "pincode_empty" : {
+    "humanId" : "PO-12674",
+    "uuid" : "1cd531df-b450-4c55-839b-708d8b01c016"
+  },
+  "pincode_tooShort" : {
+    "humanId" : "PO-12675",
+    "uuid" : "086e559c-1440-4f57-b62f-5dfb94210cf0"
+  },
+  "pincode_tooLong" : {
+    "humanId" : "PO-12677",
+    "uuid" : "1050ebbd-904e-4e76-a241-24c0cb1549f2"
+  },
+  "auth_noToken_getUserJourney" : {
+    "humanId" : "PO-12639",
+    "uuid" : "121b75dd-23da-4fbe-87c5-0c8c8c5274e9"
+  },
+  "auth_noToken_postPopConsent" : {
+    "humanId" : "PO-12640",
+    "uuid" : "15d441a6-13f4-4bfc-bfae-23b00f05b1a9"
+  },
+  "auth_invalidToken_getUserJourney" : {
+    "humanId" : "PO-12641",
+    "uuid" : "04758ecc-f27a-47fb-8048-4007a4857753"
+  },
+  "auth_noToken_yblConsents" : {
+    "humanId" : "PO-12642",
+    "uuid" : "177fa307-003d-40f6-95b4-645ccd82eab6"
+  },
+  "auth_noToken_postUserDetailsPan" : {
+    "humanId" : "PO-12643",
+    "uuid" : "ca06cfaa-8dce-44ba-a9ca-6a4378b04798"
+  },
+  "auth_noToken_getUserDetails" : {
+    "humanId" : "PO-12644",
+    "uuid" : "21a7d34f-6bce-4e59-b992-60b812076167"
+  },
+  "auth_noToken_verifyPincode" : {
+    "humanId" : "PO-12646",
+    "uuid" : "560fb4e8-d262-4442-8ffc-0846f753e9bf"
+  },
+  "auth_noToken_saveYblConsents" : {
+    "humanId" : "PO-12647",
+    "uuid" : "3ba653e3-1adc-4866-8e56-43e1609da963"
+  },
+  "auth_noToken_saveAddress" : {
+    "humanId" : "PO-12648",
+    "uuid" : "711338a4-b033-4800-a89b-f56b5ad2783d"
+  },
+  "auth_noToken_getAddresses" : {
+    "humanId" : "PO-12649",
+    "uuid" : "cd93ced7-d5c8-4057-8b45-97dd8a9d0b78"
+  },
+  "auth_noToken_savePersonalDetails" : {
+    "humanId" : "PO-12650",
+    "uuid" : "56f5bcc8-103e-4519-9747-f60c59678277"
+  },
+  "auth_noToken_getPersonalDetails" : {
+    "humanId" : "PO-12651",
+    "uuid" : "86075815-a4d0-44eb-ae27-b90282ab6dcc"
+  },
+  "auth_noToken_getMasterLists" : {
+    "humanId" : "PO-12652",
+    "uuid" : "730ea749-8134-4ca9-bd18-dffa8637acc4"
+  },
+  "sso_emptyMobileNumber" : {
+    "humanId" : "PO-12654",
+    "uuid" : "82bbbba9-67ef-4c69-8017-b99dd1563593"
+  },
+  "sso_nullMobileNumber" : {
+    "humanId" : "PO-12655",
+    "uuid" : "e4616d16-b3a1-4714-9fb4-499d05f22d89"
+  },
+  "sso_shortMobileNumber" : {
+    "humanId" : "PO-12656",
+    "uuid" : "00de83e0-66b0-44e8-9a47-04bdf162dc48"
+  },
+  "sso_specialCharsMobileNumber" : {
+    "humanId" : "PO-12657",
+    "uuid" : "42e921e2-f25c-4c9e-8552-0f7c3e384cc6"
+  },
+  "sso_alphabeticMobileNumber" : {
+    "humanId" : "PO-12658",
+    "uuid" : "ff5affd8-74fa-4f84-be05-a4bb4dab3f5a"
+  },
+  "sso_tooLongMobileNumber" : {
+    "humanId" : "PO-12659",
+    "uuid" : "d25c9165-0e78-49a0-83c8-72ba020a22b8"
+  },
+  "popConsentsGet_emptyMobile" : {
+    "humanId" : "PO-12660",
+    "uuid" : "7b044405-baa2-4e93-b9da-2f91d4f1cb13"
+  },
+  "popConsentsGet_invalidMobile" : {
+    "humanId" : "PO-12661",
+    "uuid" : "d5230821-e451-4364-888b-e983e433f739"
+  },
+  "popConsent_wrongMobileInBody" : {
+    "humanId" : "PO-12662",
+    "uuid" : "4758b2ab-1e9f-4347-a85d-2af88ce79d22"
+  },
+  "pan_specialCharsPan" : {
+    "humanId" : "PO-12668",
+    "uuid" : "a61c23e6-79f4-4ddc-b16c-63fc83cbfc5f"
+  },
+  "pincode_invalidLetters" : {
+    "humanId" : "PO-12673",
+    "uuid" : "3a27932f-0912-4e4b-b069-48d54872d83d"
+  },
+  "pincode_specialChars" : {
+    "humanId" : "PO-12676",
+    "uuid" : "448ad133-0da0-4ea5-bd64-412fb3a0a6b2"
+  },
+  "basicDetails_missingFirstName" : {
+    "humanId" : "PO-12678",
+    "uuid" : "b160b899-1829-4547-a4f0-a1ad05075e6f"
+  },
+  "basicDetails_missingLastName" : {
+    "humanId" : "PO-12679",
+    "uuid" : "d39acbe1-8552-4fa9-a5ae-fd066218c33b"
+  },
+  "basicDetails_invalidEmail" : {
+    "humanId" : "PO-12680",
+    "uuid" : "afa53c4c-3d43-4130-8798-d195853fd10b"
+  },
+  "basicDetails_invalidDob" : {
+    "humanId" : "PO-12681",
+    "uuid" : "f1ac7308-256e-40ba-9ad8-1ac3238dbd91"
+  },
+  "basicDetails_missingEmail" : {
+    "humanId" : "PO-12682",
+    "uuid" : "73081663-02bc-4147-b71f-1367bfcc0393"
+  },
+  "basicDetails_missingDob" : {
+    "humanId" : "PO-12683",
+    "uuid" : "f30c0c54-845a-4084-9490-da2fe3c4df12"
+  },
+  "basicDetails_invalidGender" : {
+    "humanId" : "PO-12684",
+    "uuid" : "ae7d8266-d674-448d-9a78-7d7c394f7d6c"
+  },
+  "consent_emptyConsentsList" : {
+    "humanId" : "PO-12663",
+    "uuid" : "15fe392c-85ad-4ee5-bce5-98253e78e613"
+  },
+  "consent_mandatoryConsentRejected" : {
+    "humanId" : "PO-12664",
+    "uuid" : "aa0f24b3-77cd-4c3a-8590-9d701ec8de89"
+  },
+  "address_missingAddressLine1" : {
+    "humanId" : "PO-12687",
+    "uuid" : "1b165ba7-1651-474a-bdce-4fefcb348cf3"
+  },
+  "address_missingCity" : {
+    "humanId" : "PO-12688",
+    "uuid" : "202131df-a67a-47e8-9a15-29ecac525651"
+  },
+  "address_invalidPincode" : {
+    "humanId" : "PO-12689",
+    "uuid" : "ba697e91-6923-4900-bf1f-ab4edcb007ed"
+  },
+  "address_missingState" : {
+    "humanId" : "PO-12690",
+    "uuid" : "56b917f3-7958-49f0-a274-f2f61166bf0f"
+  },
+  "personalDetails_missingNameOnCard" : {
+    "humanId" : "PO-12691",
+    "uuid" : "d646076d-5964-47c6-92a2-f8b472f121be"
+  },
+  "personalDetails_missingFatherName" : {
+    "humanId" : "PO-12692",
+    "uuid" : "17f788ca-83d1-4046-8fd0-a08bd72f3f91"
+  },
+  "professionalDetails_zeroIncome" : {
+    "humanId" : "PO-12756",
+    "uuid" : "0b770ce3-30c8-4de6-9401-c35fa4baa0e5"
+  },
+  "professionalDetails_negativeIncome" : {
+    "humanId" : "PO-12757",
+    "uuid" : "23319c1d-dcad-488f-85a4-e2b924dce447"
+  },
+  "duplicate_ssoVerifyTwice" : {
+    "humanId" : "PO-12729",
+    "uuid" : "81261803-6e4e-4e74-87ce-3739c6f7b02d"
+  },
+  "yblConsents_mandatoryConsentFalse" : {
+    "humanId" : "PO-12685",
+    "uuid" : "d1e0d71f-fa4d-4e44-8bf5-08dbba3ba15c"
+  },
+  "yblConsents_cibilConsentFalse" : {
+    "humanId" : "PO-12686",
+    "uuid" : "855904ef-ecd8-4ccb-9e49-81d03f557fc8"
+  },
+  "officeAddress_missingCity" : {
+    "humanId" : "PO-12715",
+    "uuid" : "afcf937a-fe35-4def-85fc-3dd166531f25"
+  },
+  "officeAddress_invalidPincode" : {
+    "humanId" : "PO-12722",
+    "uuid" : "d08325ad-df8e-4b16-bc01-ce54d1c35057"
+  },
+  "deliveryAddress_invalidType" : {
+    "humanId" : "PO-12727",
+    "uuid" : "e83a553c-73b4-452e-9328-da55ce0c22eb"
+  },
+  "deliveryAddress_nullType" : {
+    "humanId" : "PO-12728",
+    "uuid" : "fcab5df4-e82b-468f-bab1-78147b29efac"
+  },
+  "server_emptyBody_userDetails" : {
+    "humanId" : "PO-12732",
+    "uuid" : "519aa4d0-7f23-4d61-84b8-dd5cacc0b5f6"
+  },
+  "server_emptyBody_yblAddress" : {
+    "humanId" : "PO-12733",
+    "uuid" : "6fcd8911-26be-4a1b-bbce-67c89202216c"
+  },
+  "server_emptyBody_yblConsents" : {
+    "humanId" : "PO-12738",
+    "uuid" : "e7e91b01-a689-40cf-a180-06bbe03fdfee"
+  },
+  "pan_validFormatButFakePan" : {
+    "humanId" : "PO-12672",
+    "uuid" : "9f87c49f-d380-456c-a501-3a23c208a41b"
+  }
+}
