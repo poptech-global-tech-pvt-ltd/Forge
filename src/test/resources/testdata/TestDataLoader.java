@@ -33,4 +33,16 @@ public final class TestDataLoader {
             throw new RuntimeException("Failed to load invalid_cases_card_onboarding.json: " + e.getMessage(), e);
         }
     }
+
+    public static YblMockRequests loadYblMockRequests() {
+        try (InputStream is = TestDataLoader.class.getClassLoader()
+                .getResourceAsStream("testdata/card/ybl_mock_requests.json")) {
+            if (is == null) {
+                throw new RuntimeException("ybl_mock_requests.json not found in testdata/card/");
+            }
+            return MAPPER.readValue(is, YblMockRequests.class);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load ybl_mock_requests.json: " + e.getMessage(), e);
+        }
+    }
 }
