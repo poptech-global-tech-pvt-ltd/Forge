@@ -92,8 +92,8 @@ public class ScrollUntilVisibleAction implements Action {
         System.out.printf("[scrollUntilVisible] direction=%s  maxScrolls=%d  timeout=%ds  element=%s%n",
                 direction, maxScrolls, timeout, step.element);
 
-        // ── Strategy 1: UiScrollable (vertical only, accessibilityId + text) ─────
-        if ("down".equals(direction) || "up".equals(direction)) {
+        // ── Strategy 1: UiScrollable (down only — scrollIntoView always scrolls forward) ──
+        if ("down".equals(direction)) {
             for (Locator loc : step.locators) {
                 if ("accessibilityId".equalsIgnoreCase(loc.type)) {
                     if (tryUiScrollableByTag(driver, loc.value, direction)) {
@@ -121,7 +121,7 @@ public class ScrollUntilVisibleAction implements Action {
         }
 
         for (int i = 1; i <= maxScrolls; i++) {
-            swipe(driver, direction);
+            swipe(driver, toGestureDirection(direction));
 
             try { Thread.sleep(POST_SWIPE_SETTLE_MS); }
             catch (InterruptedException e) { Thread.currentThread().interrupt(); }
@@ -184,15 +184,28 @@ public class ScrollUntilVisibleAction implements Action {
 
     /** Builds a UiScrollable scrollIntoView selector for the given direction. */
     private String buildUiScrollable(String direction, String innerSelector) {
-        String base = "new UiScrollable(new UiSelector().scrollable(true))";
-        if ("up".equals(direction)) {
-            // Reverse the scroll direction so UiScrollable searches upward
-            base += ".setMaxSearchSwipes(20).scrollBackward()";
-        }
-        return base + ".scrollIntoView(" + innerSelector + ")";
+        return "new UiScrollable(new UiSelector().scrollable(true))"
+                + ".scrollIntoView(" + innerSelector + ")";
     }
 
     // ── Generic directional swipe ─────────────────────────────────────────────────
+
+    /**
+     * GestureUtil.swipe()'s "down"/"up" are named for the finger's travel
+     * direction, not the resulting scroll direction — its "up" gesture is
+     * what reveals content further down the page, and vice versa. Translate
+     * the intuitive YAML direction (down = reveal more below) into
+     * GestureUtil's finger-direction convention here, at the YAML boundary,
+     * instead of changing GestureUtil itself (which ~15 other actions call
+     * directly with hardcoded "up" expecting today's behavior).
+     */
+    private String toGestureDirection(String direction) {
+        switch (direction) {
+            case "down": return "up";
+            case "up":   return "down";
+            default:     return direction; // left / right unaffected
+        }
+    }
 
     private void swipe(AppiumDriver driver, String direction) {
         try {

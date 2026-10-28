@@ -318,10 +318,6 @@ cart_payment_method_bottom_sheet_button:
   android:
     - type: accessibilityId
       value: cart_payment_method_bottom_sheet_button
-cart_payment_method_dropdown:
-  android:
-    - type: accessibilityId
-      value: Select
 cart_price_summary_expand_button:
   android:
     - type: accessibilityId
@@ -510,18 +506,6 @@ clp_section_view_all_9:
   android:
     - type: accessibilityId
       value: clp_section_view_all_9
-Collapse:
-  android:
-    - type: accessibilityId
-      value: Collapse
-Expand:
-  android:
-    - type: accessibilityId
-      value: Expand
-grey_price:
-  android:
-    - type: accessibilityId
-      value: pdp_product_strikethrough_price
 order_details_bill_items_list_row:
   android:
     - type: accessibilityId
@@ -758,6 +742,58 @@ payment_processing_status_text:
   android:
     - type: accessibilityId
       value: payment_processing_status_text
+plp_back_button:
+  android:
+    - type: accessibilityId
+      value: plp_back_button
+plp_cart_icon:
+  android:
+    - type: accessibilityId
+      value: plp_cart_icon
+plp_filter_pill:
+  android:
+    - type: accessibilityId
+      value: plp_filter_pill
+plp_page_title:
+  android:
+    - type: accessibilityId
+      value: plp_page_title
+plp_popcoins_icon:
+  android:
+    - type: accessibilityId
+      value: plp_popcoins_icon
+plp_search_icon:
+  android:
+    - type: accessibilityId
+      value: plp_search_icon
+plp_sort_pill:
+  android:
+    - type: accessibilityId
+      value: plp_sort_pill
+plp_sort_text:
+  android:
+    - type: accessibilityId
+      value: plp_sort_text
+plp_wishlist_icon:
+  android:
+    - type: accessibilityId
+      value: plp_wishlist_icon
+product_card_brand_0:
+  android:
+    - type: accessibilityId
+      value: product_card_brand_0
+product_card_image_0:
+  android:
+    - type: accessibilityId
+      value: product_card_image_0
+product_card_name_0:
+  android:
+    - type: accessibilityId
+      value: product_card_name_0
+product_card_price_0:
+  android:
+    - type: accessibilityId
+      value: product_card_price_0
 product_details_back_button:
   android:
     - type: accessibilityId
@@ -829,7 +865,7 @@ product_details_size_option_1:
 product_details_strikethrough_price:
   android:
     - type: accessibilityId
-      value: pdp_product_price
+      value: pdp_product_strikethrough_price
 product_details_title:
   android:
     - type: accessibilityId
@@ -909,11 +945,11 @@ product_list_item_rating_0:
 product_list_item_strikethrough_price_0:
   android:
     - type: accessibilityId
-      value: product_list_item_0
+      value: product_list_item_strikethrough_price_0
 product_list_item_strikethrough_price_1:
   android:
     - type: accessibilityId
-      value: product_list_item_price_1  # healed from: product_list_item_strikethrough_price_1
+      value: product_list_item_strikethrough_price_1
 product_list_item_title_0:
   android:
     - type: accessibilityId
@@ -1038,6 +1074,14 @@ saved_address_item_label_1:
   android:
     - type: accessibilityId
       value: saved_address_item_label_1
+search_back_button:
+  android:
+    - type: accessibilityId
+      value: search_back_button
+search_clear_button:
+  android:
+    - type: accessibilityId
+      value: search_clear_button
 search_input:
   android:
     - type: accessibilityId
@@ -1058,6 +1102,10 @@ search_recent_item_1:
   android:
     - type: accessibilityId
       value: search_recent_item_1
+search_recent_section:
+  android:
+    - type: accessibilityId
+      value: search_recent_section
 search_suggestion_item_0:
   android:
     - type: accessibilityId
@@ -1074,6 +1122,10 @@ search_trending_item_1:
   android:
     - type: accessibilityId
       value: search_trending_item_1
+search_trending_section:
+  android:
+    - type: accessibilityId
+      value: search_trending_section
 Shop:
   android:
     - type: accessibilityId
@@ -1169,7 +1221,7 @@ shop_promo_banner_row:
 shop_search_button:
   android:
     - type: accessibilityId
-      value: shop_search_button
+      value: search_back_button  # healed from: shop_search_button
 shop_search_icon:
   android:
     - type: accessibilityId
@@ -1223,10 +1275,22 @@ toolbar_popcoin_button:
   android:
     - type: accessibilityId
       value: toolbar_popcoin_button
+toolbar_search_button:
+  android:
+    - type: accessibilityId
+      value: toolbar_search_button
+toolbar_wishlist_button:
+  android:
+    - type: accessibilityId
+      value: toolbar_wishlist_button
 wishlist_add_to_cart_button:
   android:
     - type: accessibilityId
       value: wishlist_add_to_cart_button
+wishlist_back_button:
+  android:
+    - type: accessibilityId
+      value: Navigation
 wishlist_icon:
   android:
     - type: accessibilityId
@@ -1251,6 +1315,22 @@ wishlist_size_selection_section_row:
   android:
     - type: accessibilityId
       value: wishlist_size_selection_section_row
+Collapse:
+  android:
+    - type: accessibilityId
+      value: Collapse
+Expand:
+  android:
+    - type: accessibilityId
+      value: Expand
+cart_payment_method_dropdown:
+  android:
+    - type: accessibilityId
+      value: Select
+grey_price:
+  android:
+    - type: accessibilityId
+      value: pdp_product_strikethrough_price
 your_cart_merchant_background:
   android:
     - type: accessibilityId

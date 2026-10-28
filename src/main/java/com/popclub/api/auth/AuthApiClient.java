@@ -6,10 +6,12 @@ import com.popclub.api.enums.HttpMethod;
 import com.popclub.api.impl.PopApiClient;
 import com.popclub.api.impl.PopRequestSpecification;
 import com.popclub.api.util.ApiConstants;
+import com.popclub.api.util.ConfigManager;
 import io.restassured.response.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -35,9 +37,13 @@ public class AuthApiClient {
     private static final String LOGIN_URL =
             ApiConstants.APP_BASE_URL + "/api/v3/login/";
 
-    private static final String DEVICE_ID  = "b1bee75238a76999";
+    private static final String DEVICE_ID  = "4dad8298141de331";
     private static final String PLATFORM   = "android";
-    private static final String APP_VERSION = "89";
+    private static final String APP_VERSION = "237";
+
+    // Device integrity token — all-zero flags = clean device (full flag set from real device)
+    private static final String X_TSIG_TOKEN =
+            "djE6dmRkOjAscnRkOjAsYmJiOjAsc3ViOjAsZnJkOjAsaG9rOjAscHh5OjAsc3NwOjAsc3B2OjAsZGJnOjAscmV2OjAsaXN2OjAsc3RkOjAsdGpwOjAsdnBuOjAsY29iOjAsbmRrOjAsbWNpOjAscHNtOjAsc292OjAsdWRlOjAsZG1lOjAsZHNsOjAsbWxjOjAsZGFwOjAsdGltOjAsdXdkOjAsYWNwOjAsYXVjOjAsYXdkOjAsaWNsOjAsa2xnOjAsaGFwOjAsYXZjOjAscmFwOjAsc2J4OjAsc3BmOjAsZGJsOjAsb2ZhOjAsdHBrOjAscnYzOjAsZGljOjAsYWFkOjAsaHZsOjAsaGsyOjAsaGszOjA=";
 
     /**
      * Full login: sends OTP then verifies it.
@@ -164,6 +170,69 @@ public class AuthApiClient {
         return new LoginResult(legacy, jwt);
     }
 
+    // ── SSO-based login (no x-tsig-token needed) ──────────────────────────────
+
+    /**
+     * Login via SSO verify — works without device integrity token.
+     * Returns a LoginResult where the single SSO token is used as both legacy + JWT.
+     *
+     * Use this when v3/login is blocked by x-tsig-token requirement.
+     *
+     * @param phone digits only e.g. "1234561122"
+     * @return LoginResult with same token for both legacy and JWT
+     */
+    public static LoginResult loginViaSSO(String phone) {
+        // SSO verify expects bare number without +91 prefix
+        String normalised = phone.startsWith("+91") ? phone.substring(3) : phone;
+
+        log.info("[AuthApiClient] SSO verify → {}", normalised);
+
+        // Use ConfigManager base URL (cardstack-sit.popclub.co.in from sit.properties)
+        String ssoUrl = ConfigManager.getBaseUrl() + "/sso/verify";
+        log.info("[AuthApiClient] SSO URL: {}", ssoUrl);
+
+        PopRequestSpecification spec = PopRequestSpecification.builder()
+                .baseUrl(ssoUrl)
+                .authorization(Authorization.NONE)
+                .headers(Map.of(
+                        "Content-Type", "application/json",
+                        "X-Source-Api-Key", ConfigManager.getXSourceApiKey()
+                ))
+                .body(Map.of("mobile_number", normalised))
+                .build();
+
+        Response r = PopApiClient.executeRequest(HttpMethod.POST, spec);
+
+        if (r.statusCode() != 200) {
+            throw new RuntimeException(
+                    "SSO verify failed HTTP " + r.statusCode() + ": " + r.body().asString());
+        }
+
+        boolean ok = r.jsonPath().getBoolean("is_success");
+        if (!ok) {
+            throw new RuntimeException(
+                    "SSO verify returned is_success=false: " + r.body().asString());
+        }
+
+        String token = r.jsonPath().getString("data.token");
+        if (token == null || token.isBlank()) {
+            throw new RuntimeException(
+                    "SSO verify succeeded but no token found: " + r.body().asString());
+        }
+
+        String userId = r.jsonPath().getString("data.user_id");
+        log.info("[AuthApiClient] SSO login successful — token={}, userId={}", preview(token), userId);
+
+        // SSO returns JWT. For app APIs that need legacy DRF token, use APP_TOKEN from config.
+        String legacyToken = ApiConstants.APP_TOKEN;
+        if (legacyToken == null || legacyToken.isBlank()) {
+            log.warn("[AuthApiClient] APP_TOKEN not set — using SSO JWT as legacy token (may fail for some APIs)");
+            legacyToken = token;
+        }
+
+        return new LoginResult(legacyToken, token, userId);
+    }
+
     private static String preview(String t) {
         if (t == null || t.isBlank()) return "(none)";
         return t.length() > 12 ? t.substring(0, 8) + "…" + t.substring(t.length() - 4) : t;
@@ -172,15 +241,22 @@ public class AuthApiClient {
     // ── Shared request builder ────────────────────────────────────────────────
 
     private static Response post(Map<String, Object> body) {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Accept",          "*/*");
+        headers.put("device_id",       DEVICE_ID);
+        headers.put("x-device-id",     DEVICE_ID);
+        headers.put("platform",        PLATFORM);
+        headers.put("app_version",     APP_VERSION);
+        headers.put("x-app-version",   APP_VERSION);
+        headers.put("x-tsig-token",    X_TSIG_TOKEN);
+        headers.put("x-device-meta",   "c2Ftc3VuZzpTTS1TOTExQjoxNjphbmRyb2lk"); // samsung:SM-S911B:16:android
+        headers.put("x-transport-type", "wifi");
+        headers.put("user-agent",      "okhttp/5.1.0");
+
         PopRequestSpecification spec = PopRequestSpecification.builder()
                 .baseUrl(LOGIN_URL)
-                .authorization(Authorization.APP_API)
-                .headers(Map.of(
-                        "Accept",      "*/*",
-                        "device_id",   DEVICE_ID,
-                        "platform",    PLATFORM,
-                        "app_version", APP_VERSION
-                ))
+                .authorization(Authorization.NONE)
+                .headers(headers)
                 .body(body)
                 .build();
 

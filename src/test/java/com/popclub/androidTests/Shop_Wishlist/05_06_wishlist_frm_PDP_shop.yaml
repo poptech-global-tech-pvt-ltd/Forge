@@ -74,4 +74,8 @@ steps:
     element: toolbar_cart_button
 
   - action: verifyElement
-    element: toolbar_popcoin_button
+    element: toolbar_credit_aware_pill
+    
+  - action: tap
+    element: wishlist_remove_button
+

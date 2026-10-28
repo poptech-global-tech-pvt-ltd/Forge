@@ -13,10 +13,22 @@ public class LoginResult {
 
     public final String legacyToken;
     public final String jwtToken;
+    public final String userId;
+    public final String refreshToken;
 
     public LoginResult(String legacyToken, String jwtToken) {
-        this.legacyToken = legacyToken;
-        this.jwtToken    = jwtToken;
+        this(legacyToken, jwtToken, null, null);
+    }
+
+    public LoginResult(String legacyToken, String jwtToken, String userId) {
+        this(legacyToken, jwtToken, userId, null);
+    }
+
+    public LoginResult(String legacyToken, String jwtToken, String userId, String refreshToken) {
+        this.legacyToken  = legacyToken;
+        this.jwtToken     = jwtToken;
+        this.userId       = userId;
+        this.refreshToken = refreshToken;
     }
 
     @Override

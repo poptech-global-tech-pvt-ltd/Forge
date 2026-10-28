@@ -515,8 +515,8 @@ function parseNodes(xml) {
 }
 
 async function dumpXml() {
-  await run(adbShell('uiautomator dump --compressed /sdcard/ui_dump.xml'), 8000);
-  return run(adbShell('cat /sdcard/ui_dump.xml'), 5000);
+  await run(adbShell('uiautomator dump /data/local/tmp/ui_dump.xml'), 15000);
+  return run(adbShell('cat /data/local/tmp/ui_dump.xml'), 5000);
 }
 
 // Reverse map: accessibilityId/locatorValue → element key name in YAMLs
@@ -2170,8 +2170,8 @@ app.post('/api/recorder/start', (req, res) => {
 
   rlog('▶ Starting recorder…', 'step');
 
-  // Run ForgeRecorder.java directly via java — avoids Maven exec:java which swallows stdin
-  const javaArgs = ['-cp', 'target/classes', 'com.popclub.ai.app.ForgeRecorder'];
+  // Run MaestroRecorder.java directly via java — avoids Maven exec:java which swallows stdin
+  const javaArgs = ['-cp', 'target/classes', 'com.popclub.ai.app.MaestroRecorder'];
   if (device) javaArgs.push(device);
 
   recorderProcess = spawn('java', javaArgs, { cwd: FORGE_ROOT, shell: false });

@@ -1,0 +1,105 @@
+testName: Order Success Screen — Verify UI elements, timestamp, popcoin savings, expand details, Done CTA
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-9384
+ 
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - shop
+  - regression
+
+retry: 0
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: tap
+    element: common_shop_tab
+
+  - action: callFlow
+    flow: cod_payment_oss
+
+  # PO-11569: Verify OSS shows all required UI elements
+  - action: waitFor
+    element: order_success_order_id_text
+
+  - action: verifyElement
+    element: order_success_order_id_text
+    testCaseId: PO-11569
+
+  # PO-9384: Verify timestamp and popcoin savings badge
+  - action: verifyElement
+    element: cart_saved_and_earned_chip
+    testCaseId: PO-9384
+
+  # PO-11577: Verify POPCoins balance updated in header
+  #- action: captureText
+   # element: toolbar_popcoin_button
+   # variable: popcoin_after
+
+  #- action: logVar
+   # variable: popcoin_after
+   # value: "POPCoins after order: ${popcoin_after}"
+
+  - action: verifyElement
+    element: toolbar_popcoin_button
+    testCaseId: PO-11577
+   
+   # PO-11576: Verify Order ID displayed and copyable
+   
+  - action: verifyElement
+    element: order_success_order_id_text
+    
+
+    # PO-11570: Tap order details toggle — verify expanded section
+  - action: tap
+    element: cod_payment_expand
+
+  - action: verifyElement
+    element: order_success_item_brand_0
+    testCaseId: PO-11570
+
+  - action: captureText
+    element: order_success_payment_mode_text
+    variable: payment_method
+
+  - action: logVar
+    variable: payment_method
+    value: "Payment method: ${payment_method}"
+
+  # PO-9385: Tap Done — navigates back to home
+  - action: tap
+    element: Navigation
+
+  - action: waitFor
+    element: home_tab
+
+  - action: verifyElement
+    element: home_tab
+    testCaseId: PO-9385
+    
+
+  # PO-11578: Verify cart is cleared — go to shop, open cart
+  - action: tap
+    element: common_shop_tab
+
+  - action: tap
+    element: toolbar_cart_button
+
+  # Cart should be empty — verify empty state or no cart items
+  - action: tapByText
+    value: "Your cart is empty"
+    testCaseId: PO-11578

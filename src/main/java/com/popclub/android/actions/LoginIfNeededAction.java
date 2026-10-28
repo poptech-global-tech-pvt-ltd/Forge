@@ -45,6 +45,13 @@ public class LoginIfNeededAction implements Action {
             return;
         }
 
+        // When noReset=false (fresh install), old cached tokens are invalid.
+        // Clear them so we don't accidentally use stale tokens for API calls.
+        if (!TestContext.isNoReset()) {
+            System.out.println("[loginIfNeeded] noReset=false — clearing cached tokens (fresh install invalidates old tokens)");
+            clearCachedTokens();
+        }
+
         AppiumDriver driver = DriverManager.getDriver();
 
         String phone = step.value != null ? step.value.trim() : "1234561122";
@@ -57,7 +64,12 @@ public class LoginIfNeededAction implements Action {
 
         if (loginScreenVisible) {
             System.out.println("[loginIfNeeded] Login screen detected — performing login…");
+            // Clear logcat BEFORE login so VERIFY_OTP response is guaranteed to be
+            // in buffer afterward (analytics spam can push it out if buffer is full).
+            clearLogcat(getDeviceSerial());
             doLogin(driver, phone, otp);
+            // Small delay to let OkHttp log the VERIFY_OTP response
+            sleep(2000);
             captureTokenFromLogcat();   // reads jwt_access_token from OkHttp logcat
         } else {
             System.out.println("[loginIfNeeded] No login required — already on home screen.");
@@ -170,6 +182,40 @@ public class LoginIfNeededAction implements Action {
         try { Thread.sleep(ms); } catch (InterruptedException ignored) {}
     }
 
+    /** Clears cached tokens from disk and TestContext so fresh login tokens are used. */
+    private void clearCachedTokens() {
+        // Clear TestContext
+        TestContext.setUserToken(null);
+        TestContext.setScalarData("auth_token", "");
+        TestContext.setScalarData("legacy_token", "");
+        TestContext.setScalarData("user_id", "");
+
+        // Clear disk cache files
+        try {
+            java.nio.file.Path jwtCache = java.nio.file.Paths.get(
+                    System.getProperty("user.home"), ".forge", "auth_token");
+            java.nio.file.Path legacyCache = java.nio.file.Paths.get(
+                    System.getProperty("user.home"), ".forge", "legacy_token");
+            java.nio.file.Files.deleteIfExists(jwtCache);
+            java.nio.file.Files.deleteIfExists(legacyCache);
+            System.out.println("[loginIfNeeded] Cached tokens cleared (disk + TestContext)");
+        } catch (Exception e) {
+            System.out.println("[loginIfNeeded] Cache clear failed: " + e.getMessage());
+        }
+    }
+
+    private void clearLogcat(String deviceSerial) {
+        try {
+            String[] cmd = (deviceSerial != null && !deviceSerial.isBlank())
+                    ? new String[]{"adb", "-s", deviceSerial, "logcat", "-c"}
+                    : new String[]{"adb", "logcat", "-c"};
+            Runtime.getRuntime().exec(cmd).waitFor();
+            System.out.println("[loginIfNeeded] Logcat cleared before login");
+        } catch (Exception e) {
+            System.out.println("[loginIfNeeded] Logcat clear failed: " + e.getMessage());
+        }
+    }
+
     private void captureTokenFromLogcat() {
         storeToken(getDeviceSerial(), "logcat/DataStore/SharedPrefs");
     }
@@ -205,12 +251,28 @@ public class LoginIfNeededAction implements Action {
                 String preview = token.length() > 20
                         ? token.substring(0, 10) + "…" + token.substring(token.length() - 6)
                         : token;
-                System.out.println("  ✅ [loginIfNeeded] Token captured via " + source + ": " + preview);
+                System.out.println("  ✅ [loginIfNeeded] JWT captured via " + source + ": " + preview);
             } else {
-                System.out.println("  ⚠️  [loginIfNeeded] Token not found via " + source);
+                System.out.println("  ⚠️  [loginIfNeeded] JWT not found via " + source);
             }
         } catch (Exception e) {
-            System.out.println("  ⚠️  [loginIfNeeded] Token capture failed (" + source + "): " + e.getMessage());
+            System.out.println("  ⚠️  [loginIfNeeded] JWT capture failed (" + source + "): " + e.getMessage());
+        }
+
+        // Also capture legacy DRF token — API requires both headers
+        try {
+            String legacyToken = TokenExtractor.getLegacyToken(deviceSerial);
+            if (legacyToken != null && !legacyToken.isBlank()) {
+                TestContext.setScalarData("legacy_token", legacyToken);
+                String preview = legacyToken.length() > 16
+                        ? legacyToken.substring(0, 8) + "…" + legacyToken.substring(legacyToken.length() - 4)
+                        : legacyToken;
+                System.out.println("  ✅ [loginIfNeeded] Legacy DRF token captured: " + preview);
+            } else {
+                System.out.println("  ⚠️  [loginIfNeeded] Legacy token not found");
+            }
+        } catch (Exception e) {
+            System.out.println("  ⚠️  [loginIfNeeded] Legacy token capture failed: " + e.getMessage());
         }
     }
 

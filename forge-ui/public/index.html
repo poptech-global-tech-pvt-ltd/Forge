@@ -4247,7 +4247,11 @@ document.getElementById('btn-scan').addEventListener('click', async () => {
 
   try {
     const res   = await fetch('/api/tagged-elements');
-    allTagElems = await res.json();
+    const body  = await res.json();
+    if (!res.ok || !Array.isArray(body)) {
+      throw new Error(body.error || `Server returned ${res.status}`);
+    }
+    allTagElems = body;
     document.getElementById('tag-count').textContent = `${allTagElems.length} found`;
     renderTagRows(allTagElems);
   } catch (e) {

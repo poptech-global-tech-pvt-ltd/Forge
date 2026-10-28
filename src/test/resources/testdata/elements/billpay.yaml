@@ -1,5 +1,3 @@
-
-# ─── Bill Pay ──────────────────────────────────────────────────────────────────
 bill_pay_all_bills_bills_tab:
   android:
     - type: accessibilityId

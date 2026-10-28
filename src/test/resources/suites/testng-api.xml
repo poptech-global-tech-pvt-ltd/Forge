@@ -53,4 +53,15 @@
         </classes>
     </test>
 
+    <test name="API - Shop E2E">
+        <groups>
+            <run>
+                <include name="shop-e2e"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.popclub.apiTests.shop.ShopE2ETest"/>
+        </classes>
+    </test>
+
 </suite>

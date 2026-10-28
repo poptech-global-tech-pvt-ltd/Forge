@@ -42,6 +42,14 @@ public class TokenExtractor {
     private static final Path TOKEN_CACHE_FILE =
             Paths.get(System.getProperty("user.home"), ".forge", "auth_token");
 
+    /** Local file for the legacy DRF token — needed alongside JWT for API auth. */
+    private static final Path LEGACY_TOKEN_CACHE_FILE =
+            Paths.get(System.getProperty("user.home"), ".forge", "legacy_token");
+
+    /** Local file for the Hashira refresh token — 1yr TTL. */
+    private static final Path REFRESH_TOKEN_CACHE_FILE =
+            Paths.get(System.getProperty("user.home"), ".forge", "refresh_token");
+
     // SharedPreferences key patterns to try (adjust if key name changes)
     private static final String[] PREFS_KEYS = {
             "access_token", "accessToken", "jwt_token", "jwtToken",
@@ -313,6 +321,220 @@ public class TokenExtractor {
             System.out.println("[TokenExtractor] logcat grep failed: " + e.getMessage());
         }
         return null;
+    }
+
+    // ── Legacy DRF token ───────────────────────────────────────────────────────
+    // The API requires both Authorization: Token <legacy> AND X-Access-Token: Token <jwt>.
+    // The legacy token is the DRF "token" field from the VERIFY_OTP response.
+
+    /**
+     * Returns the legacy DRF token, or null if not found.
+     * Checks local cache first, then logcat.
+     */
+    public static String getLegacyToken(String deviceSerial) {
+        // 1. Local cache
+        String cached = fromLegacyCache();
+        if (cached != null) return cached;
+
+        // 2. Logcat
+        String fromLogcat = grepLegacyToken(deviceSerial);
+        if (fromLogcat != null) {
+            saveLegacyToCache(fromLogcat);
+        }
+        return fromLogcat;
+    }
+
+    private static String grepLegacyToken(String deviceSerial) {
+        try {
+            // The VERIFY_OTP response contains "token":"<hex>" — the legacy DRF token.
+            // Grep for it alongside jwt_access_token (same response line).
+            String[] cmd = buildAdb(deviceSerial, "shell",
+                    "logcat -d okhttp.OkHttpClient:I *:S | grep jwt_access_token");
+            String output = run(cmd);
+            if (output == null || output.isBlank()) {
+                // Fallback: full logcat
+                cmd = buildAdb(deviceSerial, "shell",
+                        "logcat -d | grep jwt_access_token");
+                output = run(cmd);
+            }
+            if (output == null || output.isBlank()) return null;
+
+            // Match "token":"<40-char hex>" — the DRF token (not jwt, not firebase)
+            Pattern p = Pattern.compile("\"token\"\\s*:\\s*\"([a-f0-9]{30,50})\"");
+            Matcher m = p.matcher(output);
+            String last = null;
+            while (m.find()) last = m.group(1);
+            if (last != null) {
+                System.out.println("[TokenExtractor] ✅ Legacy DRF token found in logcat");
+            }
+            return last;
+        } catch (Exception e) {
+            System.out.println("[TokenExtractor] Legacy token logcat grep failed: " + e.getMessage());
+            return null;
+        }
+    }
+
+    public static void saveLegacyToCache(String token) {
+        if (token == null || token.isBlank()) return;
+        try {
+            Files.createDirectories(LEGACY_TOKEN_CACHE_FILE.getParent());
+            Files.writeString(LEGACY_TOKEN_CACHE_FILE, token,
+                    StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+            System.out.println("[TokenExtractor] Legacy token persisted to: " + LEGACY_TOKEN_CACHE_FILE);
+        } catch (Exception e) {
+            System.out.println("[TokenExtractor] Legacy cache write failed: " + e.getMessage());
+        }
+    }
+
+    private static String fromLegacyCache() {
+        try {
+            if (!Files.exists(LEGACY_TOKEN_CACHE_FILE)) return null;
+            String token = Files.readString(LEGACY_TOKEN_CACHE_FILE).trim();
+            if (token.length() >= 30) {
+                System.out.println("[TokenExtractor] ✅ Legacy token found in local cache");
+                return token;
+            }
+        } catch (Exception ignored) {}
+        return null;
+    }
+
+    // ── Refresh token ──────────────────────────────────────────────────────────
+
+    /**
+     * Returns the Hashira refresh token from local cache, or null.
+     * Refresh token has ~1yr TTL — stable across runs.
+     */
+    public static String getRefreshToken() {
+        try {
+            if (!Files.exists(REFRESH_TOKEN_CACHE_FILE)) {
+                System.out.println("[TokenExtractor] Refresh token cache not found: " + REFRESH_TOKEN_CACHE_FILE);
+                return null;
+            }
+            String token = Files.readString(REFRESH_TOKEN_CACHE_FILE).trim();
+            if (token.startsWith("eyJ")) {
+                System.out.println("[TokenExtractor] ✅ Refresh token found in local cache");
+                return token;
+            }
+        } catch (Exception e) {
+            System.out.println("[TokenExtractor] Refresh token read failed: " + e.getMessage());
+        }
+        return null;
+    }
+
+    // ── Hashira token refresh ──────────────────────────────────────────────────
+    // POST https://hashira.popclub.co.in/token/refresh
+    // Header: x-refresh-token: <refresh_jwt>
+    // Returns: { data: { jwt_access_token, jwt_refresh_token, user_id }, is_success: true }
+
+    /**
+     * Refreshes the Hashira JWT using the cached refresh token (1yr TTL).
+     * Returns a fresh RCBP_TOKEN JWT (60s TTL), or null if refresh fails.
+     * Also updates both auth_token and refresh_token caches.
+     */
+    public static String refreshAccessToken() {
+        String refreshToken = getRefreshToken();
+        if (refreshToken == null || refreshToken.isBlank()) {
+            System.out.println("[TokenExtractor] Cannot refresh — no refresh token cached");
+            return null;
+        }
+        return refreshAccessToken(refreshToken);
+    }
+
+    /**
+     * Refreshes JWT using the given refresh token.
+     */
+    public static String refreshAccessToken(String refreshToken) {
+        try {
+            String url = ApiConstants.HASHIRA_BASE_URL + "/token/refresh";
+            System.out.println("[TokenExtractor] Refreshing JWT via " + url);
+
+            io.restassured.response.Response resp = io.restassured.RestAssured.given()
+                    .baseUri(ApiConstants.HASHIRA_BASE_URL)
+                    .contentType(io.restassured.http.ContentType.JSON)
+                    .header("x-refresh-token", refreshToken)
+                    .post("/token/refresh");
+
+            if (resp.statusCode() != 200) {
+                System.out.println("[TokenExtractor] Refresh failed: HTTP " + resp.statusCode()
+                        + " " + resp.body().asString());
+                return null;
+            }
+
+            boolean success = resp.jsonPath().getBoolean("is_success");
+            if (!success) {
+                System.out.println("[TokenExtractor] Refresh failed: " + resp.jsonPath().getString("message"));
+                return null;
+            }
+
+            String newJwt = resp.jsonPath().getString("data.jwt_access_token");
+            String newRefresh = resp.jsonPath().getString("data.jwt_refresh_token");
+
+            if (newJwt != null && !newJwt.isBlank()) {
+                saveToCache(newJwt);
+                System.out.println("[TokenExtractor] ✅ JWT refreshed successfully");
+            }
+            if (newRefresh != null && !newRefresh.isBlank()) {
+                saveRefreshToCache(newRefresh);
+            }
+
+            return newJwt;
+
+        } catch (Exception e) {
+            System.out.println("[TokenExtractor] Token refresh error: " + e.getMessage());
+            log.error("[TokenExtractor] Token refresh error", e);
+            return null;
+        }
+    }
+
+    /**
+     * Returns a valid (non-expired) JWT. If the cached JWT is expired, refreshes it first.
+     * Returns null only if both cache and refresh fail.
+     */
+    public static String getFreshJwt() {
+        String cached = fromLocalCache();
+        if (cached != null && !isExpired(cached)) {
+            return cached;
+        }
+        // Cached token expired or missing — refresh
+        System.out.println("[TokenExtractor] Cached JWT expired or missing — refreshing...");
+        return refreshAccessToken();
+    }
+
+    /**
+     * Checks if a JWT is expired (or expires within 10 seconds).
+     */
+    public static boolean isExpired(String jwt) {
+        try {
+            String[] parts = jwt.split("\\.");
+            if (parts.length < 2) return true;
+            String payload = parts[1];
+            // Pad base64
+            int pad = 4 - payload.length() % 4;
+            if (pad != 4) payload += "=".repeat(pad);
+            byte[] decoded = java.util.Base64.getUrlDecoder().decode(payload);
+            String json = new String(decoded);
+            // Simple JSON parse for "exp" field
+            java.util.regex.Matcher m = java.util.regex.Pattern
+                    .compile("\"exp\"\\s*:\\s*(\\d+)").matcher(json);
+            if (!m.find()) return true;
+            long exp = Long.parseLong(m.group(1));
+            long now = System.currentTimeMillis() / 1000;
+            return (exp - now) < 10; // expired or expires in < 10s
+        } catch (Exception e) {
+            return true;
+        }
+    }
+
+    private static void saveRefreshToCache(String token) {
+        if (token == null || token.isBlank()) return;
+        try {
+            Files.createDirectories(REFRESH_TOKEN_CACHE_FILE.getParent());
+            Files.writeString(REFRESH_TOKEN_CACHE_FILE, token,
+                    StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+            System.out.println("[TokenExtractor] Refresh token persisted to: " + REFRESH_TOKEN_CACHE_FILE);
+        } catch (Exception e) {
+            System.out.println("[TokenExtractor] Refresh cache write failed: " + e.getMessage());
+        }
     }
 
     // ── ADB helpers ───────────────────────────────────────────────────────────
