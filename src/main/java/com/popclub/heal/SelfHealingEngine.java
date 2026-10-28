@@ -251,11 +251,21 @@ public class SelfHealingEngine {
         Set<String> ta = new HashSet<>(Arrays.asList(a.split("_")));
         Set<String> tb = new HashSet<>(Arrays.asList(b.split("_")));
 
-        // Check if one contains the other as a prefix (e.g. shop_search_icon vs shop_search_icon_button)
-        if (a.startsWith(b) || b.startsWith(a)) return 0.85;
+        // Check if one contains the other as a prefix (e.g. shop_search_icon vs shop_search_icon_button).
+        // Must land on a token boundary ('_' or end-of-string) — otherwise numeric-suffix
+        // siblings like clp_section_row_1 / clp_section_row_11 falsely "match" (row_1 is a
+        // plain string prefix of row_11, but they are different indices, not the same tag renamed).
+        if (isTokenPrefix(a, b) || isTokenPrefix(b, a)) return 0.85;
 
         long common = ta.stream().filter(tb::contains).count();
         return 2.0 * common / (ta.size() + tb.size());
+    }
+
+    /** True if {@code longer} starts with {@code shorter} AND the prefix ends at a token boundary. */
+    private static boolean isTokenPrefix(String longer, String shorter) {
+        if (!longer.startsWith(shorter)) return false;
+        if (longer.length() == shorter.length()) return true;
+        return longer.charAt(shorter.length()) == '_';
     }
 
     private static boolean isElementNotFound(Exception e) {

@@ -10,7 +10,7 @@ public class TestCase {
     public List<String> features;
     public List<Step> steps;
     public List<String> tags;   // ✅ ADD THIS
-    public int retry;
+    public int retry = -1;
 
 
     @JsonProperty("testCaseIds")   // 🔥 ADD THIS

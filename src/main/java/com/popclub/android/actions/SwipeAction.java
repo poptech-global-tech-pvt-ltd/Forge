@@ -11,13 +11,13 @@ import org.openqa.selenium.Dimension;
  *
  * YAML usage:
  *   - action: swipe
- *     direction: up          # up | down | left | right (default: up)
+ *     direction: down        # up | down | left | right (default: down) — down reveals content further below
  *
  *   - action: swipe
  *     direction: left
  *
  *   - action: swipe
- *     direction: up
+ *     direction: down
  *     value: "800"           # swipe speed in ms (default: 400)
  */
 public class SwipeAction implements Action {
@@ -28,7 +28,7 @@ public class SwipeAction implements Action {
     public void perform(Step step) {
         AppiumDriver driver = DriverManager.getDriver();
 
-        String direction = step.direction != null ? step.direction.trim().toLowerCase() : "up";
+        String direction = step.direction != null ? step.direction.trim().toLowerCase() : "down";
         int durationMs = DEFAULT_DURATION_MS;
         if (step.value != null && step.value.matches("\\d+")) {
             durationMs = Integer.parseInt(step.value.trim());
@@ -46,8 +46,32 @@ public class SwipeAction implements Action {
             }
         }
 
-        GestureUtil.swipe(driver, direction, durationMs);
-        System.out.println("[swipe] direction=" + direction + " " + durationMs + "ms");
+        int repeat = step.times > 0 ? step.times : 1;
+        for (int i = 1; i <= repeat; i++) {
+            GestureUtil.swipe(driver, toGestureDirection(direction), durationMs);
+            if (repeat > 1) {
+                System.out.println("[swipe] " + i + "/" + repeat + " direction=" + direction + " " + durationMs + "ms");
+                try { Thread.sleep(100); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+            } else {
+                System.out.println("[swipe] direction=" + direction + " " + durationMs + "ms");
+            }
+        }
+    }
+
+    /**
+     * GestureUtil.swipe()'s "down"/"up" name the finger's travel direction,
+     * not the resulting scroll — its "up" gesture reveals content further
+     * down the page, and vice versa. Translate the intuitive YAML direction
+     * (down = reveal more below) here at the YAML boundary rather than
+     * changing GestureUtil itself (~15 other actions call it directly with
+     * hardcoded "up" expecting today's behavior).
+     */
+    private String toGestureDirection(String direction) {
+        switch (direction) {
+            case "down": return "up";
+            case "up":   return "down";
+            default:     return direction; // left / right unaffected
+        }
     }
 
     private int[] parsePercent(String s, int w, int h) {

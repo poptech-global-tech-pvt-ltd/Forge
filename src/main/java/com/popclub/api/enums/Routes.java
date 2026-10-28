@@ -10,7 +10,25 @@ public enum Routes {
     // ── app.popclub.co.in — search ───────────────────────────────────────────
     SEARCH_PLP_V2     ("search/v2/plp/"),
 
+    // ── app.popclub.co.in — PDP ───────────────────────────────────────────────
+    PRODUCT_DETAIL_V3 ("v3/products/%s/"),
+
+    // ── sherlock.popclub.co.in — suggestion & filters ────────────────────────
+    SUGGESTION        ("/api/v4/suggestion"),
+    SUGGESTION_PLP    ("/api/v4/suggestion/plp"),
+    FILTERS_LIST      ("/api/v4/filters-list"),
+    FILTERS_MENU_LIST ("/api/v4/filters-menu-list"),
+
+    // ── api.popclub.co.in — fulfillment (cart) ──────────────────────────────
+    ADD_TO_CART       ("/fulfillment/api/v3/add-to-cart/"),
+    BASKET_COUNT      ("/fulfillment/api/v3/basket/count/"),
+    GET_CART          ("/fulfillment/api/v3/get-cart/serviceability/"),
+
+    // ── api.popclub.co.in — order management ────────────────────────────────
+    CREATE_ORDER      ("/order-management/api/v1/orders"),
+
     // hashira.popclub.co.in
+    TOKEN_REFRESH     ("/token/refresh"),
     SIGNUP            ("/api/v1/signup"),
 
     // userprofile.popclub.co.in

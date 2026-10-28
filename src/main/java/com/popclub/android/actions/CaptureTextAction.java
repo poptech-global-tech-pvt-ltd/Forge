@@ -253,24 +253,31 @@ public class CaptureTextAction implements Action {
      * We log which strategy succeeded so it's easy to trace in the output.
      */
     private String extractText(WebElement el) {
-        // 1. Direct text
+        // 1. Child text nodes — concat all (title can wrap across multiple Text composables;
+        //    parent node's own getText() is often just the first wrapped segment, so try
+        //    this richer strategy before falling back to direct text).
+        try {
+            List<WebElement> children = el.findElements(By.xpath(".//*[@text!='']"));
+            StringBuilder sb = new StringBuilder();
+            for (WebElement child : children) {
+                String ct = child.getText();
+                if (ct != null && !ct.isBlank()) {
+                    if (sb.length() > 0) sb.append(" ");
+                    sb.append(ct.trim());
+                }
+            }
+            if (sb.length() > 0) {
+                System.out.println("  [captureText] strategy=child-text");
+                return sb.toString();
+            }
+        } catch (Exception ignored) {}
+
+        // 2. Direct text
         String text = el.getText();
         if (text != null && !text.isBlank()) {
             System.out.println("  [captureText] strategy=direct");
             return text.trim();
         }
-
-        // 2. Child text nodes (Compose Button wraps its label in a child Text composable)
-        try {
-            List<WebElement> children = el.findElements(By.xpath(".//*[@text!='']"));
-            for (WebElement child : children) {
-                String ct = child.getText();
-                if (ct != null && !ct.isBlank()) {
-                    System.out.println("  [captureText] strategy=child-text");
-                    return ct.trim();
-                }
-            }
-        } catch (Exception ignored) {}
 
         // 3. content-desc attribute
         try {
