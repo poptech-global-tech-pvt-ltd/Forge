@@ -29,9 +29,6 @@ steps:
     element: common_shop_tab
 
   - action: tap
-    element: common_shop_tab
-
-  - action: tap
     element: shop_search_button
 
   - action: enterText
@@ -101,7 +98,6 @@ steps:
 
       - action: verifyElement
         element: cart_item_row_0
-        testCaseId: PO-11059
 
     else:
       - action: verifyElement

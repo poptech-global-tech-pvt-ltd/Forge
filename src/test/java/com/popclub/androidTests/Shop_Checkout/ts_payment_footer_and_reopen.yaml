@@ -1,0 +1,132 @@
+testName: Payment — Footer amount matches total, method persists on reopen
+platform: android
+noReset: true
+loginRequired: false
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - shop
+  - payment
+
+retry: 0
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561233"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  - action: call
+    flow: search_product
+    params:
+      search_query: "souled store"
+
+  # ── Select first product ──
+  - action: tap
+    element: product_list_item_0
+
+  # ── Add to cart ──
+  - action: tap
+    element: product_details_bottom_sticky_bar_button
+
+  - action: tap
+    element: size_selection_item_0
+
+  - action: tap
+    element: size_selection_add_to_cart_button
+
+  # ── Go to cart ──
+  - action: tap
+    element: product_details_go_to_cart_button
+
+  # ── Handle address bottomsheet if needed ──
+  - action: captureText
+    element: cart_pay_button
+    variable: cart_bottomsheet_cta
+
+  - action: ifVarEquals
+    variable: cart_bottomsheet_cta
+    value: "Add address"
+    steps:
+      - action: tap
+        element: cart_s2_s_payment_button_2
+      - action: call
+        flow: add_address
+        params:
+          addressLine1: "123 MG Road"
+          first_name: "Deepa"
+          last_name: "Hegde"
+          address_mobile_number: "6361463451"
+
+  - action: tap
+    element: cart_composables_s2_s_payment_button_list_item
+
+  # ── Select COD (default is popchop ₹0) ──
+  - action: tap
+    element: shop_payment_shop_cod_section_radio
+
+  # ── Capture pay button amount after COD selected ──
+  - action: captureText
+    element: cart_link_and_pay_button
+    variable: cod_pay_amount
+
+  - action: logVar
+    variable: cod_pay_amount
+    value: "COD pay button amount: ${cod_pay_amount}"
+
+  # ── PO-15724: Pay button amount exists after COD ──
+  - action: verifyElement
+    element: cart_link_and_pay_button
+    shouldExist: true
+    testCaseId: PO-15724
+
+  # ── PO-15726: Reopen sheet — COD still pre-selected ──
+  - action: tap
+    element: cart_composables_s2_s_payment_button_list_item
+
+
+  - action: verifyElement
+    element: shop_payment_shop_cod_section_button
+    shouldExist: true
+    testCaseId: PO-15726
+
+  # ── Switch from COD to PhonePe — verify amount matches ──
+
+  - action: tap
+    element: checkout_upi_apps_section
+    testCaseId: PO-15713
+    
+  - action: verifyElement
+    element: GPay
+    testCaseId: PO-15714
+    
+  - action: tap
+    element: PhonePe
+    testCaseId: PO-15715
+
+
+  # Capture pay button amount after switching to PhonePe
+  - action: captureText
+    element: cart_link_and_pay_button
+    variable: phonepe_pay_amount
+    testCaseId: PO-15725
+
+  - action: logVar
+    variable: phonepe_pay_amount
+    value: "COD→PhonePe — cod: ${cod_pay_amount} | phonepe: ${phonepe_pay_amount}"
+
+  - action: assertStoredText
+    variable: phonepe_pay_amount
+    value: cod_pay_amount
+    

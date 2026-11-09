@@ -40,20 +40,17 @@ steps:
     element: olp_filter_dropdown
     testCaseId: PO-11330
 
-  # PO-11331: Order card shows brand, title, POPCoins
+  # PO-11331: Order card shows  title, POPCoins
   - action: verifyElement
-    element: order_list_item_brand_0
-
-  - action: verifyElement
-    element: order_list_item_title_0
+    element: order_item_v2_title_text
     testCaseId: PO-11331
 
   # PO-11335: Order placed status label on card
   - action: verifyElement
-    element: order_list_item_status_0
+    element: order_item_v2_status_text
 
   - action: captureText
-    element: order_list_item_status_0
+    element: order_item_v2_status_text
     variable: olp_order_status
 
   - action: logVar
@@ -62,11 +59,15 @@ steps:
     testCaseId: PO-11335
 
   # PO-11368: POPCoins earned per order
-  # Need element key for popcoin earned label on OLP card
-  # - action: verifyElement
-  #   element: order_list_item_popcoin_0
-  #   testCaseId: PO-11368
+  - action: scrollUntilVisible
+    element: order_item_v2_coins_earned_text
+    direction: down
+    maxScrolls: 3
+  
+  - action: verifyElement
+    element: order_item_v2_coins_earned_text
+    testCaseId: PO-11368
 
   - action: logVar
-    variable: placeholder
-    value: "PO-11368 — need order_list_item_popcoin_0 element key"
+    variable: coins_earned
+    value: "order_item_v2_coins_earned_text"

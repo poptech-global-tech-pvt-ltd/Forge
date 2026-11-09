@@ -39,15 +39,18 @@ steps:
 
   - action: enterText
     element: olp_search_field_input
-    value: "kitoko"
+    value: "superyou"
 
   - action: pressKey
     value: search
+    
+  - action: tap
+    element: order_list_item_0
 
   # Verify ODP loaded
   - action: verifyElement
-    element: odp_pay_in3_brand_text
-
+    element: order_details_v2_pay_in3_product_info_row
+    
   # PO-9050: Food item — Size field should NOT exist
   - action: verifyElement
     element: odp_pay_in3_size_text

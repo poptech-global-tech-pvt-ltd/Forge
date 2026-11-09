@@ -1,0 +1,64 @@
+testName: PLP — Tapping product card navigates to PDP
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-10994
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - regression
+  - shop
+
+retry: 0
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: tap
+    element: common_shop_tab
+
+ # ── PLP: navigate, capture API + UI prices ────────────────────────────────
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: enterText
+    element: search_products_search_input
+    value: "nike"
+    
+  - action: pressKey
+    value: search
+    
+# Capture title on PLP
+  - action: captureText
+    element: product_list_item_title_0
+    value: "plp_title"
+
+  - action: tap
+    element: product_list_item_title_0
+
+  - action: waitFor
+    element: product_details_title
+ 
+# Capture title on PDP
+  - action: captureText
+    element: product_details_title
+    value: "pdp_title"
+
+# Compare
+  - action: assertStoredText
+    variable: pdp_title
+    value: plp_title

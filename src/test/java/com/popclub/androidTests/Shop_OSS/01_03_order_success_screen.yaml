@@ -1,12 +1,11 @@
 testName: Order Success Screen — Verify UI elements, timestamp, popcoin savings, Done CTA
 platform: android
 noReset: true
-loginRequired: true
+loginRequired: false
 
 testCaseIds:
   - PO-9384
  
-
 features:
   - common
   - login

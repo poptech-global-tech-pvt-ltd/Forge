@@ -42,6 +42,13 @@ steps:
 
   - action: tap
     element: product_list_item_0
+    
+  - action: verifyElement
+    element: pdp_customer_ratings_average_text
+    
+  - action: verifyElement
+    element: pdp_customer_ratings_section
+    testCaseId: PO-11053
 
   - action: tap
     element: product_details_bottom_sticky_bar_button
@@ -51,3 +58,8 @@ steps:
 
   - action: verifyElement
     element: size_selection_add_to_cart_button
+  
+  - action: tap
+    element: Close
+    testCaseId: PO-11046
+    

@@ -4,7 +4,7 @@ noReset: true
 loginRequired: false
 
 testCaseIds:
-  - PO-9051
+  - PO-9054
 
 features:
   - common
@@ -36,7 +36,7 @@ steps:
     flow: navigate_to_olp
 
   - action: tap
-    element: order_list_item_status_0
+    element: order_list_item_0
     
   # PO-9051: Cancel order button visible for Order placed state
   - action: scrollTo
@@ -63,7 +63,6 @@ steps:
     testCaseId: PO-9053
 
   # PO-9054: Confirm cancellation — status updates to cancelled
-  # WARNING: This actually cancels the order. Only run on test orders.
   - action: tap
     element: order_details_v2_cancel_button
     

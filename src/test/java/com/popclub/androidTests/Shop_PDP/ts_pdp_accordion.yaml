@@ -1,7 +1,7 @@
 testName: PDP — Product details accordion
 platform: android
 noReset: true
-loginRequired: true
+loginRequired: false
 retry: 0
 
 testCaseIds:
@@ -40,23 +40,20 @@ steps:
   - action: tap
     element: product_list_item_0
   # ── Scroll to product details section ──────────────────────────────────
-  - action: swipe
-    direction: up
-
-  - action: swipe
-    direction: up
-    
-  - action: swipe
-    direction: up
+ 
+  - action: scrollUntilVisible
+    element: cod_payment_expand
+    direction: down
+    maxScrolls: 5
 
   # ── PO-11051: Accordion collapsed by default ───────────────────────────
 
   - action: verifyElement
-    element: Expand
+    element: cod_payment_expand
 
   # ── PO-11052: Tap to expand → shows full product info ──────────────────
   - action: tap
-    element: Expand
+    element: cod_payment_expand
 
   - action: verifyElement
     element: Collapse
@@ -67,4 +64,4 @@ steps:
     element: Collapse
 
   - action: verifyElement
-    element: Expand
+    element: cod_payment_expand

@@ -1,13 +1,9 @@
 testName: OLP — Search orders, no match, clear search
 platform: android
 noReset: true
-loginRequired: true
+loginRequired: false
 
 testCaseIds:
-  - PO-11344
-  - PO-11345
-  - PO-11346
-  - PO-11347
   - PO-11348
 
 features:
@@ -39,44 +35,44 @@ steps:
 
   # PO-11344: Tap search bar — focuses input, shows keyboard
   - action: tap
-    element: orders_order_items_container_input
+    element: olp_search_field_input
 
   - action: verifyElement
-    element: orders_order_items_container_input
+    element: olp_search_field_input
     testCaseId: PO-11344
 
   # PO-11345: Search "Snackible" — returns matching orders
   - action: enterText
-    element: orders_order_items_container_input
-    value: "HKV"
+    element: olp_search_field_input
+    value: "Chocolate"
 
   - action: pressKey
     value: search
 
   - action: waitFor
-    element: order_list_item_status_0
-    timeout: 5000
+    element: order_list_item_0
+    timeout: 2000
 
   - action: verifyElement
-    element: order_list_item_status_0
+    element: order_list_item_0
     testCaseId: PO-11345
 
   # PO-11347: Tap X — clears input, shows all orders
   - action: tap
-    element: olp_search_clear_button
+    element: clear
 
   - action: waitFor
-    element: order_list_item_status_0
-    timeout: 5000
+    element: order_list_item_0
+    timeout: 2000
 
   - action: verifyElement
-    element: order_list_item_status_0
+    element: order_list_item_0
     testCaseId: PO-11347
 
   # PO-11346: Search nonsense — no match found
   - action: enterText
-    element: orders_order_items_container_input
-    value: "zzzxxyy99887766"
+    element: olp_search_field_input
+    value: "JKV"
 
   - action: pressKey
     value: search
@@ -84,13 +80,17 @@ steps:
   - action: verifyElement
     element: olp_empty_state
     testCaseId: PO-11346
+    
+  - action: enterText
+    element: olp_search_field_input
+    value: "JKV"
 
   # Clear for next test
   - action: tap
-    element: olp_search_clear_button
+    element: clear
 
   - action: waitFor
-    element: order_list_item_status_0
+    element: order_list_item_0
     timeout: 5000
 
   # PO-11348: Search with active filter

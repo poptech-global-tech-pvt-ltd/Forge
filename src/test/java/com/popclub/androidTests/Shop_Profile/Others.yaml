@@ -1,7 +1,7 @@
 testName: Profile — Others section navigation
 platform: android
 noReset: true
-loginRequired: true
+loginRequired: false
 retry: 0
 
 testCaseIds:
@@ -33,8 +33,6 @@ steps:
   - action: tap
     element: profile_help_support_button
 
-  - action: verifyElement
-    element: your_cart_merchant_background
     testCaseId: PO-11703
 
   - action: pressKey

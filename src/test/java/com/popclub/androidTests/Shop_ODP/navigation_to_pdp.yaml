@@ -33,7 +33,7 @@ steps:
     flow: navigate_to_olp
     
   - action: tap
-    element: olp_item_1
+    element: order_list_item_0
 
   # Capture product title on ODP
   - action: captureText

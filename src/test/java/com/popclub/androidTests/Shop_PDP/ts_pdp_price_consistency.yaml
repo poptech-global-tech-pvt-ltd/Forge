@@ -28,9 +28,6 @@ steps:
     element: common_shop_tab
 
   - action: tap
-    element: common_shop_tab
-
-  - action: tap
     element: shop_search_button
 
   - action: enterText

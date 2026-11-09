@@ -1,7 +1,7 @@
 testName: PDP — Header icons (Back, Search, Cart, POPCoins)
 platform: android
 noReset: true
-loginRequired: true
+loginRequired: false
 retry: 0
 
 testCaseIds:
@@ -43,7 +43,7 @@ steps:
 
   # ── PO-11032: Verify all header icons exist ───────────────────────────
   - action: tap
-    element: pdp_search_icon
+    element: dp_search_icon
 
   - action: tap
     element: toolbar_search_button  # healed locator → search_back_button
@@ -55,10 +55,10 @@ steps:
     element: cart_back_button
 
   - action: tap
-    element: toolbar_popcoin_button
+    element: credit_pill_popcoin_row
 
   - action: tap
-    element: popcoins_navigation
+    element: Navigation
 
   # ── PO-11033: Back arrow returns to PLP ─────────────────────────────────
   - action: tap
@@ -76,6 +76,6 @@ steps:
 
   # ── PO-11034: Cart badge shows 0 for new user ──────────────────────────
   - action: assertText
-    element: toolbar_popcoin_button
+    element: toolbar_cart_button
     value: "0"
     testCaseId: PO-11034

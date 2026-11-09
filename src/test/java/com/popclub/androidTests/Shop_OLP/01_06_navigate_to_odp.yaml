@@ -42,7 +42,6 @@ steps:
 
   - action: verifyElement
     element: order_details_v2_status_text
-    testCaseId: PO-11334
 
   # Go back to OLP
   - action: pressKey
