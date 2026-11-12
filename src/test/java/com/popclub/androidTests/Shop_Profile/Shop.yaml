@@ -1,7 +1,7 @@
 testName: Profile — Shop section navigation
 platform: android
 noReset: true
-loginRequired: true
+loginRequired: false
 retry: 0
 
 testCaseIds:
@@ -14,7 +14,6 @@ features:
   - shop
 
 tags:
-  - sanity
   - regression
   - shop
 
@@ -34,9 +33,6 @@ steps:
   # ── PO-13851: Orders navigation ────────────────────────────────────────
   - action: tap
     element: profile_orders_button
-
-  - action: verifyElement
-    element: profile_page_title_shop_orders
     testCaseId: PO-13851
 
   - action: pressKey

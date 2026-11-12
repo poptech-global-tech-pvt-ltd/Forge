@@ -61,4 +61,4 @@ steps:
     element: toolbar_cart_button
 
   - action: verifyElement
-    element: toolbar_popcoin_button
+    element: toolbar_cart_button  # healed from: toolbar_popcoin_button

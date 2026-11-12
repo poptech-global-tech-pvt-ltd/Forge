@@ -1,0 +1,94 @@
+testName: Filters — Sort and Filter combined results
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-11028
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - shop
+  - regression
+
+retry: 0
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: tap
+    element: common_shop_tab
+
+ # ── PLP: navigate, capture API + UI prices ────────────────────────────────
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: enterText
+    element: search_products_search_input
+    value: "the souled store"
+    
+  - action: pressKey
+    value: search
+
+  # Apply Sort first — Price Low to High
+  - action: tap
+    element: product_list_sort_button
+
+  - action: tapByText
+    value: "Price Low → High"
+
+  - action: waitFor
+    element: product_list_item_0
+
+  # Capture price after sort (should be lowest)
+  - action: captureText
+    element: product_list_item_price_0
+    variable: price_after_sort
+
+  # Now apply Filter
+  - action: tap
+    element: product_list_filter_button
+
+  - action: tap
+    element: product_filter_category_item_0
+
+  - action: tap
+    element: product_filter_sub_item_0
+
+  - action: tap
+    element: product_filter_apply_button
+
+  # Verify PLP loads with combined sort + filter
+  - action: waitFor
+    element: product_list_item_0
+
+  - action: captureText
+    element: product_list_item_price_0
+    variable: price_after_sort_and_filter
+
+  - action: captureText
+    element: product_list_item_price_1
+    variable: price_second_item
+
+  - action: logVar
+    variable: price_after_sort_and_filter
+    value: "Sort+Filter prices — first: ${price_after_sort_and_filter}, second: ${price_second_item}"
+
+  - action: verifyElement
+    element: product_list_item_0
+
+  - action: verifyElement
+    element: product_list_filter_button
+    testCaseId: PO-11028

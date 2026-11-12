@@ -33,39 +33,18 @@ steps:
     flow: navigate_to_olp
   
   - action: tap
-    element: olp_item_1
+    element: order_list_item_0
 
   # Capture product title on ODP
   - action: captureText
     element: odp_pay_in3_product_title_text
     variable: odp_product_title
 
-
-  # PO-9047: Progress bar shows Placed as active step
-  # - action: verifyElement
-  # element: order_details_v2_status_text
-
-  # - action: captureText
-   #  element: order_details_v2_status_text
-    # variable: odp_status
-
-  # - action: logVar
-  #   variable: odp_status
-   #  value: "ODP status: ${odp_status}"
-
-  # - action: verifyElement
-   #  element: order_details_v2_status_text
-    # testCaseId: PO-9047
-
-  # PO-9061: Tap More details — shows address, payment, order ID
-  - action: scrollTo
-    element: more_details_accordion
-
-  - action: tap
-    element: Expand
+  - action: scrollUntilVisible
+    element: order_details_v2_copy_order_id_button
 
   - action: verifyElement
-    element: order_details_order_id_row
+    element: order_details_v2_copy_order_id_button
     testCaseId: PO-9061
 
   # PO-9069: Bill summary — verify billing section visible

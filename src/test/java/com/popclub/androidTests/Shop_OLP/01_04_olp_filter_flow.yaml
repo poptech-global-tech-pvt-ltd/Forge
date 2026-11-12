@@ -34,40 +34,33 @@ steps:
 
   # PO-11349: Tap Order status filter pill — opens bottom sheet
   - action: tap
-    element: olp_filter_dropdown
-    
-  - action: waitFor
-    element: order_list_item_status_0
-    timeout: 5000
+    element: pop_chip_row
 
   - action: verifyElement
-    element: orders_select_order_filter_bottom_sheet_item1_item_0
+    element: orders_select_order_filter_bottom_sheet_button_1
     testCaseId: PO-11349
 
   # PO-11365: Tap X on filter sheet — closes without applying
   - action: tap
-    element: skip_tour
+    element: orders_select_order_filter_bottom_sheet_button_1
 
   - action: verifyElement
-    element: order_list_item_status_0
+    element: order_list_item_0
     testCaseId: PO-11365
 
   # PO-11350: Select Delivered, tap Apply
   - action: tap
-    element: olp_filter_dropdown
+    element: pop_chip_row
 
   - action: tap
-    value: orders_select_order_filter_bottom_sheet_item_item_8
+    element: olp_filter_delivered_radio
 
   - action: tap
-    value: orders_select_order_filter_bottom_sheet_button
-
-  - action: waitFor
-    element: order_list_item_status_0
-    timeout: 5000
+    element: orders_select_order_filter_bottom_sheet_button
+   
 
   - action: verifyElement
-    element: order_list_item_status_0
+    element: order_list_item_0
     testCaseId: PO-11350
 
   # PO-11351: Active filter chip appears
@@ -80,10 +73,6 @@ steps:
   - action: tap
     element: skip_tour
 
-  - action: waitFor
-    element: order_list_item_status_0
-    timeout: 5000
-
   - action: verifyElement
-    element: order_list_item_status_0
+    element: order_list_item_0
     testCaseId: PO-11352

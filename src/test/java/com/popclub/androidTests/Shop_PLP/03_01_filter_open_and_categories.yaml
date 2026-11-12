@@ -1,0 +1,75 @@
+testName: Filters — Open filter sheet, verify categories, close without changes
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-11014
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - shop
+  - regression
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561234"
+    text: "560102"
+
+  - action: tap
+    element: common_shop_tab
+
+  # ── PLP: navigate, capture API + UI prices ────────────────────────────────
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: enterText
+    element: search_products_search_input
+    value: "the souled store"
+    
+  - action: pressKey
+    value: search
+    
+  # Capture PLP price before filter
+  - action: captureText
+    element: product_list_item_price_0
+    variable: plp_first_product_price
+
+  # PO-11014 + PO-11015: Filter sheet opened with categories visible
+  - action: tap
+    element: product_list_filter_button
+
+  - action: verifyElement
+    element: product_filter_category_item_0
+
+  - action: verifyElement
+    element: product_filter_category_item_1
+
+  - action: verifyElement
+    element: product_filter_reset_button
+
+  - action: verifyElement
+    element: product_filter_apply_button
+    testCaseId: PO-11015
+
+  # PO-11027: Close filter sheet without applying
+  - action: pressKey
+    value: BACK
+
+  - action: waitFor
+    element: product_list_item_0
+
+  - action: assertText
+    element: product_list_item_price_0
+    value: "${plp_first_product_price}"
+    testCaseId: PO-11027

@@ -1,7 +1,7 @@
 testName: Profile — UPI Link navigation
 platform: android
 noReset: true
-loginRequired: true
+loginRequired: false
 retry: 0
 
 testCaseIds:

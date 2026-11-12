@@ -14,7 +14,6 @@ features:
   - profile
 
 tags:
-  - olp
   - shop
   - regression
 
@@ -35,10 +34,10 @@ steps:
 
   # PO-11359: Filter with no matching orders — empty state
   - action: tap
-    element: olp_filter_order_status_pill
+    element: pop_chip_row
 
-  - action: tapByText
-    value: "Returned"
+  - action: tap
+    element: "Ready_to_ship"
 
   - action: tapByText
     value: "Apply"

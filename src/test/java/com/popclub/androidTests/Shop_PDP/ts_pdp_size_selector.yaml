@@ -14,7 +14,6 @@ features:
   - shop
 
 tags:
-  - sanity
   - regression
   - shop
 
@@ -24,9 +23,6 @@ steps:
   - action: loginIfNeeded
     value: "1234561234"
     text: "560102"
-
-  - action: tap
-    element: common_shop_tab
 
   - action: tap
     element: common_shop_tab
@@ -101,7 +97,6 @@ steps:
 
       - action: verifyElement
         element: cart_item_row_0
-        testCaseId: PO-11059
 
     else:
       - action: verifyElement

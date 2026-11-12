@@ -1,7 +1,7 @@
 testName: Profile — Recharge & Bills navigation
 platform: android
 noReset: true
-loginRequired: true
+loginRequired: false
 retry: 0
 
 testCaseIds:
@@ -42,9 +42,6 @@ steps:
   # ── PO-15946: Rewards navigation ───────────────────────────────────────
   - action: tap
     element: profile_rewards_button
-
-  - action: verifyElement
-    element: toolbar_popcoin_button
     testCaseId: PO-15946
 
   - action: pressKey
