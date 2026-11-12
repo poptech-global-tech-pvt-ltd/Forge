@@ -14,7 +14,6 @@ features:
 
 tags:
   - shop
-  - smoke
   - regression
 
 retry: 0

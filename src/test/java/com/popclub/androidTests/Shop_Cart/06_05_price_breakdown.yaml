@@ -14,7 +14,6 @@ features:
 
 tags:
   - shop
-  - cart
   - regression
 
 retry: 0

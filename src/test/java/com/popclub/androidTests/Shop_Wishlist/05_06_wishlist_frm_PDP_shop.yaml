@@ -13,7 +13,7 @@ features:
 
 tags:
   - shop
-  - wishlist
+  - regression
 
 steps:
   - action: launchApp

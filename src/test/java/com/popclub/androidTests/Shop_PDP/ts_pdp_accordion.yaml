@@ -14,7 +14,7 @@ features:
   - shop
 
 tags:
-  - sanity
+  - regression
   - shop
 
 steps:

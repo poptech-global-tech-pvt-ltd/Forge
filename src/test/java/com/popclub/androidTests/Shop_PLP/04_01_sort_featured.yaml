@@ -16,7 +16,7 @@ features:
 retry: 0
 
 tags:
-  - smoke
+  - regression
   - shop
 
 steps:

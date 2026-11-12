@@ -11,10 +11,8 @@ features:
 testCaseIds:
   - PO-15722
 
-
 tags:
   - shop
-  - payment
   - regression
 
 retry: 0

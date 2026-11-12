@@ -10,7 +10,7 @@ features:
 
 tags:
   - shop
-  - payment
+  - regression
 
 retry: 0
 
