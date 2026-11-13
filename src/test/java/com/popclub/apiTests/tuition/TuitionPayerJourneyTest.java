@@ -12,6 +12,7 @@ import io.restassured.response.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeClass;
+import com.popclub.web.constants.TestCaseId;
 import org.testng.annotations.Test;
 
 import java.math.BigDecimal;
@@ -60,7 +61,11 @@ public class TuitionPayerJourneyTest {
                 TuitionTestData.get().getTutor().getMobile(), TuitionTestData.get().getTutor().getPan());
     }
 
+    // precondition: Payer is logged in with a valid student access_token.
+    // steps: Call GET /payee-list?search=98&search_field=mobile; assert HTTP 200.
+    // expected: Payee history is returned with a non-null data object (verified/unverified lists).
     @Test(groups = "tuition-payer")
+    @TestCaseId("PO-17259")
     public void step1_getPayeeHistory() {
         Response r = csvc.getPayeeList("98");
 
@@ -71,7 +76,11 @@ public class TuitionPayerJourneyTest {
         log.info("Payee list fetched successfully");
     }
 
+    // precondition: Payer is logged in; tutor's VPA is available from test data.
+    // steps: Call POST /payee/basic-info with the tutor's VPA; assert HTTP 200.
+    // expected: Response returns vpa_info (name, is_valid) and a payout_reference_id for the next step.
     @Test(groups = "tuition-payer", dependsOnMethods = "step1_getPayeeHistory")
+    @TestCaseId("PO-17260")
     public void step2_getPayeeBasicInfo() {
         Response r = csvc.getPayeeBasicInfo(
                 PayeeBasicInfoRequest.forVpaSubmission(TuitionTestData.get().getTutor().getVpa())
@@ -85,7 +94,11 @@ public class TuitionPayerJourneyTest {
         log.info("PayeeBasicInfo OK, payoutReferenceId={}", payoutReferenceId);
     }
 
+    // precondition: payout_reference_id from step2 (getPayeeBasicInfo) is available.
+    // steps: Call POST /payee/verification with tutor PAN, mobile and payout_reference_id; assert HTTP 200.
+    // expected: is_success=true and a payee_display_id + payee_id are returned for use in later steps.
     @Test(groups = "tuition-payer", dependsOnMethods = "step2_getPayeeBasicInfo")
+    @TestCaseId("PO-17261")
     public void step3_verifyPayeeInfo() {
         Response resp = csvc.verifyPayee(
                 VerifyPayeeRequestDto.from(
@@ -113,7 +126,11 @@ public class TuitionPayerJourneyTest {
                 .doubleValue();
     }
 
+    // precondition: payee_display_id from step3 (verifyPayeeInfo) is available.
+    // steps: Call GET /payment/summary?payee_display_id&amount; assert HTTP 200; recompute convenience fee (2.5%) and GST (18%) and compare to the response.
+    // expected: fee breakdown (total_amount, convenience_fee, gst_convenience_fee, total_payable) matches the independently computed values.
     @Test(groups = "tuition-payer", dependsOnMethods = "step3_verifyPayeeInfo")
+    @TestCaseId("PO-17262")
     public void step4_getPaymentSummary() {
         double amountInPaisa = Double.parseDouble(TuitionTestData.get().getPayment().getAmount());
         Response r = csvc.getPaymentSummary(payeeDisplayId, amountInPaisa);
@@ -139,7 +156,11 @@ public class TuitionPayerJourneyTest {
         log.info("Payment summary: {}", paymentFee);
     }
 
+    // precondition: payee_display_id and fee breakdown from step4 (getPaymentSummary) are available.
+    // steps: Call POST /payee/payment-intent with payee_display_id, fee breakdown and a fresh idempotency_key; assert HTTP 200.
+    // expected: is_success=true, message="success", and payment_intent_id, payee_id, payee_display_id, payer_id, total_payable are all returned.
     @Test(groups = "tuition-payer", dependsOnMethods = "step4_getPaymentSummary")
+    @TestCaseId("PO-17263")
     public void step5_generatePaymentIntent() {
         Response r = csvc.generatePaymentIntent(
                 GeneratePaymentIntentRequest.from(payeeDisplayId, paymentFee, UUID.randomUUID().toString())
@@ -165,6 +186,17 @@ public class TuitionPayerJourneyTest {
         log.info("Payment intent generated: {}", paymentIntentId);
     }
 
+    // Limit state machine (student + tutor each have a ₹1L/month aggregate limit, reset on the
+    // 1st of each month): RESERVE at checkout immediately deducts from both sides; the amount
+    // stays reserved during AWAITING_ACCEPTANCE; on tutor REJECT it is automatically RELEASED
+    // back to both; on tutor ACCEPT (after payout + a temporal update) it is finally CONSUMED.
+    //   Available = Configured − Reserved − Consumed + Released + Restored
+
+    // precondition: order_number from step7 (createTuitionOrder) is available.
+    // steps: Call POST /limit/reserve with payment_intent_id and order_number (Stage 1: RESERVE — immediately deducts from both student & tutor limits).
+    // expected: HTTP 200 and a reserve_id is returned for use in the consume/release steps.
+    @Test(groups = "tuition-payer", dependsOnMethods = "step7_createTuitionOrder")
+    @TestCaseId("PO-17281")
     public void step6_reserveLimit() {
         Response r = csvc.reserveLimit(ReserveLimitRequest.from(paymentIntentId, orderNumber));
 
@@ -178,7 +210,11 @@ public class TuitionPayerJourneyTest {
         log.info("Limit reserved: reserve_id={}", reserveId);
     }
 
+    // precondition: payment_intent_id and fee breakdown from step5 (generatePaymentIntent) are available.
+    // steps: Build a CARD order payload (test card details + amount breakdown) and call POST /marketplace/orders; assert HTTP 200; start listening to the order's SSE stream for a payment_link event.
+    // expected: Order is created successfully and an order_number is returned.
     @Test(groups = "tuition-payer", dependsOnMethods = "step5_generatePaymentIntent")
+    @TestCaseId("PO-17264")
     public void step7_createTuitionOrder() {
         TuitionTestData.Payment paymentData = TuitionTestData.get().getPayment();
 
@@ -214,7 +250,11 @@ public class TuitionPayerJourneyTest {
         });
     }
 
-    @Test(groups = "tuition-payer", dependsOnMethods = "step7_createTuitionOrder")
+    // precondition: order_number from step7 (createTuitionOrder) is available, with its SSE stream already being listened to; limit reserved in step6 and confirmed AWAITING_PAYMENT in step8_pollOrderStatus_awaitingPayment.
+    // steps: Call POST /payment-intent/{id}/verify; assert payment_allowed=true and capture the tutor onboarding link (pay_msg_link); extract the Razorpay payment_link from the SSE stream; drive the Razorpay checkout page with a random OTP; await a PAYOUT_ON_HOLD SSE event.
+    // expected: Card payment succeeds and the order reaches PAYOUT_ON_HOLD (payout held pending the tutor's onboarding acceptance — Stage 2: AWAITING_ACCEPTANCE, reserved amount still held).
+    @Test(groups = "tuition-payer", dependsOnMethods = "step8_pollOrderStatus_awaitingPayment")
+    @TestCaseId("PO-17265")
     public void step8_completePaymentAndAwaitLink() throws Exception {
         Response verifyResp = csvc.verifyPaymentIntent(
                 paymentIntentId,
@@ -273,27 +313,73 @@ public class TuitionPayerJourneyTest {
         log.info("Step 8 Complete: PAYOUT_ON_HOLD event received");
     }
 
-    // Not part of current happy flow.
-    // @Test(groups = "tuition-payer", dependsOnMethods = "step7_createTuitionOrder")
+    // precondition: order_number from step7 is available and the limit was reserved in step6.
+    // steps: Poll GET /order-status/{orderNumber} until status=AWAITING_PAYMENT or timeout (5 attempts); assert HTTP 200.
+    // expected: Order status is returned and is non-null — order sits in AWAITING_PAYMENT while the reserved amount is held.
+    @Test(groups = "tuition-payer", dependsOnMethods = "step6_reserveLimit")
+    @TestCaseId("PO-17266")
     public void step8_pollOrderStatus_awaitingPayment() {
         Response r = oms.pollOrderStatus(orderNumber, "AWAITING_PAYMENT", 5);
 
         assertStatus(r, 200, "GET", Routes.OMS_ORDER_STATUS.kongUrl(orderNumber));
 
         OrderStatusResponse statusResponse = r.as(OrderStatusResponse.class);
-        assertNotNull(statusResponse.getData().getStatus(), "Order status should not be null");
+        assertEquals(statusResponse.getData().getStatus(), "AWAITING_PAYMENT",
+                "Order should be AWAITING_PAYMENT right after reserve, before payment is completed");
 
         log.info("Order status after creation: {}", statusResponse.getData().getStatus());
     }
 
-    // Not part of current happy flow.
-    // @Test(groups = "tuition-payer", dependsOnMethods = "step7_createTuitionOrder")
+    // precondition: payment_intent_id and reserve_id from step6; payout reached PAYOUT_ON_HOLD in step8 (tutor acceptance + payout + temporal update already happened server-side).
+    // steps: Call POST /limits/consume with payment_intent_id and reserve_id (Stage 3B final step: moves the reserved amount to CONSUMED).
+    // expected: HTTP 200 — reserved limit is finally consumed and no longer held as "reserved".
+    @Test(groups = "tuition-payer", dependsOnMethods = "step8_completePaymentAndAwaitLink")
+    @TestCaseId("PO-17267")
     public void step9_consumeReservedLimit_happyPath() {
         Response r = csvc.consumeLimit(LimitActionRequest.from(paymentIntentId, reserveId));
 
         assertStatus(r, 200, "POST", Routes.CSVC_LIMITS_CONSUME.getPath());
 
         log.info("Limit consumed successfully");
+    }
+
+    // precondition: payee_display_id and fee breakdown already available from step3/step4 (reuses the same payee, builds its own fresh payment_intent + order to avoid colliding with the happy-path reservation).
+    // steps: Generate a fresh payment intent, create its order, reserve the limit for it, then call POST /limits/release with the same payment_intent_id and reserve_id (Stage 3A: REJECT — simulates the automatic release that happens when the tutor rejects the payment).
+    // expected: Reserve returns HTTP 200 with a reserve_id; release then returns HTTP 200 — the reserved amount is restored to both student and tutor limits.
+    @Test(groups = "tuition-payer", dependsOnMethods = "step4_getPaymentSummary")
+    @TestCaseId("PO-17282")
+    public void step10_rejectFlow_reserveThenReleaseLimit() {
+        Response intentResp = csvc.generatePaymentIntent(
+                GeneratePaymentIntentRequest.from(payeeDisplayId, paymentFee, UUID.randomUUID().toString())
+        );
+        assertStatus(intentResp, 200, "POST", Routes.CSVC_PAYMENT_INTENT.getPath());
+        String rejectPaymentIntentId = intentResp.as(PaymentIntentResponse.class).getData().getPaymentIntentId();
+        assertNotNull(rejectPaymentIntentId, "payment_intent_id should be returned for the reject-flow intent");
+
+        TuitionTestData.Payment paymentData = TuitionTestData.get().getPayment();
+        CreateTuitionOrderRequest.Payment cardPayment = CreateTuitionOrderRequest.Payment.cardPayment(
+                CreateTuitionOrderRequest.CardDetails.of(
+                        paymentData.getCardNumber(), paymentData.getExpiryMonth(), paymentData.getExpiryYear(),
+                        paymentData.getCvv(), paymentData.getCardHolderName(), paymentData.getCardType())
+        );
+        Response orderResp = oms.createTuitionOrder(
+                CreateTuitionOrderRequest.cardOrder(
+                        "TUITION", rejectPaymentIntentId, cardPayment, 0,
+                        CreateTuitionOrderRequest.AmountBreakdown.listFrom(paymentFee))
+        );
+        assertStatus(orderResp, 200, "POST", Routes.OMS_ORDERS.getPath());
+        String rejectOrderNumber = orderResp.as(CreateTuitionOrderResponse.class).getData().getOrderNumber();
+        assertNotNull(rejectOrderNumber, "order_number should be returned for the reject-flow order");
+
+        Response reserveResp = csvc.reserveLimit(ReserveLimitRequest.from(rejectPaymentIntentId, rejectOrderNumber));
+        assertStatus(reserveResp, 200, "POST", Routes.CSVC_LIMIT_RESERVE.getPath());
+        String rejectReserveId = reserveResp.as(ReserveLimitResponse.class).getData().getReserveId();
+        assertNotNull(rejectReserveId, "reserve_id should be returned for the reject-flow reservation");
+        log.info("Reject-flow limit reserved: reserve_id={}", rejectReserveId);
+
+        Response releaseResp = csvc.releaseLimit(LimitActionRequest.from(rejectPaymentIntentId, rejectReserveId));
+        assertStatus(releaseResp, 200, "POST", Routes.CSVC_LIMITS_RELEASE.getPath());
+        log.info("Reject-flow limit released: reserve_id={}", rejectReserveId);
     }
 
     private static TuitionTestData.InvalidCases invalidCases() {
@@ -315,7 +401,11 @@ public class TuitionPayerJourneyTest {
                 d.getTotalAmount(), d.getConvenienceFee(), d.getGstConvenienceFee(), d.getTotalPayable());
     }
 
+    // precondition: Payer is logged in.
+    // steps: Call POST /payee/basic-info with a bogus payment_option value.
+    // expected: HTTP 400 with error code err-payee-basic-info.
     @Test(groups = "tuition-payer-error")
+    @TestCaseId("PO-17268")
     public void error_payeeBasicInfo_invalidPaymentOption_badRequest() {
         Response r = csvc.getPayeeBasicInfo(
                 PayeeBasicInfoRequest.forVpa(invalidCases().getInvalidPaymentOption(), invalidCases().getWellFormedVpa())
@@ -328,7 +418,11 @@ public class TuitionPayerJourneyTest {
         log.info("Error case: payee/basic-info with bogus payment_option → 400");
     }
 
+    // precondition: Payer is logged in.
+    // steps: Call POST /payee/basic-info with a malformed VPA string.
+    // expected: HTTP 400 with error code err-payee-basic-info.
     @Test(groups = "tuition-payer-error")
+    @TestCaseId("PO-17269")
     public void error_payeeBasicInfo_invalidVpa_checkFailure() {
         Response r = csvc.getPayeeBasicInfo(
                 PayeeBasicInfoRequest.forVpa("VPA", invalidCases().getInvalidVpa())
@@ -341,7 +435,11 @@ public class TuitionPayerJourneyTest {
         log.info("Error case: payee/basic-info with invalid VPA → 400");
     }
 
+    // precondition: payout_reference_id from step2 must already be set (skips with a warning otherwise).
+    // steps: Call POST /payee/verification with a malformed PAN (wrong format/length).
+    // expected: HTTP 400.
     @Test(groups = "tuition-payer-error")
+    @TestCaseId("PO-17270")
     public void error_payeeVerification_malformedPan_badRequest() {
         if (payoutReferenceId == null) {
             log.warn("Skipping — no payoutReferenceId (run step2_getPayeeBasicInfo first)");
@@ -360,7 +458,11 @@ public class TuitionPayerJourneyTest {
         log.info("Error case: payee/verification with malformed PAN → 400");
     }
 
+    // precondition: payout_reference_id from step2 must already be set (skips with a warning otherwise).
+    // steps: Call POST /payee/verification with a well-formed but non-existent/unresolvable PAN.
+    // expected: HTTP 200 (soft failure) with is_success=false and is_pan_valid=false.
     @Test(groups = "tuition-payer-error")
+    @TestCaseId("PO-17271")
     public void error_payeeVerification_unresolvablePan_checkFailure() {
         if (payoutReferenceId == null) {
             log.warn("Skipping — no payoutReferenceId (run step2_getPayeeBasicInfo first)");
@@ -381,7 +483,11 @@ public class TuitionPayerJourneyTest {
         log.info("Error case: payee/verification with unresolvable PAN → soft failure, is_pan_valid=false");
     }
 
+    // precondition: payout_reference_id from step2 must already be set (skips with a warning otherwise).
+    // steps: Call POST /payee/verification up to 3 times in rapid succession using a known rate-limit-triggering PAN/mobile pair.
+    // expected: At least one of the rapid calls returns HTTP 429.
     @Test(groups = "tuition-payer-error")
+    @TestCaseId("PO-17272")
     public void error_payeeVerification_rateLimited() {
         if (payoutReferenceId == null) {
             log.warn("Skipping — no payoutReferenceId (run step2_getPayeeBasicInfo first)");
@@ -411,7 +517,11 @@ public class TuitionPayerJourneyTest {
         log.info("Error case: payee/verification rate limit after {} rapid calls → 429", attempts);
     }
 
+    // precondition: payee_display_id from step3 must already be set (skips with a warning otherwise).
+    // steps: Call GET /payment/summary with amount="abc" (non-numeric).
+    // expected: HTTP 400.
     @Test(groups = "tuition-payer-error")
+    @TestCaseId("PO-17273")
     public void error_paymentSummary_nonNumericAmount_badRequest() {
         if (payeeDisplayId == null) {
             log.warn("Skipping — no payeeDisplayId (run step3_verifyPayeeInfo first)");
@@ -429,7 +539,11 @@ public class TuitionPayerJourneyTest {
         log.info("Error case: payment summary with non-numeric amount → 400");
     }
 
+    // precondition: Payer is logged in.
+    // steps: Call GET /payment/summary with amount but no payee_display_id.
+    // expected: HTTP 400 with error code err-payment-summary.
     @Test(groups = "tuition-payer-error")
+    @TestCaseId("PO-17274")
     public void error_paymentSummary_missingPayeeId_badRequest() {
         Response r = csvc.getPaymentSummaryRaw(
                 Map.of("amount", TuitionTestData.get().getPayment().getAmount()));
@@ -441,7 +555,11 @@ public class TuitionPayerJourneyTest {
         log.info("Error case: payment summary with no payee_display_id → 400");
     }
 
+    // precondition: Payer is logged in. (No documented error case for this endpoint — 400 inferred from sibling C2C endpoints.)
+    // steps: Call POST /payee/payment-intent with only an idempotency_key (no payee/amount fields).
+    // expected: HTTP 400 with error code err-payee-create-payment-intent.
     @Test(groups = "tuition-payer-error")
+    @TestCaseId("PO-17275")
     public void error_generatePaymentIntent_missingRequiredFields() {
         // No documented error case for this endpoint in the Postman contract — 400 is inferred from sibling C2C endpoints.
         Response r = csvc.generatePaymentIntent(
@@ -455,7 +573,11 @@ public class TuitionPayerJourneyTest {
         log.info("Error case: payment-intent with no payee/amount fields → 400 (inferred, not documented anywhere)");
     }
 
+    // precondition: Payer is logged in.
+    // steps: Call POST /marketplace/orders with a completely empty body.
+    // expected: HTTP 400 with error_code=INVALID_PARAMETERS.
     @Test(groups = "tuition-payer-error")
+    @TestCaseId("PO-17276")
     public void error_createOrder_invalidParameters_emptyBody() {
         Response r = oms.createTuitionOrder(CreateTuitionOrderRequest.empty());
 
@@ -466,7 +588,11 @@ public class TuitionPayerJourneyTest {
         log.info("Error case: create order with no fields → 400 INVALID_PARAMETERS");
     }
 
+    // precondition: Payer is logged in.
+    // steps: Call POST /marketplace/orders with order_type="RENTAL" and dummy card/amount data.
+    // expected: HTTP 400 with error_code=ORDER_TYPE_UNSUPPORTED.
     @Test(groups = "tuition-payer-error")
+    @TestCaseId("PO-17277")
     public void error_createOrder_orderTypeUnsupported_rental() {
         Response r = oms.createTuitionOrder(
                 CreateTuitionOrderRequest.cardOrder(
@@ -480,7 +606,11 @@ public class TuitionPayerJourneyTest {
         log.info("Error case: create order with order_type=RENTAL → 400 ORDER_TYPE_UNSUPPORTED");
     }
 
+    // precondition: Payer is logged in.
+    // steps: Call POST /marketplace/orders with a payment_intent_id that was never issued.
+    // expected: HTTP 400 with error_code=PAYMENT_INTENT_INVALID.
     @Test(groups = "tuition-payer-error")
+    @TestCaseId("PO-17278")
     public void error_createOrder_paymentIntentInvalid() {
         Response r = oms.createTuitionOrder(
                 CreateTuitionOrderRequest.cardOrder(
@@ -494,7 +624,11 @@ public class TuitionPayerJourneyTest {
         log.info("Error case: create order with unknown payment_intent_id → 400 PAYMENT_INTENT_INVALID");
     }
 
+    // precondition: None — deliberately uses a fresh OmsService with no auth token attached.
+    // steps: Call POST /marketplace/orders without an Authorization header.
+    // expected: HTTP 401.
     @Test(groups = "tuition-payer-error")
+    @TestCaseId("PO-17279")
     public void error_createOrder_unauthorized_noToken() {
         OmsService unauthOms = new OmsService();
 
@@ -509,7 +643,11 @@ public class TuitionPayerJourneyTest {
         log.info("Error case: create order with no auth token → 401 UNAUTHORIZED");
     }
 
+    // precondition: paymentIntentId from step5 must already be set (skips with a warning otherwise).
+    // steps: Call POST /marketplace/orders with an amount_breakdown whose total_payable (1) doesn't match the real fee from the payment intent.
+    // expected: HTTP 400 with error_code=AMOUNT_MISMATCH.
     @Test(groups = "tuition-payer-error")
+    @TestCaseId("PO-17280")
     public void error_createOrder_amountMismatch() {
         if (paymentIntentId == null) {
             log.warn("Skipping — no paymentIntentId (run step5_generatePaymentIntent first)");

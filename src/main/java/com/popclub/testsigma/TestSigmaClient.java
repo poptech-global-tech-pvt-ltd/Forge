@@ -335,7 +335,7 @@ public class TestSigmaClient {
         body.put("status_id", TestSigmaConfig.statusId());
         body.put("automation_type_id", TestSigmaConfig.automationTypeId());
         body.put("priority_id", TestSigmaConfig.priorityId());
-        body.put("folder_id", folderId != null ? folderId : TestSigmaConfig.folderNegative());
+        body.put("folder_id", folderId != null ? folderId : TestSigmaConfig.folderDefault());
         body.put("project_id", projectId);
         body.put("preconditions", preconditions != null ? preconditions : "");
         body.put("steps", steps != null ? steps : "");
@@ -351,8 +351,13 @@ public class TestSigmaClient {
                 .post("/projects/" + projectId + "/test_cases");
 
         System.out.println("[TestSigma] Create TC [" + response.getStatusCode() + "]: " + title);
+        System.out.println("[TestSigma]   Request label_ids sent: " + labelIds);
         if (response.getStatusCode() >= 400) {
             System.out.println("[TestSigma]   ERROR: " + response.jsonPath().getString("errors.message"));
+        } else {
+            List<Object> returnedLabels = response.jsonPath().getList("data.test_case.label_ids");
+            System.out.println("[TestSigma]   Response label_ids returned: " + returnedLabels);
+            System.out.println("[TestSigma]   Full response body: " + response.asPrettyString());
         }
 
         Map<String, String> result = new HashMap<>();

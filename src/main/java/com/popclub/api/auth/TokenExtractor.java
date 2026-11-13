@@ -10,6 +10,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.time.format.DateTimeFormatter;
+import java.time.LocalTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -53,6 +55,7 @@ public class TokenExtractor {
      * Automatically picks the fastest available method.
      */
     public static String get(String deviceSerial) {
+        logStamp("get() called — device=" + (deviceSerial == null || deviceSerial.isBlank() ? "default" : deviceSerial));
 
         // 1. Already configured in local.properties
         if (!ApiConstants.USER_TOKEN.isBlank()) {
@@ -60,16 +63,16 @@ public class TokenExtractor {
             return ApiConstants.USER_TOKEN;
         }
 
-        System.out.println("[TokenExtractor] Trying logcat (device: " + (deviceSerial.isBlank() ? "default" : deviceSerial) + ")…");
+        logStamp("Trying logcat…");
 
         // 2. OkHttp logcat — anchored to VERIFY_OTP response body.
         String fromLogcat = fromLogcat(deviceSerial);
         if (fromLogcat != null) {
-            System.out.println("[TokenExtractor] ✅ Token found in logcat");
+            logStamp("✅ Token found in logcat");
             saveToCache(fromLogcat);
             return fromLogcat;
         }
-        System.out.println("[TokenExtractor] Not in logcat — trying local cache…");
+        logStamp("Not in logcat — trying local cache…");
 
         // 3. Local cache file (~/.forge/auth_token) — persisted from the last successful login.
         //    Primary fallback when login is skipped (noReset:true) and build is non-debuggable.
@@ -267,23 +270,78 @@ public class TokenExtractor {
     //   A. okhttp.OkHttpClient:I tag filter + grep  (fast, targeted)
     //   B. Full logcat + grep                       (catches any other logger)
 
-    private static String fromLogcat(String deviceSerial) {
-        // ── Pass A: okhttp tag filter + on-device grep ────────────────────────
-        String tokenA = grepLogcat(deviceSerial,
-                "logcat -d okhttp.OkHttpClient:I *:S | grep jwt_access_token");
-        if (tokenA != null) {
-            System.out.println("[TokenExtractor] ✅ Token found via logcat okhttp grep");
-            return tokenA;
-        }
-        System.out.println("[TokenExtractor] okhttp grep empty — trying full logcat grep…");
+    private static final int LOGCAT_RETRY_ATTEMPTS = 3;
+    private static final long LOGCAT_RETRY_DELAY_MS = 800;
 
-        // ── Pass B: full logcat + on-device grep ──────────────────────────────
-        String tokenB = grepLogcat(deviceSerial,
-                "logcat -d | grep jwt_access_token");
-        if (tokenB != null) {
-            System.out.println("[TokenExtractor] ✅ Token found via full logcat grep");
+    private static String fromLogcat(String deviceSerial) {
+        logStamp("fromLogcat() start — device=" + (deviceSerial == null || deviceSerial.isBlank() ? "default" : deviceSerial));
+
+        // Diagnostic: did the /verify (or /initiate) network call even happen on this
+        // device, regardless of whether we can parse a token out of it? This tells us
+        // whether we're facing a parsing/regex problem or the call never fired at all.
+        probeLoginNetworkCalls(deviceSerial);
+
+        // SMV (silent) logins can write the VERIFY_OTP response line to logcat with a
+        // short lag after Home becomes visible — `adb logcat -d` only dumps what's
+        // already in the buffer, so a single immediate read can race that write.
+        for (int attempt = 1; attempt <= LOGCAT_RETRY_ATTEMPTS; attempt++) {
+            logStamp("fromLogcat() attempt " + attempt + "/" + LOGCAT_RETRY_ATTEMPTS);
+
+            // ── Pass A: okhttp tag filter + on-device grep ────────────────────
+            String tokenA = grepLogcat(deviceSerial,
+                    "logcat -d okhttp.OkHttpClient:I *:S | grep jwt_access_token");
+            if (tokenA != null) {
+                logStamp("✅ Token found via logcat okhttp grep (attempt " + attempt + ")");
+                return tokenA;
+            }
+
+            // ── Pass B: full logcat + on-device grep ───────────────────────────
+            String tokenB = grepLogcat(deviceSerial,
+                    "logcat -d | grep jwt_access_token");
+            if (tokenB != null) {
+                logStamp("✅ Token found via full logcat grep (attempt " + attempt + ")");
+                return tokenB;
+            }
+
+            if (attempt < LOGCAT_RETRY_ATTEMPTS) {
+                logStamp("logcat empty (attempt " + attempt + ") — retrying…");
+                try { Thread.sleep(LOGCAT_RETRY_DELAY_MS); } catch (InterruptedException ignored) {}
+            }
         }
-        return tokenB;
+        logStamp("fromLogcat() exhausted all attempts — no token found in logcat");
+        return null;
+    }
+
+    /**
+     * Diagnostic probe — checks whether the login network calls (initiate/verify)
+     * appear in logcat AT ALL, independent of whether a jwt_access_token can be
+     * parsed out of them. Helps distinguish "call never fired on this device" from
+     * "call fired but our regex/parsing missed it".
+     */
+    private static void probeLoginNetworkCalls(String deviceSerial) {
+        try {
+            String[] cmd = buildAdb(deviceSerial, "shell", "logcat -d | grep -i 'user-login'");
+            String output = run(cmd);
+            if (output == null || output.isBlank()) {
+                logStamp("[probe] No 'user-login' lines found in logcat at all — "
+                        + "the initiate/verify network call likely never fired on this device.");
+                return;
+            }
+            String[] lines = output.split("\\n");
+            logStamp("[probe] Found " + lines.length + " 'user-login' line(s) in logcat:");
+            for (String line : lines) {
+                String trimmed = line.length() > 300 ? line.substring(0, 300) + "…(truncated)" : line;
+                System.out.println("  [probe] " + trimmed);
+            }
+        } catch (Exception e) {
+            logStamp("[probe] probeLoginNetworkCalls failed: " + e.getMessage());
+        }
+    }
+
+    private static final DateTimeFormatter TS_FMT = DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
+
+    private static void logStamp(String message) {
+        System.out.println("[TokenExtractor][" + LocalTime.now().format(TS_FMT) + "] " + message);
     }
 
     /**
@@ -297,20 +355,30 @@ public class TokenExtractor {
         try {
             // adb [-s serial] shell "logcat -d ... | grep jwt_access_token"
             String[] cmd = buildAdb(deviceSerial, "shell", shellCmd);
-            System.out.println("[TokenExtractor] logcat cmd: " + java.util.Arrays.toString(cmd));
+            logStamp("logcat cmd: " + java.util.Arrays.toString(cmd));
             String output = run(cmd);
 
-            if (output == null || output.isBlank()) return null;
+            if (output == null || output.isBlank()) {
+                logStamp("logcat cmd returned no matching lines");
+                return null;
+            }
 
             // Take the LAST occurrence — most recent login
             Pattern p = Pattern.compile("\"jwt_access_token\"\\s*:\\s*\"(eyJ[A-Za-z0-9._-]+)\"");
             Matcher m = p.matcher(output);
             String last = null;
             while (m.find()) last = m.group(1);
+
+            if (last == null) {
+                // grep matched something (non-blank output) but the regex couldn't pull a
+                // token out of it — print the raw output so a format mismatch is visible.
+                String preview = output.length() > 800 ? output.substring(0, 800) + "…(truncated)" : output;
+                logStamp("logcat matched lines but regex found no jwt_access_token — raw output:\n" + preview);
+            }
             return last;
 
         } catch (Exception e) {
-            System.out.println("[TokenExtractor] logcat grep failed: " + e.getMessage());
+            logStamp("logcat grep failed: " + e.getMessage());
         }
         return null;
     }

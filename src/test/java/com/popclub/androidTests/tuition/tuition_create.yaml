@@ -1,6 +1,6 @@
 testName: tuition create
 platform: android
-noReset: true
+noReset: false
 loginRequired: true
 retry: 1
 
@@ -17,11 +17,15 @@ tags:
 steps:
   - action: launchApp
 
+  - action: tapByText
+    value: "Skip"
+    optional: true
+
   - action: loginIfNeeded
-    value: "1234561122"
+    value: "8076853318"
     text: "560102"
 
   - action: waitFor
-    element: home_tab
+    element: Home
 
   - action: captureToken

@@ -47,6 +47,7 @@ public class TuitionFeePaymentAcceptanceTest extends WebBaseTest {
         TuitionReceivePaymentPage receivePage = new TuitionReceivePaymentPage(page);
         Assert.assertTrue(receivePage.isPageLoaded(), "Receive-payment confirmation page should load after OTP verification");
         Assert.assertTrue(receivePage.isSellerIdVisible(), "Seller ID should be visible on confirm details");
+        Assert.assertFalse(receivePage.isConfirmButtonEnabled(), "Confirm & receive button should be disabled until T&C is accepted");
         receivePage.acceptTerms();
         Assert.assertTrue(receivePage.isConfirmButtonEnabled(), "Confirm & receive button should enable once T&C is accepted");
         receivePage.clickConfirmAndReceive();

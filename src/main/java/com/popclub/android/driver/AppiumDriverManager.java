@@ -203,6 +203,12 @@ public class AppiumDriverManager {
             // dialog for a permission that's already granted, so no watcher is needed.
             grantAllPermissions(device, "com.popclub.android");
 
+            // Resize the logcat ring buffer. Default (~256KB) gets evicted within seconds by
+            // the app's own large API responses (e.g. the home page payload can exceed 400KB),
+            // pushing the login VERIFY response (containing jwt_access_token) out of the buffer
+            // before TokenExtractor ever reads it. 16M comfortably survives that.
+            resizeLogcatBuffer(device);
+
             // Unlock device before any test steps run
             unlockDevice((AndroidDriver) driverInstance);
 
@@ -295,6 +301,17 @@ public class AppiumDriverManager {
 
     private static void adbRun(DeviceInfo device, String... args) throws Exception {
         Runtime.getRuntime().exec(adbBase(device, args)).waitFor(5, java.util.concurrent.TimeUnit.SECONDS);
+    }
+
+    /** Resizes the device's logcat ring buffer so it survives large API response dumps
+     *  without evicting the login VERIFY_OTP response TokenExtractor depends on. */
+    private static void resizeLogcatBuffer(DeviceInfo device) {
+        try {
+            adbRun(device, "shell", "logcat", "-G", "16M");
+            System.out.println("[Driver] Logcat buffer resized to 16M for " + device.udid);
+        } catch (Exception e) {
+            System.out.println("[Driver] Failed to resize logcat buffer: " + e.getMessage());
+        }
     }
 
     /** Builds the adb base command with optional remote-server and serial flags. */

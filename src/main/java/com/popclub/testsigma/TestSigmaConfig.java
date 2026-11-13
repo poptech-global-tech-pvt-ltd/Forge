@@ -39,8 +39,7 @@ public class TestSigmaConfig {
     public static String userId()           { return get("testsigma.user.id"); }
     public static String projectId()        { return get("testsigma.project.id"); }
 
-    public static String folderNegative()   { return get("testsigma.folder.negative"); }
-    public static String folderHappy()      { return get("testsigma.folder.happy"); }
+    public static String folderDefault()    { return get("testsigma.folder.default"); }
 
     public static String labelSanity()      { return get("testsigma.label.sanity"); }
     public static String labelRegression()  { return get("testsigma.label.regression"); }

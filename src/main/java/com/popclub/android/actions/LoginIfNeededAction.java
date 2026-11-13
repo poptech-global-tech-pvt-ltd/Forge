@@ -56,8 +56,9 @@ public class LoginIfNeededAction implements Action {
         boolean loginScreenVisible = isVisible(driver, PHONE_INPUT_TAG, QUICK_TIMEOUT_MS);
 
         if (loginScreenVisible) {
-            System.out.println("[loginIfNeeded] Login screen detected — performing login…");
+            System.out.println("[loginIfNeeded][" + now() + "] Login screen detected — performing login…");
             doLogin(driver, phone, otp);
+            System.out.println("[loginIfNeeded][" + now() + "] doLogin() returned — about to capture token from logcat");
             captureTokenFromLogcat();   // reads jwt_access_token from OkHttp logcat
         } else {
             System.out.println("[loginIfNeeded] No login required — already on home screen.");
@@ -69,8 +70,22 @@ public class LoginIfNeededAction implements Action {
         // Runtime permission prompts (e.g. notifications) can cover the home screen
         // on either path above — dismiss so the next waitFor/tap isn't blocked.
         dismissPermissionDialog(driver);
+        dismissInAppPermissionsSheet(driver);
 
         System.out.println("[loginIfNeeded] ✅ Login step complete");
+    }
+
+    /** Dismisses POP's own "A few permissions, so POP works better" sheet (SMS/Phone/Notifications/
+     *  Location toggles) that can appear right after login, before Home becomes interactable. */
+    private void dismissInAppPermissionsSheet(AppiumDriver driver) {
+        try {
+            List<WebElement> skip = driver.findElements(AppiumBy.androidUIAutomator(
+                    "new UiSelector().textMatches(\"(?i)skip for now\")"));
+            if (!skip.isEmpty() && skip.get(0).isDisplayed()) {
+                skip.get(0).click();
+                System.out.println("[loginIfNeeded] Dismissed in-app permissions sheet (Skip for now)");
+            }
+        } catch (Exception ignored) {}
     }
 
     private void doLogin(AppiumDriver driver, String phone, String otp) throws Exception {
@@ -81,9 +96,25 @@ public class LoginIfNeededAction implements Action {
         WebElement continueBtn = waitFor(driver, CONTINUE_BTN_TAG, LOGIN_TIMEOUT_SEC);
         continueBtn.click();
 
-        WebElement otpInput = waitFor(driver, OTP_INPUT_TAG, LOGIN_TIMEOUT_SEC);
-        otpInput.click();
-        typeIntoFocusedField(driver, otp);
+        // Own-SIM numbers can silently verify (SMV) and jump straight to Home,
+        // skipping the OTP screen entirely — so wait for whichever appears first.
+        boolean otpScreenShown = isVisible(driver, OTP_INPUT_TAG, LOGIN_TIMEOUT_SEC * 1000);
+        if (otpScreenShown) {
+            WebElement otpInput = waitFor(driver, OTP_INPUT_TAG, LOGIN_TIMEOUT_SEC);
+            otpInput.click();
+            typeIntoFocusedField(driver, otp);
+        } else {
+            System.out.println("[loginIfNeeded][" + now() + "] OTP screen not shown — silent (SMV) verification likely completed");
+        }
+
+        // POP's own permissions sheet ("Skip for now") can appear before Home becomes
+        // visible and block it — dismiss it on each poll while waiting for Home.
+        long deadline = System.currentTimeMillis() + LOGIN_TIMEOUT_SEC * 1000;
+        while (System.currentTimeMillis() < deadline) {
+            dismissInAppPermissionsSheet(driver);
+            if (!driver.findElements(AppiumBy.accessibilityId(HOME_TAB_TAG)).isEmpty()) break;
+            sleep(300);
+        }
         new WebDriverWait(driver, Duration.ofSeconds(LOGIN_TIMEOUT_SEC))
                 .until(ExpectedConditions.presenceOfElementLocated(
                         AppiumBy.accessibilityId(HOME_TAB_TAG)));
@@ -187,8 +218,13 @@ public class LoginIfNeededAction implements Action {
         }
     }
 
+    private static String now() {
+        return java.time.LocalTime.now().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss.SSS"));
+    }
+
     private void storeToken(String deviceSerial, String source) {
         try {
+            System.out.println("[loginIfNeeded][" + now() + "] storeToken() start — source=" + source + ", deviceSerial=" + deviceSerial);
             TokenExtractor.clearCache();
             TestContext.setUserToken(null);
             TestContext.setLegacyToken(null);

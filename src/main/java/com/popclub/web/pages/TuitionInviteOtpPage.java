@@ -19,6 +19,10 @@ public class TuitionInviteOtpPage {
     private static final String OTP_DIGIT_INPUTS = "input[type='text']";
     private static final String VERIFY_BUTTON    = "button:has-text('Verify OTP')";
     private static final String FEE_HEADING      = "text=education fee";
+    // Best-effort — exact copy not yet confirmed against the live page; broadened to
+    // catch common variants so false negatives are less likely than false positives.
+    private static final String OTP_ERROR_TEXT   = "text=/invalid otp|incorrect otp|otp.*expired/i";
+    private static final String INVITE_INVALID_TEXT = "text=/invite.*(expired|invalid|not found)|link.*(expired|invalid)/i";
 
     public TuitionInviteOtpPage(Page page) {
         this.page = page;
@@ -65,5 +69,27 @@ public class TuitionInviteOtpPage {
         Locator button = page.locator(VERIFY_BUTTON);
         button.waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         button.click();
+    }
+
+    /** True once all 6 OTP boxes are filled — used to assert partial-entry disables Verify. */
+    public boolean isOtpFullyFilled() {
+        Locator digits = page.locator(OTP_DIGIT_INPUTS);
+        for (int i = 0; i < digits.count(); i++) {
+            if (digits.nth(i).inputValue().isBlank()) return false;
+        }
+        return true;
+    }
+
+    public boolean isOtpErrorVisible() {
+        boolean visible = page.locator(OTP_ERROR_TEXT).isVisible();
+        log.debug("TuitionInviteOtpPage isOtpErrorVisible: {}", visible);
+        return visible;
+    }
+
+    /** True if the invite link itself is expired/invalid/already-consumed (never reaches the OTP screen). */
+    public boolean isInviteInvalidOrExpired() {
+        boolean visible = page.locator(INVITE_INVALID_TEXT).isVisible();
+        log.debug("TuitionInviteOtpPage isInviteInvalidOrExpired: {}", visible);
+        return visible;
     }
 }
