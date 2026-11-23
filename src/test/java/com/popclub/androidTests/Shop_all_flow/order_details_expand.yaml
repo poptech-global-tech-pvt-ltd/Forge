@@ -1,0 +1,99 @@
+testName: Order Success Screen — Order details expand and Order ID copyable
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-11570
+
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - shop
+  - regression
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: tap
+    element: common_shop_tab
+
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: enterText
+    element: search_products_search_input
+    value: "superyou"
+
+  - action: pressKey
+    value: search
+
+  - action: tap
+    element: product_list_item_0
+
+  - action: tap
+    element: product_details_bottom_sticky_bar_button
+
+  - action: tap
+    element: product_details_go_to_cart_button
+
+  - action: tap
+    element: cart_s2_s_payment_button_button_2
+
+  - action: tap
+    element: cart_link_and_pay_button
+
+  - action: waitFor
+    element: shop_payment_screen_row
+
+  - action: scrollUntilVisible
+    element: shop_payment_shop_cod_section_button
+
+  - action: tap
+    element: shop_payment_shop_cod_section_button
+
+  - action: tapByText
+    value: "Cash on Delivery"
+
+  - action: scrollUntilVisible
+    text: "Pay"
+    direction: down
+
+  - action: tapByText
+    value: "Pay"
+
+  - action: waitFor
+    element: order_success_title_text
+
+  # PO-11576: Verify Order ID displayed and copyable
+  - action: verifyElement
+    element: order_success_copy_order_id_button
+
+  - action: tap
+    element: order_success_copy_order_id_button
+    testCaseId: PO-11576
+
+  # PO-11570: Tap order details toggle — verify expanded section
+  - action: tap
+    element: order_success_order_details_toggle
+
+  - action: verifyElement
+    element: order_success_detailed_components_order_item_box_row
+    testCaseId: PO-11570

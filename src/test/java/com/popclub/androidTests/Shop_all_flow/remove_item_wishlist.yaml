@@ -1,0 +1,54 @@
+testName: Cart — Remove item and move to wishlist
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-11214
+  - PO-11215
+  - PO-11216
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - shop
+  - regression
+
+retry: 0
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: call
+    flow: navigate_to_cart
+
+  # PO-11214: Tap '−' at qty 1 shows 'Move to wishlist?' popup
+  - action: tap
+    element: cart_iteam_decrease
+
+  - action: verifyElement
+    element: cart_remove_product_button
+    testCaseId: PO-11214
+
+  - action: verifyElement
+    element: cart_add_to_wishlist_button
+
+  # PO-11216: Tap 'Add to wishlist' removes from cart, adds to wishlist
+  - action: tap
+    element: cart_add_to_wishlist_button
+    testCaseId: PO-11216
+
+  # Re-add item to cart for next test (navigate back to shop, add item)
+  # PO-11215: Tap 'Remove' removes item
+  # (Need fresh cart item — run separately or re-add item)

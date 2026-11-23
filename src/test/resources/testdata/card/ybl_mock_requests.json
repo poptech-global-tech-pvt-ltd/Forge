@@ -1,0 +1,32 @@
+{
+  "consent": {
+    "prn": "POPCLUB-1718800000001abc",
+    "jtid": "JT-YBL-98765",
+    "productCode": "cc",
+    "stageName": "consent",
+    "OfferStatus": "approved",
+    "customerType": "NTB",
+    "responseCode": "0000",
+    "responseMessage": "Success",
+    "journeyStatus": "Active"
+  },
+  "ekyc": {
+    "prn": "POPCLUB-1718800000001abc",
+    "jtid": "JT-YBL-98765",
+    "stageName": "ekyc",
+    "responseCode": "0000",
+    "responseMessage": "Success",
+    "journeyStatus": "Active",
+    "ckycAllowed": "Y",
+    "url": ""
+  },
+  "vkyc": {
+    "prn": "POPCLUB-1718800000001abc",
+    "jtid": "JT-YBL-98765",
+    "stageName": "vkyc",
+    "responseCode": "0000",
+    "responseMessage": "Success",
+    "journeyStatus": "Active",
+    "url": "https://yesbank.in/vkyc/session/xyz789"
+  }
+}

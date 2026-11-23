@@ -1,0 +1,34 @@
+# Reusable login subflow
+# Usage: runFlow with env USERNAME (phone number), OTP (default 1234)
+---
+- tapOn:
+    id: "login_merged_mobile_entry_content_input"
+    optional: true
+- tapOn:
+    id: "login_phone_input"
+    optional: true
+- inputText: ${USERNAME}
+
+- tapOn:
+    id: "login_continue_button"
+
+- extendedWaitUntil:
+    visible:
+      id: "login_merged_otp_entry_content_button"
+    timeout: 10000
+
+- tapOn:
+    id: "login_merged_otp_entry_content_button"
+- inputText: ${OTP}
+
+- tapOn:
+    id: "login_merged_login_and_otp_screen_button_3"
+
+- extendedWaitUntil:
+    visible:
+      id: "common_home_tab"
+    timeout: 15000
+
+- tapOn:
+    id: "Close"
+    optional: true

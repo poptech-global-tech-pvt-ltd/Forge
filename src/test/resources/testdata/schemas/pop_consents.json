@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["is_success", "data"],
+  "properties": {
+    "is_success": { "type": "boolean" },
+    "data": {
+      "type": "object",
+      "required": ["consents"],
+      "properties": {
+        "consents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "is_mandatory"],
+            "properties": {
+              "name": { "type": "string" },
+              "title": { "type": "string" },
+              "is_parent": { "type": "boolean" },
+              "is_mandatory": { "type": "boolean" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

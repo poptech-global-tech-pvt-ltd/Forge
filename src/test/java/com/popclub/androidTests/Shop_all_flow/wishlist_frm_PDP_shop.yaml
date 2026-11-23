@@ -1,0 +1,77 @@
+testName: Shop — Add Item to Wishlist and Verify in Wishlist
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-11060
+
+features:
+  - home
+  - login
+  - shop
+
+tags:
+  - shop
+  - wishlist
+
+steps:
+  - action: launchApp
+
+  - action: tapIfPresent
+    element: skip_tour
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+    
+  - action: tap
+    element: shop_tab
+    
+ # ── PLP: navigate, capture API + UI prices ────────────────────────────────
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: enterText
+    element: search_products_search_input
+    value: "superyou"
+    
+  - action: pressKey
+    value: search
+
+  - action: tap
+    element: product_list_item_0
+    
+  # Capture the title so we can verify it appears in the wishlist later
+  - action: captureText
+    element: product_details_title
+    value: wishlisted_title
+
+  - action: tap
+    element: product_details_wishlist_button
+
+  - action: pressKey
+    value: BACK
+
+  # qaTestTag in popdroid: "wishlsit" (typo is intentional — matches app code)
+  - action: tap
+    element: toolbar_wishlist_button
+
+  - action: waitFor
+    element: wishlist_item_title_0
+
+  - action: assertStoredText
+    value: wishlisted_title
+    
+  # Verify wishlist header elements
+  - action: verifyElement
+    element: Navigation
+
+  - action: verifyElement
+    element: toolbar_cart_button
+
+  - action: verifyElement
+    element: toolbar_popcoin_button

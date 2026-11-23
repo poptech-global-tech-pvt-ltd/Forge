@@ -1,0 +1,31 @@
+steps:
+  - action: call
+    flow: search_get_product
+    params:
+      query: "${search_query}"
+      pincode: "${search_pincode}"
+
+  - action: waitFor
+    element: shop_search_button
+
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: enterText
+    element: search_products_search_input
+    value: "${search_query}"
+
+  - action: pressKey
+    value: search
+
+  - action: waitFor
+    element: product_list_filter_button
+
+  - action: tap
+    element: product_list_item_0
+
+  - action: waitFor
+    element: product_details_title

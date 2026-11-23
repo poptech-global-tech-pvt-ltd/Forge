@@ -1,0 +1,70 @@
+syntax = "proto3";
+package forgedriver;
+option java_package = "com.popclub.forgedriver.proto";
+option java_outer_classname = "ForgeDriverProto";
+option java_multiple_files = true;
+
+service ForgeDriver {
+  rpc Ping(PingRequest) returns (PingResponse);
+  rpc Tap(TapRequest) returns (ActionResponse);
+  rpc TapByText(TapByTextRequest) returns (ActionResponse);
+  rpc TapByCoords(TapByCoordsRequest) returns (ActionResponse);
+  rpc Type(TypeRequest) returns (ActionResponse);
+  rpc ClearAndType(TypeRequest) returns (ActionResponse);
+  rpc Swipe(SwipeRequest) returns (ActionResponse);
+  rpc PressKey(PressKeyRequest) returns (ActionResponse);
+  rpc WaitPresent(WaitPresentRequest) returns (WaitPresentResponse);
+  rpc IsPresent(IsPresentRequest) returns (IsPresentResponse);
+  rpc GetSource(SourceRequest) returns (SourceResponse);
+  rpc Screenshot(ScreenshotRequest) returns (ScreenshotResponse);
+  rpc SearchNodes(SearchRequest) returns (SearchResponse);
+}
+
+message PingRequest {}
+message PingResponse { string status = 1; }
+
+message TapRequest { string tag = 1; }
+message TapByTextRequest { string text = 1; }
+message TapByCoordsRequest { int32 x = 1; int32 y = 2; }
+message TypeRequest { string text = 1; }
+message SwipeRequest {
+  string direction = 1;
+  int32 x1 = 2; int32 y1 = 3; int32 x2 = 4; int32 y2 = 5;
+}
+message PressKeyRequest { string key = 1; }
+message WaitPresentRequest { string tag = 1; int64 timeout_ms = 2; }
+message IsPresentRequest { string tag = 1; }
+message SourceRequest {}
+message ScreenshotRequest {}
+
+message SearchRequest {
+  string tag        = 1;  // content-desc / accessibilityId (exact match)
+  string text       = 2;  // visible text (contains, case-insensitive)
+  string class_name = 3;  // e.g. android.widget.Button (contains)
+  string resource_id = 4; // resource-id (exact or suffix match)
+  bool   visible_only = 5; // skip nodes with empty bounds
+}
+
+message AccessibilityNode {
+  string tag         = 1;
+  string text        = 2;
+  string class_name  = 3;
+  string resource_id = 4;
+  int32  left        = 5;
+  int32  top         = 6;
+  int32  right       = 7;
+  int32  bottom      = 8;
+  bool   clickable   = 9;
+  bool   enabled     = 10;
+}
+
+message SearchResponse { repeated AccessibilityNode nodes = 1; }
+
+message ActionResponse { bool success = 1; string error = 2; }
+message WaitPresentResponse {
+  bool found = 1;
+  int32 left = 2; int32 top = 3; int32 right = 4; int32 bottom = 5;
+}
+message IsPresentResponse { bool found = 1; }
+message SourceResponse { string xml = 1; }
+message ScreenshotResponse { bytes png = 1; }

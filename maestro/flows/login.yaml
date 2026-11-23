@@ -1,0 +1,26 @@
+appId: com.popclub.android
+name: "Login Flow"
+tags:
+  - login
+  - smoke
+---
+- launchApp:
+    clearState: true
+
+- assertVisible:
+    id: "login_screen_title_text"
+    label: "Login screen is visible"
+
+- tapOn:
+    id: "google_phone_dialog_cancel_button"
+    optional: true
+
+- runFlow:
+    file: "_login.yaml"
+    env:
+      USERNAME: ${USERNAME}
+      OTP: ${OTP}
+
+- assertVisible:
+    id: "common_home_tab"
+    label: "Successfully reached home screen"

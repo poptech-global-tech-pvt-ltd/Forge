@@ -1,0 +1,52 @@
+testName: Cart — Empty wishlist popup
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-11236
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - shop
+  - regression
+
+retry: 0
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234563737"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: call
+    flow: navigate_to_cart
+
+  # Scroll to Add from wishlist
+  - action: scrollUntilVisible
+    element: cart_add_from_wishlist_button
+    maxScrolls: 4
+
+    # PO-11236: Tap Add from wishlist — empty wishlist popup
+  - action: tap
+    element: cart_add_from_wishlist_button
+
+  - action: assertText
+    element: cart_empty_wishlist_title
+    value: "Your wishlist is empty"
+    testCaseId: PO-11236
+
+  - action: verifyElement
+    element: cart_checkout_pop_shop_button
+
+  - action: tap
+    element: skip_tour

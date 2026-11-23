@@ -1,0 +1,59 @@
+testName: Prepaid number detection bottom sheet + operator screen link
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-13210
+  - PO-13211
+
+features:
+  - common
+  - billpay
+
+tags:
+  - rcbp
+  - regression
+
+retry: 0
+
+steps:
+
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: tap
+    element: bill_pay_all_bills_recharges_tab
+
+  - action: waitFor
+    element: bill_pay_recharge_page_bill_pay_recharge_screen_row
+
+  - action: tap
+    element: bill_pay_recharge_search_input
+
+  - action: enterText
+    element: bill_pay_recharge_search_input
+    value: "9999999999"
+
+  - action: pressKey
+    value: search
+
+  # PO-13210 — prepaid number detected bottom sheet
+  - action: verifyElement
+    locator: bill_pay_recharge_prepaid_detected_bottom_sheet
+
+  - action: tapIfPresent
+    locator: bill_pay_recharge_prepaid_detected_continue_button
+
+  # PO-13211 — "I am a prepaid user" link visible + tappable on operator screen
+  - action: waitFor
+    element: bill_pay_operator_item_0
+
+  - action: verifyElement
+    locator: bill_pay_operator_i_am_prepaid_user_link
+
+  - action: tap
+    locator: bill_pay_operator_i_am_prepaid_user_link 

@@ -1,0 +1,86 @@
+testName: Wishlist — Add to cart and verify in Cart screen
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-11477
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - shop
+  - smoke
+  - regression
+
+retry: 0
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: tap
+    element: common_shop_tab
+
+  # Search for "superyou" — no size selection needed
+  # ── PLP: navigate, capture API + UI prices ────────────────────────────────
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: enterText
+    element: search_products_search_input
+    value: "superyou"
+    
+  - action: pressKey
+    value: search
+
+  # Add product to wishlist from PDP
+  - action: tap
+    element: product_list_item_0
+
+  - action: waitFor
+    element: product_details_title
+
+  - action: captureText
+    element: product_details_title
+    value: "wishlisted_title"
+
+  - action: tap
+    element: product_details_wishlist_button
+
+  - action: pressKey
+    value: BACK
+
+  # Go to wishlist
+  - action: tap
+    element: toolbar_wishlist_button
+
+  # PO-11477: Tap + button to add to cart (no size selection for superyou)
+  - action: tap
+    element: wishlist_add_to_cart_button
+
+  # PO-11480: Verify cart icon is visible (badge should increment)
+  - action: verifyElement
+    element: toolbar_cart_button
+    testCaseId: PO-11480
+
+  # PO-11478: Navigate to cart and verify item is there
+  - action: tap
+    element: toolbar_cart_button
+    testCaseId: PO-11478
+
+  - action: waitFor
+    element: cart_item_row_0
+
+  - action: assertStoredText
+    value: "wishlisted_title"

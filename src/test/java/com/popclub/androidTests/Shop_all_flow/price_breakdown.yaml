@@ -1,0 +1,74 @@
+testName: Cart — Price breakdown and delivery fee
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-11222
+  - PO-11223
+  - PO-11224
+  - PO-11225
+  - PO-11226
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - shop
+  - cart
+  - regression
+
+retry: 0
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: call
+    flow: navigate_to_cart
+
+  # PO-11222: To pay section with breakdown
+  - action: scrollUntilVisible
+    element: cart_to_pay_row
+    maxScrolls: 3
+
+  - action: verifyElement
+    element: cart_to_pay_row
+    testCaseId: PO-11222
+
+  # Expand price summary
+  - action: tap
+    element: cart_price_summary_expand_button
+
+  - action: verifyElement
+    text: "Item Total"
+
+  - action: verifyElement
+    text: "Delivery Fee"
+
+  # PO-11223: Tap delivery fee info icon
+  - action: tap
+    element: cart_delivery_fee_info_button
+
+  - action: verifyElement
+    element: cart_delivery_fee_got_it_button
+    testCaseId: PO-11223
+
+  - action: tap
+    element: cart_delivery_fee_got_it_button
+
+  # PO-11224, 11225, 11226: Delivery fee threshold tests
+  # NOTE: Need cart total below ₹249 to test. Requires removing items
+  # or using account with low-value cart. Commenting for now.
+  # - action: verifyElement
+  #   text: "Unlock free delivery"
+  #   testCaseId: PO-11225

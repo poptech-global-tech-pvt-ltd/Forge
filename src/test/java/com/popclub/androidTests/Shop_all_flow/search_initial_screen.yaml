@@ -1,0 +1,42 @@
+testName: PO-11000 — Verify Search initial screen shows Recent searches and Trending searches
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-11000
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - shop
+  - regression
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: tap
+    element: common_shop_tab
+
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  # Verify Recent searches section
+  - action: verifyElement
+    element: search_recent_item_0
+
+  # Verify Trending searches section
+  - action: verifyElement
+    element: search_trending_item_0
+    testCaseId: PO-11000

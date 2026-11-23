@@ -1,0 +1,42 @@
+appId: com.popclub.android
+name: "Home Screen Smoke"
+tags:
+  - home
+  - smoke
+---
+- launchApp:
+    clearState: true
+
+- runFlow:
+    file: "_login.yaml"
+    env:
+      USERNAME: ${USERNAME}
+      OTP: ${OTP}
+
+- assertVisible:
+    id: "common_home_tab"
+    label: "Home tab visible"
+
+- assertVisible:
+    id: "common_shop_tab"
+    label: "Shop tab visible"
+
+- assertVisible:
+    id: "home_search_bar"
+    label: "Search bar visible"
+
+- tapOn:
+    id: "common_shop_tab"
+    label: "Navigate to Shop"
+
+- assertNoDefectsWithAI
+
+- tapOn:
+    id: "common_home_tab"
+    label: "Navigate back to Home"
+
+- tapOn:
+    id: "common_card_tab"
+    label: "Navigate to Card"
+
+- assertNoDefectsWithAI

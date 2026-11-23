@@ -1,0 +1,105 @@
+testName: Shop — Search, Open PDP, Add to Cart, Verify Cart
+platform: android
+noReset: true
+loginRequired: true
+
+features:
+  - common
+  - login
+  - shop
+
+tags:
+  - smoke
+  - shop
+  - e2e
+
+retry: 1
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: common_home_tab
+
+  # ── Navigate to Shop ────────────────────────────────────────────────────────
+  - action: tap
+    element: common_shop_tab
+
+  - action: waitFor
+    element: shop_search_button
+
+  # ── Search for a product ────────────────────────────────────────────────────
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: enterText
+    element: search_products_search_input
+    value: "shirt"
+
+  - action: pressKey
+    value: search
+
+
+  # ── Product List Page ───────────────────────────────────────────────────────
+  - action: waitFor
+    element: product_list_item_0
+
+  - action: verifyElement
+    element: product_list_item_price_0
+
+  - action: captureText
+    element: product_list_item_price_0
+    variable: plp_price
+
+  # ── Product Details Page ────────────────────────────────────────────────────
+  - action: tap
+    element: product_list_item_0
+
+  - action: waitFor
+    element: product_details_title
+
+  - action: verifyElement
+    element: product_details_price
+
+  - action: captureText
+    element: product_details_price
+    variable: pdp_price
+
+  # ── Add to Cart ─────────────────────────────────────────────────────────────
+  - action: tap
+    element: product_details_bottom_sticky_bar_button
+
+  - action: tapIfPresent
+    element: product_details_size_option_0
+
+  - action: tapIfPresent
+    element: size_selection_add_to_cart_button
+
+  - action: waitFor
+    element: add_to_cart_snackbar
+
+  # ── Cart ─────────────────────────────────────────────────────────────────────
+  - action: tap
+    element: toolbar_cart_button
+
+  - action: waitFor
+    element: cart_item_row_0
+
+  - action: verifyElement
+    element: cart_delivery_address_card
+
+  - action: verifyElement
+    element: cart_item_final_price_0
+
+  - action: scrollTo
+    element: cart_composables_s2_s_payment_button
+
+  - action: verifyElement
+    element: cart_composables_s2_s_payment_button

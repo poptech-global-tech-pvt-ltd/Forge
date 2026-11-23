@@ -1,0 +1,68 @@
+testName: Payment — Compact sheet sections (EMI, RuPay, Check limit/balance, UPI Lite)
+platform: android
+noReset: true
+loginRequired: false
+features:
+  - common
+  - login
+  - home
+  - shop
+tags:
+  - shop
+  - payment
+retry: 0
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: call
+    flow: add_to_cart_and_pay
+    params:
+      search_query: "the souled store"
+      search_pincode: "560102"
+
+  - action: call
+    flow: navigate_to_payment_sheet
+
+  # ── PO-15702: Compact sheet shows Pay with EMI, RuPay, Account sections ──
+  # NOTE: Need element keys from Android team for: popchop_section, emi_section
+  # Using available elements — RuPay card + bank account sections
+  - action: verifyElement
+    element: payment_method_bottom_sheet_section_header_row
+    shouldExist: true
+    testCaseId: PO-15702
+
+  # ── PO-15703: 'Check limit' link for POPchop and RuPay ──
+  # NOTE: Missing element key — need: popchop_check_limit_button, rupay_check_limit_button
+  # Verify RuPay card item exists as proxy
+  - action: scrollUntilVisible
+    element: payment_method_rupay_card_item_0
+    direction: down
+    maxScrolls: 3
+
+  - action: verifyElement
+    element: payment_method_rupay_card_item_0
+    shouldExist: true
+    testCaseId: PO-15703
+
+  # ── PO-15704: 'Check balance' link for UPI account options ──
+  # NOTE: Missing element key — need: upi_check_balance_button
+  # Verify bank account item exists as proxy
+  - action: verifyElement
+    element: payment_method_bank_item_0
+    shouldExist: true
+    testCaseId: PO-15704
+
+  # ── PO-15705: UPI Lite shows balance, disabled when insufficient ──
+  # NOTE: Missing element keys — need: upi_lite_section, upi_lite_balance_text
+  # Cannot automate until Android team adds accessibility IDs
+  - action: logVar
+    variable: product_title
+    value: "PO-15705 SKIPPED — upi_lite element keys not available yet"

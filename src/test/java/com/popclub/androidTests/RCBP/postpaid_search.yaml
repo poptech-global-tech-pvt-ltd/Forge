@@ -1,0 +1,65 @@
+testName: Contact search — no results, special chars, invalid number
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-13206
+  - PO-13207
+  - PO-13208
+
+features:
+  - common
+  - billpay
+
+tags:
+  - rcbp
+  - regression
+
+retry: 0
+
+steps:
+
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+
+  - action: tap
+    element: bill_pay_all_bills_recharges_tab
+
+  # PO-13206 — unrecognised contact name shows no-results state
+  - action: tap
+    element: bill_pay_recharge_search_input
+
+  - action: enterText
+    element: bill_pay_recharge_search_input
+    value: "zzzzznotarealcontact"
+
+  - action: pressKey
+    value: search
+
+  - action: verifyElement
+    locator: bill_pay_recharge_no_results_text   # TODO: add to elements/billpay.yaml — no-results empty state
+
+  # PO-13207 — special char / emoji contact names render correctly
+  - action: tap
+    element: bill_pay_recharge_search_input
+
+  - action: enterText
+    element: bill_pay_recharge_search_input
+    value: "Test 😀 O'Brien-Smith"
+
+  - action: pressKey
+    value: search
+
+  - action: verifyElement
+    element: bill_pay_recharge_contact_item_0
+
+  # PO-13208 — invalid contact number shows error toast on selection
+  - action: tap
+    element: bill_pay_recharge_contact_item_0
+
+  - action: verifyElement
+    locator: bill_pay_recharge_invalid_number_toast   # TODO: add to elements/billpay.yaml — error toast on invalid number select

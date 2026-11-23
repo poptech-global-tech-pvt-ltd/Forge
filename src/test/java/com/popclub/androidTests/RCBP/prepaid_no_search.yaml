@@ -1,0 +1,44 @@
+testName: Recharge contact search — dismiss, no-results
+platform: android
+noReset: true
+loginRequired: false
+retry: 0
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - smoke
+
+steps:
+  - action: launchApp
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+    
+  - action: tap
+    element: bills_tab  
+  
+  - action: scrollTo
+    element: Mobile_prepaid
+
+  - action: tap
+    element: Mobile_prepaid
+
+# PO-13175 — no search results for unmatched query
+  - action: tap
+    element: bill_pay_recharge_search_input
+    
+  - action: enterText
+    element: bill_pay_recharge_search_input
+    value: "zzzznonexistentcontact"
+    
+  - action: pressKey
+    value: search
+    
+  - action: verifyElement
+    element: no_contact_found
+    testCaseID: P0-13175

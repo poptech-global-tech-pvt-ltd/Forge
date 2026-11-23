@@ -1,0 +1,26 @@
+# Reusable flow: open shop search and navigate to results for a given query.
+#
+# Pre-condition: caller must be on a screen with the shop search button visible.
+#
+# Inputs (set via `params:` in the calling test):
+#   search_query — search text to enter  (required)
+
+steps:
+  - action: waitFor
+    element: shop_search_button
+
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: enterText
+    element: search_products_search_input
+    value: "${search_query}"
+
+  - action: pressKey
+    value: search
+
+  - action: waitFor
+    element: product_list_item_1

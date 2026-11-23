@@ -1,0 +1,49 @@
+testName: Monthly transaction groups expand and collapse on tap
+platform: android
+noReset: true
+loginRequired: false
+testCaseIds:
+  - PO-13262
+  
+features: 
+  - common
+  - billpay
+  
+tags: 
+   - regression
+   - rcbp
+   
+retry: 0
+
+steps:
+  - action: launchApp
+  
+  - action: loginIfNeeded
+    value: "1234561122"
+    text: "560102"
+    
+  - action: tap
+    element: bills_tab  
+     
+  - action: scrollTo
+    element: edge_image_banner_image_8  
+   
+  - action: tap
+    element: edge_image_banner_image_8
+   
+  - action: verifyElement
+    element: month
+    
+
+  - action: tap
+    element: month
+    
+  - action: assertNotVisible
+    element: bill_pay_txn_history_item_0
+    
+  - action: tap
+    element: skip_tour
+    
+  - action: verifyElement
+    element: month
+   

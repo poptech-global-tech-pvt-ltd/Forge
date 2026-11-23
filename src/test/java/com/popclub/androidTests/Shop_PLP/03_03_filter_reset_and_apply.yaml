@@ -1,0 +1,96 @@
+testName: Filters — Reset clears all filters and Applies filters
+platform: android
+noReset: true
+loginRequired: false
+
+testCaseIds:
+  - PO-11021
+
+features:
+  - common
+  - login
+  - home
+  - shop
+
+tags:
+  - regression
+  - shop
+
+retry: 0
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561234"
+    text: "560102"
+
+  - action: tap
+    element: common_shop_tab
+
+ # ── PLP: navigate, capture API + UI prices ────────────────────────────────
+  - action: tap
+    element: shop_search_button
+
+  - action: waitFor
+    element: search_products_search_input
+
+  - action: enterText
+    element: search_products_search_input
+    value: "the souled store"
+    
+  - action: pressKey
+    value: search
+
+  # Capture first product before filter
+  - action: captureText
+    element: product_list_item_price_0
+    variable: price_before_filter
+
+  # Open filter sheet and apply a filter
+  - action: tap
+    element: product_list_filter_button
+
+  - action: tap
+    element: product_filter_category_item_0
+
+  - action: tap
+    element: filter_selection_sub_filter_item_checkbox
+
+  - action: tap
+    element: product_filter_apply_button
+
+  - action: waitFor
+    element: product_list_item_0
+
+  # Capture title after filter applied
+  - action: captureText
+    element: product_list_item_price_0
+    variable: price_after_filter
+
+  # PO-11022: Verify filter was applied (product list changed)
+  - action: verifyElement
+    element: product_list_filter_button
+
+  - action: verifyElement
+    element: product_list_item_0
+    testCaseId: PO-11022
+
+  # Open filter sheet again and tap Reset
+  - action: tap
+    element: product_list_filter_button
+
+  - action: tap
+    element: product_filter_reset_button
+
+  - action: waitFor
+    element: product_list_item_0
+
+  # PO-11021: Verify reset restored original list
+  - action: captureText
+    element: product_list_item_price_0
+    variable: price_after_reset
+
+  - action: assertText
+    element: product_list_item_price_0
+    value: "${price_before_filter}"

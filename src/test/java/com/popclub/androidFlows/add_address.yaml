@@ -1,0 +1,38 @@
+# Flow: add_address
+# Adds a new delivery address. Call from any test:
+#
+#   - action: call
+#     flow: add_address
+#     params:
+#       addressLine1: "123 Main Street"
+#       city: "Mumbai"
+#       pincode: "400001"
+
+steps:
+
+
+  - action: tap
+    element: add_address_screen_row
+
+  - action: tap
+    element: add_address_confirm_location_button
+
+
+  - action: enterText
+    element: add_address_house_no_input
+    value: ${addressLine1}
+
+  - action: enterText
+    element: add_address_first_name_input
+    value: ${first_name}
+
+  - action: enterText
+    element: add_address_last_name_input
+    value: ${last_name}
+
+  - action: enterText
+    element: add_address_phone_input
+    value: ${address_mobile_number}
+
+  - action: tap
+    element: add_address_save_button
