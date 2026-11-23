@@ -26,9 +26,16 @@ public class SwipeAction implements Action {
 
     @Override
     public void perform(Step step) {
+        String direction = step.direction != null ? step.direction.trim().toLowerCase() : "up";
+
+        if (com.popclub.driver.ForgeDriverContext.isActive()) {
+            com.popclub.driver.ForgeDriverContext.get().swipe(direction);
+            System.out.println("[swipe/forge] direction=" + direction);
+            return;
+        }
+
         AppiumDriver driver = DriverManager.getDriver();
 
-        String direction = step.direction != null ? step.direction.trim().toLowerCase() : "up";
         int durationMs = DEFAULT_DURATION_MS;
         if (step.value != null && step.value.matches("\\d+")) {
             durationMs = Integer.parseInt(step.value.trim());

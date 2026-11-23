@@ -3,6 +3,7 @@ package com.popclub.android.actions;
 import com.popclub.core.TestContext;
 import com.popclub.core.WaitUtil;
 import com.popclub.android.driver.DriverManager;
+import com.popclub.driver.ForgeDriverContext;
 import com.popclub.model.Step;
 import io.appium.java_client.AppiumDriver;
 import org.openqa.selenium.WebElement;
@@ -11,6 +12,21 @@ public class VerifyElementAction implements Action {
 
     @Override
     public void perform(Step step) {
+        if (ForgeDriverContext.isActive()) {
+            String tag = ForgeDriverContext.forgeTag(step);
+            boolean shouldExist = !Boolean.FALSE.equals(step.shouldExist);
+            int timeout = step.timeout > 0 ? step.timeout : TestContext.getDefaultTimeout();
+            if (shouldExist) {
+                int[] coords = ForgeDriverContext.get().waitUntilPresent(tag, (long) timeout * 1000);
+                if (coords == null) throw new RuntimeException("verifyElement: not found: " + tag);
+                System.out.println("✅ Verified element: " + step.element);
+            } else {
+                if (ForgeDriverContext.get().isPresent(tag))
+                    throw new RuntimeException("verifyElement: should NOT exist but found: " + tag);
+                System.out.println("✅ Verified element absent: " + step.element);
+            }
+            return;
+        }
 
         AppiumDriver driver = DriverManager.getDriver();
 

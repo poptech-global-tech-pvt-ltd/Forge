@@ -59,37 +59,29 @@ public class AppiumServerManager {
             cmd.add("--port"); cmd.add(String.valueOf(port));
             cmd.add("--relaxed-security");
             cmd.add("--allow-cors");
-            cmd.add("--log-level"); cmd.add("debug");
+            cmd.add("--log-level"); cmd.add("error");
 
             String androidHome = CloudConfig.getAndroidHome();
             ProcessBuilder pb = new ProcessBuilder(cmd);
+            // Redirect Appium output to ~/appium-<port>.log — keeps console clean
+            java.io.File logFile = new java.io.File(
+                    System.getProperty("user.home"), "appium-" + port + ".log");
             pb.redirectErrorStream(true);
+            pb.redirectOutput(ProcessBuilder.Redirect.appendTo(logFile));
             if (androidHome != null) {
                 pb.environment().put("ANDROID_HOME", androidHome);
                 pb.environment().put("ANDROID_SDK_ROOT", androidHome);
             }
 
             Process process = pb.start();
-
-            // Stream Appium output to console on a daemon thread
-            Thread logThread = new Thread(() -> {
-                try (java.io.BufferedReader br = new java.io.BufferedReader(
-                        new java.io.InputStreamReader(process.getInputStream()))) {
-                    String line;
-                    while ((line = br.readLine()) != null) {
-                        System.out.println("[Appium] " + line);
-                    }
-                } catch (Exception ignored) {}
-            }, "appium-log-" + port);
-            logThread.setDaemon(true);
-            logThread.start();
             localProcesses.put(udid, process);
 
             // Wait up to 30s for Appium to be ready
             long deadline = System.currentTimeMillis() + 30_000;
             while (System.currentTimeMillis() < deadline) {
                 if (isLocalAppiumUp(port)) {
-                    System.out.println("[Appium] Server ready on port " + port);
+                    System.out.println("[Appium] Server ready on port " + port
+                            + " (logs → ~/appium-" + port + ".log)");
                     return;
                 }
                 if (!process.isAlive()) {

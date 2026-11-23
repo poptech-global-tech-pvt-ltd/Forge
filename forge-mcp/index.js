@@ -25,10 +25,83 @@ import { join, dirname, basename }  from "path";
 import { fileURLToPath }      from "url";
 import { parseStringPromise } from "xml2js";
 import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
+import { createRequire } from "module";
 
 const __dirname    = dirname(fileURLToPath(import.meta.url));
 const FORGE_ROOT   = join(__dirname, "..");
 const ELEMENTS_DIR = join(FORGE_ROOT, "src/test/resources/testdata/elements");
+
+// ── ForgeDriver gRPC client ───────────────────────────────────────────────────
+
+const _require    = createRequire(import.meta.url);
+const grpc        = _require("@grpc/grpc-js");
+const protoLoader = _require("@grpc/proto-loader");
+
+const PROTO_PATH  = join(FORGE_ROOT, "src/main/proto/forge_driver.proto");
+const FORGE_PORT  = 7790;
+const FORGE_APK   = "com.popclub.forgedriver.test";
+const FORGE_CLASS = "com.popclub.forgedriver.ForgeDriverService";
+const FORGE_RUNNER = "androidx.test.runner.AndroidJUnitRunner";
+
+let _packageDef  = null;
+let _forgeProto  = null;
+let _forgeClient = null;
+
+function getForgeProto() {
+  if (_forgeProto) return _forgeProto;
+  _packageDef = protoLoader.loadSync(PROTO_PATH, { keepCase: true, longs: Number, defaults: true, enums: String, arrays: true, objects: true });
+  _forgeProto = grpc.loadPackageDefinition(_packageDef).forgedriver;
+  return _forgeProto;
+}
+
+function forgeGrpc(device) {
+  if (_forgeClient) return _forgeClient;
+  const proto = getForgeProto();
+  _forgeClient = new proto.ForgeDriver(
+    `localhost:${FORGE_PORT}`,
+    grpc.credentials.createInsecure(),
+    { 'grpc.max_receive_message_length': 50 * 1024 * 1024 }
+  );
+  return _forgeClient;
+}
+
+function grpcCall(client, method, request, timeoutMs = 10000) {
+  return new Promise((resolve, reject) => {
+    client[method](request, { deadline: new Date(Date.now() + timeoutMs) }, (err, res) => {
+      if (err) reject(err);
+      else resolve(res);
+    });
+  });
+}
+
+async function ensureForgeDriver(device) {
+  const adbBase = device ? ["-s", device] : [];
+  // port forward
+  spawnSync("adb", [...adbBase, "forward", `tcp:${FORGE_PORT}`, `tcp:${FORGE_PORT}`], { timeout: 5000 });
+  // try ping
+  const client = forgeGrpc(device);
+  const alive = await grpcCall(client, "Ping", {}, 2000).then(() => true).catch(() => false);
+  if (!alive) {
+    // reset client so we get a fresh channel
+    _forgeClient = null;
+    // start ForgeDriver instrumentation in background
+    spawn("adb", [...adbBase, "shell", "am", "instrument", "-w", "-r",
+      "-e", "class", FORGE_CLASS,
+      `${FORGE_APK}/${FORGE_RUNNER}`],
+      { stdio: "ignore", detached: true }).unref();
+    // wait up to 20s for it to start
+    const deadline = Date.now() + 20000;
+    while (Date.now() < deadline) {
+      await new Promise(r => setTimeout(r, 600));
+      spawnSync("adb", [...adbBase, "forward", `tcp:${FORGE_PORT}`, `tcp:${FORGE_PORT}`], { timeout: 3000 });
+      const c = forgeGrpc(device);
+      const ready = await grpcCall(c, "Ping", {}, 2000).then(() => true).catch(() => false);
+      if (ready) return c;
+    }
+    throw new Error("ForgeDriver failed to start in 20s. Is the APK installed? Run: ./forge-driver/install.sh");
+  }
+  return client;
+}
 
 // ── ADB helper ────────────────────────────────────────────────────────────────
 
@@ -266,18 +339,13 @@ server.tool(
     try { deviceId = udid || detectDevice(); }
     catch (e) { return { content: [{ type: "text", text: `❌ ${e.message}` }] }; }
 
-    // ── Dump ──────────────────────────────────────────────────────────────────
-    try { adb("-s", deviceId, "shell", "uiautomator", "dump", "/sdcard/wd.xml"); }
-    catch (e) { return { content: [{ type: "text", text: `❌ uiautomator dump failed: ${e.message}` }] }; }
-
+    // ── Dump via ForgeDriver gRPC (falls back to uiautomator dump) ────────────
     let xml;
     try {
-      const r = spawnSync("adb", ["-s", deviceId, "shell", "cat", "/sdcard/wd.xml"],
-        { encoding: "utf8", maxBuffer: 10 * 1024 * 1024, timeout: 10000 });
-      xml = r.stdout || "";
-      if (!xml.includes("<hierarchy")) throw new Error("Empty XML");
+      xml = await getHierarchyXml(deviceId);
+      if (!xml.includes("<hierarchy") && !xml.includes("<node")) throw new Error("Empty XML");
     } catch (e) {
-      return { content: [{ type: "text", text: `❌ Failed to read UI dump: ${e.message}` }] };
+      return { content: [{ type: "text", text: `❌ Failed to read UI hierarchy: ${e.message}` }] };
     }
 
     // ── Parse ─────────────────────────────────────────────────────────────────
@@ -468,11 +536,32 @@ function resolveLocator(tag, text, x, y) {
 
 // ── Screenshot helper (shared by all action tools) ───────────────────────────
 
-function captureScreen(adbBase) {
+async function captureScreen(device) {
+  try {
+    const client = forgeGrpc(device);
+    const res = await grpcCall(client, "Screenshot", {}, 10000);
+    if (res?.data) return { type: "image", data: Buffer.from(res.data).toString("base64"), mimeType: "image/png" };
+  } catch (_) {}
+  // fallback to adb
+  const adbBase = device ? ["-s", device] : [];
   const r = spawnSync("adb", [...adbBase, "exec-out", "screencap", "-p"],
     { timeout: 10000, encoding: "buffer" });
   if (r.error || !r.stdout?.length) return null;
   return { type: "image", data: r.stdout.toString("base64"), mimeType: "image/png" };
+}
+
+async function getHierarchyXml(device) {
+  try {
+    const client = forgeGrpc(device);
+    const res = await grpcCall(client, "GetSource", {}, 10000);
+    if (res?.xml) return res.xml;
+  } catch (_) {}
+  // fallback to uiautomator dump
+  const adbBase = device ? ["-s", device] : [];
+  spawnSync("adb", [...adbBase, "shell", "uiautomator", "dump", "/sdcard/wd.xml"], { timeout: 8000 });
+  const r = spawnSync("adb", [...adbBase, "shell", "cat", "/sdcard/wd.xml"],
+    { encoding: "utf8", maxBuffer: 10 * 1024 * 1024, timeout: 8000 });
+  return r.stdout || "";
 }
 
 // ── forge_device_screenshot ───────────────────────────────────────────────────
@@ -488,7 +577,7 @@ server.tool(
 
   async () => {
     const id  = deviceId();
-    const img = captureScreen(id ? ["-s", id] : []);
+    const img = await captureScreen(id);
     if (!img) return { content: [{ type: "text", text: "❌ Screenshot failed" }] };
     return { content: [img] };
   }
@@ -513,64 +602,54 @@ server.tool(
 
   async ({ tag, element, text, x, y }) => {
     const id = deviceId();
-    const adbBase = id ? ["-s", id] : [];
-
-    // If element key given, look up its accessibilityId to find coords via dump
-    let tapX = x, tapY = y;
     const resolvedTag = tag || element;
 
-    if (resolvedTag || text) {
-      // Dump hierarchy, find element, get centre point
-      try { spawnSync("adb", [...adbBase, "shell", "uiautomator", "dump", "/sdcard/wd.xml"], { timeout: 8000 }); } catch (_) {}
-      const r = spawnSync("adb", [...adbBase, "shell", "cat", "/sdcard/wd.xml"],
-        { encoding: "utf8", maxBuffer: 10 * 1024 * 1024, timeout: 8000 });
-      const xml = r.stdout || "";
-      const elements = await parseHierarchy(xml);
+    try {
+      const client = await ensureForgeDriver(id);
 
-      const match = elements.find(el => {
-        if (resolvedTag) return el.tag === resolvedTag || el.tag?.includes(resolvedTag);
-        if (text) return el.text === text || el.text?.toLowerCase().includes(text.toLowerCase());
-        return false;
-      });
-
-      if (match) {
-        const pt = centrePoint(match.bounds);
-        if (pt) { tapX = pt.x; tapY = pt.y; }
+      if (resolvedTag) {
+        await grpcCall(client, "Tap", { tag: resolvedTag }, 10000);
+      } else if (text) {
+        await grpcCall(client, "TapByText", { text }, 10000);
+      } else if (x != null && y != null) {
+        await grpcCall(client, "TapByCoords", { x: Math.round(x), y: Math.round(y) }, 10000);
+      } else {
+        return { content: [{ type: "text", text: "❌ Provide tag, element, text, or x+y coordinates." }] };
       }
+
+      await new Promise(r => setTimeout(r, 500));
+
+      let tapX = x, tapY = y;
+      // get coords from hierarchy for YAML step generation (if tag-based)
+      if (resolvedTag && (tapX == null || tapY == null)) {
+        const xml = await getHierarchyXml(id);
+        const elements = await parseHierarchy(xml);
+        const match = elements.find(el => el.tag === resolvedTag);
+        if (match) { const pt = centrePoint(match.bounds); if (pt) { tapX = pt.x; tapY = pt.y; } }
+      }
+
+      const loc = resolveLocator(resolvedTag, text, tapX, tapY);
+      let yamlStep = `- action: tap\n`;
+      let warning = null;
+      if (loc.type === "element")       yamlStep += `  element: ${loc.value}`;
+      else if (loc.type === "locator")  yamlStep += `  locator: ${loc.value}`;
+      else if (loc.type === "text")     yamlStep += `  text: "${loc.value}"`;
+      else {
+        yamlStep += `  x: ${tapX}\n  y: ${tapY}  # ⚠️ NO testTag — add Modifier.testTag() to this Composable`;
+        warning = `⚠️  No qaTestTag found. Used coordinates — fragile.`;
+      }
+
+      const label = tapX != null ? `(${tapX}, ${tapY})` : (resolvedTag || text);
+      const out = [`✅ Tapped ${label}`, ``, `Forge YAML step:`, yamlStep];
+      if (warning) out.push(``, warning);
+      const content = [{ type: "text", text: out.join("\n") }];
+      const img = await captureScreen(id);
+      if (img) content.push(img);
+      return { content };
+
+    } catch (err) {
+      return { content: [{ type: "text", text: `❌ Tap failed: ${err.message}` }] };
     }
-
-    if (tapX == null || tapY == null) {
-      return { content: [{ type: "text", text: "❌ Could not locate element on screen. Try forge_device_screenshot first to verify the screen state." }] };
-    }
-
-    spawnSync("adb", [...adbBase, "shell", "input", "tap", String(Math.round(tapX)), String(Math.round(tapY))],
-      { timeout: 5000 });
-
-    await new Promise(r => setTimeout(r, 500)); // settle
-
-    const loc = resolveLocator(resolvedTag, text, tapX, tapY);
-    let yamlStep = `- action: tap\n`;
-    let warning = null;
-
-    if (loc.type === "element") {
-      yamlStep += `  element: ${loc.value}`;
-    } else if (loc.type === "locator") {
-      yamlStep += `  locator: ${loc.value}`;
-    } else if (loc.type === "text") {
-      yamlStep += `  text: "${loc.value}"`;
-    } else {
-      // No testTag, no text — coordinate fallback
-      yamlStep += `  x: ${tapX}\n  y: ${tapY}  # ⚠️ NO testTag — add Modifier.testTag() to this Composable`;
-      warning = `⚠️  No qaTestTag found at (${tapX}, ${tapY}). Used coordinates — fragile.\n   Ask Android dev to add: Modifier.testTag("<name>") to this element.`;
-    }
-
-    const out = [`✅ Tapped (${tapX}, ${tapY})`, ``, `Forge YAML step:`, yamlStep];
-    if (warning) out.push(``, warning);
-
-    const content = [{ type: "text", text: out.join("\n") }];
-    const img = captureScreen(adbBase);
-    if (img) content.push(img);
-    return { content };
   }
 );
 
@@ -585,17 +664,17 @@ server.tool(
   },
   async ({ text, element }) => {
     const id = deviceId();
-    const adbBase = id ? ["-s", id] : [];
-    if (element) {
-      spawnSync("adb", [...adbBase, "shell", "uiautomator", "dump", "/sdcard/wd.xml"], { timeout: 8000 });
-      // tap element first (reuse tap logic via adb)
+    try {
+      const client = await ensureForgeDriver(id);
+      if (element) await grpcCall(client, "Tap", { tag: element }, 10000);
+      await grpcCall(client, "ClearAndType", { text }, 15000);
+      const content = [{ type: "text", text: `✅ Typed: "${text}"\n\nForge YAML step:\n- action: enterText\n  value: "${text}"` }];
+      const img = await captureScreen(id);
+      if (img) content.push(img);
+      return { content };
+    } catch (err) {
+      return { content: [{ type: "text", text: `❌ Type failed: ${err.message}` }] };
     }
-    const escaped = text.replace(/ /g, "%s").replace(/['"]/g, "");
-    spawnSync("adb", [...adbBase, "shell", "input", "text", escaped], { timeout: 5000 });
-    const content = [{ type: "text", text: `✅ Typed: "${text}"\n\nForge YAML step:\n- action: enterText\n  value: "${text}"` }];
-    const img = captureScreen(adbBase);
-    if (img) content.push(img);
-    return { content };
   }
 );
 
@@ -607,17 +686,22 @@ server.tool(
   {
     key: z.string().describe("Key name: back | home | search | enter | tab | delete"),
   },
-  ({ key }) => {
-    const KEY_CODES = { back: 4, home: 3, search: 84, enter: 66, tab: 61, delete: 67 };
-    const code = KEY_CODES[key.toLowerCase()];
-    if (!code) return { content: [{ type: "text", text: `❌ Unknown key: ${key}. Use: ${Object.keys(KEY_CODES).join(", ")}` }] };
-    const id      = deviceId();
-    const adbBase = id ? ["-s", id] : [];
-    spawnSync("adb", [...adbBase, "shell", "input", "keyevent", String(code)], { timeout: 5000 });
-    const content = [{ type: "text", text: `✅ Pressed: ${key}\n\nForge YAML step:\n- action: pressKey\n  value: ${key}` }];
-    const img = captureScreen(adbBase);
-    if (img) content.push(img);
-    return { content };
+  async ({ key }) => {
+    const VALID_KEYS = ["back", "home", "search", "enter", "tab", "delete", "backspace"];
+    if (!VALID_KEYS.includes(key.toLowerCase())) {
+      return { content: [{ type: "text", text: `❌ Unknown key: ${key}. Use: ${VALID_KEYS.join(", ")}` }] };
+    }
+    const id = deviceId();
+    try {
+      const client = await ensureForgeDriver(id);
+      await grpcCall(client, "PressKey", { key: key.toLowerCase() }, 10000);
+      const content = [{ type: "text", text: `✅ Pressed: ${key}\n\nForge YAML step:\n- action: pressKey\n  value: ${key}` }];
+      const img = await captureScreen(id);
+      if (img) content.push(img);
+      return { content };
+    } catch (err) {
+      return { content: [{ type: "text", text: `❌ Key failed: ${err.message}` }] };
+    }
   }
 );
 
@@ -630,23 +714,18 @@ server.tool(
     direction: z.enum(["up", "down", "left", "right"]).describe("Swipe direction"),
     distance : z.number().optional().describe("Swipe distance in pixels (default 600)"),
   },
-  ({ direction, distance = 600 }) => {
-    const id      = deviceId();
-    const adbBase = id ? ["-s", id] : [];
-    const cx = 540, cy = 1200;
-    const d = distance;
-    const coords = {
-      up   : [cx, cy, cx, cy - d],
-      down : [cx, cy - d, cx, cy],
-      left : [cx + d/2, cy, cx - d/2, cy],
-      right: [cx - d/2, cy, cx + d/2, cy],
-    }[direction];
-    spawnSync("adb", [...adbBase, "shell", "input", "swipe",
-      ...coords.map(String), "400"], { timeout: 5000 });
-    const content = [{ type: "text", text: `✅ Swiped ${direction}\n\nForge YAML step:\n- action: swipe\n  value: ${direction}` }];
-    const img = captureScreen(adbBase);
-    if (img) content.push(img);
-    return { content };
+  async ({ direction, distance = 600 }) => {
+    const id = deviceId();
+    try {
+      const client = await ensureForgeDriver(id);
+      await grpcCall(client, "Swipe", { direction }, 10000);
+      const content = [{ type: "text", text: `✅ Swiped ${direction}\n\nForge YAML step:\n- action: swipe\n  value: ${direction}` }];
+      const img = await captureScreen(id);
+      if (img) content.push(img);
+      return { content };
+    } catch (err) {
+      return { content: [{ type: "text", text: `❌ Swipe failed: ${err.message}` }] };
+    }
   }
 );
 
@@ -664,42 +743,42 @@ server.tool(
     maxSwipes: z.number().optional().default(8).describe("Max swipes before giving up"),
   },
   async ({ tag, text, direction = "down", maxSwipes = 8 }) => {
-    const id      = deviceId();
-    const adbBase = id ? ["-s", id] : [];
-    const cx = 540, cy = 1200, dist = 600;
-    const [fromY, toY] = direction === "down" ? [cy, cy - dist] : [cy - dist, cy];
-
-    function findInXml(xml) {
-      return xml.split("<node").some(seg => {
-        const desc = (seg.match(/content-desc="([^"]*)"/) || [])[1] || "";
-        const txt  = (seg.match(/text="([^"]*)"/)         || [])[1] || "";
-        if (tag  && (desc === tag  || desc.includes(tag)))  return true;
-        if (text && (txt  === text || txt.toLowerCase().includes(text.toLowerCase()))) return true;
-        return false;
-      });
-    }
-
-    for (let i = 0; i < maxSwipes; i++) {
-      // Dump and check
-      spawnSync("adb", [...adbBase, "shell", "uiautomator", "dump", "/sdcard/wd.xml"], { timeout: 8000 });
-      const r = spawnSync("adb", [...adbBase, "shell", "cat", "/sdcard/wd.xml"],
-        { encoding: "utf8", maxBuffer: 10 * 1024 * 1024, timeout: 8000 });
-      if (findInXml(r.stdout || "")) {
-        const label = tag || `"${text}"`;
-        const content = [{ type: "text", text:
-          `✅ Found ${label} after ${i} swipe(s)\n\nForge YAML step:\n- action: scrollDown\n  element: ${tag || ""}` }];
-        const img = captureScreen(adbBase);
-        if (img) content.push(img);
-        return { content };
-      }
-      // Swipe
-      spawnSync("adb", [...adbBase, "shell", "input", "swipe",
-        String(cx), String(fromY), String(cx), String(toY), "400"], { timeout: 5000 });
-      await new Promise(r => setTimeout(r, 600));
-    }
-
+    const id = deviceId();
     const label = tag || `"${text}"`;
-    return { content: [{ type: "text", text: `❌ "${label}" not found after ${maxSwipes} swipe(s)` }] };
+
+    try {
+      const client = await ensureForgeDriver(id);
+
+      for (let i = 0; i < maxSwipes; i++) {
+        // Check presence via gRPC (fast — no XML dump)
+        if (tag) {
+          const res = await grpcCall(client, "IsPresent", { tag }, 5000).catch(() => ({ found: false }));
+          if (res?.found) {
+            const content = [{ type: "text", text:
+              `✅ Found ${label} after ${i} swipe(s)\n\nForge YAML step:\n- action: scrollTo\n  element: ${tag}` }];
+            const img = await captureScreen(id);
+            if (img) content.push(img);
+            return { content };
+          }
+        } else if (text) {
+          const xml = await getHierarchyXml(id);
+          const found = xml.includes(`text="${text}"`) || xml.includes(text);
+          if (found) {
+            const content = [{ type: "text", text:
+              `✅ Found ${label} after ${i} swipe(s)\n\nForge YAML step:\n- action: scrollTo\n  text: "${text}"` }];
+            const img = await captureScreen(id);
+            if (img) content.push(img);
+            return { content };
+          }
+        }
+        await grpcCall(client, "Swipe", { direction }, 10000);
+        await new Promise(r => setTimeout(r, 600));
+      }
+
+      return { content: [{ type: "text", text: `❌ ${label} not found after ${maxSwipes} swipe(s)` }] };
+    } catch (err) {
+      return { content: [{ type: "text", text: `❌ scroll_to failed: ${err.message}` }] };
+    }
   }
 );
 
@@ -716,13 +795,8 @@ server.tool(
     element: z.string().optional().describe("Registered element key expected to contain this text"),
   },
   async ({ text, tag, element }) => {
-    const id      = deviceId();
-    const adbBase = id ? ["-s", id] : [];
-
-    spawnSync("adb", [...adbBase, "shell", "uiautomator", "dump", "/sdcard/wd.xml"], { timeout: 8000 });
-    const r = spawnSync("adb", [...adbBase, "shell", "cat", "/sdcard/wd.xml"],
-      { encoding: "utf8", maxBuffer: 10 * 1024 * 1024, timeout: 8000 });
-    const xml = r.stdout || "";
+    const id = deviceId();
+    const xml = await getHierarchyXml(id);
 
     // Check if text appears anywhere
     const textFound = xml.split("<node").some(seg => {
@@ -912,11 +986,19 @@ server.tool(
   async () => {
     const id      = deviceId();
     const adbBase = id ? ["-s", id] : [];
-    spawnSync("adb", [...adbBase, "shell", "monkey", "-p",
-      "com.popclub.android", "-c", "android.intent.category.LAUNCHER", "1"], { timeout: 8000 });
-    await new Promise(r => setTimeout(r, 2000)); // wait for app to load
+    try {
+      // ensure ForgeDriver is running
+      await ensureForgeDriver(id);
+    } catch (e) {
+      return { content: [{ type: "text", text: `❌ ForgeDriver not ready: ${e.message}` }] };
+    }
+    // force-stop then relaunch preserving login session
+    spawnSync("adb", [...adbBase, "shell", "am", "force-stop", "com.popclub.android"], { timeout: 5000 });
+    await new Promise(r => setTimeout(r, 500));
+    spawnSync("adb", [...adbBase, "shell", "am", "start", "-n", "com.popclub.android/.LauncherFresh"], { timeout: 8000 });
+    await new Promise(r => setTimeout(r, 3000));
     const content = [{ type: "text", text: "✅ App launched\n\nForge YAML step:\n- action: launchApp" }];
-    const img = captureScreen(adbBase);
+    const img = await captureScreen(id);
     if (img) content.push(img);
     return { content };
   }
@@ -1191,18 +1273,13 @@ server.tool(
     try { deviceId = udid || detectDevice(); }
     catch (e) { return { content: [{ type: "text", text: `❌ ${e.message}` }] }; }
 
-    // Dump current screen
-    try { adb("-s", deviceId, "shell", "uiautomator", "dump", "/sdcard/wd.xml"); }
-    catch (e) { return { content: [{ type: "text", text: `❌ uiautomator dump failed: ${e.message}` }] }; }
-
+    // Dump current screen via ForgeDriver gRPC
     let xml;
     try {
-      const r = spawnSync("adb", ["-s", deviceId, "shell", "cat", "/sdcard/wd.xml"],
-        { encoding: "utf8", maxBuffer: 10 * 1024 * 1024, timeout: 10000 });
-      xml = r.stdout || "";
-      if (!xml.includes("<hierarchy")) throw new Error("Empty XML");
+      xml = await getHierarchyXml(deviceId);
+      if (!xml.includes("<hierarchy") && !xml.includes("<node")) throw new Error("Empty XML");
     } catch (e) {
-      return { content: [{ type: "text", text: `❌ Failed to read UI dump: ${e.message}` }] };
+      return { content: [{ type: "text", text: `❌ Failed to read UI hierarchy: ${e.message}` }] };
     }
 
     let elements;

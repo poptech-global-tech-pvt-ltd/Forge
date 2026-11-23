@@ -36,10 +36,10 @@ public class CaptureTokenAction implements Action {
 
         // Read token from device SharedPreferences (written by the app after login)
         // Always overwrites — if login happened again the new token replaces the old one
-        String deviceSerial = "";
+        String deviceSerial = System.getProperty("deviceSerial", "");
         try {
             var info = AppiumDriverManager.getDeviceInfo();
-            if (info != null) deviceSerial = info.udid;
+            if (info != null && info.udid != null && !info.udid.isBlank()) deviceSerial = info.udid;
         } catch (Exception ignored) {}
 
         String token = TokenExtractor.get(deviceSerial);

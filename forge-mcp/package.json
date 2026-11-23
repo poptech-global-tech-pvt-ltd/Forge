@@ -4,6 +4,8 @@
   "type": "module",
   "main": "index.js",
   "dependencies": {
+    "@grpc/grpc-js": "^1.14.7",
+    "@grpc/proto-loader": "^0.8.1",
     "@modelcontextprotocol/sdk": "^1.0.0",
     "xml2js": "^0.6.2",
     "yaml": "^2.8.3"

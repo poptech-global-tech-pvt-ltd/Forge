@@ -1,6 +1,7 @@
 package com.popclub.android.actions;
 
 import com.popclub.android.driver.DriverManager;
+import com.popclub.driver.ForgeDriverContext;
 import com.popclub.model.Step;
 import io.appium.java_client.AppiumDriver;
 
@@ -10,6 +11,10 @@ public class PressKeyAction implements Action {
 
     @Override
     public void perform(Step step) {
+        if (ForgeDriverContext.isActive()) {
+            pressForge(step.value == null ? null : step.value.toLowerCase().trim());
+            return;
+        }
 
         AppiumDriver driver = DriverManager.getDriver();
         String key = step.value == null ? null : step.value.toLowerCase().trim();
@@ -34,6 +39,22 @@ public class PressKeyAction implements Action {
         int keycode = resolveKeycode(key);
         driver.executeScript("mobile: pressKey", Map.of("keycode", keycode));
         System.out.println("Pressed key: " + step.value + " (keycode " + keycode + ")");
+    }
+
+    private void pressForge(String key) {
+        if (key == null) throw new RuntimeException("pressKey requires a value");
+        switch (key) {
+            case "search": ForgeDriverContext.get().pressSearch(); break;
+            case "enter":
+            case "done":   ForgeDriverContext.get().pressEnter();  break;
+            case "back":   ForgeDriverContext.get().pressBack();   break;
+            case "home":   ForgeDriverContext.get().pressHome();   break;
+            case "delete":
+            case "backspace": ForgeDriverContext.get().pressDelete(); break;
+            default:
+                throw new RuntimeException("Unknown key for forge: '" + key + "'");
+        }
+        System.out.println("Pressed key (forge): " + key);
     }
 
     private int resolveKeycode(String key) {

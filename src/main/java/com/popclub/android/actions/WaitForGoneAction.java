@@ -24,9 +24,24 @@ public class WaitForGoneAction implements Action {
 
     @Override
     public void perform(Step step) {
-        AppiumDriver driver = DriverManager.getDriver();
         int timeout = step.timeout > 0 ? step.timeout : TestContext.getDefaultTimeout();
         long deadline = System.currentTimeMillis() + (long) timeout * 1000;
+
+        if (com.popclub.driver.ForgeDriverContext.isActive()) {
+            String tag = com.popclub.driver.ForgeDriverContext.forgeTag(step);
+            System.out.println("[waitForGone/forge] Waiting up to " + timeout + "s for: " + tag);
+            while (System.currentTimeMillis() < deadline) {
+                if (!com.popclub.driver.ForgeDriverContext.get().isPresent(tag)) {
+                    System.out.println("[waitForGone/forge] Element gone: " + tag);
+                    return;
+                }
+                try { Thread.sleep(POLL_INTERVAL_MS); } catch (InterruptedException e) { Thread.currentThread().interrupt(); break; }
+            }
+            System.out.println("[waitForGone/forge] Element still present after " + timeout + "s — continuing");
+            return;
+        }
+
+        AppiumDriver driver = DriverManager.getDriver();
 
         System.out.println("[waitForGone] Waiting up to " + timeout + "s for element to disappear");
 

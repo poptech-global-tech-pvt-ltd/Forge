@@ -61,6 +61,10 @@ public class ScrollUntilVisibleAction implements Action {
 
     @Override
     public void perform(Step step) {
+        if (com.popclub.driver.ForgeDriverContext.isActive()) {
+            try { performForge(step); } catch (RuntimeException e) { throw e; } catch (Exception e) { throw new RuntimeException(e); }
+            return;
+        }
         AppiumDriver driver = DriverManager.getDriver();
 
         // value: "${var}" or value: "literal text" — treat as a text locator so
@@ -200,6 +204,34 @@ public class ScrollUntilVisibleAction implements Action {
         } catch (Exception e) {
             System.out.println("[scrollUntilVisible] swipe failed: " + e.getMessage());
         }
+    }
+
+    // ── Forge gRPC path ──────────────────────────────────────────────────────────
+
+    private void performForge(Step step) throws Exception {
+        com.popclub.driver.ForgeDriverClient forge = com.popclub.driver.ForgeDriverContext.get();
+        String tag = com.popclub.driver.ForgeDriverContext.forgeTag(step);
+        if (tag == null) throw new RuntimeException("[scrollUntilVisible/forge] No tag resolved for step");
+
+        String direction = (step.direction != null && !step.direction.isBlank())
+                ? step.direction.trim().toLowerCase() : "down";
+        int maxScrolls = step.maxScrolls > 0 ? step.maxScrolls : DEFAULT_MAX_SCROLLS;
+
+        // Check presence before first swipe
+        if (forge.isPresent(tag)) {
+            System.out.println("[scrollUntilVisible/forge] ✅ Already visible: " + tag);
+            return;
+        }
+
+        for (int i = 1; i <= maxScrolls; i++) {
+            forge.swipe(direction);
+            Thread.sleep(POST_SWIPE_SETTLE_MS);
+            if (forge.isPresent(tag)) {
+                System.out.printf("[scrollUntilVisible/forge] ✅ Found after %d swipe(s): %s%n", i, tag);
+                return;
+            }
+        }
+        throw new RuntimeException("[scrollUntilVisible/forge] Element not found after " + maxScrolls + " swipes: " + tag);
     }
 
     // ── Instant visibility check (no poll — check right now) ─────────────────────

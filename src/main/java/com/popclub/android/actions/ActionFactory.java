@@ -89,6 +89,14 @@ public class ActionFactory {
             case "verifyWishlistFlow":       return new WishlistFlowAction();
             case "findCartItemIndex":        return new FindCartItemIndexAction();
 
+            // ── AI-powered assertions (Maestro parity) ────────────────────────
+            case "assertWithAI":          return new AssertWithAIAction();
+            case "assertNoDefectsWithAI": return new AssertNoDefectsWithAIAction();
+            case "extractTextWithAI":     return new ExtractTextWithAIAction();
+
+            // ── JavaScript eval ───────────────────────────────────────────────
+            case "evalScript":            return new EvalScriptAction();
+
             default: throw new RuntimeException("Unknown action: " + action);
         }
     }

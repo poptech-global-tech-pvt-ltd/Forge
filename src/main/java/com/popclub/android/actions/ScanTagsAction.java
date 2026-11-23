@@ -2,6 +2,7 @@ package com.popclub.android.actions;
 
 import com.popclub.ai.app.QaTagAnalyzer;
 import com.popclub.android.driver.DriverManager;
+import com.popclub.driver.ForgeDriverContext;
 import com.popclub.model.Step;
 import com.popclub.parser.XmlElementParser;
 import io.appium.java_client.AppiumDriver;
@@ -25,6 +26,20 @@ public class ScanTagsAction implements Action {
 
     @Override
     public void perform(Step step) {
+        if (ForgeDriverContext.isActive()) {
+            try {
+                Thread.sleep(800);
+                String xml = ForgeDriverContext.get().getSource();
+                List<Map<String, String>> elements = XmlElementParser.parse(xml);
+                String screenName = step.value != null && !step.value.isBlank() ? step.value.trim() : "unknown_screen";
+                QaTagAnalyzer.ScreenReport report = QaTagAnalyzer.analyse(elements, screenName);
+                QaTagAnalyzer.printReport(report);
+                QaTagAnalyzer.writeYaml(report, "reports");
+            } catch (Exception e) {
+                throw new RuntimeException("scanTags (forge) failed: " + e.getMessage(), e);
+            }
+            return;
+        }
 
         AppiumDriver driver = DriverManager.getDriver();
 

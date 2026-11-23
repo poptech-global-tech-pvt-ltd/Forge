@@ -4,6 +4,7 @@ import com.popclub.api.auth.TokenExtractor;
 import com.popclub.core.TestContext;
 import com.popclub.android.driver.AppiumDriverManager;
 import com.popclub.android.driver.DriverManager;
+import com.popclub.driver.ForgeDriverContext;
 import com.popclub.model.Step;
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.AppiumDriver;
@@ -23,6 +24,8 @@ public class LoginIfNeededAction implements Action {
     private static final String CONTINUE_BTN_TAG = "login_continue_button";
     private static final String OTP_INPUT_TAG    = "login_otp_input";
     private static final String HOME_TAB_TAG     = "Home";
+    // Onboarding story screen shown before the phone-number screen when login hasn't happened yet.
+    private static final String ONBOARDING_SKIP_BTN_TAG = "story_onboarding_skip_button";
 
     private static final long QUICK_TIMEOUT_MS = 4_000;
     private static final long LOGIN_TIMEOUT_SEC = 20;
@@ -39,9 +42,13 @@ public class LoginIfNeededAction implements Action {
     }
 
     private void performInternal(Step step) throws Exception {
-        // If the test declares loginRequired: false, skip the entire login flow.
         if (!TestContext.isLoginRequired()) {
             System.out.println("[loginIfNeeded] loginRequired=false — skipping login");
+            return;
+        }
+
+        if (ForgeDriverContext.isActive()) {
+            forgeLogin(step);
             return;
         }
 
@@ -71,6 +78,88 @@ public class LoginIfNeededAction implements Action {
         dismissPermissionDialog(driver);
 
         System.out.println("[loginIfNeeded] ✅ Login step complete");
+    }
+
+    private void forgeLogin(Step step) throws Exception {
+        com.popclub.driver.ForgeDriverClient forge = ForgeDriverContext.get();
+        String phone = step.value != null ? step.value.trim() : "1234561122";
+        String otp   = step.text  != null ? step.text.trim()  : "560102";
+        TestContext.setLoginPhone(phone);
+        TestContext.setLoginOtp(otp);
+
+        // Wait up to 15s for either the login screen or the home/tab bar to appear
+        System.out.println("[loginIfNeeded/forge] Waiting for app to reach login or home screen…");
+        boolean loginVisible = false;
+        boolean homeVisible  = false;
+        long deadline = System.currentTimeMillis() + 15_000;
+        while (System.currentTimeMillis() < deadline) {
+            // Onboarding story screen can cover the phone-input screen before login — skip it.
+            if (forge.isPresent(ONBOARDING_SKIP_BTN_TAG)) {
+                System.out.println("[loginIfNeeded/forge] Onboarding story screen detected — tapping skip button");
+                forge.tap(ONBOARDING_SKIP_BTN_TAG);
+                Thread.sleep(500);
+                continue;
+            }
+            if (forge.isPresent(PHONE_INPUT_TAG)) { loginVisible = true; break; }
+            if (forge.isPresent(HOME_TAB_TAG))    { homeVisible  = true; break; }
+            if (forge.isPresent("common_shop_tab")) { homeVisible = true; break; }
+            Thread.sleep(500);
+        }
+
+        if (homeVisible) {
+            System.out.println("[loginIfNeeded/forge] Already logged in — skipping login");
+            storeToken(ForgeDriverContext.getDeviceSerial(), "DataStore/SharedPrefs (forge, login skipped)");
+            return;
+        }
+
+        if (!loginVisible) {
+            // Dismiss any system permission dialogs ("Allow" / "While using the app" / "Don't allow")
+            dismissSystemDialogs(forge);
+
+            // Re-check after dismissal
+            if (forge.isPresent(PHONE_INPUT_TAG)) { loginVisible = true; }
+            else if (forge.isPresent(HOME_TAB_TAG) || forge.isPresent("common_shop_tab")) { homeVisible = true; }
+
+            if (!loginVisible && !homeVisible) {
+                // App might be on a deep screen — press back until login or home appears
+                System.out.println("[loginIfNeeded/forge] Neither login nor home visible — pressing back to navigate…");
+                for (int i = 0; i < 6; i++) {
+                    forge.pressBack();
+                    Thread.sleep(600);
+                    dismissSystemDialogs(forge);
+                    if (forge.isPresent(PHONE_INPUT_TAG)) { loginVisible = true; break; }
+                    if (forge.isPresent(HOME_TAB_TAG) || forge.isPresent("common_shop_tab")) { homeVisible = true; break; }
+                }
+            }
+
+            if (homeVisible) {
+                System.out.println("[loginIfNeeded/forge] Reached home screen after back-presses — already logged in");
+                storeToken(ForgeDriverContext.getDeviceSerial(), "DataStore/SharedPrefs (forge)");
+                return;
+            }
+            if (!loginVisible) {
+                throw new RuntimeException("[loginIfNeeded/forge] Could not reach login or home screen");
+            }
+        }
+
+        System.out.println("[loginIfNeeded/forge] Login screen detected — performing login…");
+        forge.tap(PHONE_INPUT_TAG);
+        forge.clearAndType(phone);
+        forge.tap(CONTINUE_BTN_TAG);
+
+        int[] otpField = forge.waitUntilPresent(OTP_INPUT_TAG, LOGIN_TIMEOUT_SEC * 1000);
+        if (otpField == null) {
+            otpField = forge.waitUntilPresent("login_merged_otp_entry_content_button", 10_000);
+        }
+        if (otpField == null) throw new RuntimeException("[loginIfNeeded/forge] OTP screen did not appear");
+
+        forge.tap(OTP_INPUT_TAG);
+        forge.type(otp);
+
+        int[] homeTab = forge.waitUntilPresent(HOME_TAB_TAG, LOGIN_TIMEOUT_SEC * 1000);
+        if (homeTab == null) throw new RuntimeException("[loginIfNeeded/forge] Home screen not visible after OTP");
+        System.out.println("[loginIfNeeded/forge] ✅ Login succeeded");
+        storeToken(ForgeDriverContext.getDeviceSerial(), "logcat/DataStore (forge)");
     }
 
     private void doLogin(AppiumDriver driver, String phone, String otp) throws Exception {
@@ -115,6 +204,58 @@ public class LoginIfNeededAction implements Action {
         } catch (Exception ignored) {}
     }
 
+    /** Taps the first visible system permission dialog button via ForgeDriver text search. */
+    private void dismissSystemDialogs(com.popclub.driver.ForgeDriverClient forge) {
+        autoHandleDialogs(forge);
+    }
+
+    /**
+     * Auto-grant permissions and/or dismiss dialogs.
+     * Called before each forge step when autoGrantPermissions/autoDismissDialogs are set in YAML.
+     * Also callable from forgeLogin() for in-flow dialogs.
+     */
+    public static void autoHandleDialogs(com.popclub.driver.ForgeDriverClient forge) {
+        // Permission dialogs — tap the affirmative button
+        if (com.popclub.core.TestContext.isAutoGrantPermissions()) {
+            for (String label : new String[]{"While using the app", "Only this time", "Allow"}) {
+                try {
+                    if (!forge.searchByText(label).isEmpty()) {
+                        forge.tapByText(label);
+                        System.out.println("[forge/dialog] Granted permission: " + label);
+                        Thread.sleep(300);
+                        return;
+                    }
+                } catch (Exception ignored) {}
+            }
+        } else {
+            // Legacy behaviour: dismiss (deny) permission dialogs
+            for (String label : new String[]{"While using the app", "Only this time", "Allow", "Don’t allow"}) {
+                try {
+                    if (!forge.searchByText(label).isEmpty()) {
+                        forge.tapByText(label);
+                        System.out.println("[forge/dialog] Dismissed permission dialog: " + label);
+                        Thread.sleep(300);
+                        return;
+                    }
+                } catch (Exception ignored) {}
+            }
+        }
+
+        // Generic dialogs — OK, Got it, Close, Skip, Not now, etc.
+        if (com.popclub.core.TestContext.isAutoDismissDialogs()) {
+            for (String label : new String[]{"OK", "Got it", "Close", "Dismiss", "Skip", "Not now", "No thanks", "Later"}) {
+                try {
+                    if (!forge.searchByText(label).isEmpty()) {
+                        forge.tapByText(label);
+                        System.out.println("[forge/dialog] Dismissed dialog: " + label);
+                        Thread.sleep(300);
+                        return;
+                    }
+                } catch (Exception ignored) {}
+            }
+        }
+    }
+
     /** Types into the focused field; falls back to mobile: type for Compose TextFields. */
     private void typeIntoFocusedField(AppiumDriver driver, String text) {
         try {
@@ -151,6 +292,13 @@ public class LoginIfNeededAction implements Action {
                     System.out.println("[loginIfNeeded] Dismissed phone-number-hint bottom sheet");
                 }
 
+                // Onboarding story screen can cover the phone-input screen before login — skip it.
+                List<WebElement> onboardingSkip = driver.findElements(AppiumBy.accessibilityId(ONBOARDING_SKIP_BTN_TAG));
+                if (!onboardingSkip.isEmpty() && onboardingSkip.get(0).isDisplayed()) {
+                    onboardingSkip.get(0).click();
+                    System.out.println("[loginIfNeeded] Onboarding story screen detected — tapped skip button");
+                }
+
                 List<WebElement> found = driver.findElements(AppiumBy.accessibilityId(tag));
                 if (!found.isEmpty() && found.get(0).isDisplayed()) return true;
             } catch (Exception ignored) {}
@@ -181,10 +329,9 @@ public class LoginIfNeededAction implements Action {
     private String getDeviceSerial() {
         try {
             var info = AppiumDriverManager.getDeviceInfo();
-            return (info != null) ? info.udid : "";
-        } catch (Exception ignored) {
-            return "";
-        }
+            if (info != null && info.udid != null && !info.udid.isBlank()) return info.udid;
+        } catch (Exception ignored) {}
+        return System.getProperty("deviceSerial", "");
     }
 
     private void storeToken(String deviceSerial, String source) {

@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "forge-ui",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["forge-ui/server.js"],
+      "port": 3847
+    }
+  ]
+}

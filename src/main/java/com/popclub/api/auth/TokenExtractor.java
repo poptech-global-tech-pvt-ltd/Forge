@@ -60,7 +60,11 @@ public class TokenExtractor {
             return ApiConstants.USER_TOKEN;
         }
 
-        System.out.println("[TokenExtractor] Trying logcat (device: " + (deviceSerial.isBlank() ? "default" : deviceSerial) + ")…");
+        boolean cloud = com.popclub.android.cloud.CloudConfig.isCloudEnabled();
+        String modeLabel = cloud ? "STF " + stfHost() : "local";
+        System.out.println("[TokenExtractor] Trying logcat (device: "
+                + (deviceSerial.isBlank() ? "default" : deviceSerial)
+                + ", mode: " + modeLabel + ")…");
 
         // 2. OkHttp logcat — anchored to VERIFY_OTP response body.
         String fromLogcat = fromLogcat(deviceSerial);
@@ -318,13 +322,32 @@ public class TokenExtractor {
     // ── ADB helpers ───────────────────────────────────────────────────────────
 
     private static String[] buildAdb(String deviceSerial, String... args) {
-        String[] base = deviceSerial != null && !deviceSerial.isBlank()
-                ? new String[]{"adb", "-s", deviceSerial}
-                : new String[]{"adb"};
-        String[] cmd = new String[base.length + args.length];
-        System.arraycopy(base, 0, cmd, 0, base.length);
-        System.arraycopy(args, 0, cmd, base.length, args.length);
-        return cmd;
+        java.util.List<String> base = new java.util.ArrayList<>();
+        base.add("adb");
+
+        // In cloud mode, route through the STF ADB server
+        if (com.popclub.android.cloud.CloudConfig.isCloudEnabled()) {
+            String stfHost = stfHost();
+            if (stfHost != null) {
+                base.add("-H"); base.add(stfHost);
+                base.add("-P"); base.add("5037");
+            }
+        }
+
+        if (deviceSerial != null && !deviceSerial.isBlank()) {
+            base.add("-s"); base.add(deviceSerial);
+        }
+
+        for (String arg : args) base.add(arg);
+        return base.toArray(new String[0]);
+    }
+
+    private static String stfHost() {
+        try {
+            String url = com.popclub.android.cloud.CloudConfig.getStfBaseUrl();
+            if (url == null || url.isBlank()) return null;
+            return new java.net.URL(url).getHost();
+        } catch (Exception e) { return null; }
     }
 
     private static String run(String[] cmd) throws Exception {

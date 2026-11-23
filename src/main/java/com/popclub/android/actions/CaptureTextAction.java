@@ -2,6 +2,8 @@ package com.popclub.android.actions;
 
 import com.popclub.core.TestContext;
 import com.popclub.android.driver.DriverManager;
+import com.popclub.driver.ForgeDriverContext;
+import com.popclub.forgedriver.proto.AccessibilityNode;
 import com.popclub.model.Step;
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.AppiumDriver;
@@ -65,6 +67,33 @@ public class CaptureTextAction implements Action {
         if (storeKey == null || storeKey.isBlank())
             throw new RuntimeException(
                 "captureText: 'variable' (storage key) is required");
+
+        if (ForgeDriverContext.isActive()) {
+            String tag = ForgeDriverContext.forgeTag(step);
+            long timeoutMs = (step.timeout > 0) ? step.timeout : DEFAULT_TIMEOUT_MS;
+            List<AccessibilityNode> nodes = null;
+            long deadline = System.currentTimeMillis() + timeoutMs;
+            while (System.currentTimeMillis() < deadline) {
+                nodes = ForgeDriverContext.get().search(tag);
+                if (!nodes.isEmpty()) break;
+                try { Thread.sleep(POLL_MS); } catch (InterruptedException ignored) {}
+            }
+            if (nodes == null || nodes.isEmpty()) {
+                if (step.optional) {
+                    TestContext.setScalarData(storeKey, "");
+                    System.out.printf("  ⚠️  captureText [%s] — not found (optional)%n", storeKey);
+                    return;
+                }
+                throw new RuntimeException("captureText: element not found: " + tag);
+            }
+            String text = nodes.get(0).getText();
+            if ((text == null || text.isBlank()) && !nodes.get(0).getTag().isBlank()) {
+                text = nodes.get(0).getTag();
+            }
+            TestContext.setScalarData(storeKey, text != null ? text : "");
+            System.out.printf("  ✅ captureText [%s] = \"%s\" (forge)%n", storeKey, text);
+            return;
+        }
 
         // optional: step.timeout (in ms) overrides default — useful for transient elements like snackbars
         long timeoutMs = (step.timeout > 0) ? step.timeout : DEFAULT_TIMEOUT_MS;

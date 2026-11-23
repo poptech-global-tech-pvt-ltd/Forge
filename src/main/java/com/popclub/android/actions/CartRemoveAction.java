@@ -17,12 +17,45 @@ public class CartRemoveAction implements Action {
 
     @Override
     public void perform(Step step) {
+        if (com.popclub.driver.ForgeDriverContext.isActive()) {
+            try { performForge(); } catch (RuntimeException e) { throw e; } catch (Exception e) { throw new RuntimeException(e); }
+            return;
+        }
         try {
             performInternal();
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void performForge() throws Exception {
+        com.popclub.driver.ForgeDriverClient forge = com.popclub.driver.ForgeDriverContext.get();
+
+        // Tap decrease button up to 20 times until remove dialog appears
+        for (int i = 0; i < 20; i++) {
+            if (forge.isPresent("cart_remove_product_button")) {
+                forge.tap("cart_remove_product_button");
+                System.out.println("[cartRemoveItem/forge] ✅ Item removed");
+                return;
+            }
+            if (forge.isPresent("cart_unavailable_remove_button")) {
+                forge.tap("cart_unavailable_remove_button");
+                System.out.println("[cartRemoveItem/forge] ✅ Unavailable item removed");
+                return;
+            }
+            if (!forge.isPresent("cart_item_decrease_button")) break;
+            forge.tap("cart_item_decrease_button");
+            Thread.sleep(400);
+        }
+
+        // Final check
+        if (forge.isPresent("cart_remove_product_button")) {
+            forge.tap("cart_remove_product_button");
+            System.out.println("[cartRemoveItem/forge] ✅ Item removed");
+        } else {
+            throw new RuntimeException("[cartRemoveItem/forge] cart_remove_product_button not found");
         }
     }
 

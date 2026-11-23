@@ -17,21 +17,23 @@ public class ScreenshotUtil {
     public static File capture(String testName) {
 
         try {
-            AppiumDriver driver = DriverManager.getDriver();
-
-            // Ensure directory exists
             Path dirPath = Paths.get(SCREENSHOT_DIR);
-            if (!Files.exists(dirPath)) {
-                Files.createDirectories(dirPath);
+            if (!Files.exists(dirPath)) Files.createDirectories(dirPath);
+
+            String fileName = testName + "_" + System.currentTimeMillis() + ".png";
+            Path destPath = Paths.get(SCREENSHOT_DIR + fileName);
+
+            if (com.popclub.driver.ForgeDriverContext.isActive()) {
+                byte[] png = com.popclub.driver.ForgeDriverContext.get().screenshot();
+                Files.write(destPath, png);
+                return destPath.toFile();
             }
+
+            AppiumDriver driver = DriverManager.getDriver();
 
             // Capture screenshot
             File src = ((TakesScreenshot) driver)
                     .getScreenshotAs(OutputType.FILE);
-
-            String fileName = testName + "_" + System.currentTimeMillis() + ".png";
-
-            Path destPath = Paths.get(SCREENSHOT_DIR + fileName);
 
             // Use Files.copy (more reliable than renameTo)
             Files.copy(src.toPath(), destPath);

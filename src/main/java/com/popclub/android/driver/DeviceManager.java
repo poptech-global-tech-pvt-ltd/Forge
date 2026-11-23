@@ -124,9 +124,10 @@ public class DeviceManager {
         int port = portCounter.getAndAdd(2);
         devicePortMap.put(serial, port);
 
+        String driverLabel = "forge".equalsIgnoreCase(System.getProperty("driver")) ? "ForgeDriver" : "Appium port: " + port;
         System.out.println("[STF] Cloud device ready → " + serial
                 + " | Platform: " + platformInfo[0] + " " + platformInfo[1]
-                + " | ADB server: " + stfHost + ":5037 | Appium port: " + port);
+                + " | ADB server: " + stfHost + ":5037 | " + driverLabel);
 
         DeviceInfo info = new DeviceInfo(serial, port, platformInfo[0], platformInfo[1]);
         info.adbHost       = stfHost;

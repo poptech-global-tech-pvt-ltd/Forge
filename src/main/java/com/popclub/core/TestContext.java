@@ -30,7 +30,9 @@ public class TestContext {
 
     private static ThreadLocal<String> executionMode = new ThreadLocal<>();
     private static ThreadLocal<Boolean> noReset        = ThreadLocal.withInitial(() -> false);
-    private static ThreadLocal<Boolean> loginRequired  = ThreadLocal.withInitial(() -> true);
+    private static ThreadLocal<Boolean> loginRequired         = ThreadLocal.withInitial(() -> true);
+    private static ThreadLocal<Boolean> autoGrantPermissions  = ThreadLocal.withInitial(() -> false);
+    private static ThreadLocal<Boolean> autoDismissDialogs    = ThreadLocal.withInitial(() -> false);
     private static ThreadLocal<Boolean> resumeMode     = ThreadLocal.withInitial(() -> false);
     private static ThreadLocal<File> videoFile = new ThreadLocal<>();
     private static ThreadLocal<String> currentTestCase = new ThreadLocal<>();
@@ -96,6 +98,12 @@ public class TestContext {
     public static boolean isLoginRequired() {
         return loginRequired.get();
     }
+
+    public static void setAutoGrantPermissions(boolean v) { autoGrantPermissions.set(v); }
+    public static boolean isAutoGrantPermissions()         { return autoGrantPermissions.get(); }
+
+    public static void setAutoDismissDialogs(boolean v)   { autoDismissDialogs.set(v); }
+    public static boolean isAutoDismissDialogs()           { return autoDismissDialogs.get(); }
 
     public static void markFailed(String testCaseId) {
         results.get().put(testCaseId, "FAILED");
@@ -345,6 +353,8 @@ public class TestContext {
         clpBanners.remove();
         scalarStore.remove();
         defaultTimeout.remove();
+        autoGrantPermissions.remove();
+        autoDismissDialogs.remove();
     }
 
 

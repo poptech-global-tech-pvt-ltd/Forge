@@ -5,6 +5,8 @@ import com.popclub.core.TestContext;
 import com.popclub.android.driver.AppiumDriverManager;
 import com.popclub.android.cloud.CloudConfig;
 import com.popclub.android.driver.AppiumServerManager;
+import com.popclub.driver.ForgeDriverContext;
+import com.popclub.driver.ForgeDriverManager;
 import com.popclub.model.TestCase;
 import com.popclub.parser.YamlParser;
 import com.popclub.testsigma.TestSigmaClient;
@@ -119,9 +121,12 @@ public class TestRunnerTest {
 
         // Register the total test count for this device so AppiumDriverManager
         // knows to keep the session alive until the last test completes.
-        String serial = context.getCurrentXmlTest().getParameter("deviceSerial");
-        if (serial != null && !serial.isBlank()) {
-            AppiumDriverManager.setExpectedTestCount(serial, filtered.size());
+        // Not needed in forge mode — ForgeDriver is per-test.
+        if (!"forge".equalsIgnoreCase(System.getProperty("driver"))) {
+            String serial = context.getCurrentXmlTest().getParameter("deviceSerial");
+            if (serial != null && !serial.isBlank()) {
+                AppiumDriverManager.setExpectedTestCount(serial, filtered.size());
+            }
         }
 
         return filtered.toArray(new Object[0][0]);
@@ -158,6 +163,18 @@ public class TestRunnerTest {
 
     @AfterMethod(alwaysRun = true)
     public void quitDriverAfterTest() {
+        if (ForgeDriverContext.isActive()) {
+            String serial = ForgeDriverContext.getDeviceSerial();
+            ForgeDriverContext.clear();
+            if (serial != null && !serial.isBlank()) {
+                ForgeDriverManager.stop(serial);
+                // Release the STF device back to the farm in cloud mode
+                if (CloudConfig.isCloudEnabled()) {
+                    com.popclub.android.driver.DeviceManager.release(serial);
+                }
+            }
+            return;
+        }
         //  ALWAYS CLEAN DRIVER
         AppiumDriverManager.quitDriver();
     }

@@ -38,9 +38,12 @@ steps:
   - action: enterText
     element: search_products_search_input
     value: "tshirt"
-
+    
   - action: pressKey
     value: search
+
+  - action: tapIfPresent
+    element: search_category_suggestion_item_0
 
   - action: waitFor
     element: product_list_item_0

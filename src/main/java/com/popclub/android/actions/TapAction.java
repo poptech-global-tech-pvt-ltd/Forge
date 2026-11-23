@@ -4,6 +4,7 @@ import com.popclub.core.Locator;
 import com.popclub.core.TestContext;
 import com.popclub.core.WaitUtil;
 import com.popclub.android.driver.DriverManager;
+import com.popclub.driver.ForgeDriverContext;
 import com.popclub.model.Step;
 import io.appium.java_client.AppiumDriver;
 import org.openqa.selenium.WebElement;
@@ -18,6 +19,15 @@ public class TapAction implements Action {
 
     @Override
     public void perform(Step step) {
+        if (ForgeDriverContext.isActive()) {
+            if (step.x > 0 || step.y > 0) {
+                ForgeDriverContext.get().tapByCoords(step.x, step.y);
+            } else {
+                String tag = ForgeDriverContext.forgeTag(step);
+                ForgeDriverContext.get().tap(tag);
+            }
+            return;
+        }
 
         AppiumDriver driver = DriverManager.getDriver();
 

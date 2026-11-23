@@ -36,8 +36,15 @@ public class TapByTextAction implements Action {
             throw new RuntimeException("tapByText requires a non-empty value");
         }
 
-        AppiumDriver driver = DriverManager.getDriver();
         String text = step.value.trim();
+
+        if (com.popclub.driver.ForgeDriverContext.isActive()) {
+            com.popclub.driver.ForgeDriverContext.get().tapByText(text);
+            System.out.println("  ✅ tapByText (forge): \"" + text + "\"");
+            return;
+        }
+
+        AppiumDriver driver = DriverManager.getDriver();
 
         System.out.println("  tapByText → looking for: \"" + text + "\"");
 

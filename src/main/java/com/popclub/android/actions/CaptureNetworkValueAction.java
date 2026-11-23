@@ -52,7 +52,7 @@ public class CaptureNetworkValueAction implements Action {
 
         String udid = AppiumDriverManager.deviceInfo.get() != null
             ? AppiumDriverManager.deviceInfo.get().udid
-            : null;
+            : System.getProperty("deviceSerial", null);
 
         long deadline = System.currentTimeMillis() + (long) timeout * 1000;
         StringBuilder allLogs = new StringBuilder();

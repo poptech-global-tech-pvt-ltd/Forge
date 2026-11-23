@@ -29,6 +29,47 @@ const FLOWS_ROOT     = path.join(FORGE_ROOT, 'src/test/java/com/popclub/androidF
 const APK_DIR        = path.join(FORGE_ROOT, 'src/main/resources');
 const APP_PACKAGE    = 'com.popclub.android';
 
+// Read java.home from local.properties (falls back to process.env.JAVA_HOME)
+function readLocalProps() {
+  const full = path.join(FORGE_ROOT, 'src/test/resources/config/local.properties');
+  const out = {};
+  if (!fs.existsSync(full)) return out;
+  for (const line of fs.readFileSync(full, 'utf8').split('\n')) {
+    const t = line.trim();
+    if (!t || t.startsWith('#')) continue;
+    const idx = t.indexOf('=');
+    if (idx < 0) continue;
+    out[t.slice(0, idx).trim()] = t.slice(idx + 1).trim();
+  }
+  return out;
+}
+const LOCAL_PROPS = readLocalProps();
+const JAVA_HOME = LOCAL_PROPS['java.home'] || process.env.JAVA_HOME || '';
+
+// ─── Cloud / STF config (from cloud.properties + local.cloud.properties) ─────
+function readCloudProps() {
+  const out = {};
+  for (const rel of [
+    'src/test/resources/cloud.properties',
+    'src/test/resources/config/local.cloud.properties',
+  ]) {
+    const full = path.join(FORGE_ROOT, rel);
+    if (!fs.existsSync(full)) continue;
+    for (const line of fs.readFileSync(full, 'utf8').split('\n')) {
+      const t = line.trim();
+      if (!t || t.startsWith('#')) continue;
+      const idx = t.indexOf('=');
+      if (idx < 0) continue;
+      out[t.slice(0, idx).trim()] = t.slice(idx + 1).trim();
+    }
+  }
+  return out;
+}
+const CLOUD_PROPS = readCloudProps();
+const CLOUD_ENABLED  = CLOUD_PROPS['cloud.enabled'] === 'true';
+const STF_BASE_URL   = (CLOUD_PROPS['stf.base.url'] || '').replace(/\/$/, '');
+const STF_AUTH_EMAIL = CLOUD_PROPS['stf.auth.email'] || 'testdevices@popclub.co';
+
 // ─── TestSigma — create ONE run for a whole "Run Folder" batch ───────────────
 // Reads the same properties files the Java side uses, so there is a single
 // source of truth for the token/project id.
@@ -423,10 +464,15 @@ function sendPng(res, buf) {
 
 // Live device screenshot — spawn (non-blocking) + JPEG via sips (~5x smaller payload)
 app.get('/api/screenshot', (req, res) => {
-  const serial = getConnectedDevice();
-  const adbArgs = serial
-    ? ['-s', serial, 'exec-out', 'screencap', '-p']
-    : ['exec-out', 'screencap', '-p'];
+  // Cloud mode: use the serial+host tracked from Maven stdout
+  // Local mode: fall back to adb devices auto-detect
+  const serial = CLOUD_ENABLED ? mirrorSerial : getConnectedDevice();
+  const adbArgs = (() => {
+    if (!serial) return ['exec-out', 'screencap', '-p'];
+    if (CLOUD_ENABLED && mirrorAdbHost)
+      return ['-H', mirrorAdbHost, '-P', '5037', '-s', serial, 'exec-out', 'screencap', '-p'];
+    return ['-s', serial, 'exec-out', 'screencap', '-p'];
+  })();
   const adb    = spawn('adb', adbArgs);
   const chunks = [];
 
@@ -925,8 +971,9 @@ app.post('/api/delete-test', (req, res) => {
 
 // Connected device info
 app.get('/api/device', (req, res) => {
-  const device = getConnectedDevice();
-  res.json({ device });
+  // Cloud mode: use the serial tracked from Maven stdout (set when ForgeDriver starts)
+  const device = CLOUD_ENABLED ? (mirrorSerial || null) : getConnectedDevice();
+  res.json({ device, cloud: CLOUD_ENABLED, adbHost: mirrorAdbHost || null });
 });
 
 // POST /api/stop — HTTP fallback for stopping a test run when WS is unavailable
@@ -996,6 +1043,12 @@ app.post('/api/apk/install', (req, res) => {
 
 let currentRun    = null;
 let runWasStopped = false;   // true when user clicked Stop — suppresses 'done' event
+let lastRunKey    = null;    // "<file>@<timestamp>" — deduplicate rapid duplicate triggers
+let lastRunAt     = 0;
+
+// Active device for mirror/screenshot in cloud mode — set from Maven stdout
+let mirrorSerial  = null;
+let mirrorAdbHost = null;
 
 wss.on('connection', (ws) => {
   console.log('UI client connected');
@@ -1005,6 +1058,10 @@ wss.on('connection', (ws) => {
     try { msg = JSON.parse(raw); } catch (_) { return; }
 
     if (msg.type === 'run') {
+      const key = msg.file + '|' + (msg.fromStep ?? 0);
+      const now = Date.now();
+      if (key === lastRunKey && now - lastRunAt < 2000) return; // deduplicate rapid triggers
+      lastRunKey = key; lastRunAt = now;
       startTest(msg.file, msg.device, ws, msg.fromStep, msg.batchRun, msg.existingRunId, msg.finalizeRun);
     } else if (msg.type === 'create_batch_run') {
       createTestSigmaBatchRun(msg.folder, msg.files)
@@ -1060,14 +1117,98 @@ function stopTest(ws) {
   killTimer.unref(); // don't keep Node alive just for this timer
 
   // 4. Kill any stale ForgeDriver instrumentation on device so next run starts clean
-  const device = getConnectedDevice();
+  const device = CLOUD_ENABLED ? mirrorSerial : getConnectedDevice();
   if (device) {
-    exec(`adb -s ${device} shell am force-stop com.popclub.forgedriver.test`, () => {});
-    exec(`adb -s ${device} forward --remove tcp:7790`, () => {});
+    const adbPrefix = (CLOUD_ENABLED && mirrorAdbHost)
+      ? `adb -H ${mirrorAdbHost} -P 5037 -s ${device}`
+      : `adb -s ${device}`;
+    exec(`${adbPrefix} shell am force-stop com.popclub.forgedriver.test`, () => {});
+    exec(`${adbPrefix} forward --remove tcp:7790`, () => {});
+  }
+
+  // 5. Release the STF device so it's available for the next run
+  if (CLOUD_ENABLED && mirrorSerial) {
+    const relSerial = mirrorSerial;
+    mirrorSerial  = null;
+    mirrorAdbHost = null;
+    stfReleaseDevice(relSerial).catch(() => {});
   }
 
   if (ws) send(ws, { type: 'stopped' });
   broadcast({ type: 'stopped' });
+}
+
+// ─── STF helpers ──────────────────────────────────────────────────────────────
+
+let _stfToken = null;
+const STF_TOKEN_FILE = require('path').join(require('os').homedir(), '.forge', 'stf_token');
+
+async function stfToken() {
+  // Prefer the token Java wrote to ~/.forge/stf_token — it owns the device reservation
+  // so only that token can release it. Fall back to fetching our own only if unavailable.
+  try {
+    const saved = fs.readFileSync(STF_TOKEN_FILE, 'utf8').trim();
+    if (saved && saved.split('.').length === 3) {
+      _stfToken = saved;
+      return _stfToken;
+    }
+  } catch (_) {}
+
+  if (_stfToken) return _stfToken;
+  const r = await httpsJson(`${STF_BASE_URL}/api/v1/user/accessTokens`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: STF_AUTH_EMAIL, name: 'forge-ui' }),
+  }).catch(() => null);
+  _stfToken = r?.body?.token || null;
+  if (!_stfToken) {
+    // Try mock-auth endpoint used by STFClient.java
+    const r2 = await httpsJson(`${STF_BASE_URL}/auth/api/v1/mock`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: STF_AUTH_EMAIL, name: 'forge-ui' }),
+    }).catch(() => null);
+    _stfToken = r2?.body?.jwt || r2?.body?.token || null;
+  }
+  return _stfToken;
+}
+
+async function stfAcquireDevice(preferredSerial) {
+  const tok = await stfToken();
+  if (!tok) throw new Error('[STF] Could not obtain auth token');
+
+  const headers = { Authorization: `Bearer ${tok}` };
+
+  // List available devices
+  const devR = await httpsJson(`${STF_BASE_URL}/api/v1/devices`, { headers });
+  const devices = (devR?.body?.devices || [])
+    .filter(d => d.present && d.ready && !d.using);
+
+  let serial = preferredSerial || (devices[0]?.serial);
+  if (!serial) throw new Error('[STF] No available devices on the farm');
+
+  // Reserve the device
+  await httpsJson(`${STF_BASE_URL}/api/v1/user/devices`, {
+    method: 'POST',
+    headers: { ...headers, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ serial, timeout: 600000 }),
+  });
+  console.log(`[STF] Reserved device: ${serial}`);
+  return serial;
+}
+
+async function stfReleaseDevice(serial) {
+  try {
+    const tok = await stfToken();
+    if (!tok) return;
+    await httpsJson(`${STF_BASE_URL}/api/v1/user/devices/${serial}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${tok}` },
+    });
+    console.log(`[STF] Released device: ${serial}`);
+  } catch (e) {
+    console.warn('[STF] Release failed:', e.message);
+  }
 }
 
 function startTest(file, deviceOverride, ws, fromStep, batchRun, existingRunId, finalizeRun) {
@@ -1078,15 +1219,20 @@ function startTest(file, deviceOverride, ws, fromStep, batchRun, existingRunId, 
   }
   runWasStopped = false;
 
-  // Clean up any stale device state from a previous stopped run
+  // Clean up stale ForgeDriver instrumentation from a previous stopped run.
+  // Port cleanup is handled by ForgeDriverManager.stop() in Java @AfterMethod,
+  // so we only kill the instrumentation process here (no hardcoded port).
   const prevDevice = deviceOverride || getConnectedDevice();
-  if (prevDevice) {
+  if (prevDevice && !CLOUD_ENABLED) {
     exec(`adb -s ${prevDevice} shell am force-stop com.popclub.forgedriver.test`, () => {});
-    exec(`adb -s ${prevDevice} forward --remove tcp:7790`, () => {});
+    // Remove all forwards on this device so stale ports don't linger
+    exec(`adb -s ${prevDevice} forward --remove-all`, () => {});
   }
 
   const suite  = suiteFor(file);
-  const device = deviceOverride || getConnectedDevice() || '10BDCM0YJZ00043';
+  // In cloud mode, Java acquires the device from STF — don't pass a serial.
+  // In local mode, use the override, the connected device, or fail clearly.
+  const device = CLOUD_ENABLED ? (deviceOverride || null) : (deviceOverride || getConnectedDevice());
 
   // Derive filename only (TestRunnerTest looks up by basename)
   const fileName = path.basename(file);
@@ -1095,16 +1241,18 @@ function startTest(file, deviceOverride, ws, fromStep, batchRun, existingRunId, 
   const startStep = (typeof fromStep === 'number' && fromStep > 0) ? fromStep + 1 : null;
 
   lastRunningStepIdx = -1;  // reset for new run
-  send(ws, { type: 'started', file, suite, device, fromStep: startStep });
+  send(ws, { type: 'started', file, suite, device: device || 'stf', fromStep: startStep });
   startNetworkCapture(ws);
 
   const args = [
     'test',
     `-Dsurefire.suiteXmlFiles=src/test/resources/suites/${suite}`,
     `-DtestFile=${fileName}`,
-    `-DdeviceSerial=${device}`,
+    '-Ddriver=forge',
     '--no-transfer-progress',
   ];
+  // Only pass deviceSerial when we have one — cloud mode lets Java pick from STF
+  if (device) args.push(`-DdeviceSerial=${device}`);
 
   if (startStep) {
     args.push(`-DfromStep=${startStep}`);
@@ -1125,11 +1273,18 @@ function startTest(file, deviceOverride, ws, fromStep, batchRun, existingRunId, 
 
   console.log(`Running: mvn ${args.join(' ')}`);
 
+  const logFile = require('fs').createWriteStream(
+    require('path').join(require('os').homedir(), 'forge-run.log'), { flags: 'w' });
+
   const mvn = spawn('mvn', args, {
     cwd     : FORGE_ROOT,
     shell   : true,
     detached: true,          // creates a new process group so kill(-pid) kills mvn + forked JVM
-    env     : { ...process.env }
+    env     : {
+      ...process.env,
+      ...(JAVA_HOME ? { JAVA_HOME } : {}),
+      MAVEN_OPTS: '-Xmx768m -XX:+UseSerialGC', // cap heap so macOS jetsam doesn't kill forge-ui
+    }
   });
   mvn.unref();               // don't keep the Node event loop alive for this child
 
@@ -1138,16 +1293,17 @@ function startTest(file, deviceOverride, ws, fromStep, batchRun, existingRunId, 
   let buffer = '';
 
   mvn.stdout.on('data', (chunk) => {
+    logFile.write(chunk);
+    process.stdout.write(chunk);
     buffer += chunk.toString();
     const lines = buffer.split('\n');
-    buffer = lines.pop(); // hold incomplete line
-
-    for (const line of lines) {
-      processLine(line.trim(), ws);
-    }
+    buffer = lines.pop();
+    for (const line of lines) processLine(line.trim(), ws);
   });
 
   mvn.stderr.on('data', (chunk) => {
+    logFile.write(chunk);
+    process.stderr.write(chunk);
     const text = chunk.toString().trim();
     if (text) send(ws, { type: 'log', level: 'error', line: text });
   });
@@ -1158,8 +1314,12 @@ function startTest(file, deviceOverride, ws, fromStep, batchRun, existingRunId, 
     currentRun = null;
     if (runWasStopped) {
       runWasStopped = false;
+      // stopTest() already called stfReleaseDevice — nothing more to do here
       return;
     }
+    // Normal completion — Java @AfterMethod releases the STF device; clear mirror state
+    mirrorSerial  = null;
+    mirrorAdbHost = null;
     send(ws, { type: 'done', success: code === 0, code });
     // Broadcast TestSigma run link if the listener wrote one
     try {
@@ -1366,6 +1526,14 @@ function processLine(line, ws) {
 
   // Always forward raw log
   send(ws, { type: 'log', line });
+
+  // [LaunchApp/Forge] ForgeDriver started on <serial> via ADB server <host>
+  const forgeStarted = line.match(/\[LaunchApp\/Forge\] ForgeDriver started on (\S+) via ADB server (\S+)/);
+  if (forgeStarted) {
+    mirrorSerial  = forgeStarted[1];
+    mirrorAdbHost = forgeStarted[2];
+    broadcast({ type: 'device_mirror_ready', serial: mirrorSerial, adbHost: mirrorAdbHost });
+  }
 
   // [STEP] [1] tap  — top-level step starts
   const stepMatch = line.match(/\[STEP\]\s+\[(\d+)\]\s+(.+)/);

@@ -3,6 +3,7 @@ package com.popclub.android.actions;
 import com.popclub.core.GestureUtil;
 import com.popclub.core.WaitUtil;
 import com.popclub.android.driver.DriverManager;
+import com.popclub.driver.ForgeDriverContext;
 import com.popclub.core.Locator;
 import com.popclub.core.LocatorUtil;
 import com.popclub.model.Step;
@@ -35,6 +36,21 @@ public class ScrollToElementAction implements Action {
 
     @Override
     public void perform(Step step) {
+        if (ForgeDriverContext.isActive()) {
+            String tag = ForgeDriverContext.forgeTag(step);
+            com.popclub.driver.ForgeDriverClient forge = ForgeDriverContext.get();
+            for (int i = 0; i < MAX_SWIPES; i++) {
+                if (forge.isPresent(tag)) {
+                    System.out.println("[scrollTo/forge] Element visible after " + i + " swipes: " + tag);
+                    return;
+                }
+                forge.swipe("up");
+                try { Thread.sleep(400); } catch (InterruptedException ignored) {}
+            }
+            System.out.println("[scrollTo/forge] Element not found after " + MAX_SWIPES + " swipes: " + tag);
+            return;
+        }
+
         AppiumDriver driver = DriverManager.getDriver();
 
         if (step.locators == null || step.locators.isEmpty()) {

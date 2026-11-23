@@ -2246,6 +2246,13 @@ function handleMessage(msg) {
       break;
     }
 
+    case 'device_mirror_ready':
+      // STF device is now connected — start live mirror immediately
+      document.getElementById('device-dot').className = 'dot online';
+      document.getElementById('device-label').textContent = msg.serial + ' (STF)';
+      startScreenPoll();
+      break;
+
     case 'done': {
       running = false;
       showBtnRun();
@@ -2855,12 +2862,9 @@ document.getElementById('btn-run').addEventListener('click', async () => {
         stepStates[e.stepIndex].warn = e.message;
       });
       renderSteps();
-      const proceed = confirm(
-        `⚠ ${vData.errors.length} element(s) not found in element YAMLs:\n\n` +
-        vData.errors.map(e => `  Step ${e.stepIndex + 1}: ${e.element}`).join('\n') +
-        '\n\nRun anyway?'
-      );
-      if (!proceed) return;
+      // Log the warning but always proceed — missing elements fall back to direct accessibilityId
+      console.warn(`⚠ ${vData.errors.length} element(s) not found in element YAMLs (will use direct accessibilityId):\n` +
+        vData.errors.map(e => `  Step ${e.stepIndex + 1}: ${e.element}`).join('\n'));
     }
   } catch (_) { /* validation is best-effort */ }
 
@@ -3038,15 +3042,17 @@ function doRefresh() {
   screenshotAbort = ctrl;
 
   fetch(`/api/screenshot?t=${Date.now()}`, { signal: ctrl.signal })
-    .then(r => r.blob())
-    .then(blob => {
-      if (ctrl !== screenshotAbort) return; // superseded by forceRefresh
-      const url = URL.createObjectURL(blob);
-      const img = document.getElementById('screen-img');
-      const old = img.src;
-      img.src   = url;
-      if (old.startsWith('blob:')) URL.revokeObjectURL(old);
-      screenshotBusy = false;
+    .then(r => {
+      if (!r.ok) { screenshotBusy = false; return; } // 503 = no device yet, skip silently
+      return r.blob().then(blob => {
+        if (ctrl !== screenshotAbort) return; // superseded by forceRefresh
+        const url = URL.createObjectURL(blob);
+        const img = document.getElementById('screen-img');
+        const old = img.src;
+        img.src   = url;
+        if (old.startsWith('blob:')) URL.revokeObjectURL(old);
+        screenshotBusy = false;
+      });
     })
     .catch(() => { screenshotBusy = false; });
 }

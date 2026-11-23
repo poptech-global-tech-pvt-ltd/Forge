@@ -4,6 +4,7 @@ import com.popclub.core.*;
 import com.popclub.heal.SelfHealingEngine;
 import com.popclub.android.driver.DeviceKeepAlive;
 import com.popclub.android.driver.DriverManager;
+import com.popclub.driver.ForgeDriverContext;
 import com.popclub.model.Step;
 import com.popclub.model.TestCase;
 import com.popclub.android.actions.Action;
@@ -57,6 +58,8 @@ public class TestExecutor {
         TestContext.setNoReset(testCase.noReset || resumeMode);
         TestContext.setResumeMode(resumeMode);
         TestContext.setLoginRequired(testCase.loginRequired);
+        TestContext.setAutoGrantPermissions(com.popclub.android.cloud.CloudConfig.isAutoGrantPermissions());
+        TestContext.setAutoDismissDialogs(com.popclub.android.cloud.CloudConfig.isAutoDismissDialogs());
         TestContext.setTestSourceFile(testCase.sourceFile);
 
         // Zero-wait intelligence: publish the test-level default timeout so every
@@ -335,14 +338,24 @@ public class TestExecutor {
             // ── fromStep: handle steps before the resume point ────────────────────
             if (resumeMode && stepIndex < fromStep) {
                 if ("launchApp".equalsIgnoreCase(step.action)) {
-                    // Must still create the Appium driver session; noReset=true means
-                    // the app won't be killed. Run LaunchAppAction silently.
-                    System.out.println("[fromStep] Step " + stepIndex + ": launchApp (creating driver, app kept alive)");
-                    LoggerUtil.step("[" + stepIndex + "] launchApp (resume — no restart)");
-                    try {
-                        ActionFactory.get(step.action).perform(step);
-                    } catch (Exception e) {
-                        System.out.println("[fromStep] launchApp setup warning: " + e.getMessage());
+                    if (ForgeDriverContext.isActive()) {
+                        // Forge mode: ForgeDriver is already running on-device; just init the client
+                        System.out.println("[fromStep] Step " + stepIndex + ": launchApp (forge — connecting driver, app kept alive)");
+                        LoggerUtil.step("[" + stepIndex + "] launchApp (resume/forge — no restart)");
+                        try {
+                            ActionFactory.get(step.action).perform(step);
+                        } catch (Exception e) {
+                            System.out.println("[fromStep] launchApp forge setup warning: " + e.getMessage());
+                        }
+                    } else {
+                        // Appium mode: must still create the driver session; noReset=true keeps app alive
+                        System.out.println("[fromStep] Step " + stepIndex + ": launchApp (creating driver, app kept alive)");
+                        LoggerUtil.step("[" + stepIndex + "] launchApp (resume — no restart)");
+                        try {
+                            ActionFactory.get(step.action).perform(step);
+                        } catch (Exception e) {
+                            System.out.println("[fromStep] launchApp setup warning: " + e.getMessage());
+                        }
                     }
                 } else {
                     System.out.println("[fromStep] Skipping step " + stepIndex + ": " + step.action);
@@ -364,10 +377,17 @@ public class TestExecutor {
                             "[" + stepIndex + "] " + step.action
                     );
 
+                    // Pre-step: auto-grant permissions / dismiss dialogs in forge mode
+                    if (ForgeDriverContext.isActive()
+                            && (TestContext.isAutoGrantPermissions() || TestContext.isAutoDismissDialogs())) {
+                        com.popclub.android.actions.LoginIfNeededAction.autoHandleDialogs(ForgeDriverContext.get());
+                    }
+
                     Action action = ActionFactory.get(step.action);
                     action.perform(step);
 
-                    if ("launchApp".equalsIgnoreCase(step.action)) {
+                    if ("launchApp".equalsIgnoreCase(step.action)
+                            && !ForgeDriverContext.isActive()) {
 
                         AppiumDriver driver = DriverManager.getDriver();
 

@@ -38,7 +38,7 @@ steps:
 
   # ── Select first product ──
   - action: tap
-    element: product_list_item_0
+    element: product_list_item_1
 
   # ── Add to cart ──
   - action: tap
@@ -57,13 +57,13 @@ steps:
   # Scroll to price summary
 
   - action: scrollUntilVisible
-    element: cart_to_pay_row
+    element: cart_to_pay_row_price_total
     maxScrolls: 3
 
   # Capture total before POPCoins
 
   - action: captureText
-    element: cart_to_pay_row
+    element: cart_to_pay_row_price_total
     variable: total_before
 
   # PO-11218: POPCoins toggle card shown
@@ -84,10 +84,10 @@ steps:
     element: pop_toggle_row
 
   - action: scrollUntilVisible
-    element: cart_to_pay_row
+    element: cart_to_pay_row_price_total
 
   - action: captureText
-    element: cart_to_pay_row
+    element: cart_to_pay_row_price_total
     variable: cart_to_pay_price_text
 
 
@@ -101,7 +101,7 @@ steps:
     element: pop_toggle_row
 
   - action: captureText
-    element: cart_to_pay_row
+    element: cart_to_pay_row_price_total
     variable: total_after_disable
 
   - action: logVar

@@ -1,0 +1,22 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<!--
+    Forge Driver Shop Flow Suite
+    Runs against the gRPC ForgeDriver APK (no Appium required).
+
+    Usage:
+        mvn test -DsuiteXmlFile=src/test/resources/suites/testng-forge-shop.xml
+        mvn test -DsuiteXmlFile=src/test/resources/suites/testng-forge-shop.xml -DdeviceSerial=a207699b
+-->
+
+<suite name="Forge Shop Flow" parallel="false" thread-count="1">
+
+    <parameter name="deviceSerial" value="a207699b"/>
+
+    <test name="Shop E2E via ForgeDriver">
+        <classes>
+            <class name="com.popclub.forgeTests.ShopFlowForgeTest"/>
+        </classes>
+    </test>
+
+</suite>

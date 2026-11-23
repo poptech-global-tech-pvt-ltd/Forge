@@ -24,6 +24,12 @@ skip_tour:
     - type: accessibilityId
       value: Close
 
+# ─── Onboarding Story (shown before the phone-number screen on a fresh/logged-out launch) ──────
+story_onboarding_skip_button:
+  android:
+    - type: accessibilityId
+      value: story_onboarding_skip_button
+
 
 # ─── Google Phone Number Dialog ────────────────────────────────────────────────
 google_phone_dialog_cancel_button:

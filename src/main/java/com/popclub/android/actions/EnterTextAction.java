@@ -2,6 +2,7 @@ package com.popclub.android.actions;
 
 import com.popclub.core.WaitUtil;
 import com.popclub.android.driver.DriverManager;
+import com.popclub.driver.ForgeDriverContext;
 import com.popclub.model.Step;
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.AppiumDriver;
@@ -13,14 +14,22 @@ public class EnterTextAction implements Action {
 
     @Override
     public void perform(Step step) {
-
-        AppiumDriver driver = DriverManager.getDriver();
-
         // Accept text from either `value:` or `variable:` — whichever is set.
-        // Both are already interpolated by TestExecutor before this action runs.
         String textToType = (step.value != null && !step.value.isBlank())
                 ? step.value
                 : (step.variable != null ? step.variable : "");
+
+        if (ForgeDriverContext.isActive()) {
+            String tag = ForgeDriverContext.forgeTag(step);
+            if (tag != null) {
+                ForgeDriverContext.get().tap(tag);
+            }
+            ForgeDriverContext.get().clearAndType(textToType);
+            try { Thread.sleep(400); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+            return;
+        }
+
+        AppiumDriver driver = DriverManager.getDriver();
 
         boolean elementFound = false;
 

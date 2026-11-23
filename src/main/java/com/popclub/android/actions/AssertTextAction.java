@@ -47,6 +47,27 @@ public class AssertTextAction implements Action {
         if (expected == null)
             throw new RuntimeException("assertText: 'value' (expected text) is required");
 
+        if (com.popclub.driver.ForgeDriverContext.isActive()) {
+            String tag = com.popclub.driver.ForgeDriverContext.forgeTag(step);
+            java.util.List<com.popclub.forgedriver.proto.AccessibilityNode> nodes =
+                    com.popclub.driver.ForgeDriverContext.get().search(tag);
+            if (nodes.isEmpty())
+                throw new RuntimeException("assertText: element not found — " + describeLocator(step));
+            String actual = nodes.get(0).getText();
+            if (actual == null) actual = "";
+            actual = actual.trim();
+            String expectedNorm = normalizePrice(expected.trim());
+            String actualNorm   = normalizePrice(actual);
+            if (!actualNorm.equals(expectedNorm)) {
+                throw new RuntimeException(
+                    "assertText FAIL — " + describeLocator(step) + "\n" +
+                    "  expected: \"" + expected.trim() + "\"\n" +
+                    "  actual:   \"" + actual + "\"");
+            }
+            System.out.printf("  ✅ assertText PASS (forge): \"%s\"%n", actual);
+            return;
+        }
+
         AppiumDriver driver = DriverManager.getDriver();
         WebElement el = findElement(driver, step);
 

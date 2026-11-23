@@ -68,6 +68,13 @@ public class STFClient {
                 if (!saved.isBlank() && isTokenValid(saved)) {
                     System.out.println("[STF] Reusing saved session token for " + email);
                     TOKEN_CACHE.put(cacheKey, saved);
+                    // Keep ~/.forge/stf_token in sync so forge-ui can release with the same token
+                    try {
+                        java.io.File shared = new java.io.File(
+                                System.getProperty("user.home"), ".forge/stf_token");
+                        shared.getParentFile().mkdirs();
+                        java.nio.file.Files.write(shared.toPath(), saved.getBytes());
+                    } catch (Exception ignored2) {}
                     return saved;
                 }
             } catch (Exception ignored) {}
@@ -79,6 +86,13 @@ public class STFClient {
         try {
             tokenFile.getParentFile().mkdirs();
             java.nio.file.Files.write(tokenFile.toPath(), fresh.getBytes());
+        } catch (Exception ignored) {}
+        // Also write to ~/.forge/stf_token so forge-ui can use the same token for releases
+        try {
+            java.io.File shared = new java.io.File(
+                    System.getProperty("user.home"), ".forge/stf_token");
+            shared.getParentFile().mkdirs();
+            java.nio.file.Files.write(shared.toPath(), fresh.getBytes());
         } catch (Exception ignored) {}
         return fresh;
     }

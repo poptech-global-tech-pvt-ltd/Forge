@@ -3,6 +3,9 @@ package com.popclub.android.actions;
 import com.popclub.core.TestContext;
 import com.popclub.android.driver.AppiumDriverManager;
 import com.popclub.android.driver.DriverManager;
+import com.popclub.android.cloud.CloudConfig;
+import com.popclub.driver.ForgeDriverContext;
+import com.popclub.driver.ForgeDriverManager;
 import com.popclub.model.Step;
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.AppiumDriver;
@@ -15,7 +18,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.time.Duration;
 import java.util.List;
 
-/** launchApp — starts the Appium session, wakes the device, and dismisses system dialogs. */
+/** launchApp — starts the Appium session (or ForgeDriver), wakes the device, and dismisses system dialogs. */
 public class LaunchAppAction implements Action {
 
     /** How long to wait for the first app screen to appear after launch. */
@@ -28,6 +31,12 @@ public class LaunchAppAction implements Action {
 
     @Override
     public void perform(Step step) {
+        // ── Forge mode: skip Appium entirely ──────────────────────────────────
+        if ("forge".equalsIgnoreCase(System.getProperty("driver"))) {
+            launchWithForge();
+            return;
+        }
+
         // 1. Boot Appium session (installs APK if needed)
         AppiumDriver driver = AppiumDriverManager.getDriver();
         DriverManager.setDriver(driver);
@@ -62,6 +71,155 @@ public class LaunchAppAction implements Action {
         }
 
         System.out.println("[LaunchApp] App launch complete — proceeding with test steps.");
+    }
+
+    private void launchWithForge() {
+        String serial = CloudConfig.getDeviceSerial();
+        if (serial == null || serial.isBlank()) {
+            serial = System.getProperty("deviceSerial", "");
+        }
+        String adbHost = null;
+
+        // Cloud/STF mode: acquire device from STF to get serial + adbHost
+        if (CloudConfig.isCloudEnabled() && (serial == null || serial.isBlank())) {
+            System.out.println("[LaunchApp/Forge] Cloud mode — acquiring device from STF…");
+            com.popclub.android.driver.DeviceInfo acquired =
+                    com.popclub.android.driver.DeviceManager.getDevice();
+            serial  = acquired.udid;
+            adbHost = acquired.adbHost;
+            AppiumDriverManager.deviceInfo.set(acquired);
+            System.out.println("[LaunchApp/Forge] STF device acquired: " + serial
+                    + " via ADB server " + adbHost);
+        } else {
+            // Local mode — auto-detect serial if not specified
+            if (serial == null || serial.isBlank()) {
+                serial = detectLocalSerial();
+                System.out.println("[LaunchApp/Forge] Auto-detected local device: " + serial);
+            }
+            // Pick up adbHost if already set (e.g. from a prior Appium session)
+            try {
+                com.popclub.android.driver.DeviceInfo info = AppiumDriverManager.getDeviceInfo();
+                if (info != null && info.adbHost != null && !info.adbHost.isBlank()) {
+                    adbHost = info.adbHost;
+                }
+            } catch (Exception ignored) {}
+        }
+
+        try {
+            com.popclub.driver.ForgeDriverClient forge = ForgeDriverManager.start(serial, adbHost);
+            ForgeDriverContext.set(forge, serial);
+            System.out.println("[LaunchApp/Forge] ForgeDriver started on " + serial
+                    + (adbHost != null ? " via ADB server " + adbHost : ""));
+
+            String[] adbPrefix = buildAdbPrefix(serial, adbHost);
+
+            // Auto-install the app if not present on the device
+            ensureAppInstalled(adbPrefix, serial);
+
+            // Wake screen and dismiss lock screen (swipe/insecure keyguard only)
+            adbShell(adbPrefix, "input", "keyevent", "KEYCODE_WAKEUP")
+                    .waitFor(3, java.util.concurrent.TimeUnit.SECONDS);
+            adbShell(adbPrefix, "wm", "dismiss-keyguard")
+                    .waitFor(3, java.util.concurrent.TimeUnit.SECONDS);
+            Thread.sleep(500);
+
+            if (TestContext.isResumeMode()) {
+                // Run-from-step: keep app alive, just bring to foreground
+                System.out.println("[LaunchApp/Forge] Resume mode — bringing app to foreground, not restarting");
+                adbShell(adbPrefix, "am", "start", "-n", APP_PACKAGE + "/.LauncherFresh")
+                        .waitFor(5, java.util.concurrent.TimeUnit.SECONDS);
+            } else {
+                // Full run from step 1 — force-stop then relaunch
+                adbShell(adbPrefix, "am", "force-stop", APP_PACKAGE)
+                        .waitFor(5, java.util.concurrent.TimeUnit.SECONDS);
+                Thread.sleep(500);
+                adbShell(adbPrefix, "am", "start", "-n", APP_PACKAGE + "/.LauncherFresh")
+                        .waitFor(10, java.util.concurrent.TimeUnit.SECONDS);
+            }
+            System.out.println("[LaunchApp/Forge] App launched — loginIfNeeded will handle login/navigation");
+        } catch (Exception e) {
+            throw new RuntimeException("[LaunchApp/Forge] Failed to start ForgeDriver: " + e.getMessage(), e);
+        }
+    }
+
+    /** Installs the PopClub APK if the app is not already on the device. */
+    private static void ensureAppInstalled(String[] adbPrefix, String serial) throws Exception {
+        // pm path <package> returns the APK path if installed, empty if not — exact match, no false positives
+        Process check = adbShell(adbPrefix, "pm", "path", APP_PACKAGE);
+        check.waitFor(5, java.util.concurrent.TimeUnit.SECONDS);
+        String checkOut = new String(check.getInputStream().readAllBytes()).trim();
+        System.out.println("[LaunchApp/Forge] pm path check: " + (checkOut.isEmpty() ? "NOT installed" : checkOut));
+        if (checkOut.startsWith("package:")) {
+            return; // already installed
+        }
+
+        // Find the APK in resources
+        java.net.URL apkUrl = LaunchAppAction.class.getClassLoader().getResource("pop-qaDebug.apk");
+        if (apkUrl == null) {
+            throw new RuntimeException("[LaunchApp/Forge] PopClub APK not installed on device " + serial
+                    + " and pop-qaDebug.apk not found in src/main/resources.");
+        }
+        String apkPath = new java.io.File(apkUrl.toURI()).getAbsolutePath();
+        System.out.println("[LaunchApp/Forge] App not installed — installing from " + apkPath);
+
+        // Disable package verifier to avoid INSTALL_FAILED_VERIFICATION_FAILURE
+        adbShell(adbPrefix, "settings", "put", "global", "package_verifier_enable", "0")
+                .waitFor(5, java.util.concurrent.TimeUnit.SECONDS);
+
+        String[] installCmd = new String[adbPrefix.length + 4];
+        System.arraycopy(adbPrefix, 0, installCmd, 0, adbPrefix.length);
+        installCmd[adbPrefix.length]     = "install";
+        installCmd[adbPrefix.length + 1] = "-r";
+        installCmd[adbPrefix.length + 2] = "-t";
+        installCmd[adbPrefix.length + 3] = apkPath;
+
+        System.out.println("[LaunchApp/Forge] Installing 350MB APK over network — this may take a few minutes…");
+        Process install = new ProcessBuilder(installCmd).redirectErrorStream(true).start();
+        install.waitFor(600, java.util.concurrent.TimeUnit.SECONDS);
+        String out = new String(install.getInputStream().readAllBytes()).trim();
+        System.out.println("[LaunchApp/Forge] Install output: " + out);
+        if (!out.contains("Success")) {
+            throw new RuntimeException("[LaunchApp/Forge] APK install failed on " + serial + ": " + out);
+        }
+        System.out.println("[LaunchApp/Forge] ✅ PopClub app installed on " + serial);
+    }
+
+    /** Returns the serial of the first locally connected ADB device, or throws if none found. */
+    private static String detectLocalSerial() {
+        try {
+            Process p = new ProcessBuilder("adb", "devices").redirectErrorStream(true).start();
+            p.waitFor(5, java.util.concurrent.TimeUnit.SECONDS);
+            String out = new String(p.getInputStream().readAllBytes());
+            for (String line : out.split("\n")) {
+                line = line.trim();
+                if (!line.isEmpty() && !line.startsWith("List") && line.endsWith("device")) {
+                    String serial = line.split("\\s+")[0].trim();
+                    if (!serial.isEmpty()) return serial;
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("[LaunchApp/Forge] Failed to detect local ADB device: " + e.getMessage(), e);
+        }
+        throw new RuntimeException("[LaunchApp/Forge] No local ADB device found. "
+                + "Connect a device or pass -DdeviceSerial=<serial>.");
+    }
+
+    /** Builds ["adb", "-s", serial] or ["adb", "-H", host, "-P", "5037", "-s", serial]. */
+    private static String[] buildAdbPrefix(String serial, String adbHost) {
+        if (adbHost != null && !adbHost.isBlank()) {
+            return new String[]{"adb", "-H", adbHost, "-P", "5037", "-s", serial};
+        }
+        return new String[]{"adb", "-s", serial};
+    }
+
+    /** Runs  adb [...prefix] shell <shellArgs>  and returns the Process. */
+    private static Process adbShell(String[] prefix, String... shellArgs)
+            throws java.io.IOException {
+        String[] cmd = new String[prefix.length + 1 + shellArgs.length];
+        System.arraycopy(prefix, 0, cmd, 0, prefix.length);
+        cmd[prefix.length] = "shell";
+        System.arraycopy(shellArgs, 0, cmd, prefix.length + 1, shellArgs.length);
+        return new ProcessBuilder(cmd).redirectErrorStream(true).start();
     }
 
     private void wakeDevice(AndroidDriver driver) {

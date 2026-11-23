@@ -1,0 +1,112 @@
+appId: com.popclub.android
+name: "Shop - Search and Add to Cart"
+tags:
+  - shop
+  - smoke
+  - cart
+env:
+  USERNAME: ""
+  OTP: "1234"
+  SEARCH_TERM: "shirt"
+---
+- launchApp:
+    clearState: true
+
+- runFlow:
+    file: "_login.yaml"
+    env:
+      USERNAME: ${USERNAME}
+      OTP: ${OTP}
+
+# ── Navigate to Shop ───────────────────────────────────────────────────────────
+- tapOn:
+    id: "common_shop_tab"
+    label: "Go to Shop tab"
+
+- assertVisible:
+    id: "shop_search_button"
+    label: "Shop screen loaded"
+
+# ── Search for product ─────────────────────────────────────────────────────────
+- tapOn:
+    id: "shop_search_button"
+
+- assertVisible:
+    id: "search_products_search_input"
+
+- tapOn:
+    id: "search_products_search_input"
+
+- inputText: ${SEARCH_TERM}
+
+- pressKey: Enter
+
+- extendedWaitUntil:
+    visible:
+      id: "product_list_item_0"
+    timeout: 10000
+
+- assertVisible:
+    id: "product_list_item_title_0"
+    label: "Product listing visible"
+
+- assertNoDefectsWithAI
+
+# ── Open first product ─────────────────────────────────────────────────────────
+- tapOn:
+    id: "product_list_item_0"
+    label: "Open first product"
+
+- extendedWaitUntil:
+    visible:
+      id: "product_details_title"
+    timeout: 10000
+
+- assertVisible:
+    id: "product_details_price"
+    label: "PDP price visible"
+
+- assertNoDefectsWithAI
+
+# ── Select size ────────────────────────────────────────────────────────────────
+- tapOn:
+    id: "product_details_size_option_0"
+    label: "Select first size"
+    optional: true
+
+# ── Add to cart ────────────────────────────────────────────────────────────────
+- tapOn:
+    id: "product_details_bottom_sticky_bar_button"
+    label: "Add to cart"
+
+- extendedWaitUntil:
+    visible:
+      id: "product_details_add_to_cart_toast"
+    timeout: 5000
+
+- assertVisible:
+    id: "product_details_add_to_cart_toast"
+    label: "Add to cart toast shown"
+
+# ── Go to cart ─────────────────────────────────────────────────────────────────
+- tapOn:
+    id: "product_details_cart_button"
+    label: "Go to cart"
+
+- extendedWaitUntil:
+    visible:
+      id: "cart_item_row_0"
+    timeout: 10000
+
+- assertVisible:
+    id: "cart_item_title_0"
+    label: "Item in cart"
+
+- assertVisible:
+    id: "cart_item_price_0"
+
+- assertVisible:
+    id: "cart_pay_button"
+    label: "Pay button visible"
+
+- assertNoDefectsWithAI

@@ -211,6 +211,64 @@ public class CloudConfig {
         return get("appium.remote.ssh.user");
     }
 
+    // ── Forge port pool (parallel device runs) ───────────────────────────────
+
+    /**
+     * Port range for ForgeDriver gRPC in parallel runs.
+     * Format: "7790-7799" (10 slots = up to 10 concurrent devices).
+     * Each device gets its own port; socat must listen on all ports in the range on the STF server.
+     */
+    public static String getForgePortRange() {
+        String val = get("forge.port.range");
+        return (val != null && !val.isBlank()) ? val : "7790-7799";
+    }
+
+    /** Auto-tap Allow/While using/Only this time for every permission dialog in forge mode. */
+    public static boolean isAutoGrantPermissions() {
+        return "true".equalsIgnoreCase(get("forge.auto.grant.permissions"));
+    }
+
+    /** Auto-dismiss generic dialogs (OK, Got it, Close, Skip…) between steps in forge mode. */
+    public static boolean isAutoDismissDialogs() {
+        return "true".equalsIgnoreCase(get("forge.auto.dismiss.dialogs"));
+    }
+
+    // ── Forge SSH config (kept for reference) ────────────────────────────────
+
+    /**
+     * SSH username for the STF server used when opening a port-forward tunnel
+     * for ForgeDriver gRPC in cloud mode.
+     * Set forge.ssh.user in local.cloud.properties.
+     * Falls back to appium.remote.ssh.user for backwards compatibility.
+     */
+    public static String getForgeSshUser() {
+        String val = get("forge.ssh.user");
+        if (val != null && !val.isBlank()) return val;
+        return get("appium.remote.ssh.user"); // fallback
+    }
+
+    /**
+     * Path to the SSH private key for the ForgeDriver SSH tunnel.
+     * Uses forge.ssh.key if set; otherwise falls back to appium.remote.ssh.key,
+     * then auto-detects from ~/.ssh.
+     */
+    public static String getForgeSshKey() {
+        String val = get("forge.ssh.key");
+        if (val != null && !val.isBlank()) return val;
+        val = get("appium.remote.ssh.key");
+        if (val != null && !val.isBlank()) return val;
+
+        String home = System.getProperty("user.home");
+        for (String name : new String[]{"id_ed25519", "id_rsa", "id_ecdsa"}) {
+            java.io.File key = new java.io.File(home + "/.ssh/" + name);
+            if (key.exists()) {
+                System.out.println("[CloudConfig] Auto-detected SSH key → " + key.getPath());
+                return key.getPath();
+            }
+        }
+        return null;
+    }
+
     /**
      * Path to the SSH private key for starting remote Appium.
      * Uses appium.remote.ssh.key if set; otherwise auto-detects the first key

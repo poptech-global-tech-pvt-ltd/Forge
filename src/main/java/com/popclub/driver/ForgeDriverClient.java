@@ -1,187 +1,162 @@
 package com.popclub.driver;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.popclub.forgedriver.proto.*;
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
+import io.grpc.StatusRuntimeException;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.Duration;
 import java.util.Base64;
-import java.util.Map;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
- * ForgeDriverClient — talks to the ForgeDriver companion APK running on the device.
+ * ForgeDriverClient — talks to the ForgeDriver gRPC server on the Android device.
  *
- * The companion APK exposes a NanoHTTPD server on port 6790 (forwarded via adb).
- * This client replaces AppiumDriver calls with direct HTTP calls to the device,
- * eliminating the Appium server proxy hop.
+ * The companion APK exposes a gRPC server on port 7790 (device-side).
+ * Port-forward with: adb forward tcp:7790 tcp:7790
  *
- * Usage:
- *   ForgeDriverClient driver = new ForgeDriverClient();
- *   driver.tap("shop_add_to_cart_button");
- *   driver.waitUntilPresent("cart_item_price_0", 10_000);
- *   String xml = driver.getSource();
- *
- * Architecture:
- *   Forge Java → HTTP → adb forward → ForgeDriver APK → UiAutomator2 → device
- *   (vs Appium: Forge Java → HTTP → Appium server → HTTP → UiAutomator2 → device)
+ * ForgeDriverManager.start() handles port-forwarding and lifecycle.
  */
 public class ForgeDriverClient {
 
-    private static final String BASE_URL    = "http://localhost:6790";
-    private static final int    CONNECT_MS  = 3_000;
-    private static final int    REQUEST_MS  = 30_000;
+    private static final String HOST      = "localhost";
+    private static final int    PORT      = 7790;
+    // Per-call deadline for quick operations (tap, type, swipe, isPresent, etc.)
+    private static final int    QUICK_S   = 10;
 
-    private final HttpClient    http;
-    private final ObjectMapper  json = new ObjectMapper();
+    private final ManagedChannel            channel;
+    private final ForgeDriverGrpc.ForgeDriverBlockingStub stub;
 
     public ForgeDriverClient() {
-        this.http = HttpClient.newBuilder()
-                .connectTimeout(Duration.ofMillis(CONNECT_MS))
+        this(HOST, PORT);
+    }
+
+    public ForgeDriverClient(String host) {
+        this(host, PORT);
+    }
+
+    public ForgeDriverClient(String host, int port) {
+        this.channel = ManagedChannelBuilder
+                .forAddress(host, port)
+                .usePlaintext()
                 .build();
+        this.stub = ForgeDriverGrpc.newBlockingStub(channel);
+    }
+
+    /** Returns a stub with a short per-call deadline for quick one-shot operations. */
+    private ForgeDriverGrpc.ForgeDriverBlockingStub quick() {
+        return stub.withDeadlineAfter(QUICK_S, TimeUnit.SECONDS);
     }
 
     // ── Health check ──────────────────────────────────────────────────────────
 
     public boolean isAlive() {
         try {
-            Map<?, ?> res = get("/ping");
-            return "ok".equals(res.get("status"));
+            PingResponse res = stub.withDeadlineAfter(3, TimeUnit.SECONDS)
+                    .ping(PingRequest.newBuilder().build());
+            return "ok".equals(res.getStatus());
         } catch (Exception e) {
             return false;
         }
     }
 
-    // ── Element presence (replaces WebDriverWait polling) ────────────────────
+    // ── Element presence ──────────────────────────────────────────────────────
 
-    /**
-     * Block until element with the given tag is present, or timeout elapses.
-     * One HTTP call to the device — no polling loop on the Java side.
-     *
-     * @param tag            accessibility ID (qaTestTag value)
-     * @param timeoutMillis  how long to wait (passed to UiAutomator on device)
-     * @return bounds map {left, top, right, bottom, cx, cy} or null if not found
-     */
-    @SuppressWarnings("unchecked")
-    public Map<String, Integer> waitUntilPresent(String tag, long timeoutMillis) {
+    public int[] waitUntilPresent(String tag, long timeoutMillis) {
         try {
-            Map<?, ?> res = get("/present?tag=" + encode(tag) + "&timeout=" + timeoutMillis);
-            if (Boolean.TRUE.equals(res.get("present"))) {
-                return (Map<String, Integer>) res.get("bounds");
+            // Use a per-call deadline = requested timeout + 8s overhead so the gRPC
+            // call doesn't expire before the server-side poll finishes.
+            WaitPresentResponse res = stub
+                    .withDeadlineAfter(timeoutMillis + 8_000, java.util.concurrent.TimeUnit.MILLISECONDS)
+                    .waitPresent(
+                            WaitPresentRequest.newBuilder()
+                                    .setTag(tag)
+                                    .setTimeoutMs(timeoutMillis)
+                                    .build());
+            if (res.getFound()) {
+                return new int[]{res.getLeft(), res.getTop(), res.getRight(), res.getBottom()};
             }
-        } catch (Exception e) {
+        } catch (StatusRuntimeException e) {
             System.out.println("[ForgeDriver] waitUntilPresent error: " + e.getMessage());
         }
         return null;
     }
 
     public boolean isPresent(String tag) {
-        return waitUntilPresent(tag, 0) != null;
+        try {
+            return quick().isPresent(IsPresentRequest.newBuilder().setTag(tag).build()).getFound();
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     // ── Tap ──────────────────────────────────────────────────────────────────
 
-    public void tap(String tag) throws IOException {
-        post("/tap", Map.of("tag", tag));
+    public void tap(String tag) {
+        quick().tap(TapRequest.newBuilder().setTag(tag).build());
     }
 
-    public void tapByText(String text) throws IOException {
-        post("/tap", Map.of("text", text));
+    public void tapByText(String text) {
+        quick().tapByText(TapByTextRequest.newBuilder().setText(text).build());
     }
 
-    public void tapByCoords(int x, int y) throws IOException {
-        post("/tap", Map.of("x", x, "y", y));
+    public void tapByCoords(int x, int y) {
+        quick().tapByCoords(TapByCoordsRequest.newBuilder().setX(x).setY(y).build());
     }
 
     // ── Type ─────────────────────────────────────────────────────────────────
 
-    public void type(String text) throws IOException {
-        post("/type", Map.of("text", text));
+    public void type(String text) {
+        quick().type(TypeRequest.newBuilder().setText(text).build());
     }
 
-    public void clearAndType(String text) throws IOException {
-        post("/type", Map.of("text", text, "clear", true));
+    public void clearAndType(String text) {
+        quick().clearAndType(TypeRequest.newBuilder().setText(text).build());
     }
 
     // ── Swipe ────────────────────────────────────────────────────────────────
 
-    public void swipe(String direction) throws IOException {
-        post("/swipe", Map.of("direction", direction));
+    public void swipe(String direction) {
+        quick().swipe(SwipeRequest.newBuilder().setDirection(direction).build());
     }
 
-    public void swipe(int x1, int y1, int x2, int y2) throws IOException {
-        post("/swipe", Map.of("x1", x1, "y1", y1, "x2", x2, "y2", y2));
+    public void swipe(int x1, int y1, int x2, int y2) {
+        quick().swipe(SwipeRequest.newBuilder().setX1(x1).setY1(y1).setX2(x2).setY2(y2).build());
     }
 
     // ── Keys ─────────────────────────────────────────────────────────────────
 
-    public void pressBack()   throws IOException { post("/key", Map.of("key", "back"));   }
-    public void pressHome()   throws IOException { post("/key", Map.of("key", "home"));   }
-    public void pressEnter()  throws IOException { post("/key", Map.of("key", "enter"));  }
-    public void pressSearch() throws IOException { post("/key", Map.of("key", "search")); }
-    public void pressDelete() throws IOException { post("/key", Map.of("key", "delete")); }
+    public void pressBack()   { quick().pressKey(PressKeyRequest.newBuilder().setKey("back").build()); }
+    public void pressHome()   { quick().pressKey(PressKeyRequest.newBuilder().setKey("home").build()); }
+    public void pressEnter()  { quick().pressKey(PressKeyRequest.newBuilder().setKey("enter").build()); }
+    public void pressSearch() { quick().pressKey(PressKeyRequest.newBuilder().setKey("search").build()); }
+    public void pressDelete() { quick().pressKey(PressKeyRequest.newBuilder().setKey("delete").build()); }
 
-    // ── UI tree (replaces driver.getPageSource()) ─────────────────────────────
+    // ── UI source ─────────────────────────────────────────────────────────────
 
-    public String getSource() throws IOException {
-        HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + "/source"))
-                .timeout(Duration.ofMillis(REQUEST_MS))
-                .GET()
-                .build();
-        try {
-            return http.send(req, HttpResponse.BodyHandlers.ofString()).body();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new IOException("Interrupted", e);
-        }
+    public String getSource() {
+        return quick().getSource(SourceRequest.newBuilder().build()).getXml();
     }
 
     // ── Screenshot ────────────────────────────────────────────────────────────
 
-    public byte[] screenshot() throws IOException {
-        Map<?, ?> res = get("/screenshot");
-        String b64 = (String) res.get("screenshot");
-        return Base64.getDecoder().decode(b64);
+    public byte[] screenshot() {
+        return quick().screenshot(ScreenshotRequest.newBuilder().build()).getPng().toByteArray();
     }
 
-    // ── HTTP helpers ──────────────────────────────────────────────────────────
+    // ── Search ────────────────────────────────────────────────────────────────
 
-    private Map<?, ?> get(String path) throws IOException {
-        HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + path))
-                .timeout(Duration.ofMillis(REQUEST_MS))
-                .GET()
-                .build();
-        try {
-            String body = http.send(req, HttpResponse.BodyHandlers.ofString()).body();
-            return json.readValue(body, Map.class);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new IOException("Interrupted", e);
-        }
+    public List<AccessibilityNode> search(String tag) {
+        return quick().searchNodes(SearchRequest.newBuilder().setTag(tag).build()).getNodesList();
     }
 
-    private Map<?, ?> post(String path, Map<?, ?> data) throws IOException {
-        String reqBody = json.writeValueAsString(data);
-        HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + path))
-                .timeout(Duration.ofMillis(REQUEST_MS))
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(reqBody))
-                .build();
-        try {
-            String resBody = http.send(req, HttpResponse.BodyHandlers.ofString()).body();
-            return json.readValue(resBody, Map.class);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new IOException("Interrupted", e);
-        }
+    public List<AccessibilityNode> searchByText(String text) {
+        return quick().searchNodes(SearchRequest.newBuilder().setText(text).build()).getNodesList();
     }
 
-    private static String encode(String s) {
-        return java.net.URLEncoder.encode(s, java.nio.charset.StandardCharsets.UTF_8);
+    // ── Lifecycle ─────────────────────────────────────────────────────────────
+
+    public void shutdown() throws InterruptedException {
+        channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
     }
 }
