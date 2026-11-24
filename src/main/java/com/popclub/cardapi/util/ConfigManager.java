@@ -3,16 +3,21 @@ package com.popclub.cardapi.util;
 import java.io.InputStream;
 import java.util.Properties;
 
+/**
+ * Set ENV via -DENV=stage|prod at runtime; defaults to local — same convention as ApiConfig.
+ */
 public class ConfigManager {
 
     private static final Properties PROPS = new Properties();
 
     static {
-        try (InputStream in = ConfigManager.class.getClassLoader()
-                .getResourceAsStream("config/sit.properties")) {
+        String env = System.getProperty("ENV", "local");
+        String file = "config/" + env + ".properties";
+        try (InputStream in = ConfigManager.class.getClassLoader().getResourceAsStream(file)) {
+            if (in == null) throw new RuntimeException("Config file not found for env: " + env);
             PROPS.load(in);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to load config/sit.properties", e);
+            throw new RuntimeException("Failed to load " + file, e);
         }
     }
 
@@ -26,7 +31,12 @@ public class ConfigManager {
         System.out.println("========================================");
     }
 
+    /** -D system property > env var (k8s Secret in CI) > properties file. */
     private static String get(String key) {
+        String sys = System.getProperty(key);
+        if (sys != null && !sys.isBlank()) return sys;
+        String env = System.getenv(key);
+        if (env != null && !env.isBlank()) return env;
         return PROPS.getProperty(key);
     }
 

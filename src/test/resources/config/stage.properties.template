@@ -1,0 +1,82 @@
+# Copy this file to stage.properties and fill in the real values.
+# stage.properties is gitignored — never commit real tokens/keys.
+# In CI, the real values are injected as env vars from a k8s Secret and override
+# the file (see each "Set via ... env var" comment below).
+#
+# Setup:
+#   cp src/test/resources/config/stage.properties.template \
+#      src/test/resources/config/stage.properties
+
+ENV=stage
+
+# ─── API config (ApiConfig) ───────────────────────────────────────────────────
+APP_BASE_URL=https://app-qa.popclub.co.in
+HASHIRA_BASE_URL=https://hashira-qa.popclub.co.in
+USER_PROFILE_BASE_URL=https://userprofile-qa.popclub.co.in
+PROD_BASE_URL=https://prod-qa.popclub.co.in
+
+# Set via APP_TOKEN / PROD_TOKEN env vars (k8s secret) in CI
+APP_TOKEN=
+PROD_TOKEN=
+
+# Phone number series for onboarding
+PHONE_PREFIX=+91
+PHONE_BASE=1234560001
+PHONE_MAX=1234569999
+
+# ─── Card API config (api.util.ConfigManager / cardapi.util.ConfigManager) ────
+base.url=https://cardstack-sit.popclub.co.in/api/v1
+# Set via X_SOURCE_API_KEY env var (k8s secret) in CI
+x.source.api.key=
+mobile.number=9930606236
+fake.pan.mobile=1234561920
+
+card.base.url=https://cardstack-sit.popclub.co.in
+# Set via CARD_X_SOURCE_API_KEY env var (k8s secret) in CI
+card.x.source.api.key=
+# card.mobile.number is auto-generated at runtime (prefix 123456 + random 4 digits)
+card.otp=560102
+card.pan=BVXPN1005K
+card.pincode=560102
+card.first.name=Harshala
+card.last.name=Sonavane
+card.email=singh.gaurav@popclub.co
+card.dob=1998-09-15
+card.gender=MALE
+card.occupation=Salaried
+card.marital.status=SINGLE
+card.address.line1=12 MG Road
+card.address.line2=Indiranagar
+card.address.line3=East Bangalore
+card.address.city=Bangalore
+card.address.state=Karnataka
+card.address.country=India
+card.address.pincode=400028
+card.name.on.card=Harshala Sonavane
+card.father.name=Pop Singh
+card.company.name=123STORES E COMMERCE PVT LTD
+card.designation=Agriculturist
+card.annual.income=9887856
+card.company.type=Public Ltd Company
+card.profession=DOCTOR
+card.professional.occupation=Salaried
+
+mock.base.url=https://mock-preprod.pop-club-internal.co
+
+# ─── TestSigma (shared IDs — same across all environments) ───────────────────
+testsigma.base.url=https://arcus.testsigma.com/api/v1
+testsigma.user.id=05782b39-ed88-4bd5-84e2-705bb1610da2
+testsigma.project.id=d8f4a221-bc6d-47d8-9448-0834f5d012ec
+testsigma.folder.negative=0c8393c4-4ee4-440e-b411-95a68104d6ba
+testsigma.folder.happy=61c555b5-b5c6-47b5-828d-3a2bf25bedcf
+testsigma.label.sanity=2de69d73-1a1a-4e3f-b1b9-a44a7eed8e7c
+testsigma.label.regression=c3d0c6f5-3a1a-41a3-a48a-20ed71ed2f91
+testsigma.label.can.automate=24cc15c7-b831-4794-94e4-8c50b29d01e4
+testsigma.type.id=5c5a75f0-6b19-4102-a5e0-f36ea7d92dbb
+testsigma.status.id=f68d5e47-00a5-4f49-91b5-3b99b1045eac
+testsigma.automation.type.id=3aae96b2-3dd3-4fd4-b4c4-5736fd69af31
+testsigma.priority.id=4324e087-6bef-4a95-8a98-eb3dd3254650
+testsigma.run.title.prefix=POP Android Automation
+testsigma.run.tags=API,Automated,Regression
+# Set via TESTSIGMA_API_TOKEN env var (k8s secret) in CI
+testsigma.token=

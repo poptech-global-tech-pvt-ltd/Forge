@@ -4,18 +4,24 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+/**
+ * Shared TestSigma IDs (project/folder/label/etc.) live alongside API config in
+ * {ENV}.properties — see ApiConfig. The session cookie/login (a volatile, personal,
+ * auto-refreshed credential) stays in its own testsigma-local.properties.
+ */
 public class TestSigmaConfig {
 
     private static final Properties props = new Properties();
     private static final Properties localProps = new Properties();
 
     static {
-        try (InputStream in = TestSigmaConfig.class.getClassLoader()
-                .getResourceAsStream("config/testsigma.properties")) {
-            if (in == null) throw new RuntimeException("testsigma.properties not found on classpath");
+        String env = System.getProperty("ENV", "local");
+        String file = "config/" + env + ".properties";
+        try (InputStream in = TestSigmaConfig.class.getClassLoader().getResourceAsStream(file)) {
+            if (in == null) throw new RuntimeException(file + " not found on classpath");
             props.load(in);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to load testsigma.properties", e);
+            throw new RuntimeException("Failed to load " + file, e);
         }
 
         try (InputStream in = TestSigmaConfig.class.getClassLoader()
@@ -26,11 +32,14 @@ public class TestSigmaConfig {
         }
     }
 
+    /** -D system property > testsigma-local.properties > env var (k8s Secret in CI) > env file. */
     private static String get(String key) {
         String sysProp = System.getProperty(key);
         if (sysProp != null) return sysProp;
         String localProp = localProps.getProperty(key);
         if (localProp != null && !localProp.isBlank()) return localProp;
+        String envVar = System.getenv(key);
+        if (envVar != null && !envVar.isBlank()) return envVar;
         return props.getProperty(key);
     }
 

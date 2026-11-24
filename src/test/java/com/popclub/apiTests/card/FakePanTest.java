@@ -19,7 +19,7 @@ import static org.testng.Assert.*;
 
 /**
  * Submits a fake PAN on a fresh user and verifies YBL rejects it.
- * The mobile number used is configured via fake.pan.mobile in sit.properties.
+ * The mobile number used is configured via fake.pan.mobile in local.properties / stage.properties.
  */
 public class FakePanTest {
 

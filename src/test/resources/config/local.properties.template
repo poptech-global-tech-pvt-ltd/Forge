@@ -1,5 +1,5 @@
-# Copy this file to local.properties and fill in your values.
-# local.properties is gitignored — never commit real tokens or credentials.
+# Copy this file to local.properties and fill in the "SET ME" values.
+# local.properties is gitignored — never commit real tokens, keys, or device-specific paths.
 #
 # Setup:
 #   cp src/test/resources/config/local.properties.template \
@@ -7,7 +7,7 @@
 
 ENV=local
 
-# Base URLs
+# ─── API config (ApiConfig) ───────────────────────────────────────────────────
 APP_BASE_URL=https://app.popclub.co.in
 HASHIRA_BASE_URL=https://hashira.popclub.co.in
 USER_PROFILE_BASE_URL=https://userprofile.popclub.co.in
@@ -22,13 +22,98 @@ PROD_TOKEN=
 # look for "X-Access-Token: Bearer <token>" in device logs
 USER_TOKEN=
 
-# Device serial for CLP verification (run: adb devices)
+# SET ME: device serial for CLP verification (run: adb devices)
 DEVICE_SERIAL=
-
-# TestSigma API token — get from https://arcus.testsigma.com/ui/settings/apikeys
-TESTSIGMA_API_TOKEN=
 
 # Phone number series for onboarding test accounts
 PHONE_PREFIX=+91
 PHONE_BASE=1234560001
 PHONE_MAX=1234569999
+
+# ─── Card API config (api.util.ConfigManager / cardapi.util.ConfigManager) ────
+# No separate local backend for Card APIs — local runs hit the same stage/SIT
+# cardstack instance CI uses against stage.properties. Get the key from the
+# team's internal secrets store.
+base.url=https://cardstack-sit.popclub.co.in/api/v1
+x.source.api.key=
+mobile.number=9930606236
+fake.pan.mobile=1234561920
+
+card.base.url=https://cardstack-sit.popclub.co.in
+card.x.source.api.key=
+# card.mobile.number is auto-generated at runtime (prefix 123456 + random 4 digits)
+card.otp=560102
+card.pan=BVXPN1005K
+card.pincode=560102
+card.first.name=Harshala
+card.last.name=Sonavane
+card.email=singh.gaurav@popclub.co
+card.dob=1998-09-15
+card.gender=MALE
+card.occupation=Salaried
+card.marital.status=SINGLE
+card.address.line1=12 MG Road
+card.address.line2=Indiranagar
+card.address.line3=East Bangalore
+card.address.city=Bangalore
+card.address.state=Karnataka
+card.address.country=India
+card.address.pincode=400028
+card.name.on.card=Harshala Sonavane
+card.father.name=Pop Singh
+card.company.name=123STORES E COMMERCE PVT LTD
+card.designation=Agriculturist
+card.annual.income=9887856
+card.company.type=Public Ltd Company
+card.profession=DOCTOR
+card.professional.occupation=Salaried
+
+mock.base.url=https://mock-preprod.pop-club-internal.co
+
+# ─── TestSigma (shared IDs — same across all environments) ───────────────────
+testsigma.base.url=https://arcus.testsigma.com/api/v1
+testsigma.user.id=05782b39-ed88-4bd5-84e2-705bb1610da2
+testsigma.project.id=d8f4a221-bc6d-47d8-9448-0834f5d012ec
+testsigma.folder.negative=0c8393c4-4ee4-440e-b411-95a68104d6ba
+testsigma.folder.happy=61c555b5-b5c6-47b5-828d-3a2bf25bedcf
+testsigma.label.sanity=2de69d73-1a1a-4e3f-b1b9-a44a7eed8e7c
+testsigma.label.regression=c3d0c6f5-3a1a-41a3-a48a-20ed71ed2f91
+testsigma.label.can.automate=24cc15c7-b831-4794-94e4-8c50b29d01e4
+testsigma.type.id=5c5a75f0-6b19-4102-a5e0-f36ea7d92dbb
+testsigma.status.id=f68d5e47-00a5-4f49-91b5-3b99b1045eac
+testsigma.automation.type.id=3aae96b2-3dd3-4fd4-b4c4-5736fd69af31
+testsigma.priority.id=4324e087-6bef-4a95-8a98-eb3dd3254650
+testsigma.run.title.prefix=POP Android Automation
+testsigma.run.tags=API,Automated,Regression
+# TestSigma API token — get from https://app.testsigma.com/ui/settings/apikeys
+testsigma.token=
+# Session cookie/login is kept out of this file — see testsigma-local.properties,
+# which TestSigmaSessionManager reads/writes directly and auto-refreshes.
+
+# ─── Cloud / STF device farm (CloudConfig) ────────────────────────────────────
+cloud.enabled=false
+
+# STF (OpenSTF) device lab — get the URL from your team's STF instance
+stf.base.url=https://<stf-ip>
+stf.auth.email=testdevices@temp.popclub.co
+stf.auth.name=test
+
+# Comma-separated Appium server ports (one per parallel device)
+appium.remote.ports=4723,4725,4727,4729,4731
+
+# SET ME: path to your local Node.js binary (used to launch Appium)
+appium.node.path=~/.nvm/versions/node/v20.20.1/bin/node
+
+# SET ME: Android SDK root — leave blank to fall back to $ANDROID_HOME env var
+android.home=
+
+# Auto-grant all permission dialogs and dismiss generic dialogs between steps (forge mode)
+forge.auto.grant.permissions=true
+forge.auto.dismiss.dialogs=true
+
+# ForgeDriver parallel port pool (default 7790-7799 = up to 10 concurrent devices)
+# forge.port.range=7790-7799
+#
+# On the STF Mac, run socat for every port in the range (one-time setup):
+#   for p in $(seq 7790 7799); do socat TCP-LISTEN:$p,fork,reuseaddr TCP:localhost:$p & done
+# Or use the LaunchDaemon at com.popclub.forge-relay.plist in the STF repo.

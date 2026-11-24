@@ -40,15 +40,14 @@ build/
 .DS_Store
 
 ### Secrets ###
-src/test/resources/*.properties
-src/test/resources/local.properties
-src/test/resources/prod.properties
-src/test/resources/qa.properties
+# Real env config files — contain live tokens/paths. Copy the matching
+# *.properties.template to create these locally; never commit the real file.
+src/test/resources/config/local.properties
+src/test/resources/config/stage.properties
+src/test/resources/config/prod.properties
 
 ### Local overrides (machine-specific, never commit) ###
-src/main/resources/config/local.cloud.properties
 src/test/resources/config/testsigma-local.properties
-src/test/resources/config/local.cloud.properties
 
 
 ### Forge ###

@@ -8,9 +8,13 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * Loads API config from {ENV}.properties (local | qa | prod).
- * Set ENV via -DENV=qa at runtime; defaults to local.
+ * Loads API config from {ENV}.properties (local | stage | prod).
+ * Set ENV via -DENV=stage at runtime; defaults to local.
  * Mirrors roast's Constants pattern.
+ *
+ * Secrets resolve in this order: -D system property > env var (k8s Secret in
+ * CI) > the properties file. This lets stage/prod CI runs inject real tokens
+ * via env vars instead of committing them to the properties file.
  */
 public class ApiConfig {
 
@@ -37,6 +41,8 @@ public class ApiConfig {
     public static String get(String key, String defaultValue) {
         String sys = System.getProperty(key);
         if (sys != null && !sys.isBlank()) return sys;
+        String env = System.getenv(key);
+        if (env != null && !env.isBlank()) return env;
         return props.getProperty(key, defaultValue);
     }
 }

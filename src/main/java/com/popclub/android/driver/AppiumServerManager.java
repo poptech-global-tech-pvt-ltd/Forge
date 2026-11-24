@@ -11,7 +11,7 @@ public class AppiumServerManager {
     private static final ConcurrentHashMap<String, Process> localProcesses = new ConcurrentHashMap<>();
 
     // Predefined Appium ports for cloud/STF parallel slots.
-    // Configurable via appium.remote.ports in local.cloud.properties (comma-separated).
+    // Configurable via appium.remote.ports in local.properties (comma-separated).
     private static final int[] CLOUD_APPIUM_PORTS = resolveCloudPorts();
 
     // Slot counter — each parallel session claims the next slot.

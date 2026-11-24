@@ -6,7 +6,9 @@ import java.util.Properties;
 /**
  * Reads cloud/STF configuration from:
  *  1. System properties  (highest priority)  -Dcloud.enabled=true
- *  2. cloud.properties   (on classpath)
+ *  2. Env var                                 (k8s Secret in CI)
+ *  3. cloud.properties                        (shared defaults, on classpath)
+ *  4. {ENV}.properties                        (local|stage|prod — same file ApiConfig reads)
  */
 public class CloudConfig {
 
@@ -22,12 +24,13 @@ public class CloudConfig {
         } catch (Exception e) {
             System.out.println("[CloudConfig] cloud.properties not found, using system properties only.");
         }
-        // local.cloud.properties (gitignored) overrides shared values for local dev machines
-        try (InputStream is = CloudConfig.class.getClassLoader()
-                .getResourceAsStream("config/local.cloud.properties")) {
+        // {ENV}.properties overrides shared defaults with env-specific cloud/STF values
+        String env  = System.getProperty("ENV", "local");
+        String file = "config/" + env + ".properties";
+        try (InputStream is = CloudConfig.class.getClassLoader().getResourceAsStream(file)) {
             if (is != null) {
                 props.load(is);
-                System.out.println("[CloudConfig] Loaded local.cloud.properties");
+                System.out.println("[CloudConfig] Loaded " + file);
             }
         } catch (Exception ignored) {}
     }
@@ -35,6 +38,8 @@ public class CloudConfig {
     private static String get(String key) {
         // System property wins over file
         String val = System.getProperty(key);
+        if (val != null && !val.isBlank()) return val.trim();
+        val = System.getenv(key);
         if (val != null && !val.isBlank()) return val.trim();
         val = props.getProperty(key);
         return val != null ? val.trim() : null;
@@ -162,7 +167,7 @@ public class CloudConfig {
 
     /**
      * PIN used to unlock STF farm devices at session start.
-     * Set appium.device.unlock.pin in local.cloud.properties.
+     * Set appium.device.unlock.pin in local.properties.
      * Returns null when not set.
      */
     public static String getDeviceUnlockPin() {
@@ -171,7 +176,7 @@ public class CloudConfig {
 
     /**
      * Password used to unlock STF farm devices at session start.
-     * Set appium.device.unlock.password in local.cloud.properties.
+     * Set appium.device.unlock.password in local.properties.
      * Returns null when not set.
      */
     public static String getDeviceUnlockPassword() {
@@ -181,7 +186,7 @@ public class CloudConfig {
     /**
      * Comma-separated list of Appium ports running on the STF Mac
      * (started by appium_manager.py).  Set appium.remote.ports in
-     * local.cloud.properties.  Returns null when not configured —
+     * local.properties.  Returns null when not configured —
      * AppiumServerManager will fall back to the built-in defaults.
      */
     public static String getAppiumRemotePorts() {
@@ -190,7 +195,7 @@ public class CloudConfig {
 
     /**
      * Port on which Appium is running on the STF server.
-     * Set appium.remote.port in local.cloud.properties to override (default 4723).
+     * Set appium.remote.port in local.properties to override (default 4723).
      * Only used when cloud.enabled=true.
      */
     public static int getAppiumRemotePort() {
@@ -204,7 +209,7 @@ public class CloudConfig {
 
     /**
      * SSH username for starting remote Appium on the STF server.
-     * Set appium.remote.ssh.user in local.cloud.properties.
+     * Set appium.remote.ssh.user in local.properties.
      * Returns null if not configured (remote Appium must be started manually).
      */
     public static String getAppiumSshUser() {
@@ -238,7 +243,7 @@ public class CloudConfig {
     /**
      * SSH username for the STF server used when opening a port-forward tunnel
      * for ForgeDriver gRPC in cloud mode.
-     * Set forge.ssh.user in local.cloud.properties.
+     * Set forge.ssh.user in local.properties.
      * Falls back to appium.remote.ssh.user for backwards compatibility.
      */
     public static String getForgeSshUser() {
@@ -349,7 +354,7 @@ public class CloudConfig {
         } catch (Exception ignored) {}
         throw new RuntimeException(
             "[CloudConfig] Cannot find '" + binary + "' on PATH. " +
-            "Set " + propertyName + " in src/main/resources/config/local.cloud.properties"
+            "Set " + propertyName + " in src/test/resources/config/local.properties"
         );
     }
 
@@ -395,7 +400,7 @@ public class CloudConfig {
 
         throw new RuntimeException(
             "[CloudConfig] Cannot find Appium main.js. " +
-            "Set appium.js.path in src/main/resources/config/local.cloud.properties\n" +
+            "Set appium.js.path in src/test/resources/config/local.properties\n" +
             "  Example: appium.js.path=/opt/homebrew/lib/node_modules/appium/build/lib/main.js"
         );
     }
