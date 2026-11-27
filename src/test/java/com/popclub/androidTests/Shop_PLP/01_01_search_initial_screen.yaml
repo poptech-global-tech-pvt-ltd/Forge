@@ -1,7 +1,7 @@
 testName: PO-11000 — Verify Search initial screen shows Recent searches and Trending searches
 platform: android
 noReset: true
-loginRequired: false
+loginRequired: true
 
 testCaseIds:
   - PO-11000

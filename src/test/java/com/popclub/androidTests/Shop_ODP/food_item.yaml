@@ -31,7 +31,7 @@ steps:
 
   # Navigate to OLP
   - action: call
-    flow: navigate_to_olp
+    flow: navigate_to_orders
 
   # Search for food item in OLP
   - action: tap

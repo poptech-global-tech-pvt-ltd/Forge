@@ -58,7 +58,7 @@ steps:
 
   # ── Handle address bottomsheet if needed ──
   - action: captureText
-    element: cart_pay_button
+    element: cart_back_button  # healed from: cart_pay_button
     variable: cart_bottomsheet_cta
 
   - action: ifVarEquals

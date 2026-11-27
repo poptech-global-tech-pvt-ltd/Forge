@@ -33,7 +33,7 @@ steps:
     element: home_tab
 
   - action: call
-    flow: navigate_to_olp
+    flow: navigate_to_orders
 
   - action: tap
     element: order_list_item_0
@@ -67,7 +67,7 @@ steps:
     element: order_details_v2_cancel_button
     
   - action: tap
-    element: order_details_v2_cancel_reason_selection_v2_item_item_0
+    element: order_details_v2_cancel_reason_selection_v2_item1_item_0  # healed from: order_details_v2_cancel_reason_selection_v2_item_item_0
     
   - action: tap
     element: order_details_v2_cancel_reason_selection_button

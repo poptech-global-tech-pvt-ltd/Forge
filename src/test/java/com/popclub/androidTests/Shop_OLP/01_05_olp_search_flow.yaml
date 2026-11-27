@@ -30,7 +30,7 @@ steps:
     element: home_tab
 
   - action: call
-    flow: navigate_to_olp
+    flow: navigate_to_orders
 
   # PO-11344: Tap search bar — focuses input, shows keyboard
   - action: tap

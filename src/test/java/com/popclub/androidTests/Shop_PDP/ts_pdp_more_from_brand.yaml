@@ -41,8 +41,8 @@ steps:
     element: product_list_item_0
 
   # ── Scroll down to 'More from this brand' section ──────────────────────
-  - action: call
-    flow: swipe_3
+  - action: scrollUntilVisible
+    element: product_details_similar_products_section_row
 
   # ── PO-11054: Verify section exists ────────────────────────────────────
   - action: verifyElement

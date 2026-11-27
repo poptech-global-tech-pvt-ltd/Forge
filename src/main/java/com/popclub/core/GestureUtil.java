@@ -68,11 +68,13 @@ public class GestureUtil {
 
         int sx, sy, ex, ey;
         switch (direction.toLowerCase()) {
-            case "up":
+            case "down":
+                // Scroll down = reveal content below = swipe finger upward (high start → low end)
                 sx = cx; sy = (int)(h * SCROLL_START_RATIO);
                 ex = cx; ey = (int)(h * SCROLL_END_RATIO);
                 break;
-            case "down":
+            case "up":
+                // Scroll up = reveal content above = swipe finger downward (low start → high end)
                 sx = cx; sy = (int)(h * SCROLL_END_RATIO);
                 ex = cx; ey = (int)(h * SCROLL_START_RATIO);
                 break;
@@ -115,7 +117,7 @@ public class GestureUtil {
     /** Scroll to top by swiping down repeatedly. */
     public static void scrollToTop(AppiumDriver driver, int times) {
         for (int i = 0; i < times; i++) {
-            swipe(driver, "down", FAST_SWIPE_MS);
+            swipe(driver, "up", FAST_SWIPE_MS);
         }
     }
 

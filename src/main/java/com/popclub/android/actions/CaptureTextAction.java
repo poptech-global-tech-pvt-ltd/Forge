@@ -247,19 +247,30 @@ public class CaptureTextAction implements Action {
             return "";
         }
 
-        // Scan forward through the subtree for any child with non-empty text=
-        // Extract a reasonable window (3000 chars) past the opening tag
-        int windowEnd = Math.min(tagEnd + 1 + 3000, xml.length());
+        // Scan forward through the subtree for child elements with non-empty text=.
+        // Stop at the next sibling (detected by another content-desc= attribute),
+        // which prevents leaking prices or other adjacent element text.
+        int windowEnd = Math.min(tagEnd + 1 + 8000, xml.length());
         String subtree = xml.substring(tagEnd + 1, windowEnd);
+
+        // Trim subtree at the next content-desc boundary (sibling element)
+        int nextDesc = subtree.indexOf("content-desc=\"");
+        if (nextDesc > 0) {
+            subtree = subtree.substring(0, nextDesc);
+        }
 
         Pattern childTextPattern = Pattern.compile("text=\"([^\"]+)\"");
         Matcher m = childTextPattern.matcher(subtree);
+        StringBuilder combined = new StringBuilder();
         while (m.find()) {
             String t = m.group(1).trim();
-            if (!t.isBlank()) return t;
+            if (!t.isBlank()) {
+                if (combined.length() > 0) combined.append(' ');
+                combined.append(t);
+            }
         }
 
-        return ""; // element found but no text anywhere in subtree
+        return combined.toString();
     }
 
     /** Extract a named XML attribute value from a single XML node string. */

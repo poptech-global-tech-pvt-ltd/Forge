@@ -1,0 +1,10 @@
+steps:
+  - action: tap
+    element: home_profile_icon
+
+  - action: scrollUntilVisible
+    element: profile_orders_button
+
+  # ── PO-13851: Orders navigation ────────────────────────────────────────
+  - action: tap
+    element: profile_orders_button

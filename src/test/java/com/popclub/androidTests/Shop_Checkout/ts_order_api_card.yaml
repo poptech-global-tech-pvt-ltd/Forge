@@ -1,0 +1,72 @@
+testName: Order API — Card Payment
+platform: android
+noReset: true
+loginRequired: true
+
+features:
+  - common
+  - login
+  - shop
+
+tags:
+  - shop
+  - checkout
+  - api
+
+retry: 0
+
+steps:
+  - action: launchApp
+
+  - action: loginIfNeeded
+    value: "1234561122"
+
+  - action: waitFor
+    element: home_tab
+
+  - action: call
+    flow: add_to_cart_and_capture
+    params:
+      search_query: "souled store"
+
+  # ── Create order via API — Card ──
+  - action: fetchApi
+    url: "https://api.popclub.co.in/order-management/api/v1/orders"
+    method: POST
+    headers:
+      X-Platform: android
+    body: >
+      {
+        "amount": ${ui_cart_total},
+        "cart_id": ${api_cart_id},
+        "coins_used": 0,
+        "payment": {
+          "method": "CARD",
+          "details": {
+            "card_number": "4111111111111111",
+            "expiry_month": "12",
+            "expiry_year": "2028",
+            "cvv": "123",
+            "card_holder_name": "Sanyam Goyal",
+            "card_type": "CREDIT"
+          }
+        },
+        "shipping_charge": {
+          "incl_tax": "0.00",
+          "excl_tax": "0.00",
+          "currency": "INR",
+          "tax": "0.00"
+        },
+        "billing_address_id": ${api_shipping_address_id},
+        "shipping_address_id": ${api_shipping_address_id},
+        "cod_charge": "0"
+      }
+    extract:
+      order_id: "data.order_id"
+      order_status: "data.status"
+      payment_url: "data.payment_url"
+    variable: order_response
+
+  - action: logVar
+    variable: order_id
+    value: "Card — order_id: ${order_id} | status: ${order_status} | payment_url: ${payment_url}"

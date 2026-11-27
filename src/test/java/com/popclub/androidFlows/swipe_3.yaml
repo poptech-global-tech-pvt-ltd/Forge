@@ -1,0 +1,7 @@
+steps:
+  - action: swipe
+    direction: down
+  - action: swipe
+    direction: down
+  - action: swipe
+    direction: down

@@ -82,7 +82,7 @@ steps:
     element: cart_item_increase
 
   - action: captureText
-    element: cart_item_quantity_0
+    element: cart_item_quantity_0  # healed locator → cart_item_0_pop_quantity_stepper_quantity
     variable: qty_after_increase
 
   - action: logVar
