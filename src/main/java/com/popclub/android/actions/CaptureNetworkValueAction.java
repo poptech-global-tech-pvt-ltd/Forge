@@ -55,14 +55,13 @@ public class CaptureNetworkValueAction implements Action {
             : System.getProperty("deviceSerial", null);
 
         long deadline = System.currentTimeMillis() + (long) timeout * 1000;
-        StringBuilder allLogs = new StringBuilder();
         long lastProgressAt = System.currentTimeMillis();
         boolean responseLinesDumped = false;
 
         while (System.currentTimeMillis() < deadline) {
             try {
                 String fresh = readLogcatViaAdb(udid);
-                allLogs.append(fresh);
+                // Use only current dump — no accumulation to avoid OOM on large logcat buffers
 
                 long okHttpLines = fresh.lines().filter(l -> l.contains("OkHttp")).count();
                 long elapsed = (System.currentTimeMillis() - (deadline - (long) timeout * 1000)) / 1000;
@@ -84,7 +83,7 @@ public class CaptureNetworkValueAction implements Action {
                         + remaining + "s left | OkHttp lines in last batch: " + okHttpLines);
                 }
 
-                String body = findResponseBody(allLogs.toString(), urlPattern);
+                String body = findResponseBody(fresh, urlPattern);
                 if (body != null) {
                     System.out.println("[captureNetworkValue] captured response: " + truncate(body, 400));
                     if (step.extract != null && !step.extract.isEmpty()) {
@@ -103,8 +102,9 @@ public class CaptureNetworkValueAction implements Action {
             }
         }
 
-        // On timeout, dump a diagnostic snippet to help triage
-        String sample = allLogs.toString();
+        // On timeout, do one final logcat read for diagnostics
+        String sample;
+        try { sample = readLogcatViaAdb(udid); } catch (Exception e) { sample = ""; }
         long okHttpLines = sample.lines().filter(l -> l.contains("OkHttp")).count();
         System.out.println("[captureNetworkValue] timeout diagnostics — total logcat lines: "
             + sample.lines().count() + ", OkHttp lines: " + okHttpLines);

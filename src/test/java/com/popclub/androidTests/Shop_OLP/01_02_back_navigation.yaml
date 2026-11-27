@@ -30,7 +30,7 @@ steps:
     element: home_tab
 
   - action: call
-    flow: navigate_to_olp
+    flow: navigate_to_orders
 
   # PO-11366: Multi-product order shows quantity prefix
   # Scroll to find multi-product order

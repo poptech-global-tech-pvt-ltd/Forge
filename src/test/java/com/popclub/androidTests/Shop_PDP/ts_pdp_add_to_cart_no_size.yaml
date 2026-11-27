@@ -42,6 +42,9 @@ steps:
 
   - action: tap
     element: product_list_item_0
+
+  - action: scrollUntilVisible
+    element: pdp_customer_ratings_average_text
     
   - action: verifyElement
     element: pdp_customer_ratings_average_text

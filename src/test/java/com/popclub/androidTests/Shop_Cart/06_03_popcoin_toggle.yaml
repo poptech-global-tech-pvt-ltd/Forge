@@ -1,7 +1,7 @@
 testName: Cart — POPCoins toggle discount
 platform: android
 noReset: true
-loginRequired: false
+loginRequired: true
 
 testCaseIds:
   - PO-11218
@@ -57,20 +57,23 @@ steps:
   # Scroll to price summary
 
   - action: scrollUntilVisible
-    element: cart_to_pay_row_price_total
+    element: cart_to_pay_row
     maxScrolls: 3
 
-  # Capture total before POPCoins
+  # Expand price summary to reveal line items
+  - action: tap
+    element: cart_price_summary_expand_button
 
+  # Capture total before POPCoins
   - action: captureText
-    element: cart_to_pay_row_price_total
+    element: cart_to_pay_price_text
     variable: total_before
 
   # PO-11218: POPCoins toggle card shown
 
-  - action: scrollUntilVisible
-    element: pop_toggle_row
-    maxScrolls: 2
+  #- action: scrollUntilVisible
+   # element: pop_toggle_row
+   # maxScrolls: 2
 
 
   - action: verifyElement
@@ -83,12 +86,9 @@ steps:
   - action: tap
     element: pop_toggle_row
 
-  - action: scrollUntilVisible
-    element: cart_to_pay_row_price_total
-
   - action: captureText
-    element: cart_to_pay_row_price_total
-    variable: cart_to_pay_price_text
+    element: cart_to_pay_price_text
+    variable: total_after_toggle
 
 
   - action: logVar
@@ -101,7 +101,7 @@ steps:
     element: pop_toggle_row
 
   - action: captureText
-    element: cart_to_pay_row_price_total
+    element: cart_to_pay_price_text
     variable: total_after_disable
 
   - action: logVar

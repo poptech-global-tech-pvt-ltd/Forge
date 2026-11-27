@@ -1,0 +1,59 @@
+steps:
+  - action: tap
+    element: common_shop_tab
+
+  - action: call
+    flow: search_product
+    params:
+      search_query: "${search_query}"
+
+  - action: tap
+    element: product_list_item_0
+
+  - action: tap
+    element: product_details_bottom_sticky_bar_button
+
+  - action: tapIfPresent
+    element: product_details_size_option_0
+
+  - action: tapIfPresent
+    element: size_selection_add_to_cart_button
+
+  - action: waitFor
+    element: add_to_cart_snackbar
+
+  - action: tap
+    element: toolbar_cart_button
+
+  - action: waitFor
+    element: cart_item_row_0
+
+  # Wait for cart APIs to complete
+  - action: waitFor
+    element: cart_to_pay_price_text
+    timeout: 10
+
+  # Capture basket_id from logcat response body
+  - action: captureFromLogcat
+    value: '"basket_id":(\d+)'
+    extract:
+      api_cart_id: "1"
+
+  # Capture shipping_address_id from logcat response body
+  - action: captureFromLogcat
+    value: '"shipping_address":\{"id":(\d+)'
+    extract:
+      api_shipping_address_id: "1"
+
+  # Capture amount from UI and strip currency symbols
+  - action: captureText
+    element: cart_to_pay_price_text
+    variable: ui_cart_total
+
+  - action: transformVar
+    variable: ui_cart_total
+    value: "stripNonNumeric"
+
+  - action: logVar
+    variable: api_cart_id
+    value: "Dynamic capture — basket_id: ${api_cart_id} | shipping: ${api_shipping_address_id} | amount: ${ui_cart_total}"

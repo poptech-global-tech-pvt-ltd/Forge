@@ -60,6 +60,9 @@ public class ActionFactory {
             case "captureText":              return new CaptureTextAction();
             case "captureToast":             return new CaptureToastAction();
             case "captureNetworkValue":      return new CaptureNetworkValueAction();
+            case "clearLogcat":              return new ClearLogcatAction();
+            case "captureFromLogcat":        return new CaptureFromLogcatAction();
+            case "transformVar":             return new TransformVarAction();
             case "assertStoredText":         return new AssertStoredTextAction();
             case "assertText":               return new AssertTextAction();
 

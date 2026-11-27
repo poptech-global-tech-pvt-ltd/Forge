@@ -30,7 +30,7 @@ steps:
     element: home_tab
 
   - action: call
-    flow: navigate_to_olp
+    flow: navigate_to_orders
     
   - action: tap
     element: order_list_item_0

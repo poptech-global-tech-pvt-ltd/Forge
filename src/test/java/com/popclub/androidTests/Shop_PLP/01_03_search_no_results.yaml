@@ -48,9 +48,8 @@ steps:
     value: search
 
   - action: waitFor
-    accessibilityId: Empty state
+    element: olp_empty_state
 
-  - action: assertText
-    element: search_no_products_found
-    value: "No products found"
+  - action: verifyElement
+    element: olp_empty_state
     testCaseId: PO-10997

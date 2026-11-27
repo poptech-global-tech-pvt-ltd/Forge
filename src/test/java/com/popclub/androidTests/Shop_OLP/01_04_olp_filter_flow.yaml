@@ -30,7 +30,7 @@ steps:
     element: home_tab
 
   - action: call
-    flow: navigate_to_olp
+    flow: navigate_to_orders
 
   # PO-11349: Tap Order status filter pill — opens bottom sheet
   - action: tap

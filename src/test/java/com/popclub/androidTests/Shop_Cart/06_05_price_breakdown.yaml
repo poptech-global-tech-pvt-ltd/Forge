@@ -34,7 +34,7 @@ steps:
   - action: call
     flow: search_product
     params:
-      search_query: "souled store"
+      search_query: "Technosport"
 
   # ── Select first product ──
   - action: tap
@@ -64,8 +64,9 @@ steps:
     testCaseId: PO-11222
 
   # Expand price summary
-  - action: tap
-    element: cart_price_summary_expand_button
+  - action: scrollUntilVisible
+    element: cart_bill_item_total_text
+
 
   - action: verifyElement
     text: "Item Total"
@@ -75,11 +76,11 @@ steps:
     
     
   - action: scrollUntilVisible
-    element: cart_delivery_fee_info_button
+    element: Info
 
   # PO-11223: Tap delivery fee info icon
   - action: tap
-    element: cart_delivery_fee_info_button
+    element: Info
 
   - action: verifyElement
     element: cart_delivery_fee_got_it_button

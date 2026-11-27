@@ -41,6 +41,8 @@ public class TokenExtractor {
      *  the device build is non-debuggable (run-as blocked). */
     private static final Path TOKEN_CACHE_FILE =
             Paths.get(System.getProperty("user.home"), ".forge", "auth_token");
+    private static final Path LEGACY_TOKEN_CACHE_FILE =
+            Paths.get(System.getProperty("user.home"), ".forge", "legacy_token");
 
     // SharedPreferences key patterns to try (adjust if key name changes)
     private static final String[] PREFS_KEYS = {
@@ -144,9 +146,26 @@ public class TokenExtractor {
             if (Files.deleteIfExists(TOKEN_CACHE_FILE)) {
                 System.out.println("[TokenExtractor] Cleared cached token: " + TOKEN_CACHE_FILE);
             }
+            Files.deleteIfExists(LEGACY_TOKEN_CACHE_FILE);
         } catch (Exception e) {
             System.out.println("[TokenExtractor] Cache clear failed: " + e.getMessage());
         }
+    }
+
+    public static void saveLegacyToCache(String token) {
+        if (token == null || token.isBlank()) return;
+        try {
+            Files.createDirectories(LEGACY_TOKEN_CACHE_FILE.getParent());
+            Files.writeString(LEGACY_TOKEN_CACHE_FILE, token, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        } catch (Exception ignored) {}
+    }
+
+    public static String getLegacyFromCache() {
+        try {
+            if (!Files.exists(LEGACY_TOKEN_CACHE_FILE)) return null;
+            String t = Files.readString(LEGACY_TOKEN_CACHE_FILE).trim();
+            return t.isBlank() ? null : t;
+        } catch (Exception e) { return null; }
     }
 
     public static void saveToCache(String token) {

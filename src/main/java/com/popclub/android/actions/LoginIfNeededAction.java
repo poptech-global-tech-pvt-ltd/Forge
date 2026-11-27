@@ -108,7 +108,7 @@ public class LoginIfNeededAction implements Action {
 
         if (homeVisible) {
             System.out.println("[loginIfNeeded/forge] Already logged in — skipping login");
-            storeToken(ForgeDriverContext.getDeviceSerial(), "DataStore/SharedPrefs (forge, login skipped)");
+            storeToken(ForgeDriverContext.getDeviceSerial(), "cache/DataStore/SharedPrefs (forge, login skipped)", false);
             return;
         }
 
@@ -134,7 +134,7 @@ public class LoginIfNeededAction implements Action {
 
             if (homeVisible) {
                 System.out.println("[loginIfNeeded/forge] Reached home screen after back-presses — already logged in");
-                storeToken(ForgeDriverContext.getDeviceSerial(), "DataStore/SharedPrefs (forge)");
+                storeToken(ForgeDriverContext.getDeviceSerial(), "cache/DataStore/SharedPrefs (forge)", false);
                 return;
             }
             if (!loginVisible) {
@@ -159,7 +159,7 @@ public class LoginIfNeededAction implements Action {
         int[] homeTab = forge.waitUntilPresent(HOME_TAB_TAG, LOGIN_TIMEOUT_SEC * 1000);
         if (homeTab == null) throw new RuntimeException("[loginIfNeeded/forge] Home screen not visible after OTP");
         System.out.println("[loginIfNeeded/forge] ✅ Login succeeded");
-        storeToken(ForgeDriverContext.getDeviceSerial(), "logcat/DataStore (forge)");
+        storeToken(ForgeDriverContext.getDeviceSerial(), "logcat/DataStore (forge)", true);
     }
 
     private void doLogin(AppiumDriver driver, String phone, String otp) throws Exception {
@@ -319,11 +319,11 @@ public class LoginIfNeededAction implements Action {
     }
 
     private void captureTokenFromLogcat() {
-        storeToken(getDeviceSerial(), "logcat/DataStore/SharedPrefs");
+        storeToken(getDeviceSerial(), "logcat/DataStore/SharedPrefs", true);
     }
 
     private void captureTokenFromDevice() {
-        storeToken(getDeviceSerial(), "DataStore/SharedPrefs (login skipped)");
+        storeToken(getDeviceSerial(), "cache/DataStore/SharedPrefs (login skipped)", false);
     }
 
     private String getDeviceSerial() {
@@ -334,9 +334,11 @@ public class LoginIfNeededAction implements Action {
         return System.getProperty("deviceSerial", "");
     }
 
-    private void storeToken(String deviceSerial, String source) {
+    private void storeToken(String deviceSerial, String source, boolean clearCacheFirst) {
         try {
-            TokenExtractor.clearCache();
+            if (clearCacheFirst) {
+                TokenExtractor.clearCache();
+            }
             TestContext.setUserToken(null);
             TestContext.setLegacyToken(null);
             String token = TokenExtractor.get(deviceSerial);
@@ -344,9 +346,13 @@ public class LoginIfNeededAction implements Action {
                 TestContext.setUserToken(token);
                 TestContext.setScalarData("auth_token", token);
                 String legacy = TokenExtractor.getLegacyToken(deviceSerial);
+                if (legacy == null || legacy.isBlank()) {
+                    legacy = TokenExtractor.getLegacyFromCache();
+                }
                 if (legacy != null && !legacy.isBlank()) {
                     TestContext.setLegacyToken(legacy);
                     TestContext.setScalarData("legacy_token", legacy);
+                    TokenExtractor.saveLegacyToCache(legacy);
                     System.out.println("  ✅ [loginIfNeeded] Legacy DRF token captured");
                 }
                 String preview = token.length() > 20

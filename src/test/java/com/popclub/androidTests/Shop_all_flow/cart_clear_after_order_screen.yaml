@@ -84,10 +84,10 @@ steps:
     element: order_success_item_0
 
   - action: waitFor
-    element: order_list_item_status_0
+    element: order_item_v2_status_text
 
   - action: verifyElement
-    element: order_list_item_status_0
+    element: order_item_v2_status_text
     testCaseId: PO-13023
 
   # Navigate back to home
